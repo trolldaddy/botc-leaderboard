@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match History - BOTC</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="dashboard-body">
+    <div class="background-effects">
+        <div class="glow red-glow"></div>
+        <div class="glow purple-glow"></div>
+    </div>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-clock"></i>
+            <h1>BOTC <span class="accent">Stats</span></h1>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> 数据看板</a></li>
+            <li><a href="record.html"><i class="fa-solid fa-feather-pointed"></i> 录入对局</a></li>
+            <li class="active"><a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> 历史记录</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="top-header">
+            <h2>时光之轴 (Match History)</h2>
+        </header>
+
+        <div class="card col-span-2">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-book-journal-whills text-blue"></i> 最近对局记录</h3>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>对局日期</th>
+                            <th>使用剧本</th>
+                            <th>说书人</th>
+                            <th>获胜阵营</th>
+                            <th>游玩人数</th>
+                            <th>危险操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-tbody">
+                        <tr>
+                            <td colspan="6" class="loading">正在追溯时空长河...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- 删除密码确认弹窗 (非常简易的暗黑风) -->
+    <div id="delete-modal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="card"
+            style="width: 400px; padding: 2rem; position: relative; border-color: var(--accent-red); box-shadow: 0 0 20px rgba(230,57,70,0.5);">
+            <h3 class="text-red" style="margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i> 销毁此条记录吗？
+            </h3>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">此操作将永久抹除对局数据，并重新计算排行榜胜率，不可撤销。
+            </p>
+            <input type="password" id="delete-pw" class="form-control" placeholder="请输入管理员钥匙 (如 botc)"
+                style="margin-bottom: 1.5rem;">
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                <button class="btn" style="background: rgba(255,255,255,0.1); color: white;"
+                    onclick="closeDeleteModal()">取消</button>
+                <button class="btn btn-primary" onclick="confirmDelete()">无情销毁</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/history.js"></script>
+</body>
+
+</html>

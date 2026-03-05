@@ -81,6 +81,23 @@ def get_matches(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     matches = db.query(models.Match).order_by(models.Match.date.desc()).offset(skip).limit(limit).all()
     return matches
 
+@app.delete("/matches/{match_id}")
+def delete_match(match_id: int, req: schemas.DeleteMatchRequest, db: Session = Depends(get_db)):
+    if req.password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="管理员密钥错误！你无权抹除这份记忆。")
+    
+    match = db.query(models.Match).filter(models.Match.id == match_id).first()
+    if not match:
+        raise HTTPException(status_code=404, detail="未找到该对局。")
+        
+    # 级联删除相关的对局玩家记录
+    db.query(models.MatchPlayer).filter(models.MatchPlayer.match_id == match_id).delete()
+    
+    # 删除比赛本身
+    db.delete(match)
+    db.commit()
+    return {"message": "对局记录已成功销毁"}
+
 # --- 统计数据路由 ---
 @app.get("/stats/")
 def get_stats(db: Session = Depends(get_db)):

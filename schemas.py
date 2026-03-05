@@ -56,3 +56,6 @@ class MatchResponse(MatchBase):
 
     class Config:
         from_attributes = True
+
+class DeleteMatchRequest(BaseModel):
+    password: str
