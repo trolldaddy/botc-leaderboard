@@ -24,7 +24,7 @@ app.add_middleware(
 )
 
 # 极简版密码
-ADMIN_PASSWORD = "botc"
+ADMIN_PASSWORD = "mmmm"
 
 # --- 玩家管理路由 ---
 @app.post("/players/", response_model=schemas.PlayerResponse)
