@@ -19,21 +19,21 @@ function addPlayerRow() {
 
     tr.innerHTML = `
         <td>
-            <input type="text" class="form-control p-name" placeholder="昵称" required>
+            <input type="text" class="form-control p-name" placeholder="暱稱" required>
         </td>
         <td>
-            <input type="text" class="form-control p-char" placeholder="如：小恶魔" required>
+            <input type="text" class="form-control p-char" placeholder="例如：小惡魔" required>
         </td>
         <td>
             <select class="form-control p-init">
-                <option value="good">好人</option>
-                <option value="bad">坏人</option>
+                <option value="good">善良</option>
+                <option value="bad">邪惡</option>
             </select>
         </td>
         <td>
             <select class="form-control p-final">
-                <option value="good">好人</option>
-                <option value="bad">坏人</option>
+                <option value="good">善良</option>
+                <option value="bad">邪惡</option>
             </select>
         </td>
         <td style="text-align:center;">
@@ -50,14 +50,14 @@ function addPlayerRow() {
 
 async function submitMatch() {
     const msgBox = document.getElementById('form-msg');
-    msgBox.innerText = "数据封印中 (Saving) ...";
+    msgBox.innerText = "對局儲存中 (Saving) ...";
     msgBox.className = "text-blue";
 
     try {
         // 构建玩家数据，动态注册新玩家
         const rows = document.querySelectorAll('.player-entry');
         if (rows.length < 5) {
-            throw new Error("一局游戏至少需要 5 名玩家！");
+            throw new Error("一場遊戲至少需要5名玩家！");
         }
 
         const matchPlayers = [];
@@ -97,10 +97,10 @@ async function submitMatch() {
 
         if (!response.ok) {
             const err = await response.json();
-            throw new Error(err.detail || "提交失败！可能是管理员密码错误。");
+            throw new Error(err.detail || "儲存失敗！可能是管理員密碼錯誤。");
         }
 
-        msgBox.innerHTML = '<i class="fa-solid fa-check"></i> 复盘记录已成功封存！';
+        msgBox.innerHTML = '<i class="fa-solid fa-check"></i> 覆盤紀錄已成功儲存！';
         msgBox.className = "text-gold";
 
         // 成功后重置表单，但不清空密码和说书人，方便连续录入
