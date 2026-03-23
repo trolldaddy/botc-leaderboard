@@ -1056,4 +1056,3 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('recorder-root'));
 root.render(<App />);
-})();
