@@ -253,9 +253,7 @@ const toTraditional = (str) => {
 const getRoleInputConfig = (role) => {
     const id = (role.baseRoleId || role.id || "").toLowerCase();
     const name = role.name || "";
-    const isRole = (ids, names = []) => ids.includes(id) || names.some(n => name.includes(n));
-
-const isRole = (ids, names = []) => {
+    const isRole = (ids, names = []) => {
         return ids.includes(id) || names.some(n => name.includes(n));
       };
 
