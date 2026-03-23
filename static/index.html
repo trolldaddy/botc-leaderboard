@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>血染鐘樓戰績榜</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="main-nav">
+            <div class="logo">
+                <i class="fas fa-clock"></i> 血染鐘樓 <span>戰績榜</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="active">排行榜</a>
+                <a href="record.html">紀錄對局</a>
+                <a href="history.html">歷史紀錄</a>
+                <a href="admin.html">管理後台</a>
+            </div>
+        </nav>
+
+        <div class="stats-overview">
+            <div class="stat-card">
+                <i class="fas fa-gamepad"></i>
+                <div class="stat-info">
+                    <span class="label">總對局數</span>
+                    <span class="value" id="val-total-matches">-</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <div class="stat-info">
+                    <span class="label">活躍玩家</span>
+                    <span class="value" id="val-total-players">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="leaderboard-section">
+                <div class="section-header">
+                    <h2><i class="fas fa-trophy"></i> 玩家排行</h2>
+                    <div class="filter-tabs" id="player-filter">
+                        <button class="active" data-team="all">綜合榜</button>
+                        <button data-team="good">好人榜</button>
+                        <button data-team="bad">壞人榜</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>玩家</th>
+                                <th>場次</th>
+                                <th>勝率</th>
+                                <th>勝率趨勢</th>
+                            </tr>
+                        </thead>
+                        <tbody id="players-tbody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="side-section">
+                <div class="card character-rank">
+                    <h3><i class="fas fa-mask"></i> 熱門角色</h3>
+                    <div id="characters-list">
+                        </div>
+                </div>
+
+                <div class="card hall-of-fame">
+                    <h3><i class="fas fa-medal"></i> 名人堂</h3>
+                    <div class="fame-item">
+                        <span class="fame-label">最強好人</span>
+                        <span class="fame-value" id="best-good-player">-</span>
+                    </div>
+                    <div class="fame-item">
+                        <span class="fame-label">最強壞人</span>
+                        <span class="fame-value" id="best-evil-player">-</span>
+                    </div>
+                    <div class="fame-item">
+                        <span class="fame-label">出場率最高</span>
+                        <span class="fame-value" id="most-played-char">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
