@@ -1,38 +1,28 @@
-<ul class="nav-links" id="main-nav">
-    <li class="active"><a href="#" data-page="dashboard"><i class="fa-solid fa-chart-line"></i> 數據看板</a></li>
-    <li><a href="#" data-page="recorder_app"><i class="fa-solid fa-book-open"></i> 覆盤紀錄</a></li>
-    <li><a href="#" data-page="record"><i class="fa-solid fa-feather-pointed"></i> 錄入對局</a></li>
-</ul>
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>BOTC 戰績魔典</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <nav class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-clock"></i>
+            <h1>BOTC <span class="accent">Stats</span></h1>
+        </div>
+        <ul class="nav-links" id="main-nav">
+            <li><a href="#" data-page="dashboard"><i class="fa-solid fa-chart-line"></i> 數據看板</a></li>
+            <li><a href="#" data-page="recorder"><i class="fa-solid fa-book-open"></i> 覆盤紀錄</a></li>
+            <li><a href="#" data-page="record"><i class="fa-solid fa-feather-pointed"></i> 錄入對局</a></li>
+            <li><a href="#" data-page="history"><i class="fa-solid fa-clock-rotate-left"></i> 歷史紀錄</a></li>
+        </ul>
+    </nav>
 
-<main class="main-content" id="content-area">
-    </main>
+    <main class="main-content" id="content-area">
+        </main>
 
-<script>
-async function loadPage(pageName) {
-    const area = document.getElementById('content-area');
-    // 指向 static/pages/ 裡面的檔案
-    const response = await fetch(`/static/pages/${pageName}.html`);
-    const html = await response.text();
-    area.innerHTML = html;
-    
-    // 重新載入該頁面需要的 JS 邏輯
-    if (pageName === 'record') {
-        // 如果原本 record.js 有初始化函式，就在這裡執行
-        initRecordLogic(); 
-    }
-}
-
-// 監聽側邊欄點擊
-document.querySelectorAll('#main-nav a').forEach(link => {
-    link.onclick = (e) => {
-        e.preventDefault();
-        loadPage(link.dataset.page);
-        // 切換 active 樣式
-        document.querySelectorAll('#main-nav li').forEach(li => li.classList.remove('active'));
-        link.parentElement.classList.add('active');
-    };
-});
-
-// 初次載入
-window.onload = () => loadPage('dashboard');
-</script>
+    <script src="js/router.js"></script>
+</body>
+</html>
