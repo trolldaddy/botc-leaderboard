@@ -15,14 +15,14 @@ async function fetchHistory() {
         tbody.innerHTML = '';
 
         if (matches.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="loading">时空长河中暂时没有记录。</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="loading">時空長河中暫時沒有記錄。</td></tr>`;
             return;
         }
 
         matches.forEach(m => {
             const tr = document.createElement('tr');
             const dateStr = new Date(m.date).toLocaleString('zh-CN');
-            const winTeamStr = m.winning_team === 'good' ? '<span class="text-blue">正义盟军</span>' : '<span class="text-red">邪恶阵营</span>';
+            const winTeamStr = m.winning_team === 'good' ? '<span class="text-blue">善良陣營</span>' : '<span class="text-red">邪惡陣營</span>';
 
             tr.innerHTML = `
                 <td>${dateStr}</td>
@@ -41,7 +41,7 @@ async function fetchHistory() {
 
     } catch (err) {
         console.error(err);
-        document.getElementById('history-tbody').innerHTML = `<tr><td colspan="6" class="loading text-red">获取历史失败。</td></tr>`;
+        document.getElementById('history-tbody').innerHTML = `<tr><td colspan="6" class="loading text-red">獲取歷史失敗。</td></tr>`;
     }
 }
 
@@ -78,7 +78,7 @@ async function confirmDelete() {
             alert(`删除失败: ${err.detail}`);
         }
     } catch (err) {
-        alert("网络请求失败");
+        alert("網絡請求失敗");
         console.error(err);
     }
 }
