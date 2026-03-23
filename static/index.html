@@ -76,7 +76,6 @@
 async function loadPage(pageName) {
     const area = document.getElementById('content-area');
     if (!area) return;
-
     area.style.opacity = '0.5';
 
     try {
@@ -86,25 +85,29 @@ async function loadPage(pageName) {
         
         area.innerHTML = html;
 
-        // 🟢 強制啟動子頁面腳本的核心邏輯
+        // 🟢 強效重啟腳本與 Babel 補丁
         const scripts = area.querySelectorAll('script');
         for (let oldScript of scripts) {
             const newScript = document.createElement('script');
-            // 複製 type (如 text/babel), src (如 /js/recorder.js) 等所有屬性
             Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
             
             if (oldScript.src) {
-                newScript.src = oldScript.src; // 外部 JS
+                newScript.src = oldScript.src;
             } else {
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML)); // 內嵌 JS
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
             }
-            // 替換舊腳本以觸發執行
             oldScript.parentNode.replaceChild(newScript, oldScript);
         }
 
+        // 🟢 重點：如果頁面包含 Babel 腳本，手動叫 Babel 去跑一次
+        if (window.Babel) {
+            console.log("觸發 Babel 重新掃描...");
+            window.Babel.transformScriptTags(); 
+        }
+
         area.style.opacity = '1';
-        
-        // 舊有邏輯初始化
+
+        // 初始化其他分頁邏輯
         if (pageName === 'record' && typeof initRecord === 'function') initRecord();
         if (pageName === 'dashboard' && typeof initDashboard === 'function') initDashboard();
 
