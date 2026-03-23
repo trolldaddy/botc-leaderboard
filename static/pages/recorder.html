@@ -2,11 +2,12 @@
     <h2>覆盤紀錄器 (LIVE RECORDER)</h2>
 </header>
 
-<div class="recorder-frame-container" style="height: calc(100vh - 160px); width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #000;">
-    <iframe src="/static/recorder_app.html" id="recorder-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+<div id="recorder-root" style="height: calc(100vh - 160px); min-height: 600px;">
+    <div style="padding: 20px; color: var(--gold); text-align: center;">載入中...</div>
 </div>
 
-<script>
-    // 如果未來需要從這裡控制 Iframe，可以在此處加入邏輯
-    console.log("魔典紀錄器容器已載入");
-</script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<script type="text/babel" src="/js/recorder.js"></script>
