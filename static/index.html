@@ -72,49 +72,33 @@
     </main>
 
     <script>
-       async function loadPage(pageName) {
+// 在 index.html 中
+async function loadPage(pageName) {
     const area = document.getElementById('content-area');
-    if (!area) return;
-
-    area.style.opacity = '0.5';
-
     try {
-        const response = await fetch(`/pages/${pageName}.html`, { cache: 'no-cache' });
-        if (!response.ok) throw new Error(`找不到頁面 (${response.status})`);
+        const response = await fetch(`/pages/${pageName}.html`);
         const html = await response.text();
         
+        // 1. 塞入 HTML
         area.innerHTML = html;
 
-        // --- 強效腳本重啟器 ---
+        // 2. 關鍵補丁：手動找出並執行所有的 script 標籤
         const scripts = area.querySelectorAll('script');
-        for (let oldScript of scripts) {
+        scripts.forEach(oldScript => {
             const newScript = document.createElement('script');
-            // 複製所有屬性 (例如 type="text/babel", src="/js/recorder.js")
+            // 複製所有屬性 (例如 type="text/babel" 或 src)
             Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-            
-            if (oldScript.src) {
-                // 如果是外部檔案，確保它是非同步載入
-                newScript.src = oldScript.src;
-            } else {
-                // 如果是內嵌代碼
-                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-            }
-            // 刪除舊的，插入新的以觸發執行
+            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
             oldScript.parentNode.replaceChild(newScript, oldScript);
-        }
-        // --------------------
+        });
 
-        area.style.opacity = '1';
+        // 3. 處理原有頁面的初始化 (如果是 record 頁面)
         if (pageName === 'record' && typeof initRecord === 'function') initRecord();
-        if (pageName === 'dashboard' && typeof initDashboard === 'function') initDashboard();
 
     } catch (err) {
-        console.error("載入出錯:", err);
-        area.innerHTML = `<div style="color:red; padding:20px;">載入失敗: ${err.message}</div>`;
-        area.style.opacity = '1';
+        console.error("載入失敗:", err);
     }
 }
-
         // 監聽導覽列點擊
         document.querySelectorAll('#main-nav a').forEach(link => {
             link.addEventListener('click', function(e) {
