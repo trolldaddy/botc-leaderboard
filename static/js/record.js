@@ -1,4 +1,4 @@
-const API_BASE = ''; // 改為相對路徑
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // 預設添加一個空白行，防止表格太乾淨
