@@ -24,60 +24,60 @@
             <h1>BOTC <span class="accent">Stats</span></h1>
         </div>
         <ul class="nav-links">
-            <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> 数据看板</a></li>
-            <li class="active"><a href="record.html"><i class="fa-solid fa-feather-pointed"></i> 录入对局</a></li>
-            <li><a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> 历史记录</a></li>
+            <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> 數據看板</a></li>
+            <li class="active"><a href="record.html"><i class="fa-solid fa-feather-pointed"></i> 錄入對局</a></li>
+            <li><a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> 歷史記錄</a></li>
         </ul>
         <div class="nav-footer" style="display: flex; align-items: center; padding-top: 1rem; margin-top: auto;">
-            <i class="fa-solid fa-music audio-control" id="bgm-toggle" title="开关氛围音乐"></i>
+            <i class="fa-solid fa-music audio-control" id="bgm-toggle" title="開關氛圍音樂"></i>
         </div>
     </nav>
     <audio id="bgm-audio" src="audio/bgm.mp3" loop preload="auto"></audio>
 
     <main class="main-content">
         <header class="top-header">
-            <h2>复盘魔法书 (Record Match)</h2>
+            <h2>覆盤魔法書 (Record Match)</h2>
         </header>
 
         <div class="card">
             <form id="record-form">
                 <div class="dashboard-grid" style="gap: 2rem;">
-                    <!-- 左侧：基础信息 -->
+                    <!-- 左側：基礎信息 -->
                     <div style="grid-column: span 1;">
-                        <h3 class="mb-4"><i class="fa-solid fa-scroll text-gold"></i> 对局信息</h3>
+                        <h3 class="mb-4"><i class="fa-solid fa-scroll text-gold"></i> 對局信息</h3>
                         <div class="form-group mt-3">
-                            <label>使用剧本 (Script)</label>
+                            <label>使用劇本 (Script)</label>
                             <select id="match-script" class="form-control" required>
-                                <option value="暗流涌动 (Trouble Brewing)">暗流涌动 (Trouble Brewing)</option>
+                                <option value="暗流湧動 (Trouble Brewing)">暗流湧動 (Trouble Brewing)</option>
                                 <option value="黯月初升 (Bad Moon Rising)">黯月初升 (Bad Moon Rising)</option>
-                                <option value="梦殒春宵 (Sects & Violets)">梦殒春宵 (Sects & Violets)</option>
-                                <option value="自定义 (Custom)">自定义 (Custom)</option>
+                                <option value="夢殞春宵 (Sects & Violets)">夢殞春宵 (Sects & Violets)</option>
+                                <option value="自定義 (Custom)">自定義 (Custom)</option>
                             </select>
                         </div>
                         <div class="form-group mt-3">
-                            <label>说书人 (Storyteller)</label>
+                            <label>說書人 (Storyteller)</label>
                             <input type="text" id="match-storyteller" class="form-control" required
-                                placeholder="请输入说书人名称">
+                                placeholder="請輸入說書人名稱">
                         </div>
                         <div class="form-group mt-3">
-                            <label>获胜阵营 (Winning Team)</label>
+                            <label>獲勝陣營 (Winning Team)</label>
                             <select id="match-winner" class="form-control" required>
-                                <option value="good">正义盟军 (Good)</option>
-                                <option value="bad">邪恶阵营 (Evil)</option>
+                                <option value="good">正義盟軍 (Good)</option>
+                                <option value="bad">邪惡陣營 (Evil)</option>
                             </select>
                         </div>
                         <div class="form-group mt-4">
-                            <label>管理员钥匙 (Admin Password)</label>
+                            <label>管理員鑰匙 (Admin Password)</label>
                             <input type="password" id="match-password" class="form-control" required
-                                placeholder="默认：botc">
+                                placeholder="默認：botc">
                         </div>
                     </div>
 
-                    <!-- 右侧：玩家列表 -->
+                    <!-- 右側：玩家列表 -->
                     <div style="grid-column: span 2;">
                         <div
                             style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3><i class="fa-solid fa-users text-purple"></i> 参与玩家</h3>
+                            <h3><i class="fa-solid fa-users text-purple"></i> 參與玩家</h3>
                             <button type="button" class="btn btn-primary"
                                 style="padding: 0.5rem 1rem; font-size: 0.9rem" onclick="addPlayerRow()">
                                 <i class="fa-solid fa-plus"></i> 添加玩家
@@ -88,16 +88,16 @@
                             <table class="data-table" id="players-table">
                                 <thead>
                                     <tr>
-                                        <th>玩家昵称</th>
-                                        <th>所选角色</th>
-                                        <th>初始阵营</th>
-                                        <th>最终阵营</th>
-                                        <th>存活状态</th>
+                                        <th>玩家昵稱</th>
+                                        <th>所選角色</th>
+                                        <th>初始陣營</th>
+                                        <th>最終陣營</th>
+                                        <th>存活狀態</th>
                                         <th>操作</th>
                                     </tr>
                                 </thead>
                                 <tbody id="players-list">
-                                    <!-- 动态添加行 -->
+                                    <!-- 動態添加行 -->
                                 </tbody>
                             </table>
                         </div>
@@ -107,7 +107,7 @@
                 <div
                     style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: right;">
                     <button type="submit" class="btn btn-primary btn-large">
-                        <i class="fa-solid fa-save"></i> 封印记录 (Save)
+                        <i class="fa-solid fa-save"></i> 封印記錄 (Save)
                     </button>
                     <div id="form-msg" style="margin-top: 1rem; font-weight: bold;"></div>
                 </div>
