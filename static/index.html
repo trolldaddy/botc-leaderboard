@@ -69,53 +69,48 @@
     </main>
 
     <script>
-        async function loadPage(pageName) {
-            const area = document.getElementById('content-area');
-            if (!area) return;
+       async function loadPage(pageName) {
+    const area = document.getElementById('content-area');
+    if (!area) return;
 
-            // 顯示讀取中狀態
-            area.style.opacity = '0.5';
+    area.style.opacity = '0.5';
 
-            try {
-                // 強制從根目錄抓取 pages 資料夾下的內容，避開路徑陷阱
-                const response = await fetch(`/pages/${pageName}.html`, { 
-                    cache: 'no-cache' 
-                });
-                
-                if (!response.ok) throw new Error(`找不到頁面 (${response.status})`);
+    try {
+        const response = await fetch(`/pages/${pageName}.html`, { cache: 'no-cache' });
+        if (!response.ok) throw new Error(`找不到頁面 (${response.status})`);
+        const html = await response.text();
+        
+        area.innerHTML = html;
 
-                const html = await response.text();
-                
-                // 填充內容並加入動畫類名
-                area.innerHTML = `<div class="fade-in">${html}</div>`;
-                area.style.opacity = '1';
-
-                // 🟢 頁面特定 JavaScript 初始化
-                // 因為內容是動態塞入的，原本 record.js 裡的監聽器會失效
-                // 你需要在 record.js 裡把邏輯包成 initRecord()
-                if (pageName === 'record' && typeof initRecord === 'function') {
-                    initRecord();
-                }
-                if (pageName === 'dashboard') {
-                if (typeof initDashboard === 'function') {
-                    initDashboard();
-                                               }
-                                            }
-
-                console.log(`頁面 [${pageName}] 載入成功`);
-
-            } catch (err) {
-                console.error("SPA 載入錯誤:", err);
-                area.innerHTML = `
-                    <div style="padding: 40px; text-align: center; color: #ff4d4d;">
-                        <i class="fa-solid fa-circle-exclamation" style="font-size: 3rem; margin-bottom: 20px;"></i>
-                        <h2>讀取魔典失敗</h2>
-                        <p>${err.message}</p>
-                        <button onclick="location.reload()" style="margin-top:20px; padding: 10px 20px; cursor:pointer;">刷新頁面</button>
-                    </div>`;
-                area.style.opacity = '1';
+        // --- 強效腳本重啟器 ---
+        const scripts = area.querySelectorAll('script');
+        for (let oldScript of scripts) {
+            const newScript = document.createElement('script');
+            // 複製所有屬性 (例如 type="text/babel", src="/js/recorder.js")
+            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+            
+            if (oldScript.src) {
+                // 如果是外部檔案，確保它是非同步載入
+                newScript.src = oldScript.src;
+            } else {
+                // 如果是內嵌代碼
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML));
             }
+            // 刪除舊的，插入新的以觸發執行
+            oldScript.parentNode.replaceChild(newScript, oldScript);
         }
+        // --------------------
+
+        area.style.opacity = '1';
+        if (pageName === 'record' && typeof initRecord === 'function') initRecord();
+        if (pageName === 'dashboard' && typeof initDashboard === 'function') initDashboard();
+
+    } catch (err) {
+        console.error("載入出錯:", err);
+        area.innerHTML = `<div style="color:red; padding:20px;">載入失敗: ${err.message}</div>`;
+        area.style.opacity = '1';
+    }
+}
 
         // 監聽導覽列點擊
         document.querySelectorAll('#main-nav a').forEach(link => {
