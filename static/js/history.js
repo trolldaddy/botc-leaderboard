@@ -1,4 +1,3 @@
-const API_BASE = '';
 let matchToDelete = null;
 
 document.addEventListener('DOMContentLoaded', () => {
