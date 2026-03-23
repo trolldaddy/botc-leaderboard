@@ -96,6 +96,11 @@
                 if (pageName === 'record' && typeof initRecord === 'function') {
                     initRecord();
                 }
+                if (pageName === 'dashboard') {
+                if (typeof initDashboard === 'function') {
+                    initDashboard();
+                                               }
+                                            }
 
                 console.log(`頁面 [${pageName}] 載入成功`);
 
