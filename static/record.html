@@ -38,7 +38,14 @@
         <header class="top-header">
             <h2>覆盤魔法書 (Record Match)</h2>
         </header>
-
+<div class="import-section" style="background: rgba(108, 92, 231, 0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px dashed var(--accent, #6c5ce7); color: white;">
+    <h3 style="margin-top: 0; color: #f1c40f;"><i class="fas fa-magic"></i> 智慧導錄 (從紀錄器貼上)</h3>
+    <p style="font-size: 0.9em; color: #ccc;">將「血染紀錄器」的覆盤文字貼在下方，系統將自動填寫玩家名稱與角色。</p>
+    <textarea id="log-input" placeholder="請在此處貼上紀錄檔內容..." rows="5" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white;"></textarea>
+    <button type="button" onclick="autoFillFromLog()" style="margin-top: 10px; background: #6c5ce7; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+        <i class="fas fa-bolt"></i> 立即解析並填表
+    </button>
+</div>
         <div class="card">
             <form id="record-form">
                 <div class="dashboard-grid" style="gap: 2rem;">
