@@ -2,12 +2,17 @@
     <h2>覆盤紀錄器 (LIVE RECORDER)</h2>
 </header>
 
-<div id="recorder-root" style="height: calc(100vh - 160px); min-height: 600px;">
-    <div style="padding: 20px; color: var(--gold); text-align: center;">載入中...</div>
-</div>
+<div id="recorder-root" style="height: calc(100vh - 160px); min-height: 600px; background: #020617;">
+    </div>
 
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-<script type="text/babel" src="/js/recorder.js"></script>
+<script type="text/babel">
+    // 這裡我們直接用 fetch 手動抓取 JS 內容，確保 Babel 一定能編譯它
+    fetch('/js/recorder.js')
+        .then(response => response.text())
+        .then(code => {
+            const script = document.createElement('script');
+            script.type = 'text/babel';
+            script.innerHTML = code;
+            document.body.appendChild(script);
+        });
+</script>
