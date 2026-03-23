@@ -37,7 +37,7 @@ async function fetchStats() {
 
     } catch (error) {
         console.error("Failed to fetch stats:", error);
-        document.getElementById('players-tbody').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">无法召唤灵魂，请检查后端是否开启？</td></tr>`;
+        document.getElementById('players-tbody').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">無法召喚靈魂，請檢查後端是否開啟？</td></tr>`;
     }
 }
 
@@ -60,7 +60,7 @@ function renderPlayersBox(players, teamFilter) {
     });
 
     if (validPlayers.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="loading">献祭的生命还不够多（需要参与至少 3 场游戏才能上榜）</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="loading">獻祭的生命還不夠多（需要參與至少 3 場遊戲才能上榜）</td></tr>`;
         return;
     }
 
@@ -101,7 +101,7 @@ function renderCharacters(characters) {
     container.innerHTML = '';
 
     if (characters.length === 0) {
-        container.innerHTML = `<div class="loading">尚未记录任何角色。</div>`;
+        container.innerHTML = `<div class="loading">尚未記錄任何角色。</div>`;
         return;
     }
 
