@@ -6,7 +6,7 @@ const { useState, useEffect, useMemo } = React;
 const S2T_MAP = {
   '缝':'縫', '师':'師', '猎':'獵', '恶':'惡', '阵':'陣', '营':'營', '杀':'殺', '处':'處', '决':'決', '蛊':'蠱',
   '僵':'殭', '丧':'喪', '业':'業', '馆':'館', '员':'員', '妇':'婦', '术':'術', '药':'藥', '农':'農', '长':'長',
-  '护':'護', '帮':'帮', '戏':'戲', '脸':'臉', '说':'說', '书':'書', '这':'這', '么':'麼', '没':'沒', '样':'樣',
+  '护':'護', '帮':'幫', '戏':'戲', '脸':'臉', '说':'說', '书':'書', '这':'這', '么':'麼', '没':'沒', '样':'樣',
   '唤':'喚', '醒':'醒', '择':'擇', '两':'兩', '个':'個', '当':'當', '会':'會', '从':'從', '来':'來', '让':'讓',
   '记':'記', '为':'為', '该':'該', '复':'復', '隐':'隱', '离':'離', '异':'異', '钟':'鐘', '表':'錶', '梦':'夢',
   '卖':'賣', '讯':'訊', '杂':'雜', '发':'髮', '门':'門', '间':'間', '关':'關', '头':'頭', '风':'風', '飞':'飛',
@@ -189,19 +189,18 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hiddenTarget, setHiddenTarget] = useState("");
   const [hiddenValue, setHiddenValue] = useState("");
-  const [demonBluffs, setDemonBluffs] = useState({ r1: "", r2: "", r3: "", recorded: false });
+  const [demonBluffs, setDemonBluffs] = useState(() => loadState('botc_demonBluffs', { r1: "", r2: "", r3: "", recorded: false }));
   const [editingLog, setEditingLog] = useState(null); 
   const [dayAction, setDayAction] = useState({ actor: "", action: "白天行動", target: "", detail: "" });
   const [nominationRecord, setNominationRecord] = useState({ nominator: "", target: "", votes: "", result: "未達門檻" });
 
   const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'alert', message: '', onConfirm: null });
 
-  // ★ 核心新功能 1：強制合併旅行者到選角池
+  // 強制合併旅行者到選角池
   const allAvailableRoles = useMemo(() => {
     const travellers = MASTER_ROLE_DB.filter(r => r.team === 'traveller');
     const combined = [...script];
     travellers.forEach(tr => {
-      // 避免重複加入
       if (!combined.some(r => r.id === tr.id)) combined.push(tr);
     });
     return combined;
@@ -240,8 +239,10 @@ const App = () => {
     saveState('botc_gameDate', gameDate);
     saveState('botc_gameLocation', gameLocation);
     saveState('botc_customLocation', customLocation);
-  }, [script, players, gamePhase, logs, playerCount, scriptName, gameDate, gameLocation, customLocation]);
+    saveState('botc_demonBluffs', demonBluffs);
+  }, [script, players, gamePhase, logs, playerCount, scriptName, gameDate, gameLocation, customLocation, demonBluffs]);
 
+  // ★ 修改：時間軸改為由上至下 (將 unshift 替換為 push)
   const recordEvent = (actor, action, target, detail) => {
     const currentPhaseLabel = gamePhase.type === 'Setup' ? '設置階段' : gamePhase.type === 'Prep' ? '準備階段' : `第 ${gamePhase.number} ${gamePhase.type === 'Night' ? '夜' : '天'}`;
     const newEvent = { id: Date.now() + Math.random(), time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }), actor, action, target, detail };
@@ -250,15 +251,14 @@ const App = () => {
       const newLogs = [...prevLogs];
       const phaseIndex = newLogs.findIndex(l => l.phase === currentPhaseLabel);
       if (phaseIndex >= 0) {
-        newLogs[phaseIndex].events.unshift(newEvent);
+        newLogs[phaseIndex].events.push(newEvent); // 舊在前，新在後
       } else {
-        newLogs.unshift({ phase: currentPhaseLabel, events: [newEvent] });
+        newLogs.push({ phase: currentPhaseLabel, events: [newEvent] });
       }
       return newLogs;
     });
   };
 
-  // ★ 核心新功能 2：中途新增玩家
   const addNewPlayer = () => {
     const nextId = players.length > 0 ? Math.max(...players.map(p => p.id)) + 1 : 1;
     const newPlayer = { id: nextId, name: `玩家 ${nextId}`, role: null, hiddenRole: "", isDead: false };
@@ -295,7 +295,7 @@ const App = () => {
     setLogs(prevLogs => {
       const newLogs = [...prevLogs];
       if (newLogs.length > 0) {
-        newLogs[0].events.unshift(snapshotEvent);
+        newLogs[newLogs.length - 1].events.push(snapshotEvent); // 將快照放在該階段的最後
       }
       
       let nextPhaseLabel = '';
@@ -303,7 +303,7 @@ const App = () => {
       else if (gamePhase.type === 'Night') nextPhaseLabel = `第 ${gamePhase.number} 天`;
       else nextPhaseLabel = `第 ${gamePhase.number + 1} 夜`;
 
-      newLogs.unshift({ phase: nextPhaseLabel, events: [] });
+      newLogs.push({ phase: nextPhaseLabel, events: [] });
       return newLogs;
     });
 
@@ -318,13 +318,33 @@ const App = () => {
 
   const proceedToPrep = () => {
     setGamePhase({ type: 'Prep', number: 0 });
-    setLogs([{ phase: '準備階段', events: [] }, ...logs]);
+    setLogs([...logs, { phase: '準備階段', events: [] }]);
   };
 
   const deleteLog = (phaseIdx, eventId) => {
     setLogs(prev => {
       const newLogs = [...prev];
       newLogs[phaseIdx].events = newLogs[phaseIdx].events.filter(e => e.id !== eventId);
+      return newLogs;
+    });
+  };
+
+  // ★ 新增：調整事件順序功能
+  const moveEvent = (phaseIdx, eventId, direction) => {
+    setLogs(prevLogs => {
+      const newLogs = [...prevLogs];
+      const events = [...newLogs[phaseIdx].events];
+      const eventIdx = events.findIndex(e => e.id === eventId);
+      
+      if (eventIdx === -1) return prevLogs;
+
+      if (direction === 'up' && eventIdx > 0) {
+        [events[eventIdx], events[eventIdx - 1]] = [events[eventIdx - 1], events[eventIdx]];
+      } else if (direction === 'down' && eventIdx < events.length - 1) {
+        [events[eventIdx], events[eventIdx + 1]] = [events[eventIdx + 1], events[eventIdx]];
+      }
+      
+      newLogs[phaseIdx].events = events;
       return newLogs;
     });
   };
@@ -343,8 +363,12 @@ const App = () => {
     setEditingLog(null);
   };
 
+  // ★ 修改：匯出加上標題，並且依照由上至下的順序匯出
   const exportHistory = () => {
     if (logs.length === 0) return;
+    const displayLocation = gameLocation === '其他' ? customLocation : gameLocation;
+    let header = `劇本名稱：${scriptName}\n遊戲日期：${gameDate}\n遊戲地點：${displayLocation}\n-----------------------------------\n\n`;
+
     const content = logs.map(p => {
       const events = p.events
         .map(e => {
@@ -363,21 +387,25 @@ const App = () => {
           }
           return baseStr + detailStr;
         })
-        .reverse()
-        .join('\n');
+        .join('\n'); // 移除 .reverse() 保持時間序
       return `=== ${p.phase} ===\n${events || '  (無紀錄)'}`;
-    }).reverse().join('\n\n');
+    }).join('\n\n'); // 移除 .reverse() 保持時間序
     
-    const blob = new Blob([content], { type: 'text/plain' });
+    const fullContent = header + content;
+    const blob = new Blob([fullContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `血染覆盤紀錄_${new Date().toLocaleDateString().replace(/\//g, '-')}.txt`;
+    a.download = `血染覆盤紀錄_${gameDate}.txt`;
     a.click();
   };
 
   const handleResetClick = () => {
     showConfirm("⚠️ 確定要清空所有紀錄並重新開始嗎？\n\n(這將會刪除所有玩家設定與日誌，無法復原)", () => {
+      saveState('botc_scriptName', '未命名劇本');
+      saveState('botc_gameDate', new Date().toISOString().split('T')[0]);
+      saveState('botc_gameLocation', '線上 (Discord)');
+      saveState('botc_customLocation', '');
       saveState('botc_script', []);
       saveState('botc_playerCount', 8);
       saveState('botc_players', []); 
@@ -385,6 +413,10 @@ const App = () => {
       saveState('botc_logs', []);
       saveState('botc_demonBluffs', { r1: "", r2: "", r3: "", recorded: false });
 
+      setScriptName('未命名劇本');
+      setGameDate(new Date().toISOString().split('T')[0]);
+      setGameLocation('線上 (Discord)');
+      setCustomLocation('');
       setScript([]);
       setPlayerCount(8);
       setPlayers(Array.from({ length: 8 }, (_, i) => ({ id: i + 1, name: `玩家 ${i + 1}`, role: null, hiddenRole: "", isDead: false })));
@@ -409,6 +441,13 @@ const App = () => {
         const json = JSON.parse(e.target.result);
         const rawRoles = Array.isArray(json) ? json : (json.roles || []);
         
+        const metaInfo = rawRoles.find(item => item.id === '_meta');
+        if (metaInfo && metaInfo.name) {
+          setScriptName(metaInfo.name);
+        } else if (file.name) {
+          setScriptName(file.name.replace('.json', ''));
+        }
+
         const parsedRoles = rawRoles
           .map(item => {
             const roleId = typeof item === 'string' ? item : item.id;
@@ -458,7 +497,7 @@ const App = () => {
   };
 
   const exportSaveData = () => {
-    const saveData = { script, playerCount, players, gamePhase, logs, demonBluffs };
+    const saveData = { script, playerCount, players, gamePhase, logs, demonBluffs, scriptName, gameDate, gameLocation, customLocation };
     const blob = new Blob([JSON.stringify(saveData)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -481,6 +520,10 @@ const App = () => {
           setGamePhase(data.gamePhase);
           setLogs(data.logs || []);
           setDemonBluffs(data.demonBluffs || { r1: "", r2: "", r3: "", recorded: false });
+          setScriptName(data.scriptName || '未命名劇本');
+          setGameDate(data.gameDate || new Date().toISOString().split('T')[0]);
+          setGameLocation(data.gameLocation || '線上 (Discord)');
+          setCustomLocation(data.customLocation || '');
           showAlert("✅ 進度讀取成功！歡迎回到遊戲。");
         } else {
           showAlert("⚠️ 檔案格式不正確，請確認您上傳的是「存檔」而非「劇本」。");
@@ -602,7 +645,6 @@ const App = () => {
             </div>
           )}
 
-          {/* ★ 加入旅行者/新增玩家按鈕 */}
           <button onClick={addNewPlayer} className="flex items-center gap-2 bg-emerald-950/40 hover:bg-emerald-900/60 px-3 py-1.5 rounded-xl border border-emerald-800/50 text-emerald-400 transition-all shrink-0" title="新增玩家">
             <span className="text-sm">➕</span>
             <span className="text-xs font-bold whitespace-nowrap hidden sm:inline">新增玩家</span>
@@ -640,6 +682,34 @@ const App = () => {
           </button>
         </div>
       </header>
+
+      {/* 遊戲資訊設定區 */}
+      <div className="bg-[#0f172a] border-b border-white/10 px-4 py-2 shrink-0 flex flex-wrap items-center gap-4 z-10 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 font-bold uppercase tracking-widest">📜 劇本</span>
+          <input type="text" value={scriptName} onChange={e=>setScriptName(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200 w-32 md:w-48" placeholder="未命名劇本" />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 font-bold uppercase tracking-widest">📅 日期</span>
+          <input type="date" value={gameDate} onChange={e=>setGameDate(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200" />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 font-bold uppercase tracking-widest">📍 地點</span>
+          <select value={gameLocation} onChange={e=>setGameLocation(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200">
+            <option value="線上 (Discord)">線上 (Discord)</option>
+            <option value="台北">台北</option>
+            <option value="新北">新北</option>
+            <option value="桃園">桃園</option>
+            <option value="台中">台中</option>
+            <option value="台南">台南</option>
+            <option value="高雄">高雄</option>
+            <option value="其他">其他...</option>
+          </select>
+          {gameLocation === '其他' && (
+            <input type="text" placeholder="自訂地點" value={customLocation} onChange={e=>setCustomLocation(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200 w-28" />
+          )}
+        </div>
+      </div>
 
       <div className="bg-slate-900/50 border-b border-slate-800 p-4 shrink-0 shadow-inner z-10 w-full overflow-y-auto max-h-[35vh] custom-scrollbar">
         <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 justify-items-center max-w-full">
@@ -979,6 +1049,9 @@ const App = () => {
         <div className="flex-1 min-h-0 min-w-0 bg-slate-950/50 p-4 lg:p-6 overflow-y-auto custom-scrollbar flex flex-col relative border-l border-slate-800">
           <div className="flex justify-between items-center mb-6 sticky top-0 bg-slate-950 py-2 z-10 px-2">
             <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">時間軸紀錄 (Timeline)</h3>
+            <button onClick={exportHistory} className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors">
+              <span className="text-sm">📥</span> 匯出文字檔
+            </button>
           </div>
 
           <div className="space-y-8 pb-20">
@@ -1004,9 +1077,19 @@ const App = () => {
                             <input className="flex-1 bg-slate-950 border border-slate-700 focus:border-indigo-500 text-xs px-3 py-2 rounded-lg outline-none text-white" value={editingLog.target} onChange={e=>setEditingLog({...editingLog, target:e.target.value})} placeholder="目標" />
                           </div>
                           <textarea className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 text-xs px-3 py-2 rounded-lg outline-none text-white min-h-[60px]" value={editingLog.detail} onChange={e=>setEditingLog({...editingLog, detail:e.target.value})} placeholder="備註" />
-                          <div className="flex justify-end gap-2 mt-1">
-                            <button onClick={() => setEditingLog(null)} className="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 transition-colors rounded-lg text-xs font-bold text-white">取消</button>
-                            <button onClick={saveEditLog} className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 transition-colors rounded-lg text-xs font-bold text-white">儲存變更</button>
+                          <div className="flex flex-wrap items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800">
+                            <div className="flex items-center gap-1">
+                              <button onClick={() => moveEvent(idx, event.id, 'up')} className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 transition-colors rounded-lg text-xs font-bold text-white flex items-center gap-1" title="上移">
+                                <span className="text-[10px]">⬆️</span> 上移
+                              </button>
+                              <button onClick={() => moveEvent(idx, event.id, 'down')} className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 transition-colors rounded-lg text-xs font-bold text-white flex items-center gap-1" title="下移">
+                                <span className="text-[10px]">⬇️</span> 下移
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => setEditingLog(null)} className="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 transition-colors rounded-lg text-xs font-bold text-white">取消</button>
+                              <button onClick={saveEditLog} className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 transition-colors rounded-lg text-xs font-bold text-white">儲存變更</button>
+                            </div>
                           </div>
                         </div>
                       ) : (
