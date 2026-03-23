@@ -537,5 +537,8 @@ const App = () => {
     );
 };
 
-const root = ReactDOM.createRoot(document.getElementById('recorder-root'));
-root.render(<App />);
+const rootElement = document.getElementById('recorder-root');
+if (rootElement) {
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<App />);
+}
