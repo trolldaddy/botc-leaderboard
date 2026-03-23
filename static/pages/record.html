@@ -1,129 +1,60 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<header class="top-header">
+    <h2>覆盤魔法書 (RECORD MATCH)</h2>
+</header>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Record Match - BOTC</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-
-<body class="dashboard-body">
-    <div class="background-effects">
-        <div class="glow red-glow"></div>
-        <div class="glow purple-glow"></div>
-    </div>
-
-    <nav class="sidebar">
-        <div class="logo">
-            <i class="fa-solid fa-clock"></i>
-            <h1>BOTC <span class="accent">Stats</span></h1>
-        </div>
-        <ul class="nav-links">
-            <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> 數據看板</a></li>
-            <li class="active"><a href="record.html"><i class="fa-solid fa-feather-pointed"></i> 錄入對局</a></li>
-            <li><a href="history.html"><i class="fa-solid fa-clock-rotate-left"></i> 歷史記錄</a></li>
-        </ul>
-        <div class="nav-footer" style="display: flex; align-items: center; padding-top: 1rem; margin-top: auto;">
-            <i class="fa-solid fa-music audio-control" id="bgm-toggle" title="開關氛圍音樂"></i>
-        </div>
-    </nav>
-    <audio id="bgm-audio" src="audio/bgm.mp3" loop preload="auto"></audio>
-
-    <main class="main-content">
-        <header class="top-header">
-            <h2>覆盤魔法書 (Record Match)</h2>
-        </header>
-<div class="import-section" style="background: rgba(108, 92, 231, 0.1); padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 2px dashed var(--accent, #6c5ce7); color: white;">
-    <h3 style="margin-top: 0; color: #f1c40f;"><i class="fas fa-magic"></i> 智慧導錄 (從紀錄器貼上)</h3>
-    <p style="font-size: 0.9em; color: #ccc;">將「血染紀錄器」的覆盤文字貼在下方，系統將自動填寫玩家名稱與角色。</p>
-    <textarea id="log-input" placeholder="請在此處貼上紀錄檔內容..." rows="5" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white;"></textarea>
-    <button type="button" onclick="autoFillFromLog()" style="margin-top: 10px; background: #6c5ce7; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-        <i class="fas fa-bolt"></i> 立即解析並填表
+<div class="card mb-4" style="border: 1px dashed #6c5ce7; background: rgba(108, 92, 231, 0.05); margin-bottom: 2rem; padding: 20px; border-radius: 8px;">
+    <h3 class="mb-3"><i class="fa-solid fa-wand-magic-sparkles text-gold"></i> 智慧導錄 (從紀錄器貼上)</h3>
+    <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 1rem;">將「血染紀錄器」的覆盤文字貼在下方，系統將自動生成玩家列表並填寫角色。</p>
+    <textarea id="log-input" class="form-control" placeholder="請在此處貼上紀錄檔內容..." rows="4" style="width: 100%; background: rgba(0,0,0,0.2); color: white; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; padding: 10px;"></textarea>
+    <button type="button" class="btn btn-primary" onclick="autoFillFromLog()">
+        <i class="fa-solid fa-bolt"></i> 立即解析並自動填表
     </button>
 </div>
-        <div class="card">
-            <form id="record-form">
-                <div class="dashboard-grid" style="gap: 2rem;">
-                    <!-- 左側：基礎信息 -->
-                    <div style="grid-column: span 1;">
-                        <h3 class="mb-4"><i class="fa-solid fa-scroll text-gold"></i> 對局信息</h3>
-                        <div class="form-group mt-3">
-                            <label>使用劇本 (Script)</label>
-                            <select id="match-script" class="form-control" required>
-                                <option value="暗流湧動 (Trouble Brewing)">暗流湧動 (Trouble Brewing)</option>
-                                <option value="黯月初升 (Bad Moon Rising)">黯月初升 (Bad Moon Rising)</option>
-                                <option value="夢殞春宵 (Sects & Violets)">夢殞春宵 (Sects & Violets)</option>
-                                <option value="自定義 (Custom)">自定義 (Custom)</option>
-                            </select>
-                        </div>
-                        <div class="form-group mt-3">
-                            <label>說書人 (Storyteller)</label>
-                            <input type="text" id="match-storyteller" class="form-control" required
-                                placeholder="請輸入說書人名稱">
-                        </div>
-                        <div class="form-group mt-3">
-                            <label>獲勝陣營 (Winning Team)</label>
-                            <select id="match-winner" class="form-control" required>
-                                <option value="good">正義盟軍 (Good)</option>
-                                <option value="bad">邪惡陣營 (Evil)</option>
-                            </select>
-                        </div>
-                        <div class="form-group mt-4">
-                            <label>管理員鑰匙 (Admin Password)</label>
-                            <input type="password" id="match-password" class="form-control" required
-                                placeholder="默認：botc">
-                        </div>
-                    </div>
 
-                    <!-- 右側：玩家列表 -->
-                    <div style="grid-column: span 2;">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h3><i class="fa-solid fa-users text-purple"></i> 參與玩家</h3>
-                            <button type="button" class="btn btn-primary"
-                                style="padding: 0.5rem 1rem; font-size: 0.9rem" onclick="addPlayerRow()">
-                                <i class="fa-solid fa-plus"></i> 添加玩家
-                            </button>
-                        </div>
-
-                        <div class="table-container">
-                            <table class="data-table" id="players-table">
-                                <thead>
-                                    <tr>
-                                        <th>玩家昵稱</th>
-                                        <th>所選角色</th>
-                                        <th>初始陣營</th>
-                                        <th>最終陣營</th>
-                                        <th>存活狀態</th>
-                                        <th>操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="players-list">
-                                    <!-- 動態添加行 -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+<div class="card">
+    <form id="record-form">
+        <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+            <div>
+                <h3 class="mb-4"><i class="fa-solid fa-scroll text-gold"></i> 對局資訊</h3>
+                <div class="form-group">
+                    <label>使用劇本 (Script)</label>
+                    <select id="match-script" class="form-control">
+                        <option>暗流湧動 (Trouble Brewing)</option>
+                        <option>黯月初升 (Bad Moon Rising)</option>
+                        <option>夢殞春宵 (Sects & Violets)</option>
+                        <option>自定義 (Custom)</option>
+                    </select>
+                </div>
                 </div>
 
-                <div
-                    style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; text-align: right;">
-                    <button type="submit" class="btn btn-primary btn-large">
-                        <i class="fa-solid fa-save"></i> 封印記錄 (Save)
-                    </button>
-                    <div id="form-msg" style="margin-top: 1rem; font-weight: bold;"></div>
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h3><i class="fa-solid fa-users text-purple"></i> 參與玩家</h3>
+                    <button type="button" class="btn btn-primary" onclick="addPlayerRow()">+ 添加玩家</button>
                 </div>
-            </form>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>玩家暱稱</th>
+                                <th>初始角色</th>
+                                <th>初始陣營</th>
+                                <th>最終角色</th>
+                                <th>最終陣營</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="players-list">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </main>
+        <div style="text-align: right; margin-top: 20px;">
+            <button type="submit" class="btn btn-primary btn-large">保存紀錄</button>
+        </div>
+    </form>
+</div>
 
-    <script src="js/audio.js"></script>
-    <script src="js/record.js"></script>
-</body>
-
-</html>
+<script src="/js/record.js"></script>
