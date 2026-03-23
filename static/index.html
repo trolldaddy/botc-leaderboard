@@ -72,31 +72,45 @@
     </main>
 
     <script>
-// 在 index.html 中
 async function loadPage(pageName) {
     const area = document.getElementById('content-area');
+    if (!area) return;
+
+    area.style.opacity = '0.5';
+
     try {
-        const response = await fetch(`/pages/${pageName}.html`);
+        const response = await fetch(`/pages/${pageName}.html`, { cache: 'no-cache' });
+        if (!response.ok) throw new Error(`找不到頁面: ${response.status}`);
         const html = await response.text();
         
-        // 1. 塞入 HTML
         area.innerHTML = html;
 
-        // 2. 關鍵補丁：手動找出並執行所有的 script 標籤
+        // 🟢 強制啟動子頁面腳本的核心邏輯
         const scripts = area.querySelectorAll('script');
-        scripts.forEach(oldScript => {
+        for (let oldScript of scripts) {
             const newScript = document.createElement('script');
-            // 複製所有屬性 (例如 type="text/babel" 或 src)
+            // 複製 type (如 text/babel), src (如 /js/recorder.js) 等所有屬性
             Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-            newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+            
+            if (oldScript.src) {
+                newScript.src = oldScript.src; // 外部 JS
+            } else {
+                newScript.appendChild(document.createTextNode(oldScript.innerHTML)); // 內嵌 JS
+            }
+            // 替換舊腳本以觸發執行
             oldScript.parentNode.replaceChild(newScript, oldScript);
-        });
+        }
 
-        // 3. 處理原有頁面的初始化 (如果是 record 頁面)
+        area.style.opacity = '1';
+        
+        // 舊有邏輯初始化
         if (pageName === 'record' && typeof initRecord === 'function') initRecord();
+        if (pageName === 'dashboard' && typeof initDashboard === 'function') initDashboard();
 
     } catch (err) {
-        console.error("載入失敗:", err);
+        console.error("SPA 載入錯誤:", err);
+        area.innerHTML = `<div style="color:red; padding:20px;">載入失敗: ${err.message}</div>`;
+        area.style.opacity = '1';
     }
 }
         // 監聽導覽列點擊
