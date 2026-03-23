@@ -2,27 +2,139 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>BOTC 戰績魔典</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>血染鐘樓戰績魔典</title>
+    
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 額外優化：確保內容區域有足夠高度且滾動順暢 */
+        .main-content {
+            min-height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+        /* 簡單的載入動畫 */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
 </head>
 <body class="dashboard-body">
+    <div class="background-effects">
+        <div class="glow red-glow"></div>
+        <div class="glow purple-glow"></div>
+    </div>
+
     <nav class="sidebar">
         <div class="logo">
             <i class="fa-solid fa-clock"></i>
             <h1>BOTC <span class="accent">Stats</span></h1>
         </div>
         <ul class="nav-links" id="main-nav">
-            <li><a href="#" data-page="dashboard"><i class="fa-solid fa-chart-line"></i> 數據看板</a></li>
-            <li><a href="#" data-page="recorder"><i class="fa-solid fa-book-open"></i> 覆盤紀錄</a></li>
-            <li><a href="#" data-page="record"><i class="fa-solid fa-feather-pointed"></i> 錄入對局</a></li>
-            <li><a href="#" data-page="history"><i class="fa-solid fa-clock-rotate-left"></i> 歷史紀錄</a></li>
+            <li class="active">
+                <a href="javascript:void(0)" data-page="dashboard">
+                    <i class="fa-solid fa-chart-line"></i> 數據看板
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" data-page="recorder">
+                    <i class="fa-solid fa-book-open"></i> 覆盤紀錄
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" data-page="record">
+                    <i class="fa-solid fa-feather-pointed"></i> 錄入對局
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0)" data-page="history">
+                    <i class="fa-solid fa-clock-rotate-left"></i> 歷史紀錄
+                </a>
+            </li>
         </ul>
+        <div class="nav-footer" style="display: flex; align-items: center; padding-top: 1rem; margin-top: auto;">
+            <i class="fa-solid fa-music audio-control" id="bgm-toggle" title="開關氛圍音樂"></i>
+        </div>
     </nav>
+    <audio id="bgm-audio" src="audio/bgm.mp3" loop preload="auto"></audio>
 
     <main class="main-content" id="content-area">
-        </main>
+        <div style="padding: 20px; color: var(--gold);">魔典讀取中...</div>
+    </main>
 
-    <script src="js/router.js"></script>
+    <script>
+        async function loadPage(pageName) {
+            const area = document.getElementById('content-area');
+            if (!area) return;
+
+            // 顯示讀取中狀態
+            area.style.opacity = '0.5';
+
+            try {
+                // 強制從根目錄抓取 pages 資料夾下的內容，避開路徑陷阱
+                const response = await fetch(`/pages/${pageName}.html`, { 
+                    cache: 'no-cache' 
+                });
+                
+                if (!response.ok) throw new Error(`找不到頁面 (${response.status})`);
+
+                const html = await response.text();
+                
+                // 填充內容並加入動畫類名
+                area.innerHTML = `<div class="fade-in">${html}</div>`;
+                area.style.opacity = '1';
+
+                // 🟢 頁面特定 JavaScript 初始化
+                // 因為內容是動態塞入的，原本 record.js 裡的監聽器會失效
+                // 你需要在 record.js 裡把邏輯包成 initRecord()
+                if (pageName === 'record' && typeof initRecord === 'function') {
+                    initRecord();
+                }
+
+                console.log(`頁面 [${pageName}] 載入成功`);
+
+            } catch (err) {
+                console.error("SPA 載入錯誤:", err);
+                area.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #ff4d4d;">
+                        <i class="fa-solid fa-circle-exclamation" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h2>讀取魔典失敗</h2>
+                        <p>${err.message}</p>
+                        <button onclick="location.reload()" style="margin-top:20px; padding: 10px 20px; cursor:pointer;">刷新頁面</button>
+                    </div>`;
+                area.style.opacity = '1';
+            }
+        }
+
+        // 監聽導覽列點擊
+        document.querySelectorAll('#main-nav a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // 徹底阻止預設跳轉與 # 產生的 channel 關閉問題
+                e.preventDefault();
+                e.stopPropagation();
+
+                const page = this.getAttribute('data-page');
+                if (page) {
+                    loadPage(page);
+                    
+                    // 切換 Active 樣式
+                    document.querySelectorAll('#main-nav li').forEach(li => li.classList.remove('active'));
+                    this.parentElement.classList.add('active');
+                }
+            });
+        });
+
+        // 頁面初次載入時，預設顯示數據看板
+        window.onload = () => {
+            loadPage('dashboard');
+        };
+    </script>
+    <script src="/js/audio.js"></script>
 </body>
 </html>
