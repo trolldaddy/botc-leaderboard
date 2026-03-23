@@ -2,15 +2,8 @@
     <h2>覆盤紀錄器 (LIVE RECORDER)</h2>
 </header>
 
-<div id="recorder-root" style="height: calc(100vh - 160px); min-height: 600px;">
-    </div>
+<div id="recorder-root" style="height: calc(100vh - 160px); min-height: 600px; background: #020617; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+    <div style="padding: 40px; color: var(--gold); text-align: center;">正在翻開魔典...</div>
+</div>
 
-<script type="text/babel">
-    // 檢查 React 是否已載入
-    if (typeof React !== 'undefined') {
-        // 如果你已經把 recorder.js 的代碼完整貼在下面，它就會執行
-        // 或者使用我們之前的強效載入器
-        console.log("React Ready, 正在啟動魔典...");
-    }
-</script>
 <script type="text/babel" src="/js/recorder.js"></script>
