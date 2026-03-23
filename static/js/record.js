@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 
 // 初始化至少添加 5 个玩家行
 document.addEventListener('DOMContentLoaded', () => {
