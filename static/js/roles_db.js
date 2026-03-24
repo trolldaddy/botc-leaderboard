@@ -1,7 +1,7 @@
 // ==========================================
 // 輕量級：血染專用「簡體轉繁體」字典 (擴充版)
 // ==========================================
-const S2T_MAP = {
+window.S2T_MAP = {
   '缝':'縫', '师':'師', '猎':'獵', '恶':'惡', '阵':'陣', '营':'營', '杀':'殺', '处':'處', '决':'決', '蛊':'蠱',
   '僵':'殭', '丧':'喪', '业':'業', '馆':'館', '员':'員', '妇':'婦', '术':'術', '药':'藥', '农':'農', '长':'長',
   '护':'護', '帮':'幫', '戏':'戲', '脸':'臉', '说':'說', '书':'書', '这':'這', '么':'麼', '没':'沒', '样':'樣',
@@ -26,7 +26,7 @@ const S2T_MAP = {
   '罂':'罌', '气':'氣', '驶':'駛', '筑':'築'
 };
 
-const toTraditional = (str) => {
+window.toTraditional = (str) => {
   if (!str) return "";
   return str.split('').map(c => S2T_MAP[c] || c).join('');
 };
@@ -34,7 +34,7 @@ const toTraditional = (str) => {
 // ==========================================
 // 內建全角色參考資料庫 (Master Database)
 // ==========================================
-const MASTER_ROLE_DB = [
+window.MASTER_ROLE_DB = [
   {id:"beggar",name:"乞丐",team:"traveller",firstNight:0,otherNight:0,image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/beggar.png"},
   {id:"scapegoat",name:"替罪羊",team:"traveller",firstNight:0,otherNight:0,image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/scapegoat.png"},
   {id:"gunslinger",name:"槍手",team:"traveller",firstNight:0,otherNight:0,image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/gunslinger.png"},
