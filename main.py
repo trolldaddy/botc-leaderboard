@@ -169,7 +169,7 @@ def get_history(location: Optional[str] = None, db: Session = Depends(get_db)):
 @app.get("/index.html")
 async def read_index():
     # 確保 index.html 在根目錄
-    if os.path.exists("index.html"):
+    if os.path.exists("static/index.html"):
         return FileResponse('index.html')
     return {"message": "魔典系統已啟動，但找不到 index.html"}
 
