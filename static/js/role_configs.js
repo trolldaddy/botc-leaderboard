@@ -1,19 +1,8 @@
-// ==========================================
-// 日間行動角色清單 (用於在白天階段自動列出)
-// ==========================================
-const DAY_ACTION_ROLES = [
-  'slayer', 'savant', 'gossip', 'juggler', 'artist', 'fisherman',
-  'alsaahir', 'bianlianshi', 'geling', 'yishi', 'princess',
-  'psychopath', 'goblin', 'vizier',
-  'gunslinger', 'matron', 'butcher', 'judge', 'gangster', 'jiaohuazi', 'diaomin',
-  'mutant', 'klutz', 'moonchild', 'golem',
-  '殺手', '博學者', '造謠者', '雜耍藝人', '藝術家', '漁夫', '戲法師', '變臉師', '歌伶', '驛使', '公主', '精神病患者', '精神病患', '哥布林', '維齊爾', '槍手', '女舍監', '屠夫', '法官', '黑幫', '叫花子', '刁民', '畸形秀演員', '呆瓜', '月之子', '魔像'
-];
-
-const getRoleInputConfig = (role) => {
+window.getRoleInputConfig = (role) => {
   const id = (role.baseRoleId || role.id || "").toLowerCase();
   const name = role.name || "";
 
+  // 內部輔助比對函式
   const isRole = (ids, names = []) => {
     return ids.includes(id) || names.some(n => name.includes(n));
   };
