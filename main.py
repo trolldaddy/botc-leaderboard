@@ -8,9 +8,13 @@ from typing import List, Optional
 import os
 from datetime import datetime
 
-# 導入你專案中的模組
-import models, schemas
-from database import engine, get_db
+# 導入專案模組
+try:
+    import models, schemas
+    from database import engine, get_db
+except ImportError:
+    # 預防模組導入失敗的基礎錯誤處理
+    print("錯誤: 找不到 models, schemas 或 database 模組。請確認檔案是否存在。")
 
 # 1. 初始化資料庫表
 try:
@@ -32,17 +36,14 @@ app.add_middleware(
 # 3. 密鑰設定
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mmmm")
 
-# --- 🟢 API 路由：與你的 record.js / dashboard.js 完全對齊 ---
+# --- API 路由 ---
 
 @app.post("/api/matches", response_model=schemas.MatchResponse)
 @app.post("/matches/", response_model=schemas.MatchResponse)
 def create_match(match: schemas.MatchCreate, db: Session = Depends(get_db)):
-    # 驗證管理員密碼
     if match.password != ADMIN_PASSWORD:
         raise HTTPException(status_code=403, detail="Invalid admin password.")
     
-    # 建立對局紀錄 (包含地點)
-    # 注意：確保你的 models.Match 有 location 欄位
     new_match = models.Match(
         script=match.script,
         storyteller=match.storyteller,
@@ -53,9 +54,7 @@ def create_match(match: schemas.MatchCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_match)
     
-    # 處理玩家資料
     for p in match.players:
-        # 自動檢查並建立玩家
         db_p = db.query(models.Player).filter(models.Player.name == p.name).first()
         if not db_p:
             db_p = models.Player(name=p.name)
@@ -80,7 +79,6 @@ def create_match(match: schemas.MatchCreate, db: Session = Depends(get_db)):
 @app.get("/api/stats")
 @app.get("/stats/")
 def get_stats(location: Optional[str] = None, db: Session = Depends(get_db)):
-    # 按地點篩選對局
     match_query = db.query(models.Match)
     if location:
         match_query = match_query.filter(models.Match.location == location)
@@ -89,7 +87,6 @@ def get_stats(location: Optional[str] = None, db: Session = Depends(get_db)):
     total_matches = len(target_matches)
     match_ids = [m.id for m in target_matches]
     
-    # 計算玩家勝率
     players = db.query(models.Player).all()
     player_stats = []
     for p in players:
@@ -106,13 +103,11 @@ def get_stats(location: Optional[str] = None, db: Session = Depends(get_db)):
             "name": p.name,
             "total_played": len(records),
             "wins": wins,
-            "win_rate": round(wins / len(records) * 100, 1)
+            "win_rate": round(wins / len(records) * 100, 1) if records else 0
         })
 
-    # 獲取地點清單
     locations = [l[0] for l in db.query(models.Match.location).distinct().all() if l[0]]
     
-    # 計算角色勝率
     char_records = db.query(models.MatchPlayer).filter(models.MatchPlayer.match_id.in_(match_ids)).all()
     character_stats = {}
     for r in char_records:
@@ -125,13 +120,11 @@ def get_stats(location: Optional[str] = None, db: Session = Depends(get_db)):
     char_list = [{
         "character": k, 
         "played": v["played"], 
-        "win_rate": round(v["wins"] / v["played"] * 100, 1)
+        "win_rate": round(v["wins"] / v["played"] * 100, 1) if v["played"] > 0 else 0
     } for k, v in character_stats.items()]
 
     return {
-        "total_games": total_matches, # 對齊前端
-        "good_win_percent": 0, # 此處可擴充具體勝率
-        "evil_win_percent": 0,
+        "total_games": total_matches,
         "total_matches": total_matches,
         "available_locations": locations,
         "players": sorted(player_stats, key=lambda x: x["win_rate"], reverse=True),
@@ -151,8 +144,7 @@ def get_player_stats(player_name: str, db: Session = Depends(get_db)):
     return {
         "player_name": player_name,
         "total_matches": total,
-        "overall_win_rate": round(wins/total*100, 1) if total > 0 else 0,
-        "most_played_roles": [] # 可擴充
+        "overall_win_rate": round(wins/total*100, 1) if total > 0 else 0
     }
 
 @app.get("/api/history")
@@ -163,17 +155,30 @@ def get_history(location: Optional[str] = None, db: Session = Depends(get_db)):
         query = query.filter(models.Match.location == location)
     return query.order_by(models.Match.date.desc()).all()
 
-# --- 🟢 核心修正：首頁與靜態資源掛載 ---
+# --- 核心修正：首頁與靜態資源掛載 ---
 
 @app.get("/")
 @app.get("/index.html")
 async def read_index():
-    # 確保 index.html 在根目錄
+    # 優先尋找 static 目錄下的 index.html
+    static_index = os.path.join("static", "index.html")
+    if os.path.exists(static_index):
+        return FileResponse(static_index)
+    # 備選尋找根目錄
     if os.path.exists("index.html"):
         return FileResponse('index.html')
-    return {"message": "魔典系統已啟動，但找不到 index.html"}
+    return {"message": "魔典系統已啟動，但在 static/ 或 根目錄 均找不到 index.html"}
 
-# 掛載目錄 (順序很重要)
-for folder in ["static", "pages", "js", "css"]:
+# 掛載目錄邏輯優化
+# 1. 掛載 pages (假設它在根目錄或 static/pages)
+if os.path.exists("pages"):
+    app.mount("/pages", StaticFiles(directory="pages"), name="pages")
+elif os.path.exists("static/pages"):
+    app.mount("/pages", StaticFiles(directory="static/pages"), name="pages")
+
+# 2. 掛載 js/css/static (處理常見路徑結構)
+for folder in ["js", "css", "static"]:
     if os.path.exists(folder):
         app.mount(f"/{folder}", StaticFiles(directory=folder), name=folder)
+    elif os.path.exists(f"static/{folder}"):
+        app.mount(f"/{folder}", StaticFiles(directory=f"static/{folder}"), name=f"{folder}_alt")
