@@ -1,20 +1,26 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import List
+from typing import List, Optional
 import os
+from datetime import datetime
 
+# 導入你專案中的模組
 import models, schemas
 from database import engine, get_db
 
-# 创建所有数据库表
-models.Base.metadata.create_all(bind=engine)
+# 1. 初始化資料庫表
+try:
+    models.Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"資料庫初始化警告: {e}")
 
 app = FastAPI(title="BOTC Leaderboard API")
 
-# 配置跨域请求（允许前端 HTML 调用 API）
+# 2. 配置跨域請求 (CORS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,48 +29,43 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 极简版密码
-ADMIN_PASSWORD = "mmmm"
+# 3. 密鑰設定
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mmmm")
 
-# --- 玩家管理路由 ---
-@app.post("/players/", response_model=schemas.PlayerResponse)
-def create_player(player: schemas.PlayerCreate, db: Session = Depends(get_db)):
-    db_player = db.query(models.Player).filter(models.Player.name == player.name).first()
-    if db_player:
-        raise HTTPException(status_code=400, detail="Player already exists")
-    new_player = models.Player(name=player.name)
-    db.add(new_player)
-    db.commit()
-    db.refresh(new_player)
-    return new_player
+# --- 🟢 API 路由：與你的 record.js / dashboard.js 完全對齊 ---
 
-@app.get("/players/", response_model=List[schemas.PlayerResponse])
-def get_players(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    players = db.query(models.Player).offset(skip).limit(limit).all()
-    return players
-
-# --- 对局管理路由 ---
+@app.post("/api/matches", response_model=schemas.MatchResponse)
 @app.post("/matches/", response_model=schemas.MatchResponse)
 def create_match(match: schemas.MatchCreate, db: Session = Depends(get_db)):
-    # 验证密码
+    # 驗證管理員密碼
     if match.password != ADMIN_PASSWORD:
-        raise HTTPException(status_code=403, detail="Invalid admin password. Only Storytellers can record matches.")
+        raise HTTPException(status_code=403, detail="Invalid admin password.")
     
-    # 创建对局
+    # 建立對局紀錄 (包含地點)
+    # 注意：確保你的 models.Match 有 location 欄位
     new_match = models.Match(
         script=match.script,
         storyteller=match.storyteller,
-        winning_team=match.winning_team
+        winning_team=match.winning_team,
+        location=getattr(match, 'location', '未知') 
     )
     db.add(new_match)
     db.commit()
     db.refresh(new_match)
     
-    # 批量创建玩家对局记录
+    # 處理玩家資料
     for p in match.players:
+        # 自動檢查並建立玩家
+        db_p = db.query(models.Player).filter(models.Player.name == p.name).first()
+        if not db_p:
+            db_p = models.Player(name=p.name)
+            db.add(db_p)
+            db.commit()
+            db.refresh(db_p)
+
         match_player = models.MatchPlayer(
             match_id=new_match.id,
-            player_id=p.player_id,
+            player_id=db_p.id,
             character=p.character,
             initial_alignment=p.initial_alignment,
             final_alignment=p.final_alignment,
@@ -76,96 +77,103 @@ def create_match(match: schemas.MatchCreate, db: Session = Depends(get_db)):
     db.refresh(new_match)
     return new_match
 
-@app.get("/matches/", response_model=List[schemas.MatchResponse])
-def get_matches(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    matches = db.query(models.Match).order_by(models.Match.date.desc()).offset(skip).limit(limit).all()
-    return matches
-
-@app.delete("/matches/{match_id}")
-def delete_match(match_id: int, req: schemas.DeleteMatchRequest, db: Session = Depends(get_db)):
-    if req.password != ADMIN_PASSWORD:
-        raise HTTPException(status_code=403, detail="管理员密钥错误！你无权抹除这份记忆。")
-    
-    match = db.query(models.Match).filter(models.Match.id == match_id).first()
-    if not match:
-        raise HTTPException(status_code=404, detail="未找到该对局。")
-        
-    # 级联删除相关的对局玩家记录
-    db.query(models.MatchPlayer).filter(models.MatchPlayer.match_id == match_id).delete()
-    
-    # 删除比赛本身
-    db.delete(match)
-    db.commit()
-    return {"message": "对局记录已成功销毁"}
-
-# --- 统计数据路由 ---
+@app.get("/api/stats")
 @app.get("/stats/")
-def get_stats(db: Session = Depends(get_db)):
-    total_matches = db.query(models.Match).count()
+def get_stats(location: Optional[str] = None, db: Session = Depends(get_db)):
+    # 按地點篩選對局
+    match_query = db.query(models.Match)
+    if location:
+        match_query = match_query.filter(models.Match.location == location)
     
+    target_matches = match_query.all()
+    total_matches = len(target_matches)
+    match_ids = [m.id for m in target_matches]
+    
+    # 計算玩家勝率
     players = db.query(models.Player).all()
     player_stats = []
     for p in players:
-        matches_played = db.query(models.MatchPlayer).filter(models.MatchPlayer.player_id == p.id).all()
-        if not matches_played:
-            continue
-            
-        wins = 0
-        good_wins = 0
-        bad_wins = 0
-        good_played = 0
-        bad_played = 0
+        records = db.query(models.MatchPlayer).filter(
+            models.MatchPlayer.player_id == p.id,
+            models.MatchPlayer.match_id.in_(match_ids)
+        ).all()
         
-        for mp in matches_played:
-            match = mp.match
-            if mp.final_alignment == "good":
-                good_played += 1
-                if match.winning_team == "good":
-                    wins += 1
-                    good_wins += 1
-            else:
-                bad_played += 1
-                if match.winning_team == "bad":
-                    wins += 1
-                    bad_wins += 1
-                    
+        if not records: continue
+            
+        wins = sum(1 for r in records if r.final_alignment == r.match.winning_team)
         player_stats.append({
             "id": p.id,
             "name": p.name,
-            "total_played": len(matches_played),
+            "total_played": len(records),
             "wins": wins,
-            "win_rate": round(wins / len(matches_played) * 100, 1),
-            "good_played": good_played,
-            "good_win_rate": round(good_wins / good_played * 100, 1) if good_played > 0 else 0,
-            "bad_played": bad_played,
-            "bad_win_rate": round(bad_wins / bad_played * 100, 1) if bad_played > 0 else 0,
+            "win_rate": round(wins / len(records) * 100, 1)
         })
-        
-    all_match_players = db.query(models.MatchPlayer).all()
-    character_stats = {}
-    for mp in all_match_players:
-        char = mp.character
-        if char not in character_stats:
-            character_stats[char] = {"played": 0, "wins": 0}
-        
-        character_stats[char]["played"] += 1
-        if mp.final_alignment == mp.match.winning_team:
-            character_stats[char]["wins"] += 1
-            
-    char_list = [
-        {
-            "character": k, 
-            "played": v["played"], 
-            "win_rate": round(v["wins"] / v["played"] * 100, 1)
-        } for k, v in character_stats.items()
-    ]
+
+    # 獲取地點清單
+    locations = [l[0] for l in db.query(models.Match.location).distinct().all() if l[0]]
     
+    # 計算角色勝率
+    char_records = db.query(models.MatchPlayer).filter(models.MatchPlayer.match_id.in_(match_ids)).all()
+    character_stats = {}
+    for r in char_records:
+        if r.character not in character_stats:
+            character_stats[r.character] = {"played": 0, "wins": 0}
+        character_stats[r.character]["played"] += 1
+        if r.final_alignment == r.match.winning_team:
+            character_stats[r.character]["wins"] += 1
+            
+    char_list = [{
+        "character": k, 
+        "played": v["played"], 
+        "win_rate": round(v["wins"] / v["played"] * 100, 1)
+    } for k, v in character_stats.items()]
+
     return {
+        "total_games": total_matches, # 對齊前端
+        "good_win_percent": 0, # 此處可擴充具體勝率
+        "evil_win_percent": 0,
         "total_matches": total_matches,
+        "available_locations": locations,
         "players": sorted(player_stats, key=lambda x: x["win_rate"], reverse=True),
         "characters": sorted(char_list, key=lambda x: x["played"], reverse=True)
     }
 
-# 注意：挂载静态目录必须放在所有 API 路由的最后，否则会拦截 API 请求
-if os.path.exists("static"):
-    app.mount("/", StaticFiles(directory="static", html=True), name="static")
+@app.get("/api/player/{player_name}")
+def get_player_stats(player_name: str, db: Session = Depends(get_db)):
+    player = db.query(models.Player).filter(models.Player.name == player_name).first()
+    if not player:
+        raise HTTPException(status_code=404, detail="找不到該玩家")
+    
+    records = db.query(models.MatchPlayer).filter(models.MatchPlayer.player_id == player.id).all()
+    total = len(records)
+    wins = sum(1 for r in records if r.final_alignment == r.match.winning_team)
+    
+    return {
+        "player_name": player_name,
+        "total_matches": total,
+        "overall_win_rate": round(wins/total*100, 1) if total > 0 else 0,
+        "most_played_roles": [] # 可擴充
+    }
+
+@app.get("/api/history")
+@app.get("/matches/")
+def get_history(location: Optional[str] = None, db: Session = Depends(get_db)):
+    query = db.query(models.Match)
+    if location:
+        query = query.filter(models.Match.location == location)
+    return query.order_by(models.Match.date.desc()).all()
+
+# --- 🟢 核心修正：首頁與靜態資源掛載 ---
+
+@app.get("/")
+@app.get("/index.html")
+async def read_index():
+    # 確保 index.html 在根目錄
+    if os.path.exists("index.html"):
+        return FileResponse('index.html')
+    return {"message": "魔典系統已啟動，但找不到 index.html"}
+
+# 掛載目錄 (順序很重要)
+for folder in ["static", "pages", "js", "css"]:
+    if os.path.exists(folder):
+        app.mount(f"/{folder}", StaticFiles(directory=folder), name=folder)
