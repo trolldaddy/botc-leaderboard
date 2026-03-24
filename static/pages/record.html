@@ -1,100 +1,112 @@
 <header class="top-header">
-    <h2>錄入對局紀錄 (RECORD MATCH)</h2>
+    <h2>覆盤魔法書 (RECORD MATCH)</h2>
 </header>
 
-<div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
-    <!-- 匯入區域 -->
-    <div class="card" style="border: 1px dashed var(--accent-purple); background: rgba(131, 56, 236, 0.05);">
-        <h3 class="mb-3"><i class="fa-solid fa-file-import text-purple"></i> 快速匯入</h3>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
-            將「覆盤紀錄器」產生的文字內容貼在下方，或直接上傳 .txt 檔案。
-        </p>
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <textarea id="log-input" class="form-control" rows="5" placeholder="請在此處貼上紀錄文字..."></textarea>
-            <div style="display: flex; gap: 1rem; align-items: center;">
-                <button type="button" class="btn btn-primary" onclick="autoFillFromLog()">
-                    <i class="fa-solid fa-magic-wand-sparkles"></i> 立即解析
-                </button>
-                <label class="btn" style="background: var(--bg-card-hover); color: var(--text-main); border: 1px solid var(--border-color);">
-                    <i class="fa-solid fa-upload"></i> 上傳檔案
-                    <input type="file" accept=".txt" onchange="importFile(this)" style="display: none;">
-                </label>
-                <span id="import-status" style="font-size: 0.8rem; color: var(--accent-gold);"></span>
-            </div>
+<div class="record-container" style="max-width: 1200px; margin: 0 auto;">
+    
+    <!-- 智慧導入工具區 -->
+    <div class="card mb-4" style="border: 1px dashed rgba(131, 56, 236, 0.3); background: rgba(131, 56, 236, 0.02); padding: 1rem;">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+            <span style="font-size: 0.85rem; color: var(--text-muted);"><i class="fa-solid fa-wand-magic-sparkles text-purple"></i> 智慧導入：</span>
+            <textarea id="log-input" class="form-control dark-input" rows="1" placeholder="貼上紀錄文字..." style="flex: 1; min-width: 200px; height: 38px; padding: 8px;"></textarea>
+            <button type="button" class="btn btn-primary" onclick="autoFillFromLog()" style="padding: 0.5rem 1rem; font-size: 0.85rem;">立即解析</button>
+            <label class="btn" style="background: var(--bg-card-hover); color: var(--text-main); padding: 0.5rem 1rem; font-size: 0.85rem; border: 1px solid var(--border-color); cursor: pointer;">
+                <i class="fa-solid fa-upload"></i> 上傳檔案
+                <input type="file" accept=".txt" onchange="importFile(this)" style="display: none;">
+            </label>
+            <span id="import-status" style="font-size: 0.8rem; color: var(--accent-gold); font-weight: bold;"></span>
         </div>
     </div>
 
-    <!-- 錄入表單 -->
+    <!-- 主表單區域 -->
     <form id="record-form">
-        <div class="dashboard-grid" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1.5rem;">
-            <!-- 左側：基礎資訊 -->
-            <div class="card">
-                <h3 class="mb-4"><i class="fa-solid fa-scroll text-gold"></i> 基礎資訊</h3>
-                
-                <div class="form-group">
-                    <label>劇本名稱 (Script)</label>
-                    <input type="text" id="match-script" class="form-control" placeholder="例如：初出茅廬">
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="card" style="padding: 2rem;">
+            
+            <!-- 1. 基礎資訊區 (上方) -->
+            <div class="section-base-info" style="margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 2rem;">
+                <h3 class="mb-4" style="font-size: 1.1rem; color: var(--accent-gold);"><i class="fa-solid fa-scroll"></i> 對局資訊</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div class="form-group">
+                        <label>使用劇本 (Script)</label>
+                        <input type="text" id="match-script" class="form-control dark-input" placeholder="例如：初出茅廬">
+                    </div>
                     <div class="form-group">
                         <label>對局日期</label>
-                        <input type="date" id="match-date" class="form-control">
+                        <input type="date" id="match-date" class="form-control dark-input">
                     </div>
                     <div class="form-group">
                         <label>遊戲地點</label>
-                        <input type="text" id="match-location" class="form-control" placeholder="地點...">
+                        <input type="text" id="match-location" class="form-control dark-input" placeholder="例如：桃園">
                     </div>
-                </div>
-
-                <div class="form-group">
-                    <label>說書人 (Storyteller)</label>
-                    <input type="text" id="match-storyteller" class="form-control" placeholder="輸入說書人名稱">
-                </div>
-
-                <div class="form-group">
-                    <label>獲勝陣營</label>
-                    <select id="match-winner" class="form-control">
-                        <option value="good">正義陣營 (Good)</option>
-                        <option value="evil">邪惡陣營 (Evil)</option>
-                    </select>
+                    <div class="form-group">
+                        <label>說書人 (Storyteller)</label>
+                        <input type="text" id="match-storyteller" class="form-control dark-input" placeholder="請輸入名字">
+                    </div>
+                    <div class="form-group">
+                        <label>獲勝陣營</label>
+                        <select id="match-winner" class="form-control dark-input">
+                            <option value="good">正義陣營 (Good)</option>
+                            <option value="evil">邪惡陣營 (Evil)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <!-- 右側：玩家與角色 -->
-            <div class="card">
+            <!-- 2. 玩家陣容區 (下方) -->
+            <div class="section-players">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                    <h3><i class="fa-solid fa-users text-blue"></i> 玩家陣容</h3>
-                    <button type="button" class="btn" style="background: var(--accent-blue); color: white;" onclick="addPlayerRow()">+ 添加玩家</button>
+                    <h3 style="font-size: 1.1rem; color: var(--accent-blue);"><i class="fa-solid fa-users"></i> 參與玩家</h3>
+                    <button type="button" class="btn" style="background: var(--accent-red); color: white; padding: 0.5rem 1rem; font-size: 0.8rem;" onclick="addPlayerRow()">+ 添加玩家</button>
                 </div>
                 
                 <div class="table-container">
                     <table class="data-table" id="players-table">
                         <thead>
-                            <tr>
-                                <th width="20%">玩家暱稱</th>
-                                <th width="20%">初始角色</th>
-                                <th width="20%">實際/隱藏角色</th>
-                                <th width="15%">陣營</th>
-                                <th width="15%">存活狀態</th>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <th width="22%">玩家暱稱</th>
+                                <th width="22%">初始角色</th>
+                                <th width="22%">實際角色 (選填)</th>
+                                <th width="12%">初始陣營</th>
+                                <th width="12%">狀態</th>
                                 <th width="10%">操作</th>
                             </tr>
                         </thead>
                         <tbody id="players-list">
-                            <!-- JS 動態生成 -->
+                            <!-- JS 會在此處生成 5 行或更多 -->
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
-        <div style="margin-top: 2rem; text-align: right;">
-            <button type="submit" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;">
-                <i class="fa-solid fa-cloud-arrow-up"></i> 保存對局戰績
-            </button>
+            <!-- 提交按鈕 -->
+            <div style="margin-top: 3rem; text-align: right;">
+                <button type="submit" class="btn btn-primary" style="padding: 0.8rem 4rem; font-size: 1rem; border-radius: 50px; background: linear-gradient(135deg, var(--accent-red), #9d0208); box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3);">
+                    <i class="fa-solid fa-check-double"></i> 儲存戰績紀錄
+                </button>
+            </div>
         </div>
     </form>
 </div>
 
-<!-- 載入邏輯 -->
+<style>
+    /* 深色輸入框專屬樣式 */
+    .dark-input {
+        background: rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: #fff !important;
+        border-radius: 8px;
+    }
+    .dark-input:focus {
+        background: rgba(0, 0, 0, 0.6) !important;
+        border-color: var(--accent-red) !important;
+        outline: none;
+    }
+    #players-list .form-control {
+        background: rgba(0,0,0,0.2);
+        border: 1px solid rgba(255,255,255,0.05);
+        height: 38px;
+    }
+</style>
+
+<!-- 關鍵：載入邏輯 -->
 <script src="/js/record.js"></script>
