@@ -1,9 +1,9 @@
-// 確保作用域獨立，防止 SPA 架構下的變數衝突
+// 確保作用域獨立
 {
     const initRecord = () => {
-        console.log("📝 錄入系統正在啟動...");
+        console.log("📝 錄入系統初始化中...");
         
-        // 1. 設定日期輸入框的預設值為今天
+        // 設定預設日期
         const dateInput = document.getElementById('match-date');
         if (dateInput) {
             dateInput.value = new Date().toISOString().split('T')[0];
@@ -12,34 +12,30 @@
         const list = document.getElementById('players-list');
         if (!list) return;
 
-        // 2. 優先檢查是否有從「覆盤紀錄器」同步過來的臨時資料
+        // 檢查魔典同步資料
         const transferData = localStorage.getItem('botc_transfer_data');
         if (transferData) {
-            console.log("📥 偵測到來自魔典的同步數據...");
             const data = JSON.parse(transferData);
-            list.innerHTML = ""; // 清空原本內容
-            data.players.forEach(p => addPlayerRow(p));
-            localStorage.removeItem('botc_transfer_data'); // 填充完畢後清除，避免重複填充
-        } else {
-            // 3. 如果沒有同步資料，則預設生成 5 行空白填寫格
             list.innerHTML = "";
-            for(let i = 0; i < 5; i++) {
-                addPlayerRow();
-            }
+            data.players.forEach(p => addPlayerRow(p));
+            localStorage.removeItem('botc_transfer_data');
+        } else if (list.children.length === 0) {
+            // 預設生成 5 行
+            for(let i = 0; i < 5; i++) addPlayerRow();
         }
     };
 
     /**
-     * 核心解析邏輯：從文字紀錄中自動填充表單
+     * 核心解析邏輯：抓取「第一份」與「最後一份」玩家狀態
      */
     window.autoFillFromLog = () => {
         const text = document.getElementById('log-input').value;
         if (!text.trim()) return;
 
         const statusLabel = document.getElementById('import-status');
-        statusLabel.innerText = "⏳ 正在解析內容...";
+        statusLabel.innerText = "⏳ 正在分析起點與終點...";
 
-        // A. 解析基礎資訊 (正則表達式)
+        // 1. 解析基礎資訊
         const scriptMatch = text.match(/劇本名稱：(.+)/);
         const dateMatch = text.match(/遊戲日期：([\d-]+)/);
         const locationMatch = text.match(/遊戲地點：(.+)/);
@@ -48,47 +44,53 @@
         if (dateMatch) document.getElementById('match-date').value = dateMatch[1].trim();
         if (locationMatch) document.getElementById('match-location').value = locationMatch[1].trim();
 
-        // B. 解析玩家列表
-        // 格式支援：[1號] 存活 - (角色 / 實際:隱藏角色) 玩家姓名
-        const playerRegex = /\[(\d+)號\]\s+(存活|死亡)\s+-\s+\(([^)]+)\)\s+(.+)/g;
-        const players = [];
-        let match;
-
-        while ((match = playerRegex.exec(text)) !== null) {
-            const roleInfo = match[3]; 
-            let initialRole = roleInfo;
-            let actualRole = "";
-
-            // 處理「陰陽師 / 實際:酒鬼」這類結構
-            if (roleInfo.includes('/')) {
-                const parts = roleInfo.split('/');
-                initialRole = parts[0].trim();
-                actualRole = parts[1].replace('實際:', '').trim();
-            }
-
-            players.push({
-                isAlive: match[2] === "存活",
-                role: initialRole,
-                actualRole: actualRole,
-                name: match[4].trim()
-            });
+        // 2. 切分狀態區塊
+        const blocks = text.split('【當前玩家狀態】');
+        if (blocks.length < 2) {
+            statusLabel.innerText = "❌ 格式錯誤：找不到玩家狀態表";
+            return;
         }
 
+        const firstBlock = blocks[1]; // 第一個狀態區
+        const lastBlock = blocks[blocks.length - 1]; // 最後一個狀態區
+
+        // 正則表達式：[數字號] 狀態 - (角色資訊) 姓名
+        const rowRegex = /\[(\d+)號\]\s+(存活|死亡)\s+-\s+\(([^)]+)\)\s+(.+)/g;
+
+        const playerMap = {}; // 用玩家 ID 作為 key 來合併數據
+
+        // 解析初始狀態
+        let match;
+        while ((match = rowRegex.exec(firstBlock)) !== null) {
+            const id = match[1];
+            playerMap[id] = {
+                name: match[4].trim(),
+                initialRole: match[3].trim(),
+                finalRole: match[3].trim(), // 預設跟初始一樣
+                isAlive: match[2] === "存活"
+            };
+        }
+
+        // 解析最終狀態 (重置 regex 的 index)
+        rowRegex.lastIndex = 0;
+        while ((match = rowRegex.exec(lastBlock)) !== null) {
+            const id = match[1];
+            if (playerMap[id]) {
+                playerMap[id].finalRole = match[3].trim();
+                playerMap[id].isAlive = match[2] === "存活";
+            }
+        }
+
+        // 轉為陣列並渲染
+        const players = Object.values(playerMap);
         if (players.length > 0) {
             const list = document.getElementById('players-list');
-            list.innerHTML = ""; // 清空預設格
+            list.innerHTML = "";
             players.forEach(p => addPlayerRow(p));
-            statusLabel.innerText = `✅ 已成功填充 ${players.length} 名玩家`;
-            statusLabel.style.color = "var(--accent-gold)";
-        } else {
-            statusLabel.innerText = "❌ 解析失敗：找不到標準玩家格式";
-            statusLabel.style.color = "var(--accent-red)";
+            statusLabel.innerText = `✅ 成功對齊 ${players.length} 名玩家數據`;
         }
     };
 
-    /**
-     * 匯入檔案按鈕處理
-     */
     window.importFile = (input) => {
         const file = input.files[0];
         if (!file) return;
@@ -101,23 +103,23 @@
     };
 
     /**
-     * 動態新增玩家列
+     * 動態新增玩家列 (依照新欄位順序：暱稱、初始、最終、陣營、狀態)
      */
     window.addPlayerRow = (data = null) => {
         const list = document.getElementById('players-list');
         const row = document.createElement('tr');
         
-        // 判定陣營預設值 (簡單邏輯)
-        const isEvil = data && (data.role.includes('惡魔') || data.role.includes('爪牙') || data.role === '小惡魔');
+        // 陣營判定邏輯：如果角色包含惡魔/爪牙字眼
+        const isEvil = data && (data.finalRole.includes('惡魔') || data.finalRole.includes('爪牙') || data.finalRole.includes('小惡魔'));
 
         row.innerHTML = `
-            <td><input type="text" class="form-control dark-input p-name" value="${data ? data.name : ''}" placeholder="玩家名字"></td>
-            <td><input type="text" class="form-control dark-input p-role" value="${data ? data.role : ''}" placeholder="例如：共情者"></td>
-            <td><input type="text" class="form-control dark-input p-actual" value="${data ? data.actualRole : ''}" placeholder="實際身分 (如：酒鬼)"></td>
+            <td><input type="text" class="form-control dark-input p-name" value="${data ? data.name : ''}" placeholder="玩家名"></td>
+            <td><input type="text" class="form-control dark-input p-initial" value="${data ? data.initialRole : ''}" placeholder="初始角色"></td>
+            <td><input type="text" class="form-control dark-input p-final" value="${data ? data.finalRole : ''}" placeholder="最終角色"></td>
             <td>
                 <select class="form-control dark-input p-team">
-                    <option value="good" ${!isEvil ? 'selected' : ''}>好人陣營</option>
-                    <option value="evil" ${isEvil ? 'selected' : ''}>壞人陣營</option>
+                    <option value="good" ${!isEvil ? 'selected' : ''}>正義 Good</option>
+                    <option value="evil" ${isEvil ? 'selected' : ''}>邪惡 Evil</option>
                 </select>
             </td>
             <td>
@@ -126,22 +128,20 @@
                     <option value="dead" ${data && !data.isAlive ? 'selected' : ''}>死亡</option>
                 </select>
             </td>
-            <td>
-                <button type="button" class="btn" style="color: var(--text-muted); padding: 0.2rem;" onclick="this.closest('tr').remove()">
-                    <i class="fa-solid fa-trash-can"></i>
+            <td style="text-align:center;">
+                <button type="button" class="btn" style="color: rgba(255,255,255,0.2); padding: 5px;" onclick="this.closest('tr').remove()">
+                    <i class="fa-solid fa-xmark"></i>
                 </button>
             </td>
         `;
         list.appendChild(row);
     };
 
-    // 表單提交攔截
-    document.getElementById('record-form')?.addEventListener('submit', async (e) => {
+    // 攔截提交
+    document.getElementById('record-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
-        console.log("💾 正在準備存檔...");
-        alert("匯入與解析功能已完成！下一步我們將串接 FastAPI 以保存這筆紀錄。");
+        alert("功能預覽：數據已收集完畢，準備發送至後端資料庫！");
     });
 
-    // 啟動初始化
     initRecord();
 }
