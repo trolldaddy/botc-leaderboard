@@ -250,3 +250,14 @@ const MASTER_ROLE_DB = [
   {id:"huapi",name:"畫皮",team:"minion",firstNight:4550,otherNight:8810,firstNightReminder:"讓畫皮選擇一名玩家，該玩家進入“活屍”狀態。",otherNightReminder:"每個夜晚，如果畫皮有“重獲能力”標記，喚醒畫皮，讓其選擇一名玩家，該玩家進入“活屍”狀態。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_8796728760171_7caa0950.jpg"},
   {id:"yishi",name:"驛使",team:"townsfolk",firstNight:0,otherNight:12210,otherNightReminder:"當晚，喚醒驛使藝人。如果他猜測正確，對他點頭表示“是”，對他搖頭表示“否”",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_9168557760171_8ae6a36c.jpg"}
 ];
+// ==========================================
+// 日間行動角色清單
+// ==========================================
+window.DAY_ACTION_ROLES = [
+  'slayer', 'savant', 'gossip', 'juggler', 'artist', 'fisherman',
+  'alsaahir', 'bianlianshi', 'geling', 'yishi', 'princess',
+  'psychopath', 'goblin', 'vizier',
+  'gunslinger', 'matron', 'butcher', 'judge', 'gangster', 'jiaohuazi', 'diaomin',
+  'mutant', 'klutz', 'moonchild', 'golem',
+  '殺手', '博學者', '造謠者', '雜耍藝人', '藝術家', '漁夫', '戲法師', '變臉師', '歌伶', '驛使', '公主', '精神病患者', '哥布林', '維齊爾', '槍手', '女舍監', '屠夫', '法官', '黑幫', '叫花子', '刁民', '畸形秀演員', '呆瓜', '月之子', '魔像'
+];
