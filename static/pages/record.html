@@ -1,0 +1,148 @@
+<header class="top-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h2>覆盤魔法書 (RECORD MATCH)</h2>
+        <div style="display: flex; gap: 1rem;">
+            <button class="btn" style="background: rgba(255,255,255,0.05); color: var(--text-muted);" onclick="clearFullForm()">
+                <i class="fa-solid fa-trash-can"></i> 清空表單
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- 🟢 隱藏的玩家建議名單，由 record.js 動態填充 -->
+<datalist id="player-names-list"></datalist>
+
+<div class="record-container" style="max-width: 1400px; margin: 0 auto; padding-bottom: 80px;">
+    
+    <!-- 1. 智慧導入工具區 -->
+    <div class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--accent-purple);">
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h3><i class="fa-solid fa-wand-magic-sparkles text-purple"></i> 快速導入 (從覆盤紀錄器)</h3>
+            <span id="import-status" style="font-size: 0.8rem; color: var(--accent-gold);"></span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+                請貼上「覆盤紀錄器」匯出的文字內容，系統將自動提取「初始角色」、「最終角色」與「存活狀態」。
+            </p>
+            <textarea id="log-input" class="form-control dark-input" style="min-height: 120px; font-family: monospace; font-size: 0.8rem;" placeholder="貼上覆盤文字紀錄..."></textarea>
+            <div style="display: flex; gap: 1rem;">
+                <button class="btn btn-primary" style="background: var(--accent-purple);" onclick="autoFillFromLog()">
+                    <i class="fa-solid fa-bolt"></i> 立即解析並填充
+                </button>
+                <label class="btn" style="background: rgba(255,255,255,0.08); cursor: pointer;">
+                    <i class="fa-solid fa-file-import"></i> 匯入文字檔
+                    <input type="file" hidden accept=".txt" onchange="importFile(this)">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 主表單區域 -->
+    <form id="record-form">
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+            
+            <!-- 對局基礎資訊 -->
+            <div class="card">
+                <div class="card-header"><h3><i class="fa-solid fa-info-circle"></i> 對局基礎資訊</h3></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                    <div class="form-group">
+                        <label>使用劇本</label>
+                        <input type="text" id="match-script" class="form-control dark-input" placeholder="例如：暗流湧動" required oninput="saveDraft()">
+                    </div>
+                    <div class="form-group">
+                        <label>對局日期</label>
+                        <input type="date" id="match-date" class="form-control dark-input" required oninput="saveDraft()">
+                    </div>
+                    <div class="form-group">
+                        <label>遊戲地點</label>
+                        <input type="text" id="match-location" class="form-control dark-input" placeholder="按此處輸入" oninput="saveDraft()">
+                    </div>
+                    <div class="form-group">
+                        <label>說書人</label>
+                        <input type="text" id="match-storyteller" class="form-control dark-input" placeholder="前輩" oninput="saveDraft()">
+                    </div>
+                    <div class="form-group">
+                        <label>獲勝陣營</label>
+                        <select id="match-winner" class="form-control dark-input" oninput="saveDraft()">
+                            <option value="good">正義陣營 Good</option>
+                            <option value="evil">邪惡陣營 Evil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>管理員密碼 (Password)</label>
+                        <input type="password" id="admin-password" class="form-control dark-input" placeholder="••••" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 參與玩家陣容 -->
+            <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3><i class="fa-solid fa-users"></i> 參與玩家陣容</h3>
+                    <button type="button" class="btn" style="background: var(--accent-blue); padding: 5px 12px; font-size: 0.8rem;" onclick="addPlayerRow()">
+                        <i class="fa-solid fa-plus"></i> 添加玩家
+                    </button>
+                </div>
+                
+                <div style="overflow-x: auto; margin-top: 1.5rem;">
+                    <table class="history-table" style="width: 100%; border-collapse: separate; border-spacing: 0 8px;">
+                        <thead>
+                            <tr style="text-align: left; color: var(--text-muted); font-size: 0.8rem;">
+                                <th style="padding: 10px;">玩家暱稱</th>
+                                <th>初始角色 (含隱藏)</th>
+                                <th>最終角色</th>
+                                <th>最終陣營</th>
+                                <th>狀態</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="players-list">
+                            <!-- 由 record.js 動態生成 rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提交按鈕區域 -->
+        <div style="margin-top: 2rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+            <div id="save-status" style="font-size: 0.75rem; color: var(--text-muted);">已自動儲存草稿</div>
+            <button type="submit" id="submit-btn" class="btn btn-primary" style="padding: 1.2rem 4rem; font-size: 1.1rem; border-radius: 50px; box-shadow: 0 10px 30px rgba(230, 57, 70, 0.3);">
+                <i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-group label {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--accent-gold);
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .dark-input {
+        background: rgba(0, 0, 0, 0.3) !important;
+        border: 1px solid var(--border-color) !important;
+        color: #fff !important;
+        padding: 0.8rem !important;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .dark-input:focus {
+        border-color: var(--accent-red) !important;
+        background: rgba(0, 0, 0, 0.5) !important;
+        outline: none;
+    }
+
+    .history-table td {
+        padding: 4px 8px;
+    }
+</style>
+
+<script src="/js/record.js"></script>
