@@ -38,17 +38,11 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mmmm")
 
 @app.post("/api/matches")
 async def create_match(data: dict, db: Session = Depends(get_db)):
-    """
-    接收對局資料。
-    包含：自動建立新玩家、建立對局主表、建立玩家表現關聯紀錄。
-    """
     try:
-        # 1. 驗證管理員密鑰 (相容 password 或 admin_password)
         received_pw = data.get("password") or data.get("admin_password")
         if received_pw != ADMIN_PASSWORD:
             raise HTTPException(status_code=403, detail="管理員密鑰錯誤，無法將資料寫入魔典")
 
-        # 2. 解析日期
         raw_date = data.get("date")
         match_date = datetime.now()
         if raw_date:
@@ -57,7 +51,6 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
             except:
                 pass
 
-        # 3. 建立對局環境資訊 (Matches 表)
         new_match = models.Match(
             script=data.get("script", "未知劇本"),
             date=match_date,
@@ -69,14 +62,12 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(new_match)
 
-        # 4. 處理每位參與玩家的表現 (MatchPlayers 表)
         players_list = data.get("players", [])
         for p in players_list:
             player_name = p.get("name", "").strip()
             if not player_name:
                 continue
 
-            # 尋找玩家 UID，若不存在則建立 (Players 表)
             db_player = db.query(models.Player).filter(models.Player.name == player_name).first()
             if not db_player:
                 db_player = models.Player(name=player_name)
@@ -84,8 +75,6 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
                 db.commit()
                 db.refresh(db_player)
 
-            # 建立詳細的表現紀錄 (MatchPlayer 表)
-            # 欄位對應：initial_character (初始), final_character (最終), alignment (陣營), survived (存活)
             performance = models.MatchPlayer(
                 match_id=new_match.id,
                 player_id=db_player.id,
@@ -98,110 +87,62 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
         
         db.commit()
         return {"status": "success", "match_id": new_match.id}
-        
     except Exception as e:
         db.rollback()
         print(f"❌ 錄入失敗 Error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"伺服器內部錯誤: {str(e)}")
 
-# --- 📊 統計 API：提供數據看板使用 ---
+# --- 📊 統計 API ---
 
 @app.get("/api/stats")
 async def get_global_stats(location: Optional[str] = None, db: Session = Depends(get_db)):
-    """
-    提供全域或特定地點的勝率統計。
-    """
     query = db.query(models.Match)
     if location:
         query = query.filter(models.Match.location == location)
-    
     matches = query.all()
     total_games = len(matches)
-    
-    # 獲取目前資料庫中出現過的所有地點 (供下拉選單使用)
     all_locations = [l[0] for l in db.query(models.Match.location).distinct().all() if l[0]]
-    
     if total_games == 0:
-        return {
-            "total_games": 0, 
-            "good_win_percent": 0, 
-            "evil_win_percent": 0, 
-            "available_locations": all_locations
-        }
-
+        return {"total_games": 0, "good_win_percent": 0, "evil_win_percent": 0, "available_locations": all_locations}
     good_wins = sum(1 for m in matches if m.winning_team == "good")
     good_rate = round(good_wins / total_games * 100, 1)
+    return {"total_games": total_games, "good_win_percent": good_rate, "evil_win_percent": round(100 - good_rate, 1), "available_locations": all_locations}
 
-    return {
-        "total_games": total_games,
-        "good_win_percent": good_rate,
-        "evil_win_percent": round(100 - good_rate, 1),
-        "available_locations": all_locations
-    }
-
-# --- 👤 玩家 API：查詢個人生涯戰績 ---
+# 🟢 新增：獲取所有玩家名單供自動完成使用
+@app.get("/api/players")
+async def get_all_players(db: Session = Depends(get_db)):
+    """獲取資料庫中所有不重複的玩家名稱"""
+    players = db.query(models.Player.name).order_by(models.Player.name).all()
+    return [p[0] for p in players]
 
 @app.get("/api/player/{name}")
 async def get_player_stats(name: str, db: Session = Depends(get_db)):
-    """
-    根據玩家暱稱計算該玩家的總勝率與最常玩角色。
-    """
     player = db.query(models.Player).filter(models.Player.name == name).first()
     if not player:
-        raise HTTPException(status_code=404, detail="找不到該玩家的歷史紀錄")
-
-    # 取得該玩家參與的所有表現
+        raise HTTPException(status_code=404, detail="找不到該玩家")
     records = db.query(models.MatchPlayer).filter(models.MatchPlayer.player_id == player.id).all()
     total = len(records)
-    
-    wins = 0
+    wins = sum(1 for r in records if r.alignment == r.match.winning_team)
     roles_stat = {}
     for r in records:
-        # 比對玩家最終陣營與該場獲勝陣營
-        if r.alignment == r.match.winning_team:
-            wins += 1
-        
-        # 統計最常玩的角色 (使用最終角色)
         char = r.final_character or "未知"
         roles_stat[char] = roles_stat.get(char, 0) + 1
-
-    # 整理角色排名數據
-    top_roles = [
-        {"role": k, "count": v} 
-        for k, v in sorted(roles_stat.items(), key=lambda x: x[1], reverse=True)[:5]
-    ]
-
-    return {
-        "player_name": player.name,
-        "total_matches": total,
-        "overall_win_rate": round(wins / total * 100, 1) if total > 0 else 0,
-        "most_played_roles": top_roles
-    }
-
-# --- 📜 歷史紀錄 API ---
+    top_roles = [{"role": k, "count": v} for k, v in sorted(roles_stat.items(), key=lambda x: x[1], reverse=True)[:5]]
+    return {"player_name": player.name, "total_matches": total, "overall_win_rate": round(wins / total * 100, 1) if total > 0 else 0, "most_played_roles": top_roles}
 
 @app.get("/api/history")
 async def get_history(db: Session = Depends(get_db)):
-    """
-    獲取最近的對局紀錄。
-    """
     return db.query(models.Match).order_by(models.Match.date.desc()).limit(50).all()
-
-# --- 🖼️ 靜態檔案處理與首頁路由 ---
 
 @app.get("/")
 @app.get("/index.html")
 async def serve_home():
-    """
-    優先尋找 static 目錄下的 index.html。
-    """
     paths = ["static/index.html", "index.html"]
     for path in paths:
         if os.path.exists(path):
             return FileResponse(path)
     return {"message": "伺服器已啟動，但在 static/ 或根目錄找不到 index.html"}
 
-# 自動掛載靜態資源目錄
 for folder in ["js", "css", "pages", "static"]:
     physical_path = folder if os.path.exists(folder) else f"static/{folder}"
     if os.path.exists(physical_path):
