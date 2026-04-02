@@ -6,17 +6,16 @@ from fastapi import FastAPI, Depends, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload 
 from sqlalchemy import func
 
 # 導入專案定義的模型與資料庫配置
 import models
 from database import engine, get_db
 
-# --- 🟢 關鍵：確保 app 物件在最頂層且無縮排，供 Vercel 識別 ---
 app = FastAPI(title="BOTC Stats Leaderboard API")
 
-# 自動同步資料庫表結構 (根據 models.py 定義建立表)
+# 自動同步資料庫表結構
 try:
     models.Base.metadata.create_all(bind=engine)
 except Exception as e:
@@ -31,7 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 管理員密鑰 (優先讀取環境變數，預設為 mmmm)
+# 管理員密鑰
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mmmm")
 
 # --- 🚀 核心 API：錄入對局 ---
@@ -41,7 +40,7 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
     try:
         received_pw = data.get("password") or data.get("admin_password")
         if received_pw != ADMIN_PASSWORD:
-            raise HTTPException(status_code=403, detail="管理員密鑰錯誤，無法將資料寫入魔典")
+            raise HTTPException(status_code=403, detail="管理員密鑰錯誤")
 
         raw_date = data.get("date")
         match_date = datetime.now()
@@ -65,8 +64,7 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
         players_list = data.get("players", [])
         for p in players_list:
             player_name = p.get("name", "").strip()
-            if not player_name:
-                continue
+            if not player_name: continue
 
             db_player = db.query(models.Player).filter(models.Player.name == player_name).first()
             if not db_player:
@@ -89,7 +87,6 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
         return {"status": "success", "match_id": new_match.id}
     except Exception as e:
         db.rollback()
-        print(f"❌ 錄入失敗 Error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"伺服器內部錯誤: {str(e)}")
 
 # --- 📊 統計 API ---
@@ -108,18 +105,15 @@ async def get_global_stats(location: Optional[str] = None, db: Session = Depends
     good_rate = round(good_wins / total_games * 100, 1)
     return {"total_games": total_games, "good_win_percent": good_rate, "evil_win_percent": round(100 - good_rate, 1), "available_locations": all_locations}
 
-# 🟢 新增：獲取所有玩家名單供自動完成使用
 @app.get("/api/players")
 async def get_all_players(db: Session = Depends(get_db)):
-    """獲取資料庫中所有不重複的玩家名稱"""
     players = db.query(models.Player.name).order_by(models.Player.name).all()
     return [p[0] for p in players]
 
 @app.get("/api/player/{name}")
 async def get_player_stats(name: str, db: Session = Depends(get_db)):
     player = db.query(models.Player).filter(models.Player.name == name).first()
-    if not player:
-        raise HTTPException(status_code=404, detail="找不到該玩家")
+    if not player: raise HTTPException(status_code=404, detail="找不到玩家")
     records = db.query(models.MatchPlayer).filter(models.MatchPlayer.player_id == player.id).all()
     total = len(records)
     wins = sum(1 for r in records if r.alignment == r.match.winning_team)
@@ -130,18 +124,50 @@ async def get_player_stats(name: str, db: Session = Depends(get_db)):
     top_roles = [{"role": k, "count": v} for k, v in sorted(roles_stat.items(), key=lambda x: x[1], reverse=True)[:5]]
     return {"player_name": player.name, "total_matches": total, "overall_win_rate": round(wins / total * 100, 1) if total > 0 else 0, "most_played_roles": top_roles}
 
+# 🟢 歷史紀錄 API：增加排序邏輯，確保顯示順序符合錄入順序
 @app.get("/api/history")
 async def get_history(db: Session = Depends(get_db)):
-    return db.query(models.Match).order_by(models.Match.date.desc()).limit(50).all()
+    """
+    獲取歷史對局。
+    使用 joinedload 預先載入，並在後端進行排序處理。
+    """
+    matches = db.query(models.Match).options(
+        joinedload(models.Match.players).joinedload(models.MatchPlayer.player)
+    ).order_by(models.Match.date.desc()).limit(50).all()
+    
+    result = []
+    for m in matches:
+        # 🟢 關鍵修正：將 players 按照 MatchPlayer.id 進行升序排序 (即錄入順序)
+        sorted_players_records = sorted(m.players, key=lambda x: x.id)
+        
+        m_data = {
+            "id": m.id,
+            "script": m.script,
+            "date": m.date,
+            "location": m.location,
+            "storyteller": m.storyteller,
+            "winning_team": m.winning_team,
+            "players": [
+                {
+                    "player_name": p.player.name,
+                    "initial_character": p.initial_character,
+                    "final_character": p.final_character,
+                    "alignment": p.alignment,
+                    "survived": p.survived
+                } for p in sorted_players_records
+            ]
+        }
+        result.append(m_data)
+    return result
+
+# --- 🖼️ 靜態資源路由 ---
 
 @app.get("/")
 @app.get("/index.html")
 async def serve_home():
-    paths = ["static/index.html", "index.html"]
-    for path in paths:
-        if os.path.exists(path):
-            return FileResponse(path)
-    return {"message": "伺服器已啟動，但在 static/ 或根目錄找不到 index.html"}
+    for path in ["static/index.html", "index.html"]:
+        if os.path.exists(path): return FileResponse(path)
+    return {"message": "找不到 index.html"}
 
 for folder in ["js", "css", "pages", "static"]:
     physical_path = folder if os.path.exists(folder) else f"static/{folder}"
