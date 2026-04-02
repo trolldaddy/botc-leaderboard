@@ -1,91 +1,130 @@
 <header class="top-header">
     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
         <h2>覆盤魔法書 (RECORD MATCH)</h2>
-        <button class="btn btn-ghost" onclick="clearFullForm()">
-            <i class="fa-solid fa-trash-can"></i> 清空
-        </button>
+        <div style="display: flex; gap: 1rem;">
+            <button class="btn" style="background: rgba(255,255,255,0.05); color: var(--text-muted);" onclick="clearFullForm()">
+                <i class="fa-solid fa-trash-can"></i> 清空表單
+            </button>
+        </div>
     </div>
 </header>
 
+<!-- 隱藏的玩家建議名單，由 record.js 動態填充 -->
 <datalist id="player-names-list"></datalist>
 
-<div class="record-layout">
-    <!-- 左側邊欄：詳細紀錄 -->
-    <aside class="recent-sidebar">
-        <div class="card sidebar-sticky">
-            <div class="card-header">
-                <h3><i class="fa-solid fa-clock-rotate-left text-gold"></i> 最近錄入紀錄</h3>
+<!-- 主容器：採用 Flex 佈局實現左右雙欄 -->
+<div class="record-layout" style="display: flex; gap: 2rem; max-width: 1600px; margin: 0 auto; padding: 0 1rem 80px 1rem;">
+    
+    <!-- 左側邊欄：最近對局紀錄 (大家都在用) -->
+    <aside class="recent-activity-sidebar" style="width: 320px; flex-shrink: 0;">
+        <div class="card" style="position: sticky; top: calc(var(--nav-height) + 1.5rem); border-top: 4px solid var(--accent-gold); padding: 1.5rem;">
+            <div class="card-header" style="border-bottom: 1px solid var(--border-color); padding-bottom: 0.8rem; margin-bottom: 1rem;">
+                <h3 style="font-size: 1rem; margin: 0;"><i class="fa-solid fa-clock-rotate-left text-gold"></i> 最近錄入對局</h3>
             </div>
-            <div id="recent-matches-list" class="recent-matches-container">
-                <div class="loading-placeholder">⏳ 讀取中...</div>
+            <div id="recent-matches-list" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <!-- 由 record.js 中的 loadRecentMatches() 填充 -->
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 2rem;">⏳ 正在讀取靈魂紀錄...</div>
             </div>
-            <button class="btn btn-full btn-outline" style="margin-top: 1rem;" onclick="if(window.loadPage) window.loadPage('history')">
-                查看全部歷史
-            </button>
+            <div style="margin-top: 1.5rem; text-align: center;">
+                <button class="btn" style="font-size: 0.75rem; background: rgba(255,255,255,0.05); width: 100%;" onclick="if(window.loadPage) window.loadPage('history')">
+                    查看完整歷史紀錄
+                </button>
+            </div>
         </div>
     </aside>
 
-    <!-- 主錄入區域 -->
-    <div class="main-record-area">
-        <!-- 快速解析 -->
-        <div class="card import-card">
-            <div class="card-header">
-                <h3><i class="fa-solid fa-wand-magic-sparkles text-purple"></i> 快速解析錄入</h3>
-                <span id="import-status" class="status-label"></span>
+    <!-- 右側：主錄入區域 -->
+    <div class="main-record-area" style="flex: 1; min-width: 0;">
+        
+        <!-- 1. 快速導入工具卡片 -->
+        <div class="card" style="margin-bottom: 2rem; border-left: 4px solid var(--accent-purple);">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3><i class="fa-solid fa-wand-magic-sparkles text-purple"></i> 快速導入 (從覆盤紀錄器)</h3>
+                <span id="import-status" style="font-size: 0.8rem; color: var(--accent-gold);"></span>
             </div>
-            <textarea id="log-input" class="form-control log-textarea" placeholder="貼上覆盤紀錄器文字..."></textarea>
-            <div class="import-actions">
-                <button class="btn btn-purple" onclick="autoFillFromLog()">
-                    <i class="fa-solid fa-bolt"></i> 立即解析
-                </button>
-                <label class="btn btn-outline">
-                    <i class="fa-solid fa-file-import"></i> 匯入檔案
-                    <input type="file" hidden accept=".txt" onchange="importFile(this)">
-                </label>
+            <div style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+                <p style="font-size: 0.85rem; color: var(--text-muted);">
+                    貼上覆盤紀錄器匯出的文字，系統將自動解析：劇本、日期、地點、角色與存活狀態。
+                </p>
+                <textarea id="log-input" class="form-control dark-input" style="min-height: 100px; font-family: monospace; font-size: 0.8rem;" placeholder="貼上覆盤文字紀錄..."></textarea>
+                <div style="display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" style="background: var(--accent-purple);" onclick="autoFillFromLog()">
+                        <i class="fa-solid fa-bolt"></i> 立即解析並填充
+                    </button>
+                    <label class="btn" style="background: rgba(255,255,255,0.08); cursor: pointer;">
+                        <i class="fa-solid fa-file-import"></i> 匯入文字檔
+                        <input type="file" hidden accept=".txt" onchange="importFile(this)">
+                    </label>
+                </div>
             </div>
         </div>
 
+        <!-- 2. 錄入表單 -->
         <form id="record-form">
-            <!-- 基礎資訊 -->
-            <div class="card info-card">
-                <div class="card-header"><h3><i class="fa-solid fa-info-circle"></i> 基礎資訊</h3></div>
-                <div class="info-grid">
-                    <div class="form-group"><label>劇本名稱</label><input type="text" id="match-script" class="form-control" required oninput="saveDraft()"></div>
-                    <div class="form-group"><label>對局日期</label><input type="date" id="match-date" class="form-control" required oninput="saveDraft()"></div>
-                    <div class="form-group"><label>遊戲地點</label><input type="text" id="match-location" class="form-control" placeholder="線上 / 拉普拉斯" oninput="saveDraft()"></div>
-                    <div class="form-group"><label>獲勝陣營</label><select id="match-winner" class="form-control" oninput="saveDraft()"><option value="good">善良獲勝</option><option value="evil">邪惡獲勝</option></select></div>
-                    <div class="form-group"><label>說書人</label><input type="text" id="match-storyteller" class="form-control" placeholder="前輩" oninput="saveDraft()"></div>
-                    <div class="form-group"><label>管理員密鑰</label><input type="password" id="admin-password" class="form-control" placeholder="••••" required></div>
+            <div class="card" style="margin-bottom: 2rem;">
+                <div class="card-header"><h3><i class="fa-solid fa-info-circle"></i> 對局基礎資訊</h3></div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.2rem; margin-top: 1.2rem;">
+                    <div class="form-group">
+                        <label>使用劇本</label>
+                        <input type="text" id="match-script" class="form-control dark-input" placeholder="例如：暗流湧動" required oninput="saveDraft()">
+                    </div>
+                    <div class="form-group">
+                        <label>對局日期</label>
+                        <input type="date" id="match-date" class="form-control dark-input" required oninput="saveDraft()">
+                    </div>
+                    <div class="form-group">
+                        <label>遊戲地點</label>
+                        <input type="text" id="match-location" class="form-control dark-input" placeholder="例如：拉普拉斯" oninput="saveDraft()">
+                    </div>
+                    <div class="form-group">
+                        <label>獲勝陣營</label>
+                        <select id="match-winner" class="form-control dark-input" oninput="saveDraft()">
+                            <option value="good">正義陣營 Good</option>
+                            <option value="evil">邪惡陣營 Evil</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>說書人</label>
+                        <input type="text" id="match-storyteller" class="form-control dark-input" placeholder="前輩" oninput="saveDraft()">
+                    </div>
+                    <div class="form-group">
+                        <label>管理員密碼 (Password)</label>
+                        <input type="password" id="admin-password" class="form-control dark-input" placeholder="••••" required>
+                    </div>
                 </div>
             </div>
 
-            <!-- 參與玩家 -->
-            <div class="card players-card">
-                <div class="card-header">
+            <!-- 參與玩家列表 -->
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                     <h3><i class="fa-solid fa-users"></i> 參與玩家</h3>
-                    <button type="button" class="btn btn-blue btn-sm" onclick="addPlayerRow()"><i class="fa-solid fa-plus"></i></button>
+                    <button type="button" class="btn" style="background: var(--accent-blue); padding: 5px 12px; font-size: 0.8rem;" onclick="addPlayerRow()">
+                        <i class="fa-solid fa-plus"></i> 添加玩家
+                    </button>
                 </div>
-                <!-- 核心修正：增加 overflow 容器 -->
-                <div class="table-scroll-container">
-                    <table class="history-table record-table">
+                <div style="overflow-x: auto; margin-top: 1rem;">
+                    <table class="history-table" style="width: 100%; border-collapse: separate; border-spacing: 0 4px;">
                         <thead>
-                            <tr>
-                                <th style="width: 20%;">暱稱</th>
-                                <th style="width: 20%;">初始角色</th>
-                                <th style="width: 20%;">最終角色</th>
-                                <th style="width: 15%;">陣營</th>
-                                <th style="width: 15%;">狀態</th>
-                                <th style="width: 10%;"></th>
+                            <tr style="text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase;">
+                                <th style="padding: 10px;">玩家暱稱</th>
+                                <th>初始角色</th>
+                                <th>最終角色</th>
+                                <th>陣營</th>
+                                <th>狀態</th>
+                                <th style="width: 40px;"></th>
                             </tr>
                         </thead>
-                        <tbody id="players-list"></tbody>
+                        <tbody id="players-list">
+                            <!-- 由 record.js 生成 -->
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <div class="submit-section">
-                <div id="save-status" class="draft-status">草稿備份中</div>
-                <button type="submit" id="submit-btn" class="btn btn-submit">
+            <!-- 提交區域 -->
+            <div style="margin-top: 2.5rem; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                <div id="save-status" style="font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.5px;">草稿已同步至雲端</div>
+                <button type="submit" id="submit-btn" class="btn btn-primary" style="padding: 1.2rem 4rem; font-size: 1.1rem; border-radius: 50px; box-shadow: 0 8px 25px rgba(230, 57, 70, 0.3);">
                     <i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績
                 </button>
             </div>
@@ -94,80 +133,73 @@
 </div>
 
 <style>
-    /* --- 響應式佈局結構 --- */
-    .record-layout {
-        display: flex;
-        gap: 1.5rem;
-        width: 100%;
-        box-sizing: border-box;
+    /* 響應式佈局：在小螢幕時轉為垂直排列 */
+    @media (max-width: 1100px) {
+        .record-layout { flex-direction: column !important; }
+        .recent-activity-sidebar { width: 100% !important; }
+        .recent-activity-sidebar .card { position: static !important; }
     }
 
-    .recent-sidebar { width: 340px; flex-shrink: 0; }
-    .main-record-area { flex: 1; min-width: 0; }
-
-    @media (max-width: 1200px) {
-        .recent-sidebar { width: 280px; }
+    .form-group label {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--accent-gold);
+        margin-bottom: 0.4rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 
-    @media (max-width: 992px) {
-        .record-layout { flex-direction: column; }
-        .recent-sidebar { width: 100%; order: 2; }
-        .main-record-area { order: 1; }
-        .sidebar-sticky { position: static !important; }
-    }
-
-    /* --- 表格滾動優化 (防止手機過寬) --- */
-    .table-scroll-container {
-        width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        margin-top: 1rem;
-        background: rgba(0,0,0,0.2);
-        border-radius: 8px;
-    }
-
-    .record-table {
-        min-width: 600px; /* 確保小螢幕也能正常顯示表格內容而不擠壓 */
-        width: 100%;
-    }
-
-    /* --- 詳細側欄項目樣式 --- */
-    .recent-matches-container { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
-    
-    .match-item {
-        padding: 1rem;
-        background: rgba(255,255,255,0.03);
-        border: 1px solid var(--border-color);
-        border-radius: 12px;
-        transition: transform 0.2s, background 0.2s;
-    }
-    .match-item:hover { transform: translateX(5px); background: rgba(255,255,255,0.06); }
-
-    .match-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
-    .match-script-name { font-weight: bold; font-size: 0.95rem; color: #fff; }
-    
-    .match-tag { font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
-    .win-good { background: rgba(69, 123, 157, 0.2); color: #a8dadc; border: 1px solid rgba(69, 123, 157, 0.4); }
-    .win-evil { background: rgba(230, 57, 70, 0.2); color: #ffb3b3; border: 1px solid rgba(230, 57, 70, 0.4); }
-
-    .match-detail-row { display: flex; gap: 1rem; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.4rem; }
-    .match-time-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-muted); border-top: 1px solid rgba(255,255,255,0.05); pt: 0.4rem; }
-
-    /* --- 通用輸入框與按鈕優化 --- */
-    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem; }
-    .form-control { 
-        background: rgba(0,0,0,0.4) !important; 
-        border: 1px solid var(--border-color) !important; 
+    .dark-input {
+        background: rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid var(--border-color) !important;
         color: #fff !important;
-        width: 100%;
-        box-sizing: border-box;
+        padding: 0.7rem !important;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease;
     }
-    .btn-full { width: 100%; justify-content: center; }
-    .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
-    .btn-blue { background: var(--accent-blue); color: #fff; }
-    .btn-purple { background: var(--accent-purple); color: #fff; }
-    .btn-submit { background: var(--accent-red); padding: 1rem 3rem; border-radius: 50px; font-size: 1.1rem; }
-    .btn-delete { background: transparent; color: rgba(255,255,255,0.2); border: none; cursor: pointer; transition: color 0.2s; }
-    .btn-delete:hover { color: var(--accent-red); }
-    .btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+
+    .dark-input:focus {
+        border-color: var(--accent-red) !important;
+        background: rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 0 0 10px rgba(230, 57, 70, 0.1);
+    }
+
+    /* 最近活動項目樣式 */
+    .match-item {
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: default;
+    }
+
+    .match-item:hover {
+        background: rgba(255, 255, 255, 0.07);
+        transform: translateX(6px);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .match-item .script-name {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: var(--text-main);
+        display: block;
+        margin-bottom: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .match-item .meta-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
 </style>
+
+<script src="/js/record.js"></script>
