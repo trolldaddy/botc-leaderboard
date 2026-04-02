@@ -1,55 +1,154 @@
 <header class="top-header">
-    <h2>數據看板 (DASHBOARD)</h2>
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="font-family: 'Cinzel', serif; letter-spacing: 2px;">數據看板 (DASHBOARD)</h2>
+        
+        <!-- 🟢 地點篩選：美化選單樣式 -->
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <i class="fa-solid fa-filter" style="color: var(--accent-gold); font-size: 0.8rem;"></i>
+            <select id="location-filter" class="form-control dark-input-select" onchange="loadDashboardStats()">
+                <option value="">所有地點 (Global)</option>
+            </select>
+        </div>
+    </div>
 </header>
 
-<div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-    <div class="card stat-card">
-        <div class="stat-icon" style="color: var(--gold);"><i class="fa-solid fa-gamepad"></i></div>
-        <div class="stat-info">
-            <span class="stat-label">總對局數</span>
-            <h3 id="total-games">--</h3>
+<div class="dashboard-wrapper" style="max-width: 1400px; margin: 0 auto; padding: 0 1rem 80px 1rem;">
+    
+    <!-- 頂部總覽區域 -->
+    <div class="dashboard-stats-grid">
+        <!-- 總對局數卡片 -->
+        <div class="card stat-card-mini" style="border-left: 4px solid var(--accent-gold);">
+            <span class="mini-label">魔典記載總量</span>
+            <div class="mini-value" id="total-games-count">-</div>
+            <i class="fa-solid fa-scroll card-bg-icon"></i>
+        </div>
+
+        <!-- 善良勝率卡片 -->
+        <div class="card stat-card-mini" style="border-left: 4px solid var(--accent-blue);">
+            <span class="mini-label">善良陣營總勝率</span>
+            <div class="mini-value text-blue" id="good-win-rate">-%</div>
+            <i class="fa-solid fa-shield-halved card-bg-icon"></i>
+        </div>
+
+        <!-- 邪惡勝率卡片 -->
+        <div class="card stat-card-mini" style="border-left: 4px solid var(--accent-red);">
+            <span class="mini-label">邪惡陣營總勝率</span>
+            <div class="mini-value text-red" id="evil-rate-summary">-%</div>
+            <i class="fa-solid fa-skull card-bg-icon"></i>
         </div>
     </div>
-    <div class="card stat-card">
-        <div class="stat-icon" style="color: #00ff00;"><i class="fa-solid fa-shield-halved"></i></div>
-        <div class="stat-info">
-            <span class="stat-label">正義勝率</span>
-            <h3 id="good-win-rate">--%</h3>
+
+    <div class="main-dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 1.5rem;">
+        
+        <!-- 🟢 左側：勝率視覺化 -->
+        <div class="card main-viz-card" style="border-top: 4px solid var(--accent-purple);">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3><i class="fa-solid fa-chart-pie text-purple"></i> 陣營勢力分佈</h3>
+                <span id="current-location-label" style="font-size: 0.75rem; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 20px;">全域數據</span>
+            </div>
+            
+            <div class="winrate-display-box">
+                <div class="faction-side faction-good">
+                    <span class="faction-name">善良陣營 (GOOD)</span>
+                    <span class="faction-percent" id="viz-good-rate">-%</span>
+                    <div class="faction-bar-outer"><div class="faction-bar-inner bg-blue" id="bar-good" style="width: 0%"></div></div>
+                </div>
+                
+                <div class="faction-vs">VS</div>
+                
+                <div class="faction-side faction-evil">
+                    <span class="faction-name">邪惡陣營 (EVIL)</span>
+                    <span class="faction-percent" id="viz-evil-rate">-%</span>
+                    <div class="faction-bar-outer"><div class="faction-bar-inner bg-red" id="bar-evil" style="width: 0%"></div></div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="card stat-card">
-        <div class="stat-icon" style="color: #ff4d4d;"><i class="fa-solid fa-skull"></i></div>
-        <div class="stat-info">
-            <span class="stat-label">邪惡勝率</span>
-            <h3 id="evil-win-rate">--%</h3>
+
+        <!-- 🟢 右側：玩家戰績速查 -->
+        <div class="card search-card" style="border-top: 4px solid var(--accent-gold);">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-magnifying-glass text-gold"></i> 玩家魔典速查</h3>
+            </div>
+            <div class="search-input-group">
+                <input type="text" id="player-search-input" class="form-control dark-input" placeholder="輸入暱稱按 Enter...">
+                <button class="btn btn-search-glow" onclick="searchPlayerStats()">
+                    <i class="fa-solid fa-bolt"></i>
+                </button>
+            </div>
+
+            <!-- 查詢結果區 -->
+            <div id="player-stats-result" style="display: none; margin-top: 1.5rem;">
+                <div class="result-box">
+                    <div class="res-name-row">
+                        <span id="res-name" class="res-name-text">-</span>
+                        <span id="res-total" class="res-count-badge">- 場</span>
+                    </div>
+                    
+                    <div class="res-stat-row">
+                        <div class="res-stat-item">
+                            <span class="label">勝率</span>
+                            <span class="value text-blue" id="res-winrate">-%</span>
+                        </div>
+                    </div>
+
+                    <div class="res-roles-section">
+                        <span class="section-label">最常使用的角色</span>
+                        <div id="res-roles" class="roles-tags-container"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="player-search-empty" style="text-align: center; color: var(--text-muted); padding: 2rem; font-size: 0.8rem; border: 1px dashed rgba(255,255,255,0.05); border-radius: 12px; margin-top: 1rem;">
+                <i class="fa-solid fa-ghost" style="display: block; font-size: 1.5rem; margin-bottom: 0.5rem; opacity: 0.3;"></i>
+                輸入玩家暱稱以窺探其命運
+            </div>
         </div>
     </div>
 </div>
 
-<div class="dashboard-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
-    <div class="card">
-        <h3><i class="fa-solid fa-trophy text-gold"></i> 傳奇玩家榜 (勝率排行)</h3>
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>排名</th>
-                        <th>玩家</th>
-                        <th>總場次</th>
-                        <th>勝場</th>
-                        <th>勝率</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-body">
-                    </tbody>
-            </table>
-        </div>
-    </div>
+<style>
+    /* 統計小卡片 */
+    .dashboard-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+    .stat-card-mini { position: relative; padding: 1.5rem !important; overflow: hidden; }
+    .mini-label { display: block; font-size: 0.7rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+    .mini-value { font-size: 2.2rem; font-weight: 900; font-family: 'Inter', sans-serif; }
+    .card-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 4rem; opacity: 0.03; transform: rotate(-15deg); }
 
-    <div class="card">
-        <h3><i class="fa-solid fa-chart-pie text-purple"></i> 陣營分佈</h3>
-        <canvas id="team-chart"></canvas>
-    </div>
-</div>
+    /* 勝率展示盒 */
+    .winrate-display-box { display: flex; align-items: center; justify-content: space-around; padding: 3rem 1rem; gap: 2rem; }
+    .faction-side { flex: 1; display: flex; flex-direction: column; align-items: center; }
+    .faction-name { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; }
+    .faction-percent { font-size: 3.5rem; font-weight: 900; line-height: 1; margin-bottom: 15px; }
+    .faction-bar-outer { width: 100%; height: 8px; background: rgba(255,255,255,0.05); border-radius: 10px; overflow: hidden; }
+    .faction-bar-inner { height: 100%; transition: width 1s ease-out; }
+    .faction-vs { font-size: 1.5rem; font-weight: 900; color: rgba(255,255,255,0.1); margin-top: 20px; }
+
+    /* 搜尋與結果 */
+    .search-input-group { display: flex; gap: 8px; margin-top: 1rem; }
+    .btn-search-glow { background: var(--accent-gold); color: #000; border: none; border-radius: 8px; padding: 0 1.2rem; cursor: pointer; transition: all 0.3s; }
+    .btn-search-glow:hover { box-shadow: 0 0 15px var(--accent-gold); transform: translateY(-2px); }
+    
+    .result-box { background: rgba(0,0,0,0.3); padding: 1.2rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+    .res-name-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.8rem; }
+    .res-name-text { font-size: 1.3rem; font-weight: 800; color: var(--accent-gold); }
+    .res-count-badge { font-size: 0.75rem; color: var(--text-muted); }
+    
+    .res-stat-item .label { font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px; }
+    .res-stat-item .value { font-size: 1.5rem; font-weight: 800; }
+    
+    .res-roles-section { margin-top: 1.2rem; }
+    .section-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 8px; text-transform: uppercase; }
+    .roles-tags-container { display: flex; flex-wrap: wrap; gap: 6px; }
+    .role-tag { background: rgba(131, 56, 236, 0.15); border: 1px solid rgba(131, 56, 236, 0.3); color: #c084fc; padding: 3px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; }
+
+    .dark-input-select { background: rgba(131, 56, 236, 0.1) !important; border: 1px solid rgba(131, 56, 236, 0.3) !important; color: #fff !important; border-radius: 50px; padding: 5px 15px !important; font-size: 0.85rem; height: auto !important; }
+
+    /* 響應式佈局 */
+    @media (max-width: 1000px) {
+        .main-dashboard-grid { grid-template-columns: 1fr; }
+        .faction-percent { font-size: 2.5rem; }
+        .winrate-display-box { padding: 2rem 0; }
+    }
+</style>
 
 <script src="/js/dashboard.js"></script>
