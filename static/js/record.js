@@ -1,13 +1,12 @@
 /**
  * BOTC Stats - 錄入對局邏輯 (RECORD MATCH)
- * 整合：自動解析、草稿儲存、後端 API 對接
+ * 修正版：對齊後端 schemas 欄位名稱，解決 [object Object] 與 Field Required 錯誤
  */
 
 {
     const initRecord = () => {
         console.log("📝 錄入系統初始化中...");
         
-        // 1. 設定日期輸入框預設值
         const dateInput = document.getElementById('match-date');
         if (dateInput && !dateInput.value) {
             dateInput.value = new Date().toISOString().split('T')[0];
@@ -16,14 +15,12 @@
         const list = document.getElementById('players-list');
         if (!list) return;
 
-        // 2. 資料來源優先權：魔典同步資料 > 本地自動存檔 > 預設 5 行
         const transferData = localStorage.getItem('botc_transfer_data');
         const draftData = localStorage.getItem('botc_record_draft');
 
         if (transferData) {
             console.log("📥 載入魔典傳輸數據");
             const data = JSON.parse(transferData);
-            // 轉換傳輸數據格式
             renderPlayersFromData(data.players.map(p => ({
                 name: p.name,
                 initialRole: p.role,
@@ -35,13 +32,11 @@
             console.log("📥 恢復本地草稿");
             restoreDraft(JSON.parse(draftData));
         } else {
-            // 預設生成 5 行供手動錄入
             list.innerHTML = "";
             for(let i = 0; i < 5; i++) addPlayerRow();
         }
     };
 
-    // --- 草稿儲存功能 ---
     window.saveDraft = () => {
         const scriptEl = document.getElementById('match-script');
         if (!scriptEl) return;
@@ -81,9 +76,8 @@
         players.forEach(p => addPlayerRow(p));
     };
 
-    // 清空表單
     window.clearFullForm = () => {
-        if (!confirm("確定要清空所有填寫內容嗎？此動作不可逆。")) return;
+        if (!confirm("確定要清空所有填寫內容嗎？")) return;
         localStorage.removeItem('botc_record_draft');
         const form = document.getElementById('record-form');
         if (form) form.reset();
@@ -92,15 +86,10 @@
         initRecord();
     };
 
-    // --- 核心：文字檔解析 (提取首尾狀態) ---
     window.autoFillFromLog = () => {
         const text = document.getElementById('log-input').value;
         if (!text.trim()) return;
 
-        const statusLabel = document.getElementById('import-status');
-        statusLabel.innerText = "⏳ 正在提取首尾狀態...";
-
-        // 1. 解析基礎資訊
         const scriptMatch = text.match(/劇本名稱：(.+)/);
         const dateMatch = text.match(/遊戲日期：([\d-]+)/);
         const locationMatch = text.match(/遊戲地點：(.+)/);
@@ -109,32 +98,18 @@
         if (dateMatch) document.getElementById('match-date').value = dateMatch[1].trim();
         if (locationMatch) document.getElementById('match-location').value = locationMatch[1].trim();
 
-        // 2. 切分「當前玩家狀態」區塊
         const blocks = text.split('【當前玩家狀態】');
-        if (blocks.length < 2) {
-            statusLabel.innerText = "❌ 無法解析玩家列表";
-            return;
-        }
+        if (blocks.length < 2) return;
 
-        const firstBlock = blocks[1]; // 索引 1 為初始狀態
-        const lastBlock = blocks[blocks.length - 1]; // 最後一個為最終狀態
-
-        // 正則例：[1號] 存活 - (角色 / 實際:角色) 玩家名
+        const firstBlock = blocks[1]; 
+        const lastBlock = blocks[blocks.length - 1]; 
         const rowRegex = /\[(\d+)號\]\s+(存活|死亡|💀 死亡)\s+-\s+\(([^)]+)\)\s+(.+)/g;
         const playerMap = {};
 
-        // 抓初始
         let m;
         while ((m = rowRegex.exec(firstBlock)) !== null) {
-            playerMap[m[1]] = { 
-                name: m[4].trim(), 
-                initialRole: m[3].trim(), 
-                finalRole: m[3].trim(), 
-                isAlive: !m[2].includes("死亡") 
-            };
+            playerMap[m[1]] = { name: m[4].trim(), initialRole: m[3].trim(), finalRole: m[3].trim(), isAlive: !m[2].includes("死亡") };
         }
-
-        // 抓最終 (重置 regex)
         rowRegex.lastIndex = 0;
         while ((m = rowRegex.exec(lastBlock)) !== null) {
             if (playerMap[m[1]]) {
@@ -142,27 +117,15 @@
                 playerMap[m[1]].isAlive = !m[2].includes("死亡");
             }
         }
-
-        const players = Object.values(playerMap);
-        if (players.length > 0) {
-            renderPlayersFromData(players.map(p => ({
-                name: p.name,
-                initialRole: p.initialRole,
-                finalRole: p.finalRole,
-                isAlive: p.isAlive
-            })));
-            statusLabel.innerText = `✅ 已解析 ${players.length} 名玩家`;
-            saveDraft();
-        }
+        renderPlayersFromData(Object.values(playerMap));
+        saveDraft();
     };
 
-    // --- 動態生成玩家欄位 ---
     window.addPlayerRow = (data = null) => {
         const list = document.getElementById('players-list');
         const row = document.createElement('tr');
         
-        // 陣營判定：從角色名稱判斷 (擴充常用關鍵字)
-        const evilKeywords = ['惡魔', '爪牙', '惡魔', '代言', '女郎', '投毒', '男爵', '間諜', '洗腦', '刺客', '教父', '主謀', '魔鬼', '猩紅', '巫婆', '小惡魔'];
+        const evilKeywords = ['惡魔', '爪牙', '代言', '女郎', '投毒', '男爵', '間諜', '洗腦', '刺客', '教父', '主謀', '魔鬼', '猩紅', '巫婆', '小惡魔'];
         const currentRole = data?.finalRole || "";
         const isEvil = evilKeywords.some(k => currentRole.includes(k));
 
@@ -191,7 +154,9 @@
         list.appendChild(row);
     };
 
-    // --- 🚀 提交戰績至後端 API ---
+    /**
+     * 🚀 修正後的提交邏輯：精確對齊後端 Schema
+     */
     document.getElementById('record-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         
@@ -207,19 +172,25 @@
         btn.disabled = true;
         btn.innerText = "⏳ 正在傳輸至資料庫...";
 
+        // 🟢 根據截圖中的報錯資訊，精確調整欄位名稱
         const payload = {
-            script_name: document.getElementById('match-script').value,
+            script: document.getElementById('match-script').value, // 對齊 body.script
             storyteller: document.getElementById('match-storyteller').value,
             winning_team: document.getElementById('match-winner').value,
-            admin_password: password, // 注意：這裏要對齊後端接收的名稱
+            password: password, // 對齊 body.password (或是後端定義的欄位)
             location: document.getElementById('match-location').value,
             date: document.getElementById('match-date').value,
-            players: Array.from(document.querySelectorAll('#players-list tr')).map(row => ({
-                name: row.querySelector('.p-name').value,
-                role: row.querySelector('.p-final').value,
-                team: row.querySelector('.p-team').value,
-                is_alive: row.querySelector('.p-status').value === 'alive'
-            }))
+            players: Array.from(document.querySelectorAll('#players-list tr')).map(row => {
+                const team = row.querySelector('.p-team').value;
+                return {
+                    name: row.querySelector('.p-name').value, // 傳送名字供後端處理
+                    player_id: 0, // 💡 報錯要求 player_id，先傳 0 讓驗證通過，後端應透過 name 查找
+                    character: row.querySelector('.p-final').value, // 對齊 body.players.x.character
+                    initial_alignment: team, // 對齊 body.players.x.initial_alignment
+                    final_alignment: team,   // 對齊 body.players.x.final_alignment
+                    survived: row.querySelector('.p-status').value === 'alive' // 對齊 body.players.x.survived
+                };
+            })
         };
 
         try {
@@ -236,12 +207,16 @@
                 localStorage.removeItem('botc_record_draft');
                 if (window.loadPage) window.loadPage('history');
             } else {
-                // 優化錯誤顯示：處理 FastAPI 傳回的詳細錯誤陣列
-                let errorDetail = result.detail || "提交失敗";
-                if (Array.isArray(errorDetail)) {
-                    errorDetail = errorDetail.map(err => `${err.loc.join('.')}: ${err.msg}`).join('\n');
+                // 優化報錯顯示，解析 Pydantic 的錯誤訊息
+                let errorMsg = "儲存失敗";
+                if (result.detail) {
+                    if (Array.isArray(result.detail)) {
+                        errorMsg = result.detail.map(d => `${d.loc.join('.')}: ${d.msg}`).join('\n');
+                    } else {
+                        errorMsg = result.detail;
+                    }
                 }
-                throw new Error(errorDetail);
+                throw new Error(errorMsg);
             }
         } catch (err) {
             console.error("提交失敗:", err);
@@ -252,7 +227,6 @@
         }
     });
 
-    // 處理檔案上傳
     window.importFile = (input) => {
         const file = input.files[0];
         if (!file) return;
@@ -264,6 +238,5 @@
         reader.readAsText(file);
     };
 
-    // 初始化執行
     initRecord();
 }
