@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOTC Stats - 血染鐘樓戰績魔典</title>
+
+    <!-- 字體與圖示 -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- 🟢 核心數據庫 (必須在 record.js 之前載入) -->
+    <script src="/js/roles_db.js"></script>
+
+    <!-- 全域 API 配置 -->
+    <script>
+        let origin = window.location.origin;
+        if (origin.endsWith('/')) origin = origin.slice(0, -1);
+        window.API_BASE = origin;
+        console.log("🚀 系統啟動，角色數據庫狀態:", window.MASTER_ROLE_DB ? "✅ 已載入" : "❌ 未載入");
+    </script>
+
+    <!-- React 運行環境 -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <!-- (其餘內容保持不變) -->
+    <div class="background-effects">
+        <div class="glow red-glow"></div>
+        <div class="glow purple-glow"></div>
+    </div>
+
+    <nav class="sidebar">
+        <div class="logo">
+            <i class="fa-solid fa-clock"></i>
+            <h1>BOTC <span class="accent">STATS</span></h1>
+        </div>
+        <ul class="nav-links" id="main-nav">
+            <li class="active"><a href="#" data-page="dashboard"><i class="fa-solid fa-chart-line"></i> <span>數據看板</span></a></li>
+            <li><a href="#" data-page="recorder"><i class="fa-solid fa-book-open"></i> <span>覆盤紀錄</span></a></li>
+            <li><a href="#" data-page="record"><i class="fa-solid fa-feather-pointed"></i> <span>錄入對局</span></a></li>
+            <li><a href="#" data-page="history"><i class="fa-solid fa-clock-rotate-left"></i> <span>歷史紀錄</span></a></li>
+        </ul>
+        <div class="nav-footer">
+            <i class="fa-solid fa-music audio-control" id="bgm-toggle"></i>
+        </div>
+    </nav>
+
+    <main class="main-content" id="content-area">
+        <div class="loading">正在召喚魔典...</div>
+    </main>
+
+    <script>
+        // SPA 載入邏輯保持不變...
+        async function loadPage(pageName) {
+            const area = document.getElementById('content-area');
+            if (!area) return;
+            area.style.opacity = '0.5';
+            try {
+                const response = await fetch(`/pages/${pageName}.html?t=${new Date().getTime()}`);
+                if (!response.ok) throw new Error("頁面載入失敗");
+                const html = await response.text();
+                area.innerHTML = html;
+                const scripts = area.querySelectorAll('script');
+                for (let oldScript of scripts) {
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                    if (oldScript.src) {
+                        newScript.src = oldScript.src + '?v=' + new Date().getTime();
+                    } else {
+                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                    }
+                    oldScript.parentNode.replaceChild(newScript, oldScript);
+                }
+                if (window.Babel) window.Babel.transformScriptTags();
+                area.style.opacity = '1';
+                document.querySelectorAll('#main-nav li').forEach(li => {
+                    const link = li.querySelector('a');
+                    if (link.getAttribute('data-page') === pageName) li.classList.add('active');
+                    else li.classList.remove('active');
+                });
+            } catch (err) {
+                area.innerHTML = `<div class="card"><h3>無法載入頁面</h3><p>${err.message}</p></div>`;
+                area.style.opacity = '1';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('#main-nav a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = e.currentTarget.getAttribute('data-page');
+                    loadPage(page);
+                    window.location.hash = page;
+                });
+            });
+            const hash = window.location.hash.replace('#', '');
+            loadPage(hash || 'dashboard');
+        });
+    </script>
+</body>
+</html>
