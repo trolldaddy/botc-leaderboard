@@ -1,54 +1,112 @@
-        <header class="top-header">
-            <h2>對局紀錄 (Match History)</h2>
-        </header>
-
-        <div class="card col-span-2">
-            <div class="card-header">
-                <h3><i class="fa-solid fa-book-journal-whills text-blue"></i> 最近對局紀錄</h3>
-            </div>
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>對局日期</th>
-                            <th>使用劇本</th>
-                            <th>說書人</th>
-                            <th>獲勝陣營</th>
-                            <th>遊玩人數</th>
-                            <th>危險操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-tbody">
-                        <tr>
-                            <td colspan="6" class="loading">正在追溯時空長河...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+<header class="top-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 1rem;">
+        <h2 style="font-family: 'Cinzel', serif; letter-spacing: 2px;">歷史紀錄 (MATCH HISTORY)</h2>
+        <!-- 頂部快速搜尋欄 -->
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="history-search" placeholder="搜尋劇本、說書人或地點..." oninput="filterHistory()">
         </div>
-    </main>
+    </div>
+</header>
 
-    <!-- 删除密码确认弹窗 (非常简易的暗黑风) -->
-    <div id="delete-modal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
-        <div class="card"
-            style="width: 400px; padding: 2rem; position: relative; border-color: var(--accent-red); box-shadow: 0 0 20px rgba(230,57,70,0.5);">
-            <h3 class="text-red" style="margin-bottom: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i> 銷毀此條記錄嗎？
-            </h3>
-            <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">此操作將永久抹除對局數據，並重新計算排行榜勝率，不可撤銷。
-            </p>
-            <input type="password" id="delete-pw" class="form-control" placeholder="请输入管理员钥匙 (如 botc)"
-                style="margin-bottom: 1.5rem;">
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button class="btn" style="background: rgba(255,255,255,0.1); color: white;"
-                    onclick="closeDeleteModal()">取消</button>
-                <button class="btn btn-primary" onclick="confirmDelete()">無情銷毀</button>
+<div class="history-container" style="max-width: 1400px; margin: 0 auto; padding: 0 1rem 80px 1rem;">
+    
+    <!-- 統計小結卡片 (與錄入頁面風格統一) -->
+    <div class="card summary-card" style="margin-bottom: 2rem; border-top: 4px solid var(--accent-purple); background: rgba(20, 20, 25, 0.8);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; text-align: center;">
+            <div class="stat-item">
+                <span class="stat-label">近期對局</span>
+                <span class="stat-value text-purple" id="count-total">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">善良獲勝</span>
+                <span class="stat-value text-blue" id="count-good">-</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">邪惡獲勝</span>
+                <span class="stat-value text-red" id="count-evil">-</span>
             </div>
         </div>
     </div>
 
-    <script src="js/audio.js"></script>
-    <script src="js/history.js"></script>
-</body>
+    <!-- 歷史清單容器 -->
+    <div id="history-list-area" class="history-list-wrapper">
+        <div style="text-align: center; color: var(--text-muted); padding: 5rem;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+            <p>正在翻開陳舊的魔典紀錄...</p>
+        </div>
+    </div>
+</div>
 
-</html>
+<style>
+    /* 搜尋框 */
+    .search-box { position: relative; width: 300px; }
+    .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .search-box input {
+        width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color);
+        color: #fff; padding: 0.8rem 1rem 0.8rem 2.8rem; border-radius: 50px; outline: none; transition: all 0.3s;
+    }
+    .search-box input:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(131, 56, 236, 0.2); }
+
+    /* 統計數字 */
+    .stat-label { display: block; font-size: 0.7rem; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
+    .stat-value { font-size: 1.8rem; font-weight: 800; }
+    .text-purple { color: var(--accent-purple); }
+    .text-blue { color: var(--accent-blue); }
+    .text-red { color: var(--accent-red); }
+
+    /* 對局卡片 */
+    .match-history-card {
+        background: rgba(30, 30, 35, 0.5); border: 1px solid var(--border-color);
+        border-radius: 16px; margin-bottom: 1.2rem; overflow: hidden; transition: all 0.3s ease;
+    }
+    .match-history-card:hover { background: rgba(40, 40, 45, 0.8); border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+
+    .match-main-row { padding: 1.2rem 1.5rem; display: flex; align-items: center; cursor: pointer; gap: 1.5rem; flex-wrap: wrap; }
+
+    /* 日期徽章 */
+    .match-date-badge {
+        width: 80px; text-align: center; background: rgba(0,0,0,0.3);
+        padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
+    }
+    .match-date-badge .year { font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px; }
+    .match-date-badge .date-text { font-size: 1.1rem; font-weight: 800; color: var(--accent-gold); }
+
+    .match-info-main { flex: 1; min-width: 250px; }
+    .match-info-main h4 { font-size: 1.3rem; color: #fff; margin-bottom: 6px; }
+    .match-meta-info { display: flex; gap: 1.2rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap; }
+    .match-meta-info i { margin-right: 4px; width: 14px; text-align: center; }
+
+    /* 獲勝標籤 */
+    .match-result-tag {
+        padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 1.1rem;
+        text-align: center; min-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .res-good { background: rgba(69, 123, 157, 0.2); color: #a8dadc; border: 1px solid rgba(69, 123, 157, 0.5); }
+    .res-evil { background: rgba(230, 57, 70, 0.2); color: #ffb3b3; border: 1px solid rgba(230, 57, 70, 0.5); }
+
+    /* 詳情摺疊區 */
+    .match-details-panel {
+        background: rgba(0, 0, 0, 0.3); border-top: 1px solid var(--border-color);
+        padding: 1.5rem; display: none;
+    }
+    
+    .detail-table-container { width: 100%; overflow-x: auto; border-radius: 12px; background: rgba(0,0,0,0.2); }
+    .detail-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 600px; }
+    .detail-table th { text-align: left; color: var(--accent-gold); padding: 12px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; text-transform: uppercase; }
+    .detail-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+    /* 箭頭旋轉 */
+    .toggle-icon { transition: transform 0.3s ease; color: var(--text-muted); }
+    .match-history-card.open .toggle-icon { transform: rotate(180deg); color: #fff; }
+
+    @media (max-width: 768px) {
+        .match-main-row { padding: 1rem; gap: 1rem; }
+        .match-result-tag { width: 100%; font-size: 1rem; }
+        .search-box { width: 100%; }
+        .match-date-badge { width: 60px; }
+        .match-date-badge .date-text { font-size: 0.9rem; }
+    }
+</style>
+
+<script src="/js/history.js"></script>
