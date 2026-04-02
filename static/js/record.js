@@ -1,6 +1,6 @@
 /**
  * BOTC Stats - 錄入對局邏輯 (RECORD MATCH)
- * 修復：Master Role DB 連結、存活狀態精確解析
+ * 功能：自動解析日期、自動完成、智慧陣營判定、提交後跳轉歷史紀錄
  */
 
 {
@@ -13,6 +13,7 @@
         }
 
         const dateInput = document.getElementById('match-date');
+        // 預設填寫今天，但稍後會被自動解析覆蓋
         if (dateInput && !dateInput.value) {
             dateInput.value = new Date().toISOString().split('T')[0];
         }
@@ -55,11 +56,10 @@
         } catch (err) { console.warn("Datalist fetch failed"); }
     };
 
-    // --- 🛡️ 智慧陣營判定 (修正數據庫匹配) ---
+    // --- 🛡️ 智慧陣營判定 ---
     const getAlignmentByRole = (roleStr) => {
         if (!roleStr) return "good";
         
-        // 1. 處理複雜格式如 "小精靈 / 實際: 毒蛇"
         let targetRole = roleStr;
         if (roleStr.includes("實際:")) {
             targetRole = roleStr.split("實際:")[1].trim();
@@ -67,15 +67,11 @@
             targetRole = roleStr.split("/")[1]?.trim() || roleStr.split("/")[0].trim();
         }
         
-        // 2. 清理括號
         targetRole = targetRole.replace(/[()（）]/g, "").trim();
-
         const db = window.MASTER_ROLE_DB || [];
-        // 同時嘗試比對名稱 (name) 與標籤 (id)
         const roleData = db.find(r => r.name === targetRole || r.id === targetRole);
         
         if (roleData) {
-            console.log(`🔍 匹配角色: ${roleData.name} (${roleData.team})`);
             if (roleData.team === 'minion' || roleData.team === 'demon') return "evil";
         }
         return "good";
@@ -124,7 +120,7 @@
         location.reload();
     };
 
-    // --- 🔮 解析覆盤文字 (強化存活判定) ---
+    // --- 🔮 解析覆盤文字 (新增：日期解析邏輯) ---
     window.autoFillFromLog = () => {
         const text = document.getElementById('log-input').value;
         if (!text.trim()) return;
@@ -134,8 +130,12 @@
 
         const scriptMatch = text.match(/劇本名稱：(.+)/);
         const locationMatch = text.match(/遊戲地點：(.+)/);
+        // 🟢 新增：日期正則表達式，支援 YYYY-MM-DD 格式
+        const dateMatch = text.match(/遊戲日期：(\d{4}-\d{2}-\d{2})/);
+
         if (scriptMatch) document.getElementById('match-script').value = scriptMatch[1].trim();
         if (locationMatch) document.getElementById('match-location').value = locationMatch[1].trim();
+        if (dateMatch) document.getElementById('match-date').value = dateMatch[1]; // 🟢 更新日期輸入框
 
         const blocks = text.split('【當前玩家狀態】');
         if (blocks.length < 2) {
@@ -146,7 +146,6 @@
         const firstBlock = blocks[1]; 
         const lastBlock = blocks[blocks.length - 1]; 
 
-        // Regex 修復：處理寬空格與特殊的連字號
         const rowRegex = /\[(\d+)號\]\s+(.+?)\s+-\s+\(([^)]+)\)\s+(.+)/g;
         const playerMap = {};
 
@@ -166,9 +165,7 @@
             const id = m[1];
             if (playerMap[id]) {
                 playerMap[id].final_character = m[3].trim();
-                // 🟢 精確判定：只要字串包含「死亡」二字即為 False
-                const statusText = m[2].trim();
-                playerMap[id].survived = !statusText.includes("死亡");
+                playerMap[id].survived = !m[2].includes("死亡");
             }
         }
 
@@ -183,8 +180,6 @@
     window.addPlayerRow = (data = null) => {
         const list = document.getElementById('players-list');
         const row = document.createElement('tr');
-        
-        // 抓取智慧陣營
         const alignment = data?.alignment || getAlignmentByRole(data?.final_character);
 
         row.innerHTML = `
@@ -249,7 +244,8 @@
             if (resp.ok) {
                 alert("🎉 錄入成功！");
                 localStorage.removeItem('botc_record_draft');
-                if (window.loadPage) window.loadPage('dashboard');
+                // 🟢 修正：錄入成功後跳轉至歷史紀錄頁面
+                if (window.loadPage) window.loadPage('history');
             } else {
                 const err = await resp.json();
                 alert("❌ 失敗: " + (err.detail || "未知錯誤"));
