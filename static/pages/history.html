@@ -1,111 +1,109 @@
 <header class="top-header">
     <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 1rem;">
-        <h2 style="font-family: 'Cinzel', serif; letter-spacing: 2px;">歷史紀錄 (MATCH HISTORY)</h2>
-        <!-- 頂部快速搜尋欄 -->
-        <div class="search-box">
+        <h2 style="font-family: 'Cinzel', serif; letter-spacing: 2px;">歷史魔典 (MATCH HISTORY)</h2>
+        
+        <!-- 🟢 簡約搜尋欄：直接搜尋 -->
+        <div class="search-input-wrapper" style="width: 350px; max-width: 100%;">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="history-search" placeholder="搜尋劇本、說書人或地點..." oninput="filterHistory()">
+            <input type="text" id="history-search" placeholder="輸入玩家、說書人、地點或劇本..." oninput="handleSearch()">
         </div>
     </div>
 </header>
 
 <div class="history-container" style="max-width: 1400px; margin: 0 auto; padding: 0 1rem 80px 1rem;">
     
-    <!-- 統計小結卡片 (與錄入頁面風格統一) -->
-    <div class="card summary-card" style="margin-bottom: 2rem; border-top: 4px solid var(--accent-purple); background: rgba(20, 20, 25, 0.8);">
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; text-align: center;">
+    <!-- 🟢 動態統計看板 -->
+    <div class="card summary-card" style="margin-bottom: 2rem; border-top: 4px solid var(--accent-purple); padding: 1.5rem;">
+        <div class="summary-header" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <h4 id="summary-title" style="color: var(--accent-gold); font-size: 1.1rem; margin-bottom: 0.5rem;">總對局紀錄回顧</h4>
+                <p id="search-hint" style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">顯示所有魔典中記載的對局</p>
+            </div>
+            
+            <!-- 🟢 搜尋後才出現的篩選 Tab -->
+            <div id="filter-tabs-container" class="filter-tabs" style="display: none;">
+                <button class="tab-btn active" onclick="setFilterType('all')">全部</button>
+                <button class="tab-btn" onclick="setFilterType('player')">作為玩家</button>
+                <button class="tab-btn" onclick="setFilterType('storyteller')">作為說書人</button>
+                <button class="tab-btn" onclick="setFilterType('location')">作為地點</button>
+                <button class="tab-btn" onclick="setFilterType('script')">作為劇本</button>
+            </div>
+        </div>
+
+        <div class="summary-stats-grid" style="margin-top: 1.5rem;">
             <div class="stat-item">
-                <span class="stat-label">近期對局</span>
-                <span class="stat-value text-purple" id="count-total">-</span>
+                <span class="stat-label">對局場次</span>
+                <span class="stat-value text-purple" id="stat-total">-</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">善良獲勝</span>
-                <span class="stat-value text-blue" id="count-good">-</span>
+                <span class="stat-label">善良勝率</span>
+                <span class="stat-value text-blue" id="stat-good-rate">-%</span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">邪惡獲勝</span>
-                <span class="stat-value text-red" id="count-evil">-</span>
+                <span class="stat-label">邪惡勝率</span>
+                <span class="stat-value text-red" id="stat-evil-rate">-%</span>
+            </div>
+            <div class="stat-item hidden-mobile">
+                <span class="stat-label">常駐地點</span>
+                <span class="stat-value-small" id="stat-top-location">-</span>
+            </div>
+            <div class="stat-item hidden-mobile">
+                <span class="stat-label">鍾情角色</span>
+                <span class="stat-value-small" id="stat-top-role">-</span>
             </div>
         </div>
     </div>
 
     <!-- 歷史清單容器 -->
     <div id="history-list-area" class="history-list-wrapper">
-        <div style="text-align: center; color: var(--text-muted); padding: 5rem;">
-            <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-            <p>正在翻開陳舊的魔典紀錄...</p>
-        </div>
+        <!-- JS 渲染內容 -->
     </div>
 </div>
 
 <style>
-    /* 搜尋框 */
-    .search-box { position: relative; width: 300px; }
-    .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-    .search-box input {
-        width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border-color);
+    /* 搜尋框樣式 */
+    .search-input-wrapper { position: relative; }
+    .search-input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .search-input-wrapper input {
+        width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color);
         color: #fff; padding: 0.8rem 1rem 0.8rem 2.8rem; border-radius: 50px; outline: none; transition: all 0.3s;
     }
-    .search-box input:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(131, 56, 236, 0.2); }
+    .search-input-wrapper input:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(131, 56, 236, 0.2); }
 
-    /* 統計數字 */
-    .stat-label { display: block; font-size: 0.7rem; color: var(--accent-gold); text-transform: uppercase; margin-bottom: 5px; font-weight: bold; }
-    .stat-value { font-size: 1.8rem; font-weight: 800; }
-    .text-purple { color: var(--accent-purple); }
-    .text-blue { color: var(--accent-blue); }
-    .text-red { color: var(--accent-red); }
-
-    /* 對局卡片 */
-    .match-history-card {
-        background: rgba(30, 30, 35, 0.5); border: 1px solid var(--border-color);
-        border-radius: 16px; margin-bottom: 1.2rem; overflow: hidden; transition: all 0.3s ease;
+    /* Tab 切換鈕樣式 */
+    .filter-tabs { display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color); }
+    .tab-btn {
+        background: transparent; border: none; color: var(--text-muted); padding: 6px 14px; border-radius: 8px;
+        font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
     }
-    .match-history-card:hover { background: rgba(40, 40, 45, 0.8); border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
+    .tab-btn.active { background: var(--accent-purple); color: #fff; }
+    .tab-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.05); }
 
-    .match-main-row { padding: 1.2rem 1.5rem; display: flex; align-items: center; cursor: pointer; gap: 1.5rem; flex-wrap: wrap; }
+    /* 統計格點 */
+    .summary-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; }
+    .stat-label { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; text-transform: uppercase; }
+    .stat-value { font-size: 1.8rem; font-weight: 800; font-family: 'Inter', sans-serif; }
+    .stat-value-small { font-size: 0.95rem; font-weight: 700; color: var(--accent-gold); display: block; margin-top: 5px; }
 
-    /* 日期徽章 */
-    .match-date-badge {
-        width: 80px; text-align: center; background: rgba(0,0,0,0.3);
-        padding: 8px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
-    }
-    .match-date-badge .year { font-size: 0.6rem; color: var(--text-muted); display: block; margin-bottom: 2px; }
-    .match-date-badge .date-text { font-size: 1.1rem; font-weight: 800; color: var(--accent-gold); }
-
-    .match-info-main { flex: 1; min-width: 250px; }
-    .match-info-main h4 { font-size: 1.3rem; color: #fff; margin-bottom: 6px; }
-    .match-meta-info { display: flex; gap: 1.2rem; font-size: 0.85rem; color: var(--text-muted); flex-wrap: wrap; }
-    .match-meta-info i { margin-right: 4px; width: 14px; text-align: center; }
-
-    /* 獲勝標籤 */
-    .match-result-tag {
-        padding: 10px 20px; border-radius: 12px; font-weight: 900; font-size: 1.1rem;
-        text-align: center; min-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .res-good { background: rgba(69, 123, 157, 0.2); color: #a8dadc; border: 1px solid rgba(69, 123, 157, 0.5); }
-    .res-evil { background: rgba(230, 57, 70, 0.2); color: #ffb3b3; border: 1px solid rgba(230, 57, 70, 0.5); }
-
-    /* 詳情摺疊區 */
-    .match-details-panel {
-        background: rgba(0, 0, 0, 0.3); border-top: 1px solid var(--border-color);
-        padding: 1.5rem; display: none;
-    }
+    /* 對局卡片與橫向滾動詳情 */
+    .match-history-card { background: rgba(30, 30, 35, 0.5); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 1rem; overflow: hidden; }
+    .match-main-row { padding: 1rem 1.2rem; display: flex; align-items: center; cursor: pointer; gap: 1rem; }
     
-    .detail-table-container { width: 100%; overflow-x: auto; border-radius: 12px; background: rgba(0,0,0,0.2); }
-    .detail-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 600px; }
-    .detail-table th { text-align: left; color: var(--accent-gold); padding: 12px; font-weight: bold; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; text-transform: uppercase; }
-    .detail-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .match-details-panel { background: rgba(0, 0, 0, 0.4); border-top: 1px solid var(--border-color); display: none; padding: 1rem; }
+    .horizontal-detail-bar { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; background: rgba(0, 0, 0, 0.2); border-radius: 12px; }
+    
+    .detail-table { min-width: 750px; width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .detail-table th { text-align: left; color: var(--accent-gold); padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.7rem; }
+    .detail-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-    /* 箭頭旋轉 */
-    .toggle-icon { transition: transform 0.3s ease; color: var(--text-muted); }
-    .match-history-card.open .toggle-icon { transform: rotate(180deg); color: #fff; }
+    .toggle-icon { transition: transform 0.3s; color: var(--text-muted); }
+    .match-history-card.open .toggle-icon { transform: rotate(180deg); }
 
     @media (max-width: 768px) {
-        .match-main-row { padding: 1rem; gap: 1rem; }
-        .match-result-tag { width: 100%; font-size: 1rem; }
-        .search-box { width: 100%; }
-        .match-date-badge { width: 60px; }
-        .match-date-badge .date-text { font-size: 0.9rem; }
+        .hidden-mobile { display: none; }
+        .match-main-row { flex-wrap: wrap; }
+        .filter-tabs { width: 100%; overflow-x: auto; }
+        .tab-btn { flex: 1; white-space: nowrap; }
     }
 </style>
 
