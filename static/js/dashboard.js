@@ -1,61 +1,67 @@
 /**
  * BOTC Stats - 數據看板邏輯
- * 移除搜尋功能，優化地點篩選與陣營條顯示
+ * 功能：抓取彙總數據，動態渲染全域總覽與各地點卡片
  */
 
 {
     const loadDashboardStats = async () => {
-        const locationFilter = document.getElementById('location-filter');
-        const location = locationFilter?.value || "";
+        const container = document.getElementById('location-cards-container');
         const apiBase = window.API_BASE || "";
         
         try {
-            const resp = await fetch(`${apiBase}/api/stats?location=${encodeURIComponent(location)}`);
+            const resp = await fetch(`${apiBase}/api/stats`);
             if (!resp.ok) throw new Error("無法抓取統計數據");
             const data = await resp.json();
 
-            // 1. 基礎數字填充
-            document.getElementById('total-games-count').innerText = data.total_games || 0;
-            const goodRate = data.good_win_percent || 0;
-            const evilRate = data.evil_win_percent || 0;
+            // 1. 渲染頂部全域總覽
+            const g = data.global;
+            document.getElementById('global-total').innerText = g.total;
+            document.getElementById('global-good').innerHTML = `${g.good_rate}% <small style="font-size:0.8rem; opacity:0.6;">(${g.good_wins}場)</small>`;
+            document.getElementById('global-evil').innerHTML = `${g.evil_rate}% <small style="font-size:0.8rem; opacity:0.6;">(${g.evil_wins}場)</small>`;
 
-            document.getElementById('good-win-rate').innerText = goodRate + "%";
-            document.getElementById('evil-rate-summary').innerText = evilRate + "%";
+            // 2. 渲染各個地點卡片
+            if (!container) return;
             
-            // 2. 視覺化拉鋸條動畫
-            document.getElementById('viz-good-rate').innerText = goodRate + "%";
-            document.getElementById('viz-evil-rate').innerText = evilRate + "%";
-            
-            // 處理極端情況 (防止 0% 時看起來還是 50/50)
-            const barGood = document.getElementById('bar-good');
-            const barEvil = document.getElementById('bar-evil');
-            
-            if (barGood && barEvil) {
-                barGood.style.width = goodRate + "%";
-                barEvil.style.width = evilRate + "%";
+            if (data.locations.length === 0) {
+                container.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--text-muted); padding:3rem;">目前魔典尚未記載任何地點數據</div>`;
+                return;
             }
 
-            const labelEl = document.getElementById('current-location-label');
-            if (labelEl) labelEl.innerText = location ? `地點：${location}` : "全域數據";
+            container.innerHTML = data.locations.map(loc => {
+                return `
+                    <div class="card location-card">
+                        <div class="loc-header">
+                            <span class="loc-name"><i class="fa-solid fa-map-location-dot" style="margin-right:8px; opacity:0.5;"></i>${loc.name}</span>
+                            <span class="loc-total-badge">${loc.total} 場對局</span>
+                        </div>
+                        <div class="loc-content">
+                            <div class="loc-stat-item">
+                                <span class="loc-stat-label">善良勝率</span>
+                                <span class="loc-stat-value text-blue">${loc.good_rate}%</span>
+                                <span class="loc-stat-games">(${loc.good_wins}場)</span>
+                            </div>
+                            <div style="height:40px; width:1px; background:var(--border-color);"></div>
+                            <div class="loc-stat-item">
+                                <span class="loc-stat-label">邪惡勝率</span>
+                                <span class="loc-stat-value text-red">${loc.evil_rate}%</span>
+                                <span class="loc-stat-games">(${loc.evil_wins}場)</span>
+                            </div>
+                        </div>
+                        <!-- 拉鋸比例條 -->
+                        <div class="loc-bar-container">
+                            <div class="bar-segment" style="width: ${loc.good_rate}%; background: linear-gradient(90deg, #457b9d, #a8dadc);"></div>
+                            <div class="bar-segment" style="width: ${loc.evil_rate}%; background: linear-gradient(90deg, #f08080, #e63946);"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-            // 3. 自動動態更新地點選單 (初次載入)
-            if (!location && data.available_locations && locationFilter.options.length <= 1) {
-                const currentValue = locationFilter.value;
-                locationFilter.innerHTML = '<option value="">所有地點 (Global)</option>';
-                data.available_locations.forEach(loc => {
-                    const opt = document.createElement('option');
-                    opt.value = loc;
-                    opt.innerText = loc;
-                    locationFilter.appendChild(opt);
-                });
-                locationFilter.value = currentValue;
-            }
         } catch (err) {
             console.error("Dashboard Stats Error:", err);
+            if (container) container.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:var(--accent-red); padding:3rem;">數據載入失敗，請確認後端連線</div>`;
         }
     };
 
-    // 初始化載入
-    window.loadDashboardStats = loadDashboardStats;
+    // 啟動載入
     loadDashboardStats();
 }
