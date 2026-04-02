@@ -1,21 +1,22 @@
 /**
  * BOTC Stats - 錄入對局邏輯 (RECORD MATCH)
- * 整合：左側詳細紀錄、自動解析日期、自動建議、響應式
  */
 
 {
     const initRecord = async () => {
         console.log("📝 錄入系統初始化中...");
         
-        // 設定日期預設值
+        if (!window.MASTER_ROLE_DB || window.MASTER_ROLE_DB.length === 0) {
+            console.error("❌ 警告：未偵測到角色數據庫。");
+        }
+
         const dateInput = document.getElementById('match-date');
         if (dateInput && !dateInput.value) {
             dateInput.value = new Date().toISOString().split('T')[0];
         }
 
-        // 同步數據
-        await refreshPlayerDatalist();
-        loadRecentMatches();
+        await refreshPlayerDatalist(); 
+        loadRecentMatches();           
 
         const list = document.getElementById('players-list');
         if (!list) return;
@@ -40,16 +41,18 @@
         }
     };
 
-    // --- 🟢 載入左側詳細紀錄 ---
+    // --- 🟢 載入左側「最近錄入對局」 ---
     const loadRecentMatches = async () => {
         const container = document.getElementById('recent-matches-list');
         if (!container) return;
+        const apiBase = window.API_BASE || "";
+
         try {
-            const resp = await fetch(`${window.API_BASE}/api/history`);
+            const resp = await fetch(`${apiBase}/api/history`);
             if (!resp.ok) throw new Error();
             const data = await resp.json();
-            const recent = data.slice(0, 5);
             
+            const recent = data.slice(0, 5);
             if (recent.length === 0) {
                 container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1.5rem;">尚未有錄入紀錄</div>`;
                 return;
@@ -57,32 +60,31 @@
 
             container.innerHTML = recent.map(m => {
                 const d = new Date(m.date);
-                const dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+                const dateStr = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
                 const isGood = m.winning_team === 'good';
                 
                 return `
                     <div class="side-match-item">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                            <span class="title">${m.script}</span>
-                            <span class="tag ${isGood ? 'tag-good' : 'tag-evil'}">${isGood ? '善良勝' : '邪惡勝'}</span>
+                        <div class="content">
+                            <span class="m-title">${m.script}</span>
+                            <div class="m-meta">
+                                <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
+                            </div>
+                            <div class="m-meta" style="opacity: 0.6; font-size: 0.65rem; margin-top: 2px;">
+                                <span>對局日期：${dateStr}</span>
+                            </div>
                         </div>
-                        <div class="info">
-                            <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
-                            <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
-                        </div>
-                        <div class="info" style="margin-top: 4px; opacity: 0.6; font-size: 0.65rem;">
-                            <span><i class="fa-solid fa-calendar"></i> ${dateStr}</span>
-                            <span>序號: #${m.id}</span>
+                        <div class="m-tag ${isGood ? 'tag-good' : 'tag-evil'}">
+                            ${isGood ? '善良獲勝' : '邪惡獲勝'}
                         </div>
                     </div>
                 `;
             }).join('');
         } catch (err) {
-            container.innerHTML = `<div style="text-align: center; color: var(--accent-red); font-size: 0.8rem; padding: 1rem;">讀取失敗</div>`;
+            container.innerHTML = `<div style="text-align: center; color: var(--accent-red); font-size: 0.8rem; padding: 1rem;">連線失敗</div>`;
         }
     };
 
-    // --- 🛡️ 智慧陣營判定 ---
     const getAlignmentByRole = (roleStr) => {
         if (!roleStr) return "good";
         let targetRole = roleStr;
@@ -110,6 +112,8 @@
             }))
         };
         localStorage.setItem('botc_record_draft', JSON.stringify(draft));
+        const statusEl = document.getElementById('save-status');
+        if (statusEl) statusEl.innerText = "草稿已儲存 (" + new Date().toLocaleTimeString() + ")";
     };
 
     const restoreDraft = (data) => {
@@ -118,9 +122,7 @@
         document.getElementById('match-location').value = data.location || "";
         document.getElementById('match-storyteller').value = data.storyteller || "";
         document.getElementById('match-winner').value = data.winner || "good";
-        const list = document.getElementById('players-list');
-        list.innerHTML = "";
-        (data.players || []).forEach(p => addPlayerRow(p));
+        renderPlayersFromData(data.players || []);
     };
 
     const renderPlayersFromData = (players) => {
@@ -171,7 +173,7 @@
             <td><input type="text" class="form-control dark-input p-final" value="${data?.final_character || ''}" placeholder="最終" oninput="saveDraft()"></td>
             <td><select class="form-control dark-input p-team" oninput="saveDraft()"><option value="good" ${alignment === 'good' ? 'selected' : ''}>正義</option><option value="evil" ${alignment === 'evil' ? 'selected' : ''}>邪惡</option></select></td>
             <td><select class="form-control dark-input p-status" oninput="saveDraft()"><option value="alive" ${data?.survived !== false ? 'selected' : ''}>存活</option><option value="dead" ${data?.survived === false ? 'selected' : ''}>死亡</option></select></td>
-            <td><button type="button" class="btn" style="color: rgba(255,255,255,0.1); border:none; background:none;" onclick="this.closest('tr').remove(); saveDraft();"><i class="fa-solid fa-xmark"></i></button></td>
+            <td style="text-align:center;"><button type="button" class="btn" style="color: rgba(255,255,255,0.1); border:none; background:none;" onclick="this.closest('tr').remove(); saveDraft();"><i class="fa-solid fa-xmark"></i></button></td>
         `;
         list.appendChild(row);
     };
@@ -180,7 +182,8 @@
         e.preventDefault();
         const btn = document.getElementById('submit-btn');
         const password = document.getElementById('admin-password').value;
-        btn.disabled = true; btn.innerText = "⏳ 處理中...";
+        const apiBase = window.API_BASE || "";
+        btn.disabled = true; btn.innerText = "⏳ 寫入中...";
         const payload = {
             script: document.getElementById('match-script').value, date: document.getElementById('match-date').value,
             location: document.getElementById('match-location').value || "未知", storyteller: document.getElementById('match-storyteller').value,
@@ -192,11 +195,11 @@
             })).filter(p => p.name !== "")
         };
         try {
-            const resp = await fetch(`${window.API_BASE}/api/matches`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const resp = await fetch(`${apiBase}/api/matches`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
             if (resp.ok) { alert("🎉 錄入成功！"); localStorage.removeItem('botc_record_draft'); if (window.loadPage) window.loadPage('history'); }
             else { const err = await resp.json(); alert("❌ 失敗: " + (err.detail || "密碼錯誤")); }
         } catch (err) { alert(`❌ 網路錯誤：${err.message}`); }
-        finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> 確認提交`; }
+        finally { btn.disabled = false; btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績`; }
     });
 
     const refreshPlayerDatalist = async () => {
