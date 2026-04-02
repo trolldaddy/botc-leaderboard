@@ -17,7 +17,76 @@
         if (dateInput && !dateInput.value) {
             dateInput.value = new Date().toISOString().split('T')[0];
         }
+// 同步基礎數據
+        await refreshPlayerDatalist();
+        // 🟢 抓取左側最近 5 場對局
+        loadRecentMatches();
 
+        const list = document.getElementById('players-list');
+        if (!list) return;
+
+        const transferData = localStorage.getItem('botc_transfer_data');
+        const draftData = localStorage.getItem('botc_record_draft');
+
+        if (transferData) {
+            const data = JSON.parse(transferData);
+            renderPlayersFromData(data.players.map(p => ({
+                name: p.name,
+                initial_character: p.role,
+                final_character: p.actualRole || p.role,
+                survived: p.isAlive
+            })));
+            localStorage.removeItem('botc_transfer_data');
+        } else if (draftData) {
+            restoreDraft(JSON.parse(draftData));
+        } else {
+            list.innerHTML = "";
+            for(let i = 0; i < 12; i++) addPlayerRow();
+        }
+    };
+
+    // --- 🟢 抓取最近 5 場對局紀錄 ---
+    const loadRecentMatches = async () => {
+        const container = document.getElementById('recent-matches-list');
+        if (!container) return;
+        const apiBase = window.API_BASE || "";
+
+        try {
+            const resp = await fetch(`${apiBase}/api/history`);
+            if (!resp.ok) throw new Error();
+            const data = await resp.json();
+            
+            // 只取前 5 筆
+            const recent = data.slice(0, 5);
+            
+            if (recent.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1rem;">尚無靈魂紀錄</div>`;
+                return;
+            }
+
+            container.innerHTML = recent.map(m => {
+                const d = new Date(m.date);
+                const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+                const winColor = m.winning_team === 'good' ? 'var(--accent-blue)' : 'var(--accent-red)';
+                const winLabel = m.winning_team === 'good' ? '正義勝' : '邪惡勝';
+                
+                return `
+                    <div class="match-item">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                            <span style="font-size: 0.85rem; font-weight: bold; color: var(--text-main);">${m.script}</span>
+                            <span style="font-size: 0.7rem; color: var(--text-muted);">${dateStr}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem;">
+                            <span style="color: var(--text-muted);"><i class="fa-solid fa-location-dot" style="font-size: 0.6rem;"></i> ${m.location || '未知'}</span>
+                            <span style="color: ${winColor}; font-weight: bold;">${winLabel}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            container.innerHTML = `<div style="text-align: center; color: var(--accent-red); font-size: 0.8rem; padding: 1rem;">紀錄載入失敗</div>`;
+        }
+    };
         await refreshPlayerDatalist();
 
         const list = document.getElementById('players-list');
