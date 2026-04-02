@@ -1,121 +1,105 @@
 <header class="top-header">
-    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
         <h2 style="font-family: 'Cinzel', serif; letter-spacing: 2px;">數據看板 (DASHBOARD)</h2>
-        
-        <!-- 地點篩選 -->
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <i class="fa-solid fa-filter" style="color: var(--accent-gold); font-size: 0.8rem;"></i>
-            <select id="location-filter" class="form-control dark-input-select" onchange="loadDashboardStats()">
-                <option value="">所有地點 (Global)</option>
-            </select>
-        </div>
+        <span style="font-size: 0.75rem; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 20px; border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-clock-rotate-left"></i> 即時數據同步中
+        </span>
     </div>
 </header>
 
-<div class="dashboard-wrapper" style="max-width: 1400px; margin: 0 auto; padding: 0 1rem 80px 1rem;">
+<div class="dashboard-wrapper" style="max-width: 1500px; margin: 0 auto; padding: 0 1rem 80px 1rem;">
     
-    <!-- 頂部三格數據卡片 -->
-    <div class="dashboard-stats-grid">
+    <!-- 🟢 頂部三格總覽 (強制橫排) -->
+    <div class="stats-overview-row">
         <div class="card stat-card-mini" style="border-left: 4px solid var(--accent-gold);">
-            <span class="mini-label">魔典記載總量</span>
-            <div class="mini-value" id="total-games-count">-</div>
+            <span class="mini-label">總登記對局</span>
+            <div class="mini-value" id="global-total">-</div>
             <i class="fa-solid fa-scroll card-bg-icon"></i>
         </div>
 
         <div class="card stat-card-mini" style="border-left: 4px solid var(--accent-blue);">
-            <span class="mini-label">善良陣營總勝率</span>
-            <div class="mini-value text-blue" id="good-win-rate">-%</div>
+            <span class="mini-label">善良總勝率 (場數)</span>
+            <div class="mini-value text-blue" id="global-good">-</div>
             <i class="fa-solid fa-shield-halved card-bg-icon"></i>
         </div>
 
         <div class="card stat-card-mini" style="border-left: 4px solid var(--accent-red);">
-            <span class="mini-label">邪惡陣營總勝率</span>
-            <div class="mini-value text-red" id="evil-rate-summary">-%</div>
+            <span class="mini-label">邪惡總勝率 (場數)</span>
+            <div class="mini-value text-red" id="global-evil">-</div>
             <i class="fa-solid fa-skull card-bg-icon"></i>
         </div>
     </div>
 
-    <!-- 🟢 陣營勢力分佈：現在橫跨全寬，並優化 Bar 條設計 -->
-    <div class="card main-viz-card" style="border-top: 4px solid var(--accent-purple); margin-top: 1.5rem;">
-        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h3><i class="fa-solid fa-chart-pie text-purple"></i> 陣營勢力分佈</h3>
-            <span id="current-location-label" style="font-size: 0.75rem; color: var(--text-muted); background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 20px;">全域數據</span>
-        </div>
-        
-        <div class="winrate-display-box">
-            <!-- 善良方數字 -->
-            <div class="faction-info">
-                <span class="faction-name">善良陣營 (GOOD)</span>
-                <span class="faction-percent text-blue" id="viz-good-rate">-%</span>
-            </div>
-
-            <!-- 🟢 中心拉鋸條設計 -->
-            <div class="faction-tug-of-war">
-                <div class="war-bar-container">
-                    <div id="bar-good" class="war-bar-segment bg-blue" style="width: 50%"></div>
-                    <div id="bar-evil" class="war-bar-segment bg-red" style="width: 50%"></div>
-                </div>
-                <div class="war-divider">VS</div>
-            </div>
-
-            <!-- 邪惡方數字 -->
-            <div class="faction-info">
-                <span class="faction-name">邪惡陣營 (EVIL)</span>
-                <span class="faction-percent text-red" id="viz-evil-rate">-%</span>
-            </div>
+    <!-- 🟢 下方地點卡片容器 -->
+    <div class="section-divider">
+        <i class="fa-solid fa-location-dot"></i> 地點分佈紀錄
+    </div>
+    
+    <div id="location-cards-container" class="location-grid">
+        <!-- JS 動態插入地點卡片 -->
+        <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 4rem;">
+            <i class="fa-solid fa-spinner fa-spin"></i> 正在召喚各界魔典...
         </div>
     </div>
 </div>
 
 <style>
-    .dashboard-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    /* 頂部橫排控制 */
+    .stats-overview-row { 
+        display: grid; 
+        grid-template-columns: repeat(3, 1fr); 
+        gap: 1.5rem; 
+        margin-bottom: 2rem;
+    }
+
     .stat-card-mini { position: relative; padding: 1.5rem !important; overflow: hidden; }
     .mini-label { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-    .mini-value { font-size: 2.5rem; font-weight: 900; font-family: 'Inter', sans-serif; }
+    .mini-value { font-size: 2.2rem; font-weight: 900; font-family: 'Inter', sans-serif; }
     .card-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 5rem; opacity: 0.03; transform: rotate(-15deg); }
 
-    /* 🟢 勢力分佈 Bar 條美化 */
-    .winrate-display-box { 
+    /* 分隔標題 */
+    .section-divider { 
+        margin: 2rem 0 1.5rem 0; 
+        color: var(--accent-gold); 
+        font-family: 'Cinzel', serif; 
+        font-weight: bold; 
         display: flex; 
-        flex-direction: row; 
         align-items: center; 
-        justify-content: space-between; 
-        padding: 4rem 2rem; 
-        gap: 3rem;
+        gap: 10px;
+        font-size: 1.1rem;
     }
+    .section-divider::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--border-color), transparent); }
+
+    /* 地點卡片網格 */
+    .location-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); 
+        gap: 1.5rem; 
+    }
+
+    /* 地點卡片內部設計 (紫色發光) */
+    .location-card {
+        border-top: 4px solid var(--accent-purple) !important;
+        padding: 0 !important;
+        overflow: hidden;
+    }
+    .loc-header { padding: 1.2rem; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+    .loc-name { font-weight: 800; font-size: 1.1rem; color: var(--text-main); }
+    .loc-total-badge { background: var(--accent-purple); color: #fff; padding: 2px 10px; border-radius: 50px; font-size: 0.7rem; font-weight: bold; }
     
-    .faction-info { display: flex; flex-direction: column; align-items: center; min-width: 150px; }
-    .faction-name { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; }
-    .faction-percent { font-size: 4rem; font-weight: 900; line-height: 1; }
+    .loc-content { padding: 1.5rem; display: flex; align-items: center; justify-content: space-around; gap: 1rem; }
+    .loc-stat-item { text-align: center; flex: 1; }
+    .loc-stat-label { display: block; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
+    .loc-stat-value { font-size: 1.8rem; font-weight: 900; }
+    .loc-stat-games { font-size: 0.75rem; opacity: 0.5; margin-left: 4px; }
 
-    .faction-tug-of-war { flex: 1; position: relative; display: flex; flex-direction: column; align-items: center; }
-    .war-bar-container { 
-        width: 100%; 
-        height: 20px; 
-        background: rgba(255,255,255,0.05); 
-        border-radius: 50px; 
-        overflow: hidden; 
-        display: flex;
-        box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
-    }
-    .war-bar-segment { height: 100%; transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
-    .war-divider { 
-        margin-top: 15px; 
-        font-weight: 900; 
-        color: rgba(255,255,255,0.1); 
-        letter-spacing: 5px;
-        font-size: 1.2rem;
-    }
+    /* 拉鋸條 */
+    .loc-bar-container { height: 6px; background: rgba(255,255,255,0.05); margin: 0 1.5rem 1.5rem 1.5rem; border-radius: 50px; overflow: hidden; display: flex; }
+    .bar-segment { height: 100%; transition: width 1s ease-in-out; }
 
-    .bg-blue { background: linear-gradient(90deg, #457b9d, #a8dadc); }
-    .bg-red { background: linear-gradient(90deg, #f08080, #e63946); }
-
-    .dark-input-select { background: rgba(131, 56, 236, 0.1) !important; border: 1px solid rgba(131, 56, 236, 0.3) !important; color: #fff !important; border-radius: 50px; padding: 5px 15px !important; font-size: 0.85rem; }
-
-    @media (max-width: 850px) {
-        .winrate-display-box { flex-direction: column; padding: 2rem 1rem; gap: 2rem; }
-        .faction-percent { font-size: 3rem; }
-        .faction-tug-of-war { width: 100%; }
+    @media (max-width: 1000px) {
+        .stats-overview-row { grid-template-columns: 1fr; }
+        .location-grid { grid-template-columns: 1fr; }
     }
 </style>
 
