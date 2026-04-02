@@ -1,0 +1,149 @@
+<header class="top-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h2>覆盤魔法書 (RECORD MATCH)</h2>
+        <button class="btn" style="background: rgba(255,255,255,0.05); color: var(--text-muted);" onclick="clearFullForm()">
+            <i class="fa-solid fa-trash-can"></i> 清空
+        </button>
+    </div>
+</header>
+
+<datalist id="player-names-list"></datalist>
+
+<!-- 主容器：Flex 佈局，平板以下自動轉為垂直 -->
+<div class="record-page-wrapper">
+    
+    <!-- 左側邊欄：最近對局 -->
+    <aside class="record-sidebar">
+        <div class="card" style="border-top: 4px solid var(--accent-gold);">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-clock-rotate-left text-gold"></i> 最近錄入對局</h3>
+            </div>
+            <div id="recent-matches-list" class="recent-list-container">
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 2rem;">⏳ 讀取中...</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 右側：錄入區域 -->
+    <div class="record-main-content">
+        <!-- 快速解析 -->
+        <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--accent-purple);">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3><i class="fa-solid fa-wand-magic-sparkles text-purple"></i> 快速導入</h3>
+                <span id="import-status" style="font-size: 0.75rem; color: var(--accent-gold);"></span>
+            </div>
+            <div style="margin-top: 1rem;">
+                <textarea id="log-input" class="form-control dark-input" style="min-height: 80px; width: 100%; box-sizing: border-box;" placeholder="貼上覆盤文字..."></textarea>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.8rem;">
+                    <button class="btn btn-primary" style="background: var(--accent-purple);" onclick="autoFillFromLog()">解析</button>
+                    <label class="btn" style="background: rgba(255,255,255,0.08); cursor: pointer; font-size: 0.85rem;">
+                        匯入檔案 <input type="file" hidden accept=".txt" onchange="importFile(this)">
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <form id="record-form">
+            <!-- 基礎資訊 -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-header"><h3><i class="fa-solid fa-info-circle"></i> 基礎資訊</h3></div>
+                <div class="responsive-grid">
+                    <div class="form-group"><label>劇本名稱</label><input type="text" id="match-script" class="form-control dark-input" required oninput="saveDraft()"></div>
+                    <div class="form-group"><label>對局日期</label><input type="date" id="match-date" class="form-control dark-input" required oninput="saveDraft()"></div>
+                    <div class="form-group"><label>遊戲地點</label><input type="text" id="match-location" class="form-control dark-input" oninput="saveDraft()"></div>
+                    <div class="form-group"><label>獲勝陣營</label><select id="match-winner" class="form-control dark-input" oninput="saveDraft()"><option value="good">正義 Good</option><option value="evil">邪惡 Evil</option></select></div>
+                    <div class="form-group"><label>說書人</label><input type="text" id="match-storyteller" class="form-control dark-input" placeholder="前輩" oninput="saveDraft()"></div>
+                    <div class="form-group"><label>密碼</label><input type="password" id="admin-password" class="form-control dark-input" placeholder="••••" required></div>
+                </div>
+            </div>
+
+            <!-- 玩家清單 (增加滾動容器防止過寬) -->
+            <div class="card">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3><i class="fa-solid fa-users"></i> 參與玩家</h3>
+                    <button type="button" class="btn" style="background: var(--accent-blue); padding: 4px 10px; font-size: 0.8rem;" onclick="addPlayerRow()">
+                        <i class="fa-solid fa-plus"></i> 添加
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="history-table" style="width: 100%; min-width: 700px;">
+                        <thead>
+                            <tr style="text-align: left; color: var(--text-muted); font-size: 0.75rem;">
+                                <th>玩家暱稱</th>
+                                <th>初始角色</th>
+                                <th>最終角色</th>
+                                <th>陣營</th>
+                                <th>狀態</th>
+                                <th style="width: 30px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="players-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="margin: 2rem 0; display: flex; flex-direction: column; align-items: center; gap: 0.8rem;">
+                <div id="save-status" style="font-size: 0.7rem; color: var(--text-muted);">草稿已儲存</div>
+                <button type="submit" id="submit-btn" class="btn btn-primary" style="padding: 1rem 3rem; border-radius: 50px;">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* 核心佈局控制 */
+    .record-page-wrapper {
+        display: flex;
+        gap: 1.5rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .record-sidebar { width: 300px; flex-shrink: 0; }
+    .record-main-content { flex: 1; min-width: 0; }
+
+    /* 基礎資訊網格 */
+    .responsive-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    /* 表格橫向捲動 */
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-top: 1rem;
+    }
+
+    /* 側欄對局項目 */
+    .recent-list-container { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem; }
+    .side-match-item {
+        padding: 12px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.05);
+        transition: transform 0.2s;
+    }
+    .side-match-item:hover { transform: translateX(5px); background: rgba(255,255,255,0.06); }
+    .side-match-item .title { font-weight: bold; font-size: 0.9rem; color: #fff; display: block; margin-bottom: 4px; }
+    .side-match-item .info { font-size: 0.75rem; color: var(--text-muted); display: flex; gap: 8px; flex-wrap: wrap; }
+    .side-match-item .tag { font-size: 0.65rem; padding: 1px 6px; border-radius: 4px; font-weight: bold; }
+    .tag-good { background: rgba(0, 150, 255, 0.1); color: var(--accent-blue); border: 1px solid rgba(0, 150, 255, 0.2); }
+    .tag-evil { background: rgba(230, 57, 70, 0.1); color: var(--accent-red); border: 1px solid rgba(230, 57, 70, 0.2); }
+
+    /* 斷點處理：平板手機變單欄 */
+    @media (max-width: 1000px) {
+        .record-page-wrapper { flex-direction: column; }
+        .record-sidebar { width: 100%; order: 2; }
+        .record-main-content { order: 1; }
+    }
+
+    .form-group label { display: block; font-size: 0.7rem; color: var(--accent-gold); margin-bottom: 0.3rem; font-weight: bold; }
+    .dark-input { background: rgba(0, 0, 0, 0.4) !important; border: 1px solid var(--border-color) !important; color: #fff !important; border-radius: 6px; }
+</style>
+
+<script src="/js/record.js"></script>
