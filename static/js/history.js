@@ -1,5 +1,6 @@
 /**
  * BOTC Stats - 歷史紀錄進階邏輯
+ * 優化：鍾情角色統計邏輯強化
  */
 
 {
@@ -89,6 +90,8 @@
             totalEl.innerText = 0;
             document.getElementById('stat-good-rate').innerText = "0%";
             document.getElementById('stat-evil-rate').innerText = "0%";
+            document.getElementById('stat-top-location').innerText = "-";
+            document.getElementById('stat-top-role').innerText = "-";
             return;
         }
 
@@ -96,16 +99,26 @@
         const locations = {}, roles = {};
 
         matches.forEach(m => {
+            // 判斷勝率計算視角
             if (currentFilterType === 'player' && currentKeyword) {
                 const p = m.players.find(p => p.player_name.toLowerCase() === currentKeyword);
                 if (p) {
                     if (p.alignment === m.winning_team) {
                         if (p.alignment === 'good') goodWins++; else evilWins++;
                     }
+                    // 統計特定玩家的最愛角色
                     roles[p.final_character] = (roles[p.final_character] || 0) + 1;
                 }
             } else {
+                // 一般視角勝率
                 if (m.winning_team === 'good') goodWins++; else evilWins++;
+                
+                // 🟢 優化：在非玩家搜尋模式下，統計該範圍內「出場頻率最高」的角色
+                m.players.forEach(p => {
+                    if (p.final_character) {
+                        roles[p.final_character] = (roles[p.final_character] || 0) + 1;
+                    }
+                });
             }
             if (m.location) locations[m.location] = (locations[m.location] || 0) + 1;
         });
@@ -115,7 +128,10 @@
         document.getElementById('stat-evil-rate').innerText = Math.round((evilWins / total) * 100) + "%";
         
         const topLoc = Object.entries(locations).sort((a,b)=>b[1]-a[1])[0]?.[0] || "未知";
-        const topRole = Object.entries(roles).sort((a,b)=>b[1]-a[1])[0]?.[0] || "暫無";
+        // 🟢 現在鍾情角色會根據 context 顯示最合理的數據
+        const sortedRoles = Object.entries(roles).sort((a,b)=>b[1]-a[1]);
+        const topRole = sortedRoles[0]?.[0] || "暫無";
+        
         document.getElementById('stat-top-location').innerText = topLoc;
         document.getElementById('stat-top-role').innerText = topRole;
     };
