@@ -1,6 +1,6 @@
 /**
  * BOTC Stats - 錄入對局邏輯 (RECORD MATCH)
- * 修正版：對齊後端 schemas 欄位名稱，解決 [object Object] 與 Field Required 錯誤
+ * 修正版：增加伺服器錯誤捕捉與 JSON 格式安全檢查
  */
 
 {
@@ -29,7 +29,6 @@
             })));
             localStorage.removeItem('botc_transfer_data');
         } else if (draftData) {
-            console.log("📥 恢復本地草稿");
             restoreDraft(JSON.parse(draftData));
         } else {
             list.innerHTML = "";
@@ -155,7 +154,7 @@
     };
 
     /**
-     * 🚀 修正後的提交邏輯：精確對齊後端 Schema
+     * 🚀 修正後的提交邏輯
      */
     document.getElementById('record-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -172,23 +171,22 @@
         btn.disabled = true;
         btn.innerText = "⏳ 正在傳輸至資料庫...";
 
-        // 🟢 根據截圖中的報錯資訊，精確調整欄位名稱
         const payload = {
-            script: document.getElementById('match-script').value, // 對齊 body.script
+            script: document.getElementById('match-script').value,
             storyteller: document.getElementById('match-storyteller').value,
             winning_team: document.getElementById('match-winner').value,
-            password: password, // 對齊 body.password (或是後端定義的欄位)
+            password: password,
             location: document.getElementById('match-location').value,
             date: document.getElementById('match-date').value,
             players: Array.from(document.querySelectorAll('#players-list tr')).map(row => {
                 const team = row.querySelector('.p-team').value;
                 return {
-                    name: row.querySelector('.p-name').value, // 傳送名字供後端處理
-                    player_id: 0, // 💡 報錯要求 player_id，先傳 0 讓驗證通過，後端應透過 name 查找
-                    character: row.querySelector('.p-final').value, // 對齊 body.players.x.character
-                    initial_alignment: team, // 對齊 body.players.x.initial_alignment
-                    final_alignment: team,   // 對齊 body.players.x.final_alignment
-                    survived: row.querySelector('.p-status').value === 'alive' // 對齊 body.players.x.survived
+                    name: row.querySelector('.p-name').value,
+                    player_id: 0,
+                    character: row.querySelector('.p-final').value,
+                    initial_alignment: team,
+                    final_alignment: team,
+                    survived: row.querySelector('.p-status').value === 'alive'
                 };
             })
         };
@@ -200,27 +198,33 @@
                 body: JSON.stringify(payload)
             });
 
-            const result = await response.json();
+            // 🟢 關鍵修正：先檢查內容類型
+            const contentType = response.headers.get("content-type");
+            let result;
+
+            if (contentType && contentType.includes("application/json")) {
+                result = await response.json();
+            } else {
+                // 如果回傳的不是 JSON，可能是伺服器崩潰噴出的 HTML 錯誤頁面
+                const errorText = await response.text();
+                throw new Error(`伺服器傳回非 JSON 內容 (HTTP ${response.status})。\n這通常代表後端程式碼崩潰或資料庫報錯。`);
+            }
 
             if (response.ok) {
                 alert("🎉 對局戰績已成功保存！魔典已更新。");
                 localStorage.removeItem('botc_record_draft');
                 if (window.loadPage) window.loadPage('history');
             } else {
-                // 優化報錯顯示，解析 Pydantic 的錯誤訊息
-                let errorMsg = "儲存失敗";
-                if (result.detail) {
-                    if (Array.isArray(result.detail)) {
-                        errorMsg = result.detail.map(d => `${d.loc.join('.')}: ${d.msg}`).join('\n');
-                    } else {
-                        errorMsg = result.detail;
-                    }
+                let errorDetail = result.detail || "儲存失敗";
+                if (Array.isArray(errorDetail)) {
+                    errorDetail = errorDetail.map(d => `${d.loc.join('.')}: ${d.msg}`).join('\n');
                 }
-                throw new Error(errorMsg);
+                throw new Error(errorDetail);
             }
         } catch (err) {
             console.error("提交失敗:", err);
-            alert(`❌ 儲存出錯：\n${err.message}`);
+            // 彈出詳細視窗供調試
+            alert(`❌ 儲存失敗！\n錯誤原因: ${err.message}\n\n提示：請檢查後端是否有新增 location 欄位。`);
         } finally {
             btn.disabled = false;
             btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績`;
