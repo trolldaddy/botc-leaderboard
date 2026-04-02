@@ -1,6 +1,6 @@
 /**
  * BOTC Stats - 歷史紀錄進階邏輯
- * 優化：鍾情角色統計邏輯強化
+ * 修正：針對特定身分標籤採用「完全匹配」邏輯，確保統計數據精準。
  */
 
 {
@@ -63,16 +63,19 @@
             hintEl.innerText = `目前的篩選條件：${labelMap[currentFilterType]}`;
             
             filtered = allMatches.filter(m => {
+                // 全域搜尋使用 .includes (模糊匹配)
                 const sScript = m.script.toLowerCase().includes(currentKeyword);
                 const sLoc = (m.location || "").toLowerCase().includes(currentKeyword);
                 const sST = (m.storyteller || "").toLowerCase().includes(currentKeyword);
                 const sPlayers = m.players.some(p => p.player_name.toLowerCase().includes(currentKeyword));
 
                 if (currentFilterType === 'all') return sScript || sLoc || sST || sPlayers;
+                
+                // 🟢 關鍵修正：特定身分搜尋改用 === (完全匹配)，避免「魚」搜到「熱帶魚」
                 if (currentFilterType === 'player') return m.players.some(p => p.player_name.toLowerCase() === currentKeyword);
                 if (currentFilterType === 'storyteller') return (m.storyteller || "").toLowerCase() === currentKeyword;
                 if (currentFilterType === 'location') return (m.location || "").toLowerCase() === currentKeyword;
-                if (currentFilterType === 'script') return m.script.toLowerCase().includes(currentKeyword);
+                if (currentFilterType === 'script') return m.script.toLowerCase() === currentKeyword;
                 return false;
             });
         }
@@ -101,19 +104,16 @@
         matches.forEach(m => {
             // 判斷勝率計算視角
             if (currentFilterType === 'player' && currentKeyword) {
+                // 這裡也必須使用精確匹配
                 const p = m.players.find(p => p.player_name.toLowerCase() === currentKeyword);
                 if (p) {
                     if (p.alignment === m.winning_team) {
                         if (p.alignment === 'good') goodWins++; else evilWins++;
                     }
-                    // 統計特定玩家的最愛角色
                     roles[p.final_character] = (roles[p.final_character] || 0) + 1;
                 }
             } else {
-                // 一般視角勝率
                 if (m.winning_team === 'good') goodWins++; else evilWins++;
-                
-                // 🟢 優化：在非玩家搜尋模式下，統計該範圍內「出場頻率最高」的角色
                 m.players.forEach(p => {
                     if (p.final_character) {
                         roles[p.final_character] = (roles[p.final_character] || 0) + 1;
@@ -126,12 +126,9 @@
         totalEl.innerText = total;
         document.getElementById('stat-good-rate').innerText = Math.round((goodWins / total) * 100) + "%";
         document.getElementById('stat-evil-rate').innerText = Math.round((evilWins / total) * 100) + "%";
-        
         const topLoc = Object.entries(locations).sort((a,b)=>b[1]-a[1])[0]?.[0] || "未知";
-        // 🟢 現在鍾情角色會根據 context 顯示最合理的數據
         const sortedRoles = Object.entries(roles).sort((a,b)=>b[1]-a[1]);
         const topRole = sortedRoles[0]?.[0] || "暫無";
-        
         document.getElementById('stat-top-location').innerText = topLoc;
         document.getElementById('stat-top-role').innerText = topRole;
     };
