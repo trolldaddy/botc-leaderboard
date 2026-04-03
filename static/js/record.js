@@ -62,7 +62,7 @@
                             <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
                         </div>
                         <div class="m-tag ${isGood ? 'tag-good' : 'tag-evil'}">
-                            ${isGood ? '正義獲勝' : '邪惡獲勝'}
+                            ${isGood ? '善良陣營獲勝' : '邪惡陣營獲勝'}
                         </div>
                     </div>
                 `;
