@@ -509,8 +509,6 @@ const App = () => {
   const [players, setPlayers] = useState(() => loadState('botc_players', [])); 
   const [gamePhase, setGamePhase] = useState(() => loadState('botc_gamePhase', { type: 'Setup', number: 0 })); 
   const [logs, setLogs] = useState(() => loadState('botc_logs', [])); 
-    // --- 🟢 新增：控制勝負選擇彈窗 ---
-  const [showWinnerModal, setShowWinnerModal] = useState(false);
 
   const [playerCount, setPlayerCount] = useState(() => loadState('botc_playerCount', 12));
 
@@ -585,35 +583,7 @@ const App = () => {
       return text;
   };
 
-  // --- 🟢 新增：最終匯出邏輯 (處理勝負標籤與自動補全名單) ---
-  const handleFinalExport = (winnerLabel) => {
-      let content = `劇本名稱：${scriptName}\n`;
-      content += `遊戲日期：${new Date().toISOString().split('T')[0]}\n`;
-      content += `遊戲地點：線上 (Discord)\n`;
-      content += `獲勝陣營：${winnerLabel}\n\n`;
 
-      // 組合對局 Log
-      logs.forEach(group => {
-          content += `--- ${group.phase} ---\n`;
-          group.events.forEach(e => {
-              content += `[${e.time}] ${e.actor} -> ${e.action} (目標: ${e.target}) | 備註: ${e.detail}\n`;
-          });
-          content += "\n";
-      });
-
-      // 自動在末端補上完整玩家名單，方便錄入系統解析
-      content += generatePlayerListText();
-
-      // 下載檔案
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `BOTC_MatchLog_${Date.now()}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
-      setShowWinnerModal(false); // 關閉彈窗
-  };
   const recordEvent = (actor, action, target, detail) => {
     const currentPhaseLabel = gamePhase.type === 'Setup' ? '設置階段' : gamePhase.type === 'Prep' ? '準備階段' : `第 ${gamePhase.number} ${gamePhase.type === 'Night' ? '夜' : '天'}`;
     const newEvent = { id: Date.now() + Math.random(), time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }), actor, action, target, detail };
@@ -626,8 +596,6 @@ const App = () => {
       } else {
         newLogs.push({ phase: currentPhaseLabel, events: [newEvent] });
       }
-
-       // --- 🟢 新增：產生目前的玩家清單文字 ---
 
       return newLogs;
     });
@@ -1440,10 +1408,7 @@ const App = () => {
         <div className="flex-1 min-h-0 min-w-0 bg-slate-950/50 p-4 lg:p-6 overflow-y-auto custom-scrollbar flex flex-col relative border-l border-slate-800">
           <div className="flex justify-between items-center mb-6 sticky top-0 bg-slate-950 py-2 z-10 px-2">
             <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">時間軸紀錄 (Timeline)</h3>
-          <button onClick={() => setShowWinnerModal(true)} 
-            className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors">
-          <span className="text-sm">📥</span> 匯出文字檔
-          </button>
+        <button onClick={exportHistory} className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors">
           </div>
 
           <div className="space-y-8 pb-20">
