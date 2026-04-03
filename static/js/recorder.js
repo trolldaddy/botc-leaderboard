@@ -932,21 +932,7 @@ const App = () => {
 
   return (
     <div className="h-full bg-slate-950 text-slate-200 font-sans flex flex-col relative overflow-hidden">
-        {/* 🟢 在這裡貼上：勝負選擇彈窗 (確保在最外層 div 內的第一位) */}
-      {showWinnerModal && (
-          <div className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-indigo-500/30 p-8 rounded-[40px] max-w-sm w-full shadow-2xl text-center">
-                  <h2 className="text-xl font-black text-indigo-400 mb-2">📜 聖旨已下</h2>
-                  <p className="text-xs text-slate-400 mb-6">請選擇本局最終的勝負結果以完成魔典匯出</p>
-                  <div className="flex flex-col gap-3">
-                      <button onClick={() => handleFinalExport("善良獲勝")} className="py-3 bg-sky-600 hover:bg-sky-500 rounded-2xl font-black text-sm transition-all">善良獲勝 (Good Wins)</button>
-                      <button onClick={() => handleFinalExport("邪惡獲勝")} className="py-3 bg-rose-600 hover:bg-rose-500 rounded-2xl font-black text-sm transition-all">邪惡獲勝 (Evil Wins)</button>
-                      <button onClick={() => handleFinalExport("尚未結束")} className="py-3 bg-slate-700 hover:bg-slate-600 rounded-2xl font-black text-sm transition-all">尚未結束 (Ongoing)</button>
-                      <button onClick={() => setShowWinnerModal(false)} className="mt-2 text-xs text-slate-500 hover:text-slate-300">取消匯出</button>
-                  </div>
-              </div>
-          </div>
-      )}
+
       {modalConfig.isOpen && (
         <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
           <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl flex flex-col gap-4">
