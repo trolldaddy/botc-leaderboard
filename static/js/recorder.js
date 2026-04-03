@@ -575,21 +575,6 @@ const App = () => {
     saveState('botc_customLocation', customLocation);
     saveState('botc_demonBluffs', demonBluffs);
   }, [script, players, gamePhase, logs, playerCount, scriptName, gameDate, gameLocation, customLocation, demonBluffs]);
-
-  const recordEvent = (actor, action, target, detail) => {
-    const currentPhaseLabel = gamePhase.type === 'Setup' ? '設置階段' : gamePhase.type === 'Prep' ? '準備階段' : `第 ${gamePhase.number} ${gamePhase.type === 'Night' ? '夜' : '天'}`;
-    const newEvent = { id: Date.now() + Math.random(), time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }), actor, action, target, detail };
-    
-    setLogs(prevLogs => {
-      const newLogs = [...prevLogs];
-      const phaseIndex = newLogs.findIndex(l => l.phase === currentPhaseLabel);
-      if (phaseIndex >= 0) {
-        newLogs[phaseIndex].events.push(newEvent); // 舊在前，新在後
-      } else {
-        newLogs.push({ phase: currentPhaseLabel, events: [newEvent] });
-      }
-
-       // --- 🟢 新增：產生目前的玩家清單文字 ---
   const generatePlayerListText = () => {
       let text = "\n【當前玩家狀態】\n";
       players.forEach(p => {
@@ -629,6 +614,21 @@ const App = () => {
       URL.revokeObjectURL(url);
       setShowWinnerModal(false); // 關閉彈窗
   };
+  const recordEvent = (actor, action, target, detail) => {
+    const currentPhaseLabel = gamePhase.type === 'Setup' ? '設置階段' : gamePhase.type === 'Prep' ? '準備階段' : `第 ${gamePhase.number} ${gamePhase.type === 'Night' ? '夜' : '天'}`;
+    const newEvent = { id: Date.now() + Math.random(), time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }), actor, action, target, detail };
+    
+    setLogs(prevLogs => {
+      const newLogs = [...prevLogs];
+      const phaseIndex = newLogs.findIndex(l => l.phase === currentPhaseLabel);
+      if (phaseIndex >= 0) {
+        newLogs[phaseIndex].events.push(newEvent); // 舊在前，新在後
+      } else {
+        newLogs.push({ phase: currentPhaseLabel, events: [newEvent] });
+      }
+
+       // --- 🟢 新增：產生目前的玩家清單文字 ---
+
       return newLogs;
     });
   };
