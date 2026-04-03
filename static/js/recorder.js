@@ -1440,7 +1440,6 @@ const App = () => {
         <div className="flex-1 min-h-0 min-w-0 bg-slate-950/50 p-4 lg:p-6 overflow-y-auto custom-scrollbar flex flex-col relative border-l border-slate-800">
           <div className="flex justify-between items-center mb-6 sticky top-0 bg-slate-950 py-2 z-10 px-2">
             <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">時間軸紀錄 (Timeline)</h3>
-           // 將原本的 onClick={exportHistory} 改掉
           <button onClick={() => setShowWinnerModal(true)} 
             className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors">
           <span className="text-sm">📥</span> 匯出文字檔
