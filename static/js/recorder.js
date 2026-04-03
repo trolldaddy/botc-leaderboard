@@ -1409,6 +1409,8 @@ const App = () => {
           <div className="flex justify-between items-center mb-6 sticky top-0 bg-slate-950 py-2 z-10 px-2">
             <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">時間軸紀錄 (Timeline)</h3>
         <button onClick={exportHistory} className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors">
+         <span className="text-sm">📥</span> 匯出文字檔
+            </button>
           </div>
 
           <div className="space-y-8 pb-20">
