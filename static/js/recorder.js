@@ -509,6 +509,9 @@ const App = () => {
   const [players, setPlayers] = useState(() => loadState('botc_players', [])); 
   const [gamePhase, setGamePhase] = useState(() => loadState('botc_gamePhase', { type: 'Setup', number: 0 })); 
   const [logs, setLogs] = useState(() => loadState('botc_logs', [])); 
+    // --- 🟢 新增：控制勝負選擇彈窗 ---
+  const [showWinnerModal, setShowWinnerModal] = useState(false);
+
   const [playerCount, setPlayerCount] = useState(() => loadState('botc_playerCount', 12));
 
   const [scriptName, setScriptName] = useState(() => loadState('botc_scriptName', '未命名劇本'));
@@ -585,6 +588,47 @@ const App = () => {
       } else {
         newLogs.push({ phase: currentPhaseLabel, events: [newEvent] });
       }
+
+       // --- 🟢 新增：產生目前的玩家清單文字 ---
+  const generatePlayerListText = () => {
+      let text = "\n【當前玩家狀態】\n";
+      players.forEach(p => {
+          const status = p.isAlive ? "存活" : "死亡";
+          const roleName = p.role ? p.role.name : "未知";
+          text += `[${p.id}號] ${status} - (${roleName}) ${p.name || "空"}\n`;
+      });
+      return text;
+  };
+
+  // --- 🟢 新增：最終匯出邏輯 (處理勝負標籤與自動補全名單) ---
+  const handleFinalExport = (winnerLabel) => {
+      let content = `劇本名稱：${scriptName}\n`;
+      content += `遊戲日期：${new Date().toISOString().split('T')[0]}\n`;
+      content += `遊戲地點：線上 (Discord)\n`;
+      content += `獲勝陣營：${winnerLabel}\n\n`;
+
+      // 組合對局 Log
+      logs.forEach(group => {
+          content += `--- ${group.phase} ---\n`;
+          group.events.forEach(e => {
+              content += `[${e.time}] ${e.actor} -> ${e.action} (目標: ${e.target}) | 備註: ${e.detail}\n`;
+          });
+          content += "\n";
+      });
+
+      // 自動在末端補上完整玩家名單，方便錄入系統解析
+      content += generatePlayerListText();
+
+      // 下載檔案
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `BOTC_MatchLog_${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setShowWinnerModal(false); // 關閉彈窗
+  };
       return newLogs;
     });
   };
