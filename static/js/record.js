@@ -172,7 +172,7 @@
             <td><input type="text" class="form-control dark-input p-name" list="player-names-list" value="${data?.name || ''}" placeholder="暱稱" oninput="saveDraft()"></td>
             <td><input type="text" class="form-control dark-input p-initial" value="${data?.initial_character || ''}" placeholder="初始" oninput="saveDraft()"></td>
             <td><input type="text" class="form-control dark-input p-final" value="${data?.final_character || ''}" placeholder="最終" oninput="saveDraft()"></td>
-            <td><select class="form-control dark-input p-team" oninput="saveDraft()"><option value="good" ${alignment === 'good' ? 'selected' : ''}>正義</option><option value="evil" ${alignment === 'evil' ? 'selected' : ''}>邪惡</option></select></td>
+            <td><select class="form-control dark-input p-team" oninput="saveDraft()"><option value="good" ${alignment === 'good' ? 'selected' : ''}>善良</option><option value="evil" ${alignment === 'evil' ? 'selected' : ''}>邪惡</option></select></td>
             <td><select class="form-control dark-input p-status" oninput="saveDraft()"><option value="alive" ${data?.survived !== false ? 'selected' : ''}>存活</option><option value="dead" ${data?.survived === false ? 'selected' : ''}>死亡</option></select></td>
             <td style="text-align:center;"><button type="button" class="btn" style="color: rgba(255,255,255,0.1); border:none; background:none;" onclick="this.closest('tr').remove(); saveDraft();"><i class="fa-solid fa-xmark"></i></button></td>
         `;
