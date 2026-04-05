@@ -151,8 +151,8 @@
         });
 
         totalEl.innerText = total;
-        document.getElementById('stat-good-rate').innerText = Math.round((goodWins / goodtotal) * 100) + "%";
-        document.getElementById('stat-evil-rate').innerText = Math.round((evilWins / eviltotal) * 100) + "%";
+        document.getElementById('stat-good-rate').innerText = Math.round((goodWins / goodTotal) * 100) + "%";
+        document.getElementById('stat-evil-rate').innerText = Math.round((evilWins / evilTotal) * 100) + "%";
         const topLoc = Object.entries(locations).sort((a,b)=>b[1]-a[1])[0]?.[0] || "未知";
         const sortedRoles = Object.entries(roles).sort((a,b)=>b[1]-a[1]);
         const topRole = sortedRoles[0]?.[0] || "暫無";
