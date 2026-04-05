@@ -151,8 +151,20 @@
         });
 
         totalEl.innerText = total;
-        document.getElementById('stat-good-rate').innerText = Math.round((goodWins / goodTotal) * 100) + "%";
-        document.getElementById('stat-evil-rate').innerText = Math.round((evilWins / evilTotal) * 100) + "%";
+
+     if ((currentFilterType === 'player' || currentFilterType === 'character') && currentKeyword) {
+            const gRate = goodTotal > 0 ? Math.round((goodWins / goodTotal) * 100) : 0;
+            const eRate = evilTotal > 0 ? Math.round((evilWins / evilTotal) * 100) : 0;
+            goodRateEl.innerHTML = `${gRate}% <small style="font-size:0.6rem; opacity:0.5; display:block;">(${goodWins}/${goodTotal} 善良場)</small>`;
+            evilRateEl.innerHTML = `${eRate}% <small style="font-size:0.6rem; opacity:0.5; display:block;">(${evilWins}/${evilTotal} 邪惡場)</small>`;
+        } else {
+            goodRateEl.innerText = Math.round((goodWins / total) * 100) + "%";
+            evilRateEl.innerText = Math.round((evilWins / total) * 100) + "%";
+        }
+
+        
+        //document.getElementById('stat-good-rate').innerText = Math.round((goodWins / goodTotal) * 100) + "%";
+        //document.getElementById('stat-evil-rate').innerText = Math.round((evilWins / evilTotal) * 100) + "%";
         const topLoc = Object.entries(locations).sort((a,b)=>b[1]-a[1])[0]?.[0] || "未知";
         const sortedRoles = Object.entries(roles).sort((a,b)=>b[1]-a[1]);
         const topRole = sortedRoles[0]?.[0] || "暫無";
