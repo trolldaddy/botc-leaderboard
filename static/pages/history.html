@@ -17,12 +17,11 @@
                 <h4 id="summary-title" style="color: var(--accent-gold); font-size: 1.1rem; margin-bottom: 0.4rem;">總對局紀錄回顧</h4>
                 <p id="search-hint" style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">顯示所有魔典中記載的對局</p>
             </div>
-            
-            <!-- 🟢 篩選分頁按鈕群組 -->
             <div id="filter-tabs-container" class="filter-tabs" style="display: none;">
                 <button class="tab-btn active" data-type="all" onclick="setFilterType('all')">全部</button>
                 <button class="tab-btn" data-type="player" onclick="setFilterType('player')">作為玩家</button>
-                <button class="tab-btn" data-type="character" onclick="setFilterType('character')">作為角色</button> <!-- 👈 新增這行 -->
+                <!-- 🟢 新增的按鈕 -->
+                <button class="tab-btn" data-type="character" onclick="setFilterType('character')">作為角色</button>
                 <button class="tab-btn" data-type="storyteller" onclick="setFilterType('storyteller')">作為說書人</button>
                 <button class="tab-btn" data-type="location" onclick="setFilterType('location')">作為地點</button>
                 <button class="tab-btn" data-type="script" onclick="setFilterType('script')">作為劇本</button>
@@ -31,7 +30,7 @@
 
         <div class="summary-stats-grid">
             <div class="stat-box">
-                <span class="stat-label">場次 / 出現</span>
+                <span class="stat-label">總場次</span>
                 <span class="stat-value text-purple" id="stat-total">-</span>
             </div>
             <div class="stat-box">
@@ -43,11 +42,11 @@
                 <span class="stat-value text-red" id="stat-evil-rate">-%</span>
             </div>
             <div class="stat-box hidden-mobile">
-                <span class="stat-label" id="label-top-loc">常駐地點</span>
+                <span class="stat-label">常出沒地點</span>
                 <span class="stat-value-small" id="stat-top-location">-</span>
             </div>
             <div class="stat-box hidden-mobile">
-                <span class="stat-label" id="label-top-role">鍾情角色</span>
+                <span class="stat-label">鍾情角色</span>
                 <span class="stat-value-small" id="stat-top-role">-</span>
             </div>
         </div>
@@ -58,56 +57,66 @@
 </div>
 
 <style>
-    /* 基礎容器佈局 */
+    /* 基礎設置 - 維持原本 history_work3.html 提供的樣式 */
     .history-container { max-width: 1500px; margin: 0 auto; padding: 0 1rem 80px 1rem; box-sizing: border-box; width: 100%; }
-    
     .search-input-wrapper { position: relative; width: 350px; max-width: 100%; }
     .search-input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
     .search-input-wrapper input {
         width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color);
-        color: #fff; padding: 0.8rem 1rem 0.8rem 2.8rem; border-radius: 50px; outline: none; transition: all 0.3s;
+        color: #fff; padding: 0.8rem 1rem 0.8rem 2.8rem; border-radius: 50px; outline: none;
     }
-    .search-input-wrapper input:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(131, 56, 236, 0.2); }
 
-    /* 篩選標籤樣式 */
-    .filter-tabs { display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap; gap: 4px; }
-    .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-    .tab-btn.active { background: var(--accent-purple); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-    .tab-btn:hover:not(.active) { color: #fff; background: rgba(255,255,255,0.05); }
-
-    /* 統計看板設計 */
-    .summary-card { margin-bottom: 2rem; border-top: 4px solid var(--accent-purple); padding: 1.5rem !important; }
-    .summary-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; }
-    .summary-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; }
-    
-    .stat-label { display: block; font-size: 0.65rem; color: var(--text-muted); margin-bottom: 8px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
-    .stat-value { font-size: 2rem; font-weight: 900; font-family: 'Inter', sans-serif; line-height: 1; }
-    .stat-value small { display: block; font-size: 0.6rem; margin-top: 4px; font-weight: normal; }
-    .stat-value-small { font-size: 0.9rem; font-weight: 800; color: var(--accent-gold); display: block; margin-top: 5px; }
-
-    /* 對局卡片基礎樣式 */
     .match-history-card { 
         background: rgba(30, 30, 35, 0.5); border: 1px solid var(--border-color); 
-        border-radius: 16px; margin-bottom: 1rem; width: 100%; overflow: hidden; 
-        transition: all 0.2s ease;
+        border-radius: 16px; margin-bottom: 1rem; width: 100%; 
+        max-width: 100%; overflow: hidden;
+        transition: all 0.2s ease; display: flex; flex-direction: column;
     }
-    .match-history-card:hover { border-color: rgba(255,255,255,0.15); background: rgba(35, 35, 40, 0.6); }
     
-    .match-main-row { padding: 1.2rem; display: flex; align-items: center; cursor: pointer; gap: 1.5rem; }
+    .match-main-row { 
+        padding: 1.2rem; display: flex; align-items: center; cursor: pointer; gap: 1.5rem; 
+        width: 100%; box-sizing: border-box;
+    }
 
-    /* 展開詳情設計 */
-    .match-details-panel { background: rgba(0, 0, 0, 0.4); border-top: 1px solid var(--border-color); display: none; padding: 1.2rem; }
-    .horizontal-detail-bar { width: 100%; overflow-x: auto; background: rgba(0, 0, 0, 0.2); border-radius: 12px; }
+    .match-date-box { width: 70px; text-align: center; background: rgba(0,0,0,0.3); padding: 10px 5px; border-radius: 14px; flex-shrink: 0; }
+    .date-label { font-size: 1.1rem; font-weight: 800; color: var(--accent-gold); }
+
+    .match-info-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+    
+    .info-row-bottom { display: flex; align-items: flex-start; gap: 8px; }
+    .player-preview-text { 
+        font-size: 0.8rem; color: rgba(255,255,255,0.4); line-height: 1.5;
+        white-space: normal; word-break: break-all; overflow: visible;
+    }
+
+    .match-result-badge { padding: 10px 24px; border-radius: 12px; font-weight: 900; font-size: 1rem; text-align: center; min-width: 140px; flex-shrink: 0; }
+    .res-good { background: rgba(69, 123, 157, 0.25); color: #a8dadc; border: 1px solid rgba(69, 123, 157, 0.4); }
+    .res-evil { background: rgba(230, 57, 70, 0.25); color: #ffb3b3; border: 1px solid rgba(230, 57, 70, 0.4); }
+
+    .match-details-panel { 
+        background: rgba(0, 0, 0, 0.4); border-top: 1px solid var(--border-color); 
+        display: none; padding: 1rem; width: 100%; box-sizing: border-box;
+    }
+    .horizontal-detail-bar { 
+        width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; 
+        background: rgba(0, 0, 0, 0.2); border-radius: 12px; 
+    }
     .detail-table { min-width: 750px; width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    .detail-table th { text-align: left; color: var(--accent-gold); padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; text-transform: uppercase; }
-    .detail-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .detail-table th { text-align: left; color: var(--accent-gold); padding: 12px; font-size: 0.7rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .detail-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-    .text-blue { color: #a8dadc; }
-    .text-red { color: #ffb3b3; }
+    .filter-tabs { display: flex; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color); flex-wrap: wrap; }
+    .tab-btn { background: transparent; border: none; color: var(--text-muted); padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
+    .tab-btn.active { background: var(--accent-purple); color: #fff; }
+    .summary-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+    .stat-label { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
+    .stat-value { font-size: 2rem; font-weight: 800; }
+    .stat-value small { display: block; font-size: 0.6rem; opacity: 0.5; margin-top: 4px; }
 
     @media (max-width: 900px) {
         .match-main-row { gap: 1rem; padding: 1rem; flex-wrap: wrap; }
-        .match-result-badge { width: 100%; order: 5; }
+        .match-info-content { width: calc(100% - 85px); }
+        .match-result-badge { width: 100%; order: 5; margin-top: 5px; }
         .hidden-mobile { display: none; }
     }
 </style>
