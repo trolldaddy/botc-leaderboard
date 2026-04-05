@@ -9,19 +9,17 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session, joinedload 
 from sqlalchemy import func
 
-# 導入專案定義的模型與資料庫配置
 import models
 from database import engine, get_db
 
 app = FastAPI(title="BOTC Stats Leaderboard API")
 
-# 自動同步資料庫表結構
+# 確保資料庫表已建立
 try:
     models.Base.metadata.create_all(bind=engine)
 except Exception as e:
     print(f"資料庫初始化失敗: {e}")
 
-# 配置跨域請求 (CORS)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,11 +28,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 管理員密鑰
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mmmm")
 
-# --- 🚀 核心 API：錄入對局 ---
+# --- 🟢 PWA 支援路由 🟢 ---
+# 確保瀏覽器可以在根目錄找到 manifest 和 service worker
+@app.get("/manifest.json")
+async def serve_manifest():
+    paths = ["static/manifest.json", "manifest.json"]
+    for path in paths:
+        if os.path.exists(path): return FileResponse(path)
+    return HTTPException(status_code=404, detail="manifest.json not found")
 
+@app.get("/sw.js")
+async def serve_sw():
+    paths = ["static/sw.js", "sw.js"]
+    for path in paths:
+        if os.path.exists(path): return FileResponse(path)
+    return HTTPException(status_code=404, detail="sw.js not found")
+
+# --- 戰績錄入 API ---
 @app.post("/api/matches")
 async def create_match(data: dict, db: Session = Depends(get_db)):
     try:
@@ -89,78 +101,67 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
         db.rollback()
         raise HTTPException(status_code=500, detail=f"伺服器內部錯誤: {str(e)}")
 
-# --- 📊 統計 API ---
-
+# 統計數據 API
 @app.get("/api/stats")
-async def get_global_stats(location: Optional[str] = None, db: Session = Depends(get_db)):
-    query = db.query(models.Match)
-    if location:
-        query = query.filter(models.Match.location == location)
-    matches = query.all()
-    total_games = len(matches)
-    all_locations = [l[0] for l in db.query(models.Match.location).distinct().all() if l[0]]
-    if total_games == 0:
-        return {"total_games": 0, "good_win_percent": 0, "evil_win_percent": 0, "available_locations": all_locations}
-    good_wins = sum(1 for m in matches if m.winning_team == "good")
-    good_rate = round(good_wins / total_games * 100, 1)
-    return {"total_games": total_games, "good_win_percent": good_rate, "evil_win_percent": round(100 - good_rate, 1), "available_locations": all_locations}
+async def get_dashboard_summary(db: Session = Depends(get_db)):
+    all_matches = db.query(models.Match).all()
+    total_games = len(all_matches)
+    
+    global_good = sum(1 for m in all_matches if m.winning_team == "good")
+    global_evil = total_games - global_good
+    
+    location_map = {}
+    for m in all_matches:
+        loc = m.location or "未知"
+        if loc not in location_map:
+            location_map[loc] = {"total": 0, "good": 0, "evil": 0}
+        location_map[loc]["total"] += 1
+        if m.winning_team == "good":
+            location_map[loc]["good"] += 1
+        else:
+            location_map[loc]["evil"] += 1
+            
+    location_stats = []
+    for loc, s in location_map.items():
+        location_stats.append({
+            "name": loc,
+            "total": s["total"],
+            "good_wins": s["good"],
+            "evil_wins": s["evil"],
+            "good_rate": round(s["good"] / s["total"] * 100, 1) if s["total"] > 0 else 0,
+            "evil_rate": round(s["evil"] / s["total"] * 100, 1) if s["total"] > 0 else 0
+        })
+
+    return {
+        "global": {
+            "total": total_games,
+            "good_wins": global_good,
+            "evil_wins": global_evil,
+            "good_rate": round(global_good / total_games * 100, 1) if total_games > 0 else 0,
+            "evil_rate": round(global_evil / total_games * 100, 1) if total_games > 0 else 0
+        },
+        "locations": sorted(location_stats, key=lambda x: x["total"], reverse=True)
+    }
 
 @app.get("/api/players")
 async def get_all_players(db: Session = Depends(get_db)):
     players = db.query(models.Player.name).order_by(models.Player.name).all()
     return [p[0] for p in players]
 
-@app.get("/api/player/{name}")
-async def get_player_stats(name: str, db: Session = Depends(get_db)):
-    player = db.query(models.Player).filter(models.Player.name == name).first()
-    if not player: raise HTTPException(status_code=404, detail="找不到玩家")
-    records = db.query(models.MatchPlayer).filter(models.MatchPlayer.player_id == player.id).all()
-    total = len(records)
-    wins = sum(1 for r in records if r.alignment == r.match.winning_team)
-    roles_stat = {}
-    for r in records:
-        char = r.final_character or "未知"
-        roles_stat[char] = roles_stat.get(char, 0) + 1
-    top_roles = [{"role": k, "count": v} for k, v in sorted(roles_stat.items(), key=lambda x: x[1], reverse=True)[:5]]
-    return {"player_name": player.name, "total_matches": total, "overall_win_rate": round(wins / total * 100, 1) if total > 0 else 0, "most_played_roles": top_roles}
-
-# 🟢 歷史紀錄 API：增加排序邏輯，確保顯示順序符合錄入順序
 @app.get("/api/history")
 async def get_history(db: Session = Depends(get_db)):
-    """
-    獲取歷史對局。
-    使用 joinedload 預先載入，並在後端進行排序處理。
-    """
     matches = db.query(models.Match).options(
         joinedload(models.Match.players).joinedload(models.MatchPlayer.player)
     ).order_by(models.Match.date.desc()).limit(50).all()
     
     result = []
     for m in matches:
-        # 🟢 關鍵修正：將 players 按照 MatchPlayer.id 進行升序排序 (即錄入順序)
-        sorted_players_records = sorted(m.players, key=lambda x: x.id)
-        
         m_data = {
-            "id": m.id,
-            "script": m.script,
-            "date": m.date,
-            "location": m.location,
-            "storyteller": m.storyteller,
-            "winning_team": m.winning_team,
-            "players": [
-                {
-                    "player_name": p.player.name,
-                    "initial_character": p.initial_character,
-                    "final_character": p.final_character,
-                    "alignment": p.alignment,
-                    "survived": p.survived
-                } for p in sorted_players_records
-            ]
+            "id": m.id, "script": m.script, "date": m.date, "location": m.location, "storyteller": m.storyteller, "winning_team": m.winning_team,
+            "players": [{"player_name": p.player.name, "initial_character": p.initial_character, "final_character": p.final_character, "alignment": p.alignment, "survived": p.survived} for p in m.players]
         }
         result.append(m_data)
     return result
-
-# --- 🖼️ 靜態資源路由 ---
 
 @app.get("/")
 @app.get("/index.html")
@@ -169,7 +170,8 @@ async def serve_home():
         if os.path.exists(path): return FileResponse(path)
     return {"message": "找不到 index.html"}
 
-for folder in ["js", "css", "pages", "static"]:
+# 掛載靜態資源資料夾
+for folder in ["js", "css", "pages", "static", "icons"]:
     physical_path = folder if os.path.exists(folder) else f"static/{folder}"
     if os.path.exists(physical_path):
         app.mount(f"/{folder}", StaticFiles(directory=physical_path), name=f"mount_{folder}")
