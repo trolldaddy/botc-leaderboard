@@ -1056,7 +1056,15 @@ const App = () => {
         </div>
       </div>
 
-      <div className="bg-slate-900/50 border-b border-slate-800 p-4 shrink-0 shadow-inner z-10 w-full overflow-y-auto max-h-[35vh] custom-scrollbar">
+      <div className="bg-slate-900/50 border-b border-slate-800 p-4 shrink-0 shadow-inner z-10 w-full overflow-y-auto max-h-[35vh] custom-scrollbar"
+            style={{ 
+            resize: 'vertical', 
+            minHeight: '120px', 
+            maxHeight: '70vh', 
+            height: '25vh', 
+            borderBottom: '4px solid rgba(99, 102, 241, 0.2)' 
+        }}
+>
         <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 justify-items-center max-w-full">
           {players.map((p) => (
             <div key={p.id} className={`w-full flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all relative ${p.isDead ? 'bg-slate-950/80 border-slate-800 grayscale' : p.role ? 'bg-slate-800 border-indigo-500/30' : 'bg-slate-800/50 border-dashed border-slate-600'}`}>
