@@ -260,7 +260,7 @@ const DAY_ACTION_ROLES = [
   'gunslinger', 'matron', 'butcher', 'judge', 'gangster', 'jiaohuazi', 'diaomin',
   'mutant', 'klutz', 'moonchild', 'golem',
   // 加入中文名稱雙重保險
-  '殺手', '博學者', '造謠者', '雜耍藝人', '藝術家', '漁夫', '戲法師', '變臉師', '歌伶', '驛使', '公主', '精神病患者', '精神病患', '哥布林', '維齊爾', '槍手', '女舍監', '屠夫', '法官', '黑幫', '叫花子', '刁民', '畸形秀演員', '呆瓜', '月之子', '魔像'
+  '獵手', '博學者', '造謠者', '雜耍藝人', '藝術家', '漁夫', '戲法師', '變臉師', '歌伶', '驛使', '公主', '精神病患者', '哥布林', '維齊爾', '槍手', '女舍監', '屠夫', '法官', '黑幫', '叫花子', '刁民', '畸形秀演員', '呆瓜', '月之子', '魔像'
 ];
 
 const getRoleInputConfig = (role) => {
@@ -485,7 +485,7 @@ const configs = getRoleInputConfig(player.role);
                   {script.map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
                 </select>
               ) : (
-                <input type="number" placeholder={c.label} onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none" />
+                <input type="text" placeholder={c.label} onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none" />
               )}
             </div>
           ))}
