@@ -58,7 +58,7 @@
             titleEl.innerText = "總對局紀錄回顧";
             hintEl.innerText = "顯示所有魔典中記載的對局";
         } else {
-            const labelMap = { 'all': '全局搜尋', 'player': '作為玩家', 'storyteller': '作為說書人', 'location': '作為地點', 'script': '作為劇本' };
+            const labelMap = { 'all': '全局搜尋', 'player': '作為玩家', 'storyteller': '作為說書人', 'location': '作為地點', 'script': '作為劇本','character': '出現角色' };
             titleEl.innerText = `「${currentKeyword}」的統計結果`;
             hintEl.innerText = `目前的篩選條件：${labelMap[currentFilterType]}`;
             
@@ -68,8 +68,11 @@
                 const sLoc = (m.location || "").toLowerCase().includes(currentKeyword);
                 const sST = (m.storyteller || "").toLowerCase().includes(currentKeyword);
                 const sPlayers = m.players.some(p => p.player_name.toLowerCase().includes(currentKeyword));
-
-                if (currentFilterType === 'all') return sScript || sLoc || sST || sPlayers;
+                const sChar = m.players.some(p => 
+                    (p.initial_character && p.initial_character.toLowerCase().includes(currentKeyword)) ||
+                    (p.final_character && p.final_character.toLowerCase().includes(currentKeyword))
+                );
+                if (currentFilterType === 'all') return sScript || sLoc || sST || sPlayers || sChar;
                 
                 // 🟢 關鍵修正：特定身分搜尋改用 === (完全匹配)，避免「魚」搜到「熱帶魚」
                 if (currentFilterType === 'player') return m.players.some(p => p.player_name.toLowerCase() === currentKeyword);
@@ -99,16 +102,40 @@
         }
 
         let goodWins = 0, evilWins = 0;
+        let goodTotal = 0, evilTotal = 0;
         const locations = {}, roles = {};
 
         matches.forEach(m => {
             // 判斷勝率計算視角
-            if (currentFilterType === 'player' && currentKeyword) {
+                 if (currentFilterType === 'character' && currentKeyword) {
+                const targetPlayers = m.players.filter(p => 
+                    (p.initial_character && p.initial_character.toLowerCase().includes(currentKeyword)) ||
+                    (p.final_character && p.final_character.toLowerCase().includes(currentKeyword))
+                );
+
+                targetPlayers.forEach(p => {
+                    const isWinner = p.alignment === m.winning_team;
+                    if (p.alignment === 'good') {
+                        goodTotal++;
+                        if (isWinner) goodWins++;
+                    } else {
+                        evilTotal++;
+                        if (isWinner) evilWins++;
+                    }
+                });
+            } 
+            else if (currentFilterType === 'player' && currentKeyword) {
                 // 這裡也必須使用精確匹配
                 const p = m.players.find(p => p.player_name.toLowerCase() === currentKeyword);
                 if (p) {
-                    if (p.alignment === m.winning_team) {
-                        if (p.alignment === 'good') goodWins++; else evilWins++;
+                     const isWinner = p.alignment === m.winning_team;
+                    // 分開統計該陣營的總場次
+                    if (p.alignment === 'good') {
+                        goodTotal++;
+                        if (isWinner) goodWins++;
+                    } else {
+                        evilTotal++;
+                        if (isWinner) evilWins++;
                     }
                     roles[p.final_character] = (roles[p.final_character] || 0) + 1;
                 }
