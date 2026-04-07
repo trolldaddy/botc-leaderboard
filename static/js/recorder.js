@@ -1042,6 +1042,7 @@ const App = () => {
           <span className="text-slate-400 font-bold uppercase tracking-widest">📍 地點</span>
           <select value={gameLocation} onChange={e=>setGameLocation(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200">
             <option value="線上 (Discord)">線上 (Discord)</option>
+            <option value="拉普拉斯">拉普拉斯</option>
             <option value="台北">台北</option>
             <option value="新北">新北</option>
             <option value="桃園">桃園</option>
