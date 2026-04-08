@@ -258,6 +258,13 @@ const DEFAULT_SCRIPTS_DATA = {
   "暗流湧動": ["washerwoman", "librarian", "investigator", "chef", "empath", "fortune_teller", "undertaker", "monk", "slayer", "soldier", "mayor", "virgin", "ravenkeeper", "butler", "drunk", "recluse", "saint", "poisoner", "spy", "scarlet_woman", "baron", "imp"],
   "黯月初升": ["grandmother", "sailor", "chambermaid", "exorcist", "innkeeper", "gambler", "gossip", "courtier", "professor", "minstrel", "tea_lady", "pacifist", "fool", "goon", "moonchild", "tinker", "lunatic", "godfather", "devils_advocate", "assassin", "mastermind", "zombuul", "pukka", "shabaloth", "po"],
   "夢殞春宵": ["clockmaker", "dreamer", "snake_charmer","mathematician", "philosopher", "artist", "oracle", "savant", "seamstress", "flowergirl", "town_crier", "juggler", "sage", "mutant", "sweetheart", "barber", "klutz", "evil_twin", "witch", "cerenovus", "pit-hag", "fang_gu", "vigormortis", "no_dashii", "vortox"]
+  "瓦釜雷鳴": [
+    "investigator", "chef", "grandmother", "balloonist", "dreamer", "snake_charmer", "fortune_teller", "gambler", "savant", "amnesiac", "philosopher", "ravenkeeper", "cannibal", 
+    "drunk", "recluse", "mutant", "sweetheart", "lunatic", 
+    "godfather", "cerenovus", "pit-hag", "widow", 
+    "fang_gu", "vigormortis", "imp", 
+    "bone_collector", "harlot", "apprentice", "beggar", "barista"
+  ],
 };
 
 
