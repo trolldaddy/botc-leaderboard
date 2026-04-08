@@ -1208,7 +1208,20 @@ const App = () => {
         <h2 className="text-2xl font-black text-slate-400 mb-2">準備開局</h2>
         <p className="text-xs text-slate-600 uppercase tracking-widest">請先分配玩家角色或選擇官方劇本</p>
      </div>
-  
+        
+        <button 
+        type="button"
+        onClick={resetScript}
+        className={`w-full p-3 rounded-2xl border-2 mb-2 transition-all flex items-center justify-center gap-2 ${
+            script.length === 0 
+            ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300' // 當前就是全角色模式的樣式
+            : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-indigo-500 hover:text-indigo-400'
+        }`}
+    >
+        <span className="text-xs">🌐</span>
+        <span className="text-[11px] font-black">顯示所有角色 (不限劇本)</span>
+    </button>
+        
      <div className="flex flex-col gap-4 w-full max-w-sm">
         <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest text-center">快速載入官方劇本</label>
         <div className="grid grid-cols-3 gap-3">
@@ -1223,13 +1236,7 @@ const App = () => {
             </button>
           ))}
 
-        <button 
-          type="button"
-          onClick={resetScript}
-          className="p-3 rounded-2xl border-2 border-dashed border-slate-700 text-slate-500 text-[11px] font-black hover:border-indigo-500 hover:text-indigo-400 transition-all"
-          >
-          重置 (全角色)
-          </button>
+
         </div>
        
         <div className="h-px bg-slate-800 my-2"></div>
