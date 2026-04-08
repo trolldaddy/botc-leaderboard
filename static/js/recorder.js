@@ -1101,9 +1101,9 @@ const App = () => {
             borderBottom: '4px solid rgba(99, 102, 241, 0.2)' 
         }}
 >
-        <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 justify-items-center max-w-full">
+        <div className="flex overflow-x-auto snap-x scroll-smooth gap-3 p-2 sm:grid sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 justify-items-center max-w-full custom-scrollbar">
           {players.map((p) => (
-            <div key={p.id} className={`w-full flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all relative ${p.isDead ? 'bg-slate-950/80 border-slate-800 grayscale' : p.role ? 'bg-slate-800 border-indigo-500/30' : 'bg-slate-800/50 border-dashed border-slate-600'}`}>
+            <div key={p.id} className={`snap-center shrink-0 w-24 sm:w-full flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all relative ${p.isDead ? 'bg-slate-950/80 border-slate-800 grayscale' : p.role ? 'bg-slate-800 border-indigo-500/30' : 'bg-slate-800/50 border-dashed border-slate-600'}`}>
               <div className="absolute -top-2 -left-2 w-6 h-6 bg-slate-800 text-slate-300 text-[11px] font-black rounded-full flex items-center justify-center border border-slate-600 shadow-lg z-10">
                 {p.id}
               </div>
