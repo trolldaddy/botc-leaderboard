@@ -1210,13 +1210,16 @@ const App = () => {
             </button>
           ))}
         </div>
-        /* 不用重複顯示自製劇本名稱
+       
         <div className="h-px bg-slate-800 my-2"></div>
+        
+        /*        
         <div className="space-y-2">
           <label className="text-[10px] font-black text-slate-500 ml-1">自定義劇本名稱</label>
           <input type="text" value={scriptName} onChange={e=>setScriptName(e.target.value)} className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-indigo-100 outline-none focus:border-indigo-500" />
         </div>
         */
+        
      </div>
      
      <p className="text-[10px] text-slate-700 italic text-center max-w-xs">或者點擊右上角「📜 載入劇本」上傳 JSON。完成後點擊右上角「進入準備階段」。</p>
