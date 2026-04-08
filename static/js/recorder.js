@@ -1219,18 +1219,18 @@ const App = () => {
         }`}
     >
         <span className="text-xs">🌐</span>
-        <span className="text-[11px] font-black">顯示所有角色 (不限劇本)</span>
+        <span className="text-base font-black">顯示所有角色 (不限劇本)</span>
     </button>
         
      <div className="flex flex-col gap-4 w-full max-w-sm">
-        <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest text-center">快速載入官方劇本</label>
+        <label className="text-base font-black text-indigo-500 uppercase tracking-widest text-center">快速載入官方劇本</label>
         <div className="grid grid-cols-3 gap-3">
           {Object.keys(DEFAULT_SCRIPTS_DATA).map(name => (
             <button 
               key={name} 
               type="button"
               onClick={() => loadBuiltInScript(name)}
-              className={`p-3 rounded-2xl border-2 text-[14px] font-black transition-all ${scriptName === name ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-600'}`}
+              className={`p-3 rounded-2xl border-2 text-base font-black transition-all ${scriptName === name ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-600'}`}
             >
               {name}
             </button>
