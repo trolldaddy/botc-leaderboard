@@ -548,6 +548,11 @@ const App = () => {
     setScript(parsed);
     setScriptName(scriptKey);
   };
+
+  const resetScript = () => {
+  setScript([]);
+  setScriptName("自定義 / 全角色");
+  };
   
   const [hiddenTarget, setHiddenTarget] = useState("");
   const [hiddenValue, setHiddenValue] = useState("");
@@ -1217,6 +1222,14 @@ const App = () => {
               {name}
             </button>
           ))}
+
+        <button 
+          type="button"
+          onClick={resetScript}
+          className="p-3 rounded-2xl border-2 border-dashed border-slate-700 text-slate-500 text-[11px] font-black hover:border-indigo-500 hover:text-indigo-400 transition-all"
+          >
+          重置 (全角色)
+          </button>
         </div>
        
         <div className="h-px bg-slate-800 my-2"></div>
