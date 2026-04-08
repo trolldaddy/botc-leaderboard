@@ -33,7 +33,11 @@ body {
 }
 
 html, body {
-    height: 100%;
+    overflow: hidden; /* 禁止全域滾動 */
+  overscroll-behavior: none; /* 現代瀏覽器禁止回彈的屬性 */
+  height: 100%;
+  width: 100%;
+  position: fixed; /* 這是對付 iOS 最暴力的做法 */
 }
 
 h1, h2, h3, h4 {
@@ -224,9 +228,10 @@ h1, h2, h3, h4 {
 }
 
 #recorder-root {
-    flex: 1;
-    min-height: 0;
-}
+    height: 100dvh; /* 使用動態視窗高度，避免 iOS 工具列干擾 */
+  display: flex;
+  flex-col;
+    }
 
 .btn {
     padding: 0.7rem 1.2rem;
