@@ -1152,7 +1152,8 @@ const App = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {['townsfolk', 'outsider', 'minion', 'demon', 'traveller'].map(team => {
-                    const teamRoles = allAvailableRoles.filter(r => r.team === team && (r.name.includes(searchTerm) || r.id.toLowerCase().includes(searchTerm.toLowerCase())));
+                    const source = (script && script.length > 0) ? allAvailableRoles : MASTER_ROLE_DB;
+                    const teamRoles = source.filter(r => r.team === team && (r.name.includes(searchTerm) || r.id.toLowerCase().includes(searchTerm.toLowerCase())));
                     if (teamRoles.length === 0) return null;
                     return (
                       <div key={team} className="space-y-3">
