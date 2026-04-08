@@ -1212,7 +1212,7 @@ const App = () => {
         <button 
         type="button"
         onClick={resetScript}
-        className={`w-full p-3 rounded-2xl border-2 mb-2 transition-all flex items-center justify-center gap-2 ${
+        className={`w-fit mx-auto px-10 p-3 rounded-2xl border-2 mb-2 transition-all flex items-center justify-center gap-2 ${
             script.length === 0 
             ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300' // 當前就是全角色模式的樣式
             : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-indigo-500 hover:text-indigo-400'
