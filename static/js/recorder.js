@@ -253,6 +253,14 @@ const MASTER_ROLE_DB = [
   {id:"yishi",name:"驛使",team:"townsfolk",firstNight:0,otherNight:12210,otherNightReminder:"當晚，喚醒驛使藝人。如果他猜測正確，對他點頭表示“是”，對他搖頭表示“否”",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_9168557760171_8ae6a36c.jpg"}
 ];
 
+// 🟢 新增：官方三大劇本角色 ID 清單
+const DEFAULT_SCRIPTS_DATA = {
+  "暗流湧動": ["washerwoman", "librarian", "investigator", "chef", "empath", "fortune_teller", "undertaker", "monk", "slayer", "soldier", "mayor", "virgin", "ravenkeeper", "butler", "drunk", "recluse", "saint", "poisoner", "spy", "scarlet_woman", "baron", "imp"],
+  "黯月初升": ["grandmother", "sailor", "chambermaid", "exorcist", "innkeeper", "gambler", "gossip", "courtier", "professor", "minstrel", "tea_lady", "pacifist", "fool", "goon", "moonchild", "tinker", "lunatic", "godfather", "devils_advocate", "assassin", "mastermind", "zombuul", "pukka", "shabaloth", "po"],
+  "夢殞春宵": ["clockmaker", "dreamer", "snake_charmer", "philosopher", "artist", "oracle", "savant", "seamstress", "flowergirl", "town_crier", "juggler", "sage", "mutant", "sweetheart", "barber", "klutz", "evil_twin", "witch", "cerenovus", "pit-hag", "fang_gu", "vigormortis", "no_dashii", "vortox"]
+};
+
+
 const DAY_ACTION_ROLES = [
   'slayer', 'savant', 'gossip', 'juggler', 'artist', 'fisherman',
   'alsaahir', 'bianlianshi', 'geling', 'yishi', 'princess',
@@ -519,6 +527,21 @@ const App = () => {
 
   const [selectingRoleFor, setSelectingRoleFor] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const loadBuiltInScript = (scriptKey) => {
+    const roleIds = DEFAULT_SCRIPTS_DATA[scriptKey];
+    if (!roleIds) return;
+    
+    // 從 window 全域的角色庫比對 ID 並產生新的 script 狀態
+    const parsed = roleIds.map(id => {
+      let dbRole = window.MASTER_ROLE_DB.find(r => r.id === id);
+      return dbRole ? { ...dbRole } : null;
+    }).filter(Boolean);
+
+    setScript(parsed);
+    setScriptName(scriptKey);
+  };
+  
   const [hiddenTarget, setHiddenTarget] = useState("");
   const [hiddenValue, setHiddenValue] = useState("");
   const [demonBluffs, setDemonBluffs] = useState(() => loadState('botc_demonBluffs', { r1: "", r2: "", r3: "", recorded: false }));
@@ -1159,12 +1182,41 @@ const App = () => {
         
         <div className="flex-1 min-h-0 min-w-0 p-4 lg:p-6 overflow-y-auto custom-scrollbar border-r border-slate-800">
           {gamePhase.type === 'Setup' ? (
+            /*
             <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-4 py-10">
               <span className="text-6xl opacity-20">👥</span>
               <h2 className="text-xl font-black text-slate-400">遊戲準備中</h2>
               <p className="text-sm">請在上方的網格座位中，點擊加號為每位玩家分配角色。</p>
               <p className="text-xs text-center">分配完成後點擊右上角的「進入準備階段」。<br/>⚠️ 如果想重置，點擊左上角的「🔄 重置」按鈕。</p>
             </div>
+          <div className="h-full flex flex-col items-center justify-center space-y-8 animate-fadeIn">
+     <div className="text-center">
+        <h2 className="text-2xl font-black text-slate-400 mb-2">準備開局</h2>
+        <p className="text-xs text-slate-600 uppercase tracking-widest">請先分配玩家角色或選擇官方劇本</p>
+     </div>
+     */
+     <div className="flex flex-col gap-4 w-full max-w-sm">
+        <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest text-center">快速載入官方劇本</label>
+        <div className="grid grid-cols-3 gap-3">
+          {Object.keys(DEFAULT_SCRIPTS_DATA).map(name => (
+            <button 
+              key={name} 
+              type="button"
+              onClick={() => loadBuiltInScript(name)}
+              className={`p-3 rounded-2xl border-2 text-[11px] font-black transition-all ${scriptName === name ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-600'}`}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+        <div className="h-px bg-slate-800 my-2"></div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-black text-slate-500 ml-1">自定義劇本名稱</label>
+          <input type="text" value={scriptName} onChange={e=>setScriptName(e.target.value)} className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-sm text-indigo-100 outline-none focus:border-indigo-500" />
+        </div>
+     </div>
+     
+     <p className="text-[10px] text-slate-700 italic text-center max-w-xs">或者點擊右上角「📜 載入劇本」上傳 JSON。完成後點擊右上角「進入準備階段」。</p>
           ) : gamePhase.type === 'Prep' ? (
             <div className="space-y-6">
               <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
