@@ -1217,6 +1217,7 @@ const App = () => {
      </div>
      
      <p className="text-[10px] text-slate-700 italic text-center max-w-xs">或者點擊右上角「📜 載入劇本」上傳 JSON。完成後點擊右上角「進入準備階段」。</p>
+     </div>
           ) : gamePhase.type === 'Prep' ? (
             <div className="space-y-6">
               <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
