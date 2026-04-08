@@ -1,4 +1,4 @@
-const { useState, useEffect, useMemo } = React;
+  const { useState, useEffect, useMemo } = React;
 
 // ==========================================
 // 輕量級：血染專用「簡體轉繁體」字典
@@ -8,7 +8,7 @@ const S2T_MAP = {
   '僵':'殭', '丧':'喪', '业':'業', '馆':'館', '员':'員', '妇':'婦', '术':'術', '药':'藥', '农':'農', '长':'長',
   '护':'護', '帮':'幫', '戏':'戲', '脸':'臉', '说':'說', '书':'書', '这':'這', '么':'麼', '没':'沒', '样':'樣',
   '唤':'喚', '醒':'醒', '择':'擇', '两':'兩', '个':'個', '当':'當', '会':'會', '从':'從', '来':'來', '让':'讓',
-  '记':'記', '为':'為', '该':'該', '复':'復', '隐':'隱', '离':'離', '异':'異', '鐘':'鐘', '表':'錶', '梦':'夢',
+  '记':'記', '为':'為', '该':'該', '复':'復', '隐':'隱', '离':'離', '异':'異', '钟':'鐘', '表':'錶', '梦':'夢',
   '卖':'賣', '讯':'訊', '杂':'雜', '发':'髮', '门':'門', '间':'間', '关':'關', '头':'頭', '风':'風', '飞':'飛',
   '鸟':'鳥', '龙':'龍', '马':'馬', '鱼':'魚', '鸡':'雞', '阴':'陰', '阳':'陽', '東':'東', '西':'西', '视':'視',
   '覺':'覺', '腦':'腦', '對':'對', '爾':'爾', '亞':'亞', '歐':'歐', '盧':'盧', '卡':'卡', '瑪':'瑪', '薩':'薩',
@@ -72,7 +72,7 @@ const MASTER_ROLE_DB = [
   {id:"grandmother",name:"祖母",team:"townsfolk",firstNight:8300,otherNight:9500,firstNightReminder:"指向她的孫子玩家，並展示該玩家的角色標記。",otherNightReminder:"如果孫子被惡魔殺死，祖母也會一同死亡。標記祖母死亡。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/grandmother.png"},
   {id:"sailor",name:"水手",team:"townsfolk",firstNight:3500,otherNight:1000,firstNightReminder:"讓水手選擇一名存活玩家。標記那名玩家或水手醉酒。",otherNightReminder:"讓水手選擇一名存活玩家。標記那名玩家或水手醉酒。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/sailor.png"},
   {id:"chambermaid",name:"侍女",team:"townsfolk",firstNight:12400,otherNight:14800,firstNightReminder:"讓侍女選擇除自己外的兩名存活玩家。給她展示數字手勢來告訴她這些玩家中有幾人因自身能力被喚醒。",otherNightReminder:"讓侍女選擇除自己外的兩名存活玩家。給她展示數字手勢來告訴她這些玩家中有幾人因自身能力被喚醒。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/chambermaid.png"},
-  {id:"exorcist",name:"驅魔人",team:"townsfolk",firstNight:0,otherNight:4300,otherNightReminder:"讓驅魔人選擇一名玩家，不能是上一夜他選擇過的玩家。讓驅魔人重新入睡。如果驅魔人選中了惡魔：喚醒惡魔。展示“該角色的能力對你生效”信息標記和驅魔人角色標記. 指向驅魔人玩家。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/exorcist.png"},
+  {id:"exorcist",name:"驅魔人",team:"townsfolk",firstNight:0,otherNight:4300,otherNightReminder:"讓驅魔人選擇一名玩家，不能是上一夜他選擇過的玩家。讓驅魔人重新入睡。如果驅魔人選中了惡魔：喚醒惡魔。展示“該角色的能力對你生效”信息標記和驅魔人角色標記。指向驅魔人玩家。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/exorcist.png"},
   {id:"courtier",name:"侍臣",team:"townsfolk",firstNight:5100,otherNight:1900,firstNightReminder:"侍臣可以選擇一個角色。如果他這麽做了，標記侍臣失去能力，標記被選擇的角色所對應的玩家之一醉酒。",otherNightReminder:"侍臣可以選擇一個角色。如果他這麽做了，標記侍臣失去能力，標記被選擇的角色所對應的玩家之一醉酒。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/courtier.png"},
   {id:"gossip",name:"造謠者",team:"townsfolk",firstNight:0,otherNight:9100,otherNightReminder:"如果白天的聲明為真，會有一名玩家死亡，並由說書人來選擇一名玩家，標記該玩家死亡。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/gossip.png"},
   {id:"gambler",name:"賭徒",team:"townsfolk",firstNight:0,otherNight:2000,otherNightReminder:"讓賭徒選擇一名玩家和一個角色。如果賭徒猜錯了，標記賭徒死亡。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/gambler.png"},
@@ -101,7 +101,7 @@ const MASTER_ROLE_DB = [
   {id:"clockmaker",name:"鐘表匠",team:"townsfolk",firstNight:8400,otherNight:0,firstNightReminder:"給他展示數字手勢來告訴他惡魔與爪牙之間最近的距離。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/clockmaker.png"},
   {id:"barista",name:"咖啡師",team:"traveller",firstNight:130,otherNight:120,firstNightReminder:"說書人選擇一名玩家喚醒，並告訴他觸發了咖啡師的什麽效果。",otherNightReminder:"說書人選擇一名玩家喚醒，並告訴他觸發了咖啡師的什麽效果。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/barista.png"},
   {id:"harlot",name:"流鶯",team:"traveller",firstNight:0,otherNight:130,otherNightReminder:"流鶯選擇一名玩家，將其喚醒，那名玩家選擇同意或拒絕。如果同意，將他的角色標記展示給流鶯看。然後說書人可以決定兩名玩家是否會一起死去。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/harlot.png"},
-  {id:"snake_charmer",name:"舞蛇人",team:"townsfolk",firstNight:5200,otherNight:2100,firstNightReminder:"讓舞蛇人選擇一名玩家。如果舞蛇人選中了惡魔：展示“你是”信息標記和惡魔角色標記。用拇指向下代表他陣營變為邪惡。在魔典中交換舞蛇人和惡魔的角色標記。讓原來的舞蛇人重新入睡。喚醒原來的惡魔。對原惡魔展示“你是”信息標記和舞蛇人角色標記，並用拇指向上代表他陣營變為善良，並標記這名玩家中毒。",otherNightReminder:"讓舞蛇人选择一名玩家。如果舞蛇人选中了恶魔：展示“你是”信息标記和恶魔角色标記。用拇指向下代表他阵营变为邪恶。在魔典中交换舞蛇人和恶魔的角色标記。让原来的舞蛇人重新入睡。唤醒原来的恶魔。对原恶魔展示“你是”信息标記和舞蛇人角色標記，並用拇指向上代表他阵营变为善良，並標記這名玩家中毒。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/snake_charmer.png"},
+  {id:"snake_charmer",name:"舞蛇人",team:"townsfolk",firstNight:5200,otherNight:2100,firstNightReminder:"讓舞蛇人選擇一名玩家。如果舞蛇人選中了惡魔：展示“你是”信息標記和惡魔角色標記。用拇指向下代表他陣營變為邪惡。在魔典中交換舞蛇人和惡魔的角色標記。讓原來的舞蛇人重新入睡。喚醒原來的惡魔。對原惡魔展示“你是”信息標記和舞蛇人角色標記，並用拇指向上代表他陣營變為善良，並標記這名玩家中毒。",otherNightReminder:"讓舞蛇人选择一名玩家。如果舞蛇人选中了恶魔：展示“你是”信息标記和恶魔角色标記。用拇指向下代表他阵营变为邪恶。在魔典中交换舞蛇人和恶魔的角色标記。让原来的舞蛇人重新入睡。唤醒原来的恶魔。对原恶魔展示“你是”信息标記和舞蛇人角色标記，并用拇指向上代表他阵营变为善良，并标記这名玩家中毒。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/snake_charmer.png"},
   {id:"mathematician",name:"數學家",team:"townsfolk",firstNight:12500,otherNight:14900,firstNightReminder:"給他展示數字手勢來告訴他在首個夜晚里有多少玩家的角色能力受他人影響而未正常生效。",otherNightReminder:"給他展示數字手勢來告訴他從上個黎明到數學家醒來前有多少玩家的角色能力受他人影響而未正常生效。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/mathematician.png"},
   {id:"flowergirl",name:"賣花女孩",team:"townsfolk",firstNight:0,otherNight:11600,otherNightReminder:"對她點頭或搖頭來示意今天白天是否有惡魔投過票。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/flowergirl.png"},
   {id:"town_crier",name:"城鎮公告員",team:"townsfolk",firstNight:0,otherNight:11700,otherNightReminder:"對他點頭或搖頭示意今天白天是否有爪牙發起過提名。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/town_crier.png"},
@@ -130,7 +130,7 @@ const MASTER_ROLE_DB = [
   {id:"harpy",name:"鷹身女妖",team:"minion",firstNight:6000,otherNight:3100,firstNightReminder:"喚醒鷹身女妖並讓他依次指向兩名玩家。標記第一名玩家“瘋狂”，標記第二名玩家“第二名”。",otherNightReminder:"喚醒鷹身女妖並讓他依次指向兩名玩家。標記第一名玩家“瘋狂”，標記第二名玩家“第二名”。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202307/c_4331482099861_0db1bfaf.jpg"},
   {id:"shugenja",name:"修行者",team:"townsfolk",firstNight:12000,otherNight:0,firstNightReminder:"在首個夜晚，喚醒修行者。用手指水平指向修行者的某一側，告訴他與他距離最近的邪惡玩家位於這一側。如果修行者兩側最近的邪惡玩家與他的距離相等，由你來決定告訴他什麽樣的信息，並用手指指向對應的一側。讓修行者重新入睡。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202411/c_9825126871371_4fbea129.jpg"},
   {id:"kazali",name:"卡紮力",team:"demon",firstNight:1000,otherNight:7750,firstNightReminder:"喚醒卡紮力，讓他選擇玩家變成邪惡爪牙。",otherNightReminder:"除首個夜晚以外的每個夜晚，喚醒卡紮力。讓他指向任意一名玩家。那名玩家死亡——在他角色標記旁放置“死亡”提示標記。讓卡紮力重新入睡。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202312/c_7795403383071_0f9107d8.jpg"},
-  {id:"hatter",name:"帽匠",team:"outsider",firstNight:0,otherNight:800,otherNightReminder:"在當晚，一同喚醒所有爪牙和惡魔。對他們展示“該角色的能力對你生效”信息標記，然後展示帽匠角色標記。每名以此被喚醒的玩家可以選擇搖頭或指向角色列表上與自己當前角色類型相同的一個角色。如果一名玩家在做出自己的選擇後會使得自己的角色與一名其他玩家选择的角色相同，对他摇头示意他重新选择。在选择完成后让他重新入睡。移除“今晚茶会”提示标记。根据这些玩家的选择，在魔典上執行相應的角色變化操作。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202312/c_9723021341071_86da6df4.jpg"},
+  {id:"hatter",name:"帽匠",team:"outsider",firstNight:0,otherNight:800,otherNightReminder:"在當晚，一同喚醒所有爪牙和惡魔。對他們展示“該角色的能力對你生效”信息標記，然後展示帽匠角色標記。每名以此被喚醒的玩家可以選擇搖頭或指向角色列表上與自己當前角色類型相同的一個角色。如果一名玩家在做出自己的選擇後會使得自己的角色與一名其他玩家选择的角色相同，对他摇头示意他重新选择。在选择完成后让他重新入睡。移除“今晚茶会”提示标记。根据这些玩家的选择，在魔典上执行相应的角色变化操作。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202312/c_9723021341071_86da6df4.jpg"},
   {id:"ojo",name:"奧赫",team:"demon",firstNight:0,otherNight:6200,otherNightReminder:"喚醒奧赫。讓奧赫指向角色列表上的一個角色標記。如果被選擇的角色在場，對應的玩家死亡——使用“死亡”提示標記標記那名玩家。如果被選擇的角色不在場，那麽改為你來選擇任意一名玩家，那名玩家死亡——使用“死亡”提示標記標記那名玩家。讓奧赫重新入睡。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202310/c_6886084308961_f221dd48.jpg"},
   {id:"plague_doctor",name:"瘟疫醫生",team:"outsider",firstNight:0,otherNight:10000,otherNightReminder:"當瘟疫醫生死亡時，將一個不在場的爪牙角色標記放置在魔典左側的正中位置，並用瘟疫醫生的“說書人能力”標記標記該爪牙角色。如可能，在夜晚順序表旁添加相應的夜晚標記用以提示。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202310/c_9614144308961_fe5074b8.jpg"},
   {id:"village_idiot",name:"村夫",team:"townsfolk",firstNight:10100,otherNight:12800,firstNightReminder:"喚醒任意一名村夫。讓村夫指向一名玩家，對他給出拇指向上或向下的手勢代表那名玩家的陣營。重覆這個操作，直到所有村夫玩家都進行了夜晚行動。",otherNightReminder:"喚醒任意一名村夫。讓村夫指向一名玩家，對他給出拇指向上或向下的手勢代表那名玩家的陣營。重覆這個操作，直到所有村夫玩家都進行了夜晚行動。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202401/c_2996546816071_b144d82c.jpg"},
@@ -183,7 +183,7 @@ const MASTER_ROLE_DB = [
   {id:"goblin",name:"哥布林",team:"minion",firstNight:0,otherNight:0,image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/goblin.png"},
   {id:"lil_monsta",name:"小怪寶",team:"demon",firstNight:4400,otherNight:7300,firstNightReminder:"喚醒所有爪牙，允許他們以指向的方式決定誰照看小怪寶，但不能產生其他交流，否則會有非常糟糕的事情發生。",otherNightReminder:"喚醒所有爪牙，允許他們以指向的方式決定誰照看小怪寶，但不能产生其他交流，否则会有非常糟糕的事情发生。说书人选择一名玩家，那名玩家死亡。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/lil_monsta.png"},
   {id:"lleech",name:"痢蛭",team:"demon",firstNight:4500,otherNight:7200,firstNightReminder:"讓痢蛭指向一名玩家。標記那名玩家中毒。",otherNightReminder:"寄生蛭指向一名玩家。那名玩家死亡。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/lleech.png"},
-  {id:"al-hadikhia",name:"哈迪寂亞",team:"demon",firstNight:0,otherNight:7000,otherNightReminder:"哈迪寂亞選擇三名玩家。對所有人宣告第一位玩家，然後喚醒他並讓他秘密選擇活著還是死去. 依次對第二第三位玩家如此做。如果三名玩家都選擇活著，他們都死去。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/al-hadikhia.png"},
+  {id:"al-hadikhia",name:"哈迪寂亞",team:"demon",firstNight:0,otherNight:7000,otherNightReminder:"哈迪寂亞選擇三名玩家。對所有人宣告第一位玩家，然後喚醒他並讓他秘密選擇活著還是死去。依次對第二第三位玩家如此做。如果三名玩家都選擇活著，他們都死去。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/al-hadikhia.png"},
   {id:"legion",name:"軍團",team:"demon",firstNight:0,otherNight:6000,otherNightReminder:"由說書人決定，讓哪一名玩家死亡。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/legion.png"},
   {id:"nightwatchman",name:"守夜人",team:"townsfolk",firstNight:10700,otherNight:13400,firstNightReminder:"守夜人可以指向一名玩家。如果他這麽做，則喚醒那名玩家，告知其被守夜人選中，且告知他守夜人是誰。",otherNightReminder:"守夜人可以指向一名玩家。如果他這麽做，則喚醒那名玩家，告知其被守夜人選中，且告知他守夜人是誰。",image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/nightwatchman.png"},
   {id:"gangster",name:"黑幫",team:"traveller",firstNight:0,otherNight:0,image:"https://oss.gstonegames.com/data_file/clocktower/role_icon/gangster.png"},
@@ -218,7 +218,7 @@ const MASTER_ROLE_DB = [
   {id:"dianxiaoer",name:"店小二",team:"townsfolk",firstNight:9400,otherNight:0,firstNightReminder:"喚醒店小二，對他指向標記有店小二的“熟客”和“醉酒”提示標記的這兩名玩家。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202301/c_8586487694761_0ecde168.jpg"},
   {id:"dagengren",name:"打更人",team:"townsfolk",firstNight:0,otherNight:1920,otherNightReminder:"喚醒打更人，並讓其猜測距離，以數字手勢給出。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202301/c_3777477694761_d60dec0e.jpg"},
   {id:"daoshi",name:"道士",team:"townsfolk",firstNight:0,otherNight:4350,otherNightReminder:"喚醒道士，讓其選擇一名玩家。如果他選中了惡魔，在他的角色標記旁放置“死亡”提示標記。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202301/c_0866187694761_98fba0d5.jpg"},
-  {id:"yanluo",name:"閻羅",team:"demon",firstNight:11710,otherNight:8410,firstNightReminder:"首個夜晚，喚醒閻羅並讓他按自己意願的時長來查看魔典。讓閻羅選擇一名玩家，放置“選擇”標記在其角色圖標旁，其在覅三個夜晚必定會死亡. 讓閻羅選擇一名玩家，放置“即將死亡”標記在其角色圖標旁。",otherNightReminder:"讓閻羅選擇一名玩家，放置“即將死亡”標記在其角色圖標旁。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_2190498760171_1c483826.jpg"},
+  {id:"yanluo",name:"閻羅",team:"demon",firstNight:11710,otherNight:8410,firstNightReminder:"首個夜晚，喚醒閻羅並讓他按自己意願的時長來查看魔典。讓閻羅選擇一名玩家，放置“選擇”標記在其角色圖標旁，其在覅三個夜晚必定會死亡。讓閻羅選擇一名玩家，放置“即將死亡”標記在其角色圖標旁。",otherNightReminder:"讓閻羅選擇一名玩家，放置“即將死亡”標記在其角色圖標旁。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_2190498760171_1c483826.jpg"},
   {id:"ranfangfangzhu",name:"染坊坊主",team:"townsfolk",firstNight:0,otherNight:0,image:"https://oss.gstonegames.com/data_file/clocktower/upload/202404/c_0616062943171_bbdbbb4c.jpg"},
   {id:"bianlianshi",name:"變臉師",team:"townsfolk",firstNight:0,otherNight:0,image:"https://oss.gstonegames.com/data_file/clocktower/upload/202310/c_2669745308961_3cd6048e.jpg"},
   {id:"diaomin",name:"刁民",team:"traveller",firstNight:0,otherNight:0,image:"https://oss.gstonegames.com/data_file/clocktower/upload/202404/c_8385231943171_9383f742.jpg"},
@@ -245,13 +245,21 @@ const MASTER_ROLE_DB = [
   {id:"yanshi",name:"偃師",team:"townsfolk",firstNight:0,otherNight:0,image:"https://oss.gstonegames.com/data_file/clocktower/upload/202401/c_8796986816071_85680b81.jpg"},
   {id:"niangjiushi",name:"釀酒師",team:"minion",firstNight:4900,otherNight:1600,firstNightReminder:"喚醒釀酒師，讓其選擇一個角色並給出該角色對應的信息形式。",otherNightReminder:"喚醒釀酒師，讓其選擇一個角色並給出該角色對應的信息形式。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202301/c_3356597694761_0a4b67e6.jpg"},
   {id:"gudiao",name:"蠱雕",team:"minion",firstNight:4800,otherNight:1500,firstNightReminder:"喚醒蠱雕，讓其選擇一個方向。將他的“中毒”標記移動至那個方向上的下一個存活玩家的角色標記旁。",otherNightReminder:"喚醒蠱雕，讓其選擇一個方向。將他的“中毒”標記移動至那個方向上的下一個存活玩家的角色標記旁。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202301/c_4078497694761_5c6ddcce.jpg"},
-  {id:"daoke",name:"刀客",team:"townsfolk",firstNight:9410,otherNight:0,firstNightReminder:"在為首個夜晚做準備時，將刀客的“追殺”標記放置在一個爪牙角色標記旁。在首個夜晚，喚醒刀客. 對他展示標記了“追殺”的爪牙角色標記。讓刀客重新入睡。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_5751437760171_79dd1401.jpg"},
+  {id:"daoke",name:"刀客",team:"townsfolk",firstNight:9410,otherNight:0,firstNightReminder:"在為首個夜晚做準備時，將刀客的“追殺”標記放置在一個爪牙角色標記旁。在首個夜晚，喚醒刀客。對他展示標記了“追殺”的爪牙角色標記。讓刀客重新入睡。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_5751437760171_79dd1401.jpg"},
   {id:"bingbi",name:"秉筆",team:"townsfolk",firstNight:0,otherNight:10310,otherNightReminder:"如果秉筆人在夜晚死去，喚醒他並指向一名邪惡玩家；如果秉筆在白天死去，喚醒他並指向一名善良玩家。隨後讓他重新入睡。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_5918227760171_7f310c1b.jpg"},
   {id:"limao",name:"貍貓",team:"townsfolk",firstNight:0,otherNight:1960,otherNightReminder:"喚醒貍貓，讓他指向一名玩家。讓貍貓重新入睡。將“太子”標記放在對應玩家角色標記旁。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_2553047760171_ed091519.jpg"},
   {id:"zhifu",name:"知府",team:"townsfolk",firstNight:0,otherNight:12220,otherNightReminder:"如果在白天以及夜晚，只有鎮民玩家死亡，對司民搖頭表示“否”，否則點頭表示“是”。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202404/c_2565080943171_2bd68241.jpg"},
   {id:"huapi",name:"畫皮",team:"minion",firstNight:4550,otherNight:8810,firstNightReminder:"讓畫皮選擇一名玩家，該玩家進入“活屍”狀態。",otherNightReminder:"每個夜晚，如果畫皮有“重獲能力”標記，喚醒畫皮，讓其選擇一名玩家，該玩家進入“活屍”狀態。",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_8796728760171_7caa0950.jpg"},
   {id:"yishi",name:"驛使",team:"townsfolk",firstNight:0,otherNight:12210,otherNightReminder:"當晚，喚醒驛使藝人。如果他猜測正確，對他點頭表示“是”，對他搖頭表示“否”",image:"https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_9168557760171_8ae6a36c.jpg"}
 ];
+
+// 🟢 新增：官方三大劇本角色 ID 清單
+const DEFAULT_SCRIPTS_DATA = {
+  "暗流湧動": ["washerwoman", "librarian", "investigator", "chef", "empath", "fortune_teller", "undertaker", "monk", "slayer", "soldier", "mayor", "virgin", "ravenkeeper", "butler", "drunk", "recluse", "saint", "poisoner", "spy", "scarlet_woman", "baron", "imp"],
+  "黯月初升": ["grandmother", "sailor", "chambermaid", "exorcist", "innkeeper", "gambler", "gossip", "courtier", "professor", "minstrel", "tea_lady", "pacifist", "fool", "goon", "moonchild", "tinker", "lunatic", "godfather", "devils_advocate", "assassin", "mastermind", "zombuul", "pukka", "shabaloth", "po"],
+  "夢殞春宵": ["clockmaker", "dreamer", "snake_charmer","mathematician", "philosopher", "artist", "oracle", "savant", "seamstress", "flowergirl", "town_crier", "juggler", "sage", "mutant", "sweetheart", "barber", "klutz", "evil_twin", "witch", "cerenovus", "pit-hag", "fang_gu", "vigormortis", "no_dashii", "vortox"]
+};
+
 
 const DAY_ACTION_ROLES = [
   'slayer', 'savant', 'gossip', 'juggler', 'artist', 'fisherman',
@@ -260,7 +268,7 @@ const DAY_ACTION_ROLES = [
   'gunslinger', 'matron', 'butcher', 'judge', 'gangster', 'jiaohuazi', 'diaomin',
   'mutant', 'klutz', 'moonchild', 'golem',
   // 加入中文名稱雙重保險
-  '殺手', '博學者', '造謠者', '雜耍藝人', '藝術家', '漁夫', '戲法師', '變臉師', '歌伶', '驛使', '公主', '精神病患者', '哥布林', '維齊爾', '槍手', '女舍監', '屠夫', '法官', '黑幫', '叫花子', '刁民', '畸形秀演員', '呆瓜', '月之子', '魔像'
+  '獵手', '博學者', '造謠者', '雜耍藝人', '藝術家', '漁夫', '戲法師', '變臉師', '歌伶', '驛使', '公主', '精神病患者', '哥布林', '維齊爾', '槍手', '女舍監', '屠夫', '法官', '黑幫', '叫花子', '刁民', '畸形秀演員', '呆瓜', '月之子', '魔像'
 ];
 
 const getRoleInputConfig = (role) => {
@@ -322,7 +330,7 @@ const getRoleInputConfig = (role) => {
     { key: 'p2', type: 'player', label: '玩家 2' }
   ];
 
-  if (isRole(['qintianjian', 'fengshuishi', 'shugenja', 'gudiao'], ['欽天監', '風水師', '修行者', '蠱雕', '欽天監', '風水師', '修行者', '蠱雕', '钦天监', '风水师', '蛊雕'])) return [
+  if (isRole(['qintianjian', 'fengshuishi', 'shugenja', 'gudiao'], ['欽天監', '風水師', '修行者', '蠱雕', '钦天监', '风水师', '蛊雕'])) return [
     { key: 'dir', type: 'select', label: '方向', options: ['左/順時針', '右/逆時針', '相同'] }
   ];
 
@@ -373,18 +381,18 @@ const getRoleInputConfig = (role) => {
   if (isRole(['artist', 'fisherman', 'gossip', 'juggler', 'alsaahir', 'goblin'], ['藝術家', '漁夫', '造謠者', '雜耍藝人', '戲法師', '哥布林', '艺术家', '渔夫', '造谣者', '杂耍艺人', '戏法师'])) return [
     { key: 'word', type: 'text', label: '聲明/提問/提示內容' }
   ];
-  if (isRole(['slayer', 'psychopath', 'gunslinger', 'golem', 'moonchild', 'klutz'], ['殺手', '精神病患者', '精神病患', '槍手', '魔像', '月之子', '呆瓜', '殺手', '槍手', '杀手', '枪手'])) return [
+  if (isRole(['slayer', 'psychopath', 'gunslinger', 'golem', 'moonchild', 'klutz'], ['殺手', '精神病患者', '精神病患', '槍手', '魔像', '月之子', '呆瓜', '杀手', '枪手'])) return [
     { key: 'target', type: 'player', label: '目標對象' },
     { key: 'res', type: 'select', label: '行動結果', options: ['死亡', '無事發生/存活', '猜測正確', '猜測錯誤'] }
   ];
-  if (isRole(['geling', 'matron', 'gangster', 'jiaohuazi'], ['歌伶', '女舍監', '黑幫', '叫花子', '女舍監', '黑幫'])) return [
+  if (isRole(['geling', 'matron', 'gangster', 'jiaohuazi'], ['歌伶', '女舍監', '黑幫', '叫花子', '女舍监', '黑帮'])) return [
     { key: 'p1', type: 'player', label: '目標 1' },
     { key: 'p2', type: 'player', label: '目標 2 (選填)' }
   ];
   // ------------------------------------
 
   // 移除被動/無目標技能的動態表單回傳
-  if (isRole(['banshee', 'zealot', 'xaan', 'wraith', 'princess', 'hermit', 'soldier', 'mayor', 'drunk', 'saint', 'recluse', 'scarlet_woman', 'baron', 'mastermind', 'deviant', 'butcher', 'mutant', 'sweetheart', 'atheist', 'cannibal', 'snitch', 'damsel', 'heretic', 'politician', 'boomdandy', 'marionette', 'leviathan', 'vizier', 'shijie', 'heshang', 'yangguren', 'jinweijun', 'shusheng', 'ganshiren', 'banxian', 'wudaozhe', 'xizi', 'ranfangfangzhu', 'diaomin', 'yongjiang', 'xizi_new', 'rulianshi', 'beggar', 'scapegoat'], ['報喪女妖', '狂熱者', '限', '亡魂', '公主', '隱士', '士兵', '鎮長', '酒鬼', '聖徒', '陌客', '紅唇女郎', '男爵', '主謀', '怪咖', '屠夫', '畸形秀演員', '心上人', '無神論者', '食人族', '告密者', '落難少女', '異端分子', '政客', '炸彈人', '提線木偶', '利維坦', '維齊爾', '使節', '和尚', '養蠱人', '禁衛軍', '書生', '趕屍人', '半仙', '悟道者', '戲子', '染坊坊主', '刁民', '俑匠', '戲子（改）', '入殮師', '乞丐', '替罪羊', '报丧女妖', '狂热者', '镇长', '圣徒', '红唇女郎', '主谋', '畸形秀演员', '无神论者', '落难少女', '异端分子', '炸弹人', '提线木偶', '利维坦', '维齐尔', '使节', '养蛊人', '禁卫军', '书生', '赶尸人', '戏子(改)', '入殓师'])) return [];
+  if (isRole(['banshee', 'zealot', 'xaan', 'wraith', 'princess', 'hermit', 'soldier', 'mayor', 'drunk', 'saint', 'recluse', 'scarlet_woman', 'baron', 'mastermind', 'deviant', 'butcher', 'mutant', 'sweetheart', 'atheist', 'cannibal', 'snitch', 'damsel', 'heretic', 'politician', 'boomdandy', 'marionette', 'leviathan', 'vizier', 'shijie', 'heshang', 'yangguren', 'jinweijun', 'shusheng', 'ganshiren', 'banxian', 'wudaozhe', 'xizi', 'ranfangfangzhu', 'diaomin', 'yongjiang', 'xizi_new', 'rulianshi', 'beggar', 'scapegoat'], ['報喪女妖', '狂熱者', '限', '亡魂', '公主', '隱士', '士兵', '鎮長', '市長', '酒鬼', '聖徒', '陌客', '紅唇女郎', '猩紅女郎', '男爵', '主謀', '怪咖', '屠夫', '畸形秀演員', '心上人', '無神論者', '食人族', '告密者', '落難少女', '異端分子', '政客', '炸彈人', '提線木偶', '利維坦', '維齊爾', '使節', '和尚', '養蠱人', '禁衛軍', '書生', '趕屍人', '半仙', '悟道者', '戲子', '染坊坊主', '刁民', '俑匠', '戲子（改）', '入殮師', '乞丐', '替罪羊', '报丧女妖', '狂热者', '镇长', '市长', '圣徒', '红唇女郎', '猩红女郎', '主谋', '畸形秀演员', '无神论者', '落难少女', '异端分子', '炸弹人', '提线木偶', '利维坦', '维齐尔', '使节', '养蛊人', '禁卫军', '书生', '赶尸人', '戏子(改)', '入殓师'])) return [];
 
   return [
     { key: 'target', type: 'player', label: '目標對象' }
@@ -475,17 +483,17 @@ const configs = getRoleInputConfig(player.role);
           {configs.map(c => (
             <div key={c.key}>
               {c.type === 'player' ? (
-                <select value={formData[c.key] || ""} onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none">
+                <select onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none">
                   <option value="">{c.label}...</option>
                   {players.map(p => <option key={p.id} value={p.name}>{p.id}號 {p.name}</option>)}
                 </select>
               ) : c.type === 'role' ? (
-                <select value={formData[c.key] || ""} onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none">
+                <select onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none">
                   <option value="">{c.label}...</option>
                   {script.map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
                 </select>
               ) : (
-                <input type={c.type || "text"} value={formData[c.key] || ""} placeholder={c.label} onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none" />
+                <input type="text" placeholder={c.label} onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none" />
               )}
             </div>
           ))}
@@ -509,7 +517,6 @@ const App = () => {
   const [players, setPlayers] = useState(() => loadState('botc_players', [])); 
   const [gamePhase, setGamePhase] = useState(() => loadState('botc_gamePhase', { type: 'Setup', number: 0 })); 
   const [logs, setLogs] = useState(() => loadState('botc_logs', [])); 
-  const [showWinnerModal, setShowWinnerModal] = useState(false);
 
   const [playerCount, setPlayerCount] = useState(() => loadState('botc_playerCount', 12));
 
@@ -520,11 +527,26 @@ const App = () => {
 
   const [selectingRoleFor, setSelectingRoleFor] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const loadBuiltInScript = (scriptKey) => {
+    const roleIds = DEFAULT_SCRIPTS_DATA[scriptKey];
+    if (!roleIds) return;
+    
+    // 從 window 全域的角色庫比對 ID 並產生新的 script 狀態
+    const parsed = roleIds.map(id => {
+      let dbRole = window.MASTER_ROLE_DB.find(r => r.id === id);
+      return dbRole ? { ...dbRole } : null;
+    }).filter(Boolean);
+
+    setScript(parsed);
+    setScriptName(scriptKey);
+  };
+  
   const [hiddenTarget, setHiddenTarget] = useState("");
   const [hiddenValue, setHiddenValue] = useState("");
   const [demonBluffs, setDemonBluffs] = useState(() => loadState('botc_demonBluffs', { r1: "", r2: "", r3: "", recorded: false }));
   const [editingLog, setEditingLog] = useState(null); 
-  const [dayAction, setDayAction] = useState({ actor: "", action: "事件紀錄", target: "", detail: "" });
+  const [dayAction, setDayAction] = useState({ actor: "", action: "白天行動", target: "", detail: "" });
   const [nominationRecord, setNominationRecord] = useState({ nominator: "", target: "", votes: "", result: "未達門檻" });
 
   const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'alert', message: '', onConfirm: null });
@@ -552,6 +574,17 @@ const App = () => {
   };
 
   useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (gamePhase.type !== 'Setup' && players.length > 0) {
+        e.preventDefault();
+        e.returnValue = ''; 
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [gamePhase.type, players.length]);
+
+  useEffect(() => {
     saveState('botc_script', script);
     saveState('botc_players', players);
     saveState('botc_gamePhase', gamePhase);
@@ -563,40 +596,16 @@ const App = () => {
     saveState('botc_customLocation', customLocation);
     saveState('botc_demonBluffs', demonBluffs);
   }, [script, players, gamePhase, logs, playerCount, scriptName, gameDate, gameLocation, customLocation, demonBluffs]);
-
   const generatePlayerListText = () => {
       let text = "\n【當前玩家狀態】\n";
       players.forEach(p => {
-          const status = p.isDead ? "死亡" : "存活";
+          const status = p.isAlive ? "存活" : "死亡";
           const roleName = p.role ? p.role.name : "未知";
           text += `[${p.id}號] ${status} - (${roleName}) ${p.name || "空"}\n`;
       });
       return text;
   };
 
-  const handleFinalExport = (winnerLabel) => {
-      let header = `劇本名稱：${scriptName}\n遊戲日期：${gameDate}\n遊戲地點：${gameLocation}\n獲勝陣營：${winnerLabel}\n-----------------------------------\n\n`;
-      const content = logs.map(p => {
-        const events = p.events.map(e => {
-            if (e.action === '狀態快照') return `\n【當前玩家狀態】\n${e.detail}\n`;
-            let detailStr = (e.detail && e.detail !== "無備註") ? `\n    └ ${e.detail}` : '';
-            return `  ${e.actor} -> ${e.action} -> ${e.target}${detailStr}`;
-        }).join('\n');
-        return `=== ${p.phase} ===\n${events || '  (無紀錄)'}`;
-      }).join('\n\n');
-      
-      const fullContent = header + content + generatePlayerListText();
-      const blob = new Blob([fullContent], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `血染覆盤紀錄_${gameDate}_${scriptName}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      setShowWinnerModal(false);
-  };
 
   const recordEvent = (actor, action, target, detail) => {
     const currentPhaseLabel = gamePhase.type === 'Setup' ? '設置階段' : gamePhase.type === 'Prep' ? '準備階段' : `第 ${gamePhase.number} ${gamePhase.type === 'Night' ? '夜' : '天'}`;
@@ -606,10 +615,11 @@ const App = () => {
       const newLogs = [...prevLogs];
       const phaseIndex = newLogs.findIndex(l => l.phase === currentPhaseLabel);
       if (phaseIndex >= 0) {
-        newLogs[phaseIndex].events.push(newEvent); 
+        newLogs[phaseIndex].events.push(newEvent); // 舊在前，新在後
       } else {
         newLogs.push({ phase: currentPhaseLabel, events: [newEvent] });
       }
+
       return newLogs;
     });
   };
@@ -650,7 +660,7 @@ const App = () => {
     setLogs(prevLogs => {
       const newLogs = [...prevLogs];
       if (newLogs.length > 0) {
-        newLogs[newLogs.length - 1].events.push(snapshotEvent); 
+        newLogs[newLogs.length - 1].events.push(snapshotEvent); // 將快照放在該階段的最後
       }
       
       let nextPhaseLabel = '';
@@ -717,10 +727,75 @@ const App = () => {
     setEditingLog(null);
   };
 
+  const exportHistory = () => {
+    if (logs.length === 0) return;
+    const displayLocation = gameLocation === '其他' ? customLocation : gameLocation;
+    let header = `劇本名稱：${scriptName}\n遊戲日期：${gameDate}\n遊戲地點：${displayLocation}\n-----------------------------------\n\n`;
+
+    const content = logs.map(p => {
+      const events = p.events
+        .map(e => {
+          if (e.action === '狀態快照') {
+            return `\n【當前玩家狀態】\n${e.detail}\n`;
+          }
+          const baseStr = `  ${e.actor} -> ${e.action} -> ${e.target}`;
+          let detailStr = '';
+          
+          if (e.detail && e.detail !== "無備註" && e.detail.trim() !== "") {
+            if (e.action === '發起提名') {
+              detailStr = `\n    ${e.detail}`;
+            } else {
+              detailStr = `\n    └ ${e.detail}`;
+            }
+          }
+          return baseStr + detailStr;
+        })
+        .join('\n'); // 移除 .reverse() 保持時間序
+      return `=== ${p.phase} ===\n${events || '  (無紀錄)'}`;
+    }).join('\n\n'); // 移除 .reverse() 保持時間序
+    
+    const fullContent = header + content;
+    const blob = new Blob([fullContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    
+    // 替換不合法的檔名字元，確保各種作業系統都能正常下載
+    const safeScriptName = scriptName.replace(/[\\/:*?"<>|]/g, '-');
+    const safeLocation = displayLocation.replace(/[\\/:*?"<>|]/g, '-');
+    a.download = `血染覆盤紀錄_${gameDate}_${safeScriptName}_${safeLocation}.txt`;
+    
+    a.click();
+  };
+
   const handleResetClick = () => {
-    showConfirm("⚠️ 確定要清空所有紀錄並重新開始嗎？", () => {
-      window.name = "";
-      window.location.reload();
+    showConfirm("⚠️ 確定要清空所有紀錄並重新開始嗎？\n\n(這將會刪除所有玩家設定與日誌，無法復原)", () => {
+      saveState('botc_scriptName', '未命名劇本');
+      saveState('botc_gameDate', new Date().toISOString().split('T')[0]);
+      saveState('botc_gameLocation', '線上 (Discord)');
+      saveState('botc_customLocation', '');
+      saveState('botc_script', []);
+      saveState('botc_playerCount', 8);
+      saveState('botc_players', []); 
+      saveState('botc_gamePhase', { type: 'Setup', number: 0 });
+      saveState('botc_logs', []);
+      saveState('botc_demonBluffs', { r1: "", r2: "", r3: "", recorded: false });
+
+      setScriptName('未命名劇本');
+      setGameDate(new Date().toISOString().split('T')[0]);
+      setGameLocation('線上 (Discord)');
+      setCustomLocation('');
+      setScript([]);
+      setPlayerCount(8);
+      setPlayers(Array.from({ length: 8 }, (_, i) => ({ id: i + 1, name: `玩家 ${i + 1}`, role: null, hiddenRole: "", isDead: false })));
+      setGamePhase({ type: 'Setup', number: 0 });
+      setLogs([]);
+      setDemonBluffs({ r1: "", r2: "", r3: "", recorded: false });
+      setHiddenTarget("");
+      setHiddenValue("");
+      setSelectingRoleFor(null);
+      setDayAction({ actor: "", action: "白天行動", target: "", detail: "" });
+      setNominationRecord({ nominator: "", target: "", votes: "", result: "未達門檻" });
     });
   };
 
@@ -733,29 +808,100 @@ const App = () => {
       try {
         const json = JSON.parse(e.target.result);
         const rawRoles = Array.isArray(json) ? json : (json.roles || []);
-        const metaInfo = rawRoles.find(item => item.id === '_meta');
-        if (metaInfo && metaInfo.name) setScriptName(metaInfo.name);
         
-        const parsedRoles = rawRoles.map(item => {
+        const metaInfo = rawRoles.find(item => item.id === '_meta');
+        if (metaInfo && metaInfo.name) {
+          setScriptName(metaInfo.name);
+        } else if (file.name) {
+          setScriptName(file.name.replace('.json', ''));
+        }
+
+        const parsedRoles = rawRoles
+          .map(item => {
             const roleId = typeof item === 'string' ? item : item.id;
             if (roleId === '_meta') return null;
-            let dbRole = MASTER_ROLE_DB.find(r => r.id === roleId || r.name === toTraditional(item.name || ""));
+            
+            const tName = toTraditional(item.name || "");
+            const tAbility = toTraditional(item.ability || "");
+
+            let dbRole = MASTER_ROLE_DB.find(r => r.id === roleId);
+            
+            if (!dbRole && tName) {
+              dbRole = MASTER_ROLE_DB.find(r => r.name === tName || tName.includes(r.name));
+            }
+
+            if (!dbRole && tAbility) {
+              const normalize = (str) => (str || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
+              const normItem = normalize(tAbility);
+              dbRole = MASTER_ROLE_DB.find(r => {
+                const dbNorm = normalize(r.ability);
+                return dbNorm === normItem && dbNorm.length > 0;
+              });
+            }
+            
             return {
               id: roleId,
-              name: dbRole?.name || toTraditional(item.name || "") || roleId,
+              baseRoleId: dbRole ? dbRole.id : roleId,
+              name: dbRole?.name || tName || roleId,
               team: dbRole?.team || item.team || "townsfolk",
-              firstNight: Number(dbRole?.firstNight) || 0,
-              otherNight: Number(dbRole?.otherNight) || 0,
-              firstNightReminder: dbRole?.firstNightReminder || "",
-              otherNightReminder: dbRole?.otherNightReminder || "",
-              image: dbRole?.image || "",
-              ability: dbRole?.ability || toTraditional(item.ability || "")
+              firstNight: Number(dbRole?.firstNight) || Number(item.firstNight) || 0,
+              otherNight: Number(dbRole?.otherNight) || Number(item.otherNight) || 0,
+              firstNightReminder: dbRole?.firstNightReminder || item.firstNightReminder || "",
+              otherNightReminder: dbRole?.otherNightReminder || item.otherNightReminder || "",
+              image: dbRole?.image || item.image || "",
+              ability: dbRole?.ability || tAbility || ""
             };
-          }).filter(Boolean);
+          })
+          .filter(Boolean);
+        
         setScript(parsedRoles);
-      } catch (err) { showAlert("格式錯誤"); }
+        showAlert(`成功讀取劇本並對接資料庫！共載入 ${parsedRoles.length} 個角色。`);
+      } catch (err) {
+        showAlert("JSON 格式錯誤，請檢查檔案。");
+      }
     };
     reader.readAsText(file);
+    event.target.value = '';
+  };
+
+  const exportSaveData = () => {
+    const saveData = { script, playerCount, players, gamePhase, logs, demonBluffs, scriptName, gameDate, gameLocation, customLocation };
+    const blob = new Blob([JSON.stringify(saveData)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `血染存檔_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
+    a.click();
+  };
+
+  const importSaveData = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.players && data.gamePhase) {
+          setScript(data.script || []);
+          setPlayerCount(data.playerCount || 8);
+          setPlayers(data.players);
+          setGamePhase(data.gamePhase);
+          setLogs(data.logs || []);
+          setDemonBluffs(data.demonBluffs || { r1: "", r2: "", r3: "", recorded: false });
+          setScriptName(data.scriptName || '未命名劇本');
+          setGameDate(data.gameDate || new Date().toISOString().split('T')[0]);
+          setGameLocation(data.gameLocation || '線上 (Discord)');
+          setCustomLocation(data.customLocation || '');
+          showAlert("✅ 進度讀取成功！歡迎回到遊戲。");
+        } else {
+          showAlert("⚠️ 檔案格式不正確，請確認您上傳的是「存檔」而非「劇本」。");
+        }
+      } catch (err) {
+        showAlert("⚠️ 讀取失敗，檔案可能已損壞。");
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
   };
 
   const getIconUrl = (role) => {
@@ -765,61 +911,75 @@ const App = () => {
     return `https://raw.githubusercontent.com/trolldaddy/botc_overlay/48e8573061c16d172912dc9e5aef5e07dac64a62/public/Allicon/240px-${cleanName}.png`;
   };
 
+  useEffect(() => {
+    if (gamePhase.type === 'Setup' && players.length !== playerCount) {
+      setPlayers(prev => {
+        if (prev.length === playerCount) return prev;
+        return Array.from({ length: playerCount }, (_, i) => {
+          const existing = prev.find(p => p.id === i + 1);
+          return existing || { id: i + 1, name: `玩家 ${i + 1}`, role: null, hiddenRole: "", isDead: false };
+        });
+      });
+    }
+  }, [playerCount, gamePhase.type]);
+
+  const togglePlayerDead = (id) => {
+    setPlayers(players.map(p => p.id === id ? { ...p, isDead: !p.isDead } : p));
+  };
+
+  const updatePlayerName = (id, newName) => {
+    setPlayers(players.map(p => p.id === id ? { ...p, name: newName } : p));
+  };
+
   const wakingOrder = useMemo(() => {
     if (gamePhase.type !== 'Night') return [];
     const inPlay = players.filter(p => p.role !== null);
-    return gamePhase.number === 1 
-      ? inPlay.filter(p => p.role.firstNight > 0).sort((a, b) => a.role.firstNight - b.role.firstNight)
-      : inPlay.filter(p => p.role.otherNight > 0).sort((a, b) => a.role.otherNight - b.role.otherNight);
+    let order = [];
+    if (gamePhase.number === 1) {
+      order = inPlay.filter(p => p.role.firstNight > 0).sort((a, b) => a.role.firstNight - b.role.firstNight);
+    } else {
+      order = inPlay.filter(p => p.role.otherNight > 0).sort((a, b) => a.role.otherNight - b.role.otherNight);
+    }
+    return order;
   }, [players, gamePhase]);
 
   const dayActors = useMemo(() => {
     if (gamePhase.type !== 'Day') return [];
+    const _DAY_ACTION_ROLES = typeof DAY_ACTION_ROLES !== 'undefined' ? DAY_ACTION_ROLES : [];
     return players.filter(p => p.role && (
-      DAY_ACTION_ROLES.includes(p.role.id.toLowerCase()) ||
-      DAY_ACTION_ROLES.some(dayRole => p.role.name.includes(dayRole))
+      _DAY_ACTION_ROLES.includes(p.role.baseRoleId) || 
+      _DAY_ACTION_ROLES.includes(p.role.id.toLowerCase()) ||
+      _DAY_ACTION_ROLES.some(dayRole => p.role.name.includes(dayRole))
     ));
   }, [players, gamePhase]);
 
-  // 自由紀錄組件
-  const FreeEventRecorder = ({ label }) => (
-    <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-[2rem] shadow-inner space-y-4">
-      <h3 className="text-sm font-black text-slate-400 flex items-center gap-2 mb-2">📝 {label}</h3>
-      <div className="grid grid-cols-2 gap-4">
-        <input type="text" value={dayAction.actor} onChange={e => setDayAction({...dayAction, actor: e.target.value})} className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-slate-500 text-sm" placeholder="執行者" />
-        <input type="text" value={dayAction.action} onChange={e => setDayAction({...dayAction, action: e.target.value})} className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-slate-500 text-sm" placeholder="動作" />
-        <input type="text" value={dayAction.target} onChange={e => setDayAction({...dayAction, target: e.target.value})} className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-slate-500 text-sm" placeholder="目標" />
-        <input type="text" value={dayAction.detail} onChange={e => setDayAction({...dayAction, detail: e.target.value})} onKeyPress={(e) => e.key === 'Enter' && recordEvent(dayAction.actor, dayAction.action, dayAction.target, dayAction.detail)} className="bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 outline-none focus:border-slate-500 text-sm" placeholder="細節" />
-      </div>
-      <button onClick={() => { recordEvent(dayAction.actor || "系統", dayAction.action, dayAction.target || "無", dayAction.detail || ""); setDayAction({ actor: "", action: label, target: "", detail: "" }); }} className="w-full bg-slate-700 hover:bg-slate-600 text-white font-black py-3 rounded-xl">寫入紀錄</button>
-    </div>
-  );
-
   return (
     <div className="h-full bg-slate-950 text-slate-200 font-sans flex flex-col relative overflow-hidden">
-      
-      {showWinnerModal && (
-          <div className="fixed inset-0 z-[999] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-indigo-500/30 p-8 rounded-[40px] max-w-sm w-full shadow-2xl text-center">
-                  <h2 className="text-xl font-black text-indigo-400 mb-2">📜 聖旨已下</h2>
-                  <p className="text-xs text-slate-400 mb-6">請選擇本局最終的勝負結果以完成魔典匯出</p>
-                  <div className="flex flex-col gap-3">
-                      <button onClick={() => handleFinalExport("善良獲勝")} className="py-3 bg-sky-600 hover:bg-sky-500 rounded-2xl font-black text-sm transition-all shadow-lg">善良獲勝 (Good Wins)</button>
-                      <button onClick={() => handleFinalExport("邪惡獲勝")} className="py-3 bg-rose-600 hover:bg-rose-500 rounded-2xl font-black text-sm transition-all shadow-lg">邪惡獲勝 (Evil Wins)</button>
-                      <button onClick={() => handleFinalExport("尚未結束")} className="py-3 bg-slate-700 hover:bg-slate-600 rounded-2xl font-black text-sm transition-all shadow-lg">尚未結束 (Ongoing)</button>
-                      <button onClick={() => setShowWinnerModal(false)} className="mt-2 text-xs text-slate-500 hover:text-slate-300">取消匯出</button>
-                  </div>
-              </div>
-          </div>
-      )}
 
       {modalConfig.isOpen && (
         <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
           <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl flex flex-col gap-4">
-            <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-bold">{modalConfig.message}</p>
+            <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-bold">
+              {modalConfig.message}
+            </p>
             <div className="flex justify-end gap-3 mt-2">
-              {modalConfig.type === 'confirm' && <button onClick={closeModal} className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold">取消</button>}
-              <button onClick={() => { if (modalConfig.onConfirm) modalConfig.onConfirm(); closeModal(); }} className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold">確定</button>
+              {modalConfig.type === 'confirm' && (
+                <button 
+                  onClick={closeModal}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
+                >
+                  取消
+                </button>
+              )}
+              <button 
+                onClick={() => {
+                  if (modalConfig.onConfirm) modalConfig.onConfirm();
+                  closeModal();
+                }}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all"
+              >
+                確定
+              </button>
             </div>
           </div>
         </div>
@@ -828,159 +988,557 @@ const App = () => {
       <header className="bg-slate-900 border-b border-slate-800 p-4 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-4 z-20">
         <div className="flex items-center gap-4">
           <div className="bg-indigo-600 p-2 rounded-xl text-white text-xl">📖</div>
-          <h1 className="text-xl font-black text-white leading-tight flex items-center gap-3">血染覆盤記錄器
-            <button onClick={handleResetClick} className="bg-red-950 border border-red-800 text-red-300 px-2 py-1 rounded-lg text-xs">🔄 重置</button>
-          </h1>
-        </div>
-        <div className="flex items-center gap-3 w-full sm:w-auto pb-1 flex-wrap sm:flex-nowrap">
-          {gamePhase.type === 'Setup' && (
-            <select value={playerCount} onChange={(e) => setPlayerCount(Number(e.target.value))} className="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 font-bold text-indigo-400 text-sm outline-none">
-              {[...Array(16)].map((_, i) => <option key={i+5} value={i+5}>{i+5} 人</option>)}
-            </select>
-          )}
-          <button onClick={addNewPlayer} className="bg-emerald-950/40 border border-emerald-800 text-emerald-400 px-3 py-1.5 rounded-xl text-xs font-bold">➕ 玩家</button>
-          <label className="bg-slate-800 border border-slate-700 px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all">📜 載入劇本<input type="file" accept=".json" onChange={handleScriptUpload} className="hidden" /></label>
-          <div className={`px-5 py-2 rounded-xl border font-black text-sm ${gamePhase.type === 'Setup' ? 'bg-slate-800 border-slate-700' : 'bg-indigo-900/40 border-indigo-800 text-indigo-300'}`}>
-            {gamePhase.type === 'Setup' ? '設置' : `第 ${gamePhase.number} ${gamePhase.type === 'Night' ? '夜' : '天'}`}
+          <div>
+            <h1 className="text-xl font-black text-white leading-tight flex items-center gap-3">
+              血染覆盤記錄器
+              <button onClick={handleResetClick} className="bg-red-950 hover:bg-red-900 border border-red-800 text-red-300 px-2 py-1 rounded-lg transition-all flex items-center gap-1 shadow-lg" title="清空全部並重置">
+                <span className="text-xs">🔄 重置</span>
+              </button>
+            </h1>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Storyteller Tablet UI</p>
           </div>
-          <button onClick={advancePhase} className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl font-black shadow-lg">▶️ 下個階段</button>
+        </div>
+
+        <div className="flex items-center gap-3 w-full sm:w-auto pb-1 sm:pb-0 flex-wrap sm:flex-nowrap">
+          {gamePhase.type === 'Setup' && (
+            <div className="flex items-center bg-slate-800 rounded-xl px-3 py-1.5 border border-slate-700 shrink-0">
+              <span className="text-sm mr-2 opacity-70">👥</span>
+              <select 
+                value={playerCount} 
+                onChange={(e) => setPlayerCount(Number(e.target.value))}
+                className="bg-transparent outline-none font-bold text-indigo-400 text-sm"
+              >
+                {[...Array(16)].map((_, i) => <option key={i+5} value={i+5}>{i+5} 人</option>)}
+              </select>
+            </div>
+          )}
+
+          <button onClick={addNewPlayer} className="flex items-center gap-2 bg-emerald-950/40 hover:bg-emerald-900/60 px-3 py-1.5 rounded-xl border border-emerald-800/50 text-emerald-400 transition-all shrink-0" title="新增玩家">
+            <span className="text-sm">➕</span>
+            <span className="text-xs font-bold whitespace-nowrap hidden sm:inline">新增玩家</span>
+          </button>
+
+          <label className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl border border-slate-700 cursor-pointer transition-all shrink-0" title="載入官方或自訂劇本">
+            <span className="text-sm">📜</span>
+            <span className="text-xs font-bold whitespace-nowrap hidden sm:inline">載入劇本</span>
+            <input type="file" accept=".json" onChange={handleScriptUpload} className="hidden" />
+          </label>
+
+          <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-xl border border-slate-700 shrink-0">
+            <button onClick={exportSaveData} className="hover:bg-slate-700 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors text-emerald-400" title="下載當前進度存檔">
+              <span>💾</span> <span className="hidden lg:inline">存檔</span>
+            </button>
+            <div className="w-px h-4 bg-slate-600 mx-0.5"></div>
+            <label className="hover:bg-slate-700 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors text-amber-400 cursor-pointer" title="上傳並恢復遊戲進度">
+              <span>📂</span> <span className="hidden lg:inline">讀檔</span>
+              <input type="file" accept=".json" onChange={importSaveData} className="hidden" />
+            </label>
+          </div>
+
+          <div className="h-8 w-px bg-slate-800 hidden sm:block mx-1"></div>
+
+          <div className={`px-5 py-2 rounded-xl border flex items-center gap-2 shrink-0 ${gamePhase.type === 'Setup' ? 'bg-slate-800 border-slate-700' : gamePhase.type === 'Prep' ? 'bg-purple-950/40 border-purple-800/50 text-purple-300' : gamePhase.type === 'Night' ? 'bg-indigo-950/40 border-indigo-800/50 text-indigo-300' : 'bg-yellow-950/40 border-yellow-800/50 text-yellow-300'}`}>
+            <span className="text-sm">{gamePhase.type === 'Setup' || gamePhase.type === 'Prep' ? '📖' : gamePhase.type === 'Night' ? '🌙' : '☀️'}</span>
+            <span className="font-black text-sm whitespace-nowrap">
+              {gamePhase.type === 'Setup' ? '設置階段' : gamePhase.type === 'Prep' ? '準備階段' : `第 ${gamePhase.number} ${gamePhase.type === 'Night' ? '夜' : '天'}`}
+            </span>
+          </div>
+
+          <button onClick={advancePhase} className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl font-black transition-all flex items-center gap-2 shrink-0 shadow-lg">
+            <span className="text-sm">▶️</span>
+            <span className="text-sm">{gamePhase.type === 'Setup' ? '進入準備階段' : gamePhase.type === 'Prep' ? '開始第一夜' : '下個階段'}</span>
+          </button>
         </div>
       </header>
 
-      <div className="bg-[#0f172a] border-b border-white/10 px-4 py-2 shrink-0 flex flex-wrap items-center gap-4 z-10 text-xs font-bold">
-        <span>📜 劇本:</span><input type="text" value={scriptName} onChange={e=>setScriptName(e.target.value)} className="bg-slate-900 border border-slate-700 rounded px-2 py-1 outline-none text-slate-200" />
-        <span>📅 日期:</span><input type="date" value={gameDate} onChange={e=>setGameDate(e.target.value)} className="bg-slate-900 border border-slate-700 rounded px-2 py-1 outline-none text-slate-200" />
-        <span>📍 地點:</span><select value={gameLocation} onChange={e=>setGameLocation(e.target.value)} className="bg-slate-900 border border-slate-700 rounded px-2 py-1 outline-none text-slate-200">
-            <option value="線上 (Discord)">線上 (Discord)</option><option value="台北">台北</option><option value="台中">台中</option><option value="高雄">高雄</option>
-        </select>
+      {/* 遊戲資訊設定區 */}
+      <div className="bg-[#0f172a] border-b border-white/10 px-4 py-2 shrink-0 flex flex-wrap items-center gap-4 z-10 text-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 font-bold uppercase tracking-widest">📜 劇本</span>
+          <input type="text" value={scriptName} onChange={e=>setScriptName(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200 w-32 md:w-48" placeholder="未命名劇本" />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 font-bold uppercase tracking-widest">📅 日期</span>
+          <input type="date" value={gameDate} onChange={e=>setGameDate(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200" />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-slate-400 font-bold uppercase tracking-widest">📍 地點</span>
+          <select value={gameLocation} onChange={e=>setGameLocation(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200">
+            <option value="線上 (Discord)">線上 (Discord)</option>
+            <option value="拉普拉斯">拉普拉斯</option>
+            <option value="台北">台北</option>
+            <option value="新北">新北</option>
+            <option value="桃園">桃園</option>
+            <option value="台中">台中</option>
+            <option value="台南">台南</option>
+            <option value="高雄">高雄</option>
+            <option value="其他">其他...</option>
+          </select>
+          {gameLocation === '其他' && (
+            <input type="text" placeholder="自訂地點" value={customLocation} onChange={e=>setCustomLocation(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200 w-28" />
+          )}
+        </div>
       </div>
 
-      {/* 🟢 核心改動：可上下拉大的座位區 */}
-      <div 
-        className="bg-slate-900/50 border-b border-slate-800 p-4 shrink-0 shadow-inner z-10 w-full overflow-y-auto custom-scrollbar"
-        style={{ 
+      <div className="bg-slate-900/50 border-b border-slate-800 p-4 shrink-0 shadow-inner z-10 w-full overflow-y-auto max-h-[35vh] custom-scrollbar"
+            style={{ 
             resize: 'vertical', 
             minHeight: '120px', 
             maxHeight: '70vh', 
             height: '25vh', 
             borderBottom: '4px solid rgba(99, 102, 241, 0.2)' 
         }}
-      >
+>
         <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 justify-items-center max-w-full">
           {players.map((p) => (
-            <div key={p.id} className={`w-full flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all relative ${p.isDead ? 'bg-slate-950/80 border-slate-800 grayscale' : p.role ? 'bg-slate-800 border-indigo-500/30 shadow-lg' : 'bg-slate-800/50 border-dashed border-slate-600'}`}>
-              <div className="absolute -top-2 -left-2 w-5 h-5 bg-slate-800 text-slate-400 text-[10px] font-black rounded-full flex items-center justify-center border border-slate-600">{p.id}</div>
-              {gamePhase.type !== 'Setup' && (
-                <button onClick={() => setPlayers(players.map(pl => pl.id === p.id ? { ...pl, isDead: !pl.isDead } : pl))} className={`absolute -top-2 -right-2 p-1.5 rounded-full border ${p.isDead ? 'bg-rose-900 border-rose-700 text-white' : 'bg-slate-800 border-slate-700 text-slate-500'}`}>
-                  {p.isDead ? '💀' : '❤️'}
+            <div key={p.id} className={`w-full flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all relative ${p.isDead ? 'bg-slate-950/80 border-slate-800 grayscale' : p.role ? 'bg-slate-800 border-indigo-500/30' : 'bg-slate-800/50 border-dashed border-slate-600'}`}>
+              <div className="absolute -top-2 -left-2 w-6 h-6 bg-slate-800 text-slate-300 text-[11px] font-black rounded-full flex items-center justify-center border border-slate-600 shadow-lg z-10">
+                {p.id}
+              </div>
+              {gamePhase.type !== 'Setup' && gamePhase.type !== 'Prep' && (
+                <button onClick={() => togglePlayerDead(p.id)} className={`absolute -top-2 -right-2 p-1.5 rounded-full shadow-lg border ${p.isDead ? 'bg-slate-700 text-slate-400 border-slate-600' : 'bg-red-900/80 text-red-400 border-red-700 hover:scale-110 z-10'}`}>
+                  <span className="text-sm">💀</span>
                 </button>
               )}
-              <button onClick={() => setSelectingRoleFor(p.id)} className="w-12 h-12 rounded-full bg-slate-950 border border-slate-700 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-indigo-400 transition-all">
-                {p.role ? <img src={getIconUrl(p.role)} className="w-10 h-10 object-contain" /> : <span className="text-xl opacity-20">＋</span>}
+              <button onClick={() => setSelectingRoleFor(p.id)} className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center overflow-hidden hover:ring-2 hover:ring-indigo-400 transition-all shrink-0">
+                {p.role ? (
+                  <img src={getIconUrl(p.role)} className="w-12 h-12 sm:w-14 sm:h-14 object-contain filter drop-shadow-md" alt="" onError={(e)=>e.target.style.display='none'} />
+                ) : (
+                  <span className="text-xl opacity-50">➕</span>
+                )}
               </button>
-              <div className="text-[10px] font-black text-slate-400 truncate w-full text-center">{p.role ? p.role.name : '未指派'}</div>
-              <input type="text" value={p.name} onChange={(e) => setPlayers(players.map(pl => pl.id === p.id ? { ...pl, name: e.target.value } : pl))} className="w-full bg-black/40 text-center text-[11px] font-bold py-1 rounded-lg outline-none" placeholder="暱稱" />
+              <div className="text-[9px] sm:text-[10px] font-black text-slate-400 h-3 truncate w-full text-center">
+                {p.role ? p.role.name : '未指派'}
+                {p.hiddenRole && <span className="text-purple-400 ml-1">({p.hiddenRole})</span>}
+              </div>
+              <input 
+                type="text" 
+                value={p.name}
+                onChange={(e) => updatePlayerName(p.id, e.target.value)}
+                className={`w-full bg-black/40 text-center text-xs font-bold py-1.5 rounded-lg outline-none focus:border-indigo-500 border border-transparent ${p.isDead ? 'text-slate-500 line-through' : 'text-white'}`}
+              />
             </div>
           ))}
         </div>
       </div>
 
+      {selectingRoleFor !== null && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-slate-900 rounded-3xl w-full max-w-5xl max-h-[85vh] border border-slate-700 flex flex-col shadow-2xl">
+            <div className="flex justify-between items-center p-5 border-b border-slate-800">
+              <h2 className="text-lg font-black flex items-center gap-2">為 <span className="text-indigo-400">{players.find(p=>p.id===selectingRoleFor)?.name}</span> 選擇劇本角色</h2>
+              <div className="flex gap-4">
+                <div className="relative">
+                  <span className="absolute left-3 top-2 opacity-50">🔍</span>
+                  <input type="text" placeholder="搜尋角色..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-sm outline-none focus:border-indigo-500 text-white" />
+                </div>
+                <button onClick={() => setSelectingRoleFor(null)} className="p-2 hover:bg-slate-800 rounded-xl text-slate-400"><span className="text-xl">❌</span></button>
+              </div>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
+              {allAvailableRoles.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-slate-500 gap-4">
+                  <span className="text-4xl opacity-20">📖</span>
+                  <p>請先由右上角讀入劇本 JSON 檔案</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {['townsfolk', 'outsider', 'minion', 'demon', 'traveller'].map(team => {
+                    const teamRoles = allAvailableRoles.filter(r => r.team === team && (r.name.includes(searchTerm) || r.id.toLowerCase().includes(searchTerm.toLowerCase())));
+                    if (teamRoles.length === 0) return null;
+                    return (
+                      <div key={team} className="space-y-3">
+                        <h3 className="text-xs font-black uppercase tracking-widest border-l-4 pl-2 border-indigo-500 text-slate-400">
+                          {team === 'townsfolk' ? '鎮民' : team === 'outsider' ? '外來者' : team === 'minion' ? '爪牙' : team === 'demon' ? '惡魔' : '旅行者'}
+                        </h3>
+                        <div className="grid grid-cols-2 gap-2">
+                          {teamRoles.map(role => (
+                            <button 
+                              key={role.id}
+                              onClick={() => {
+                                setPlayers(players.map(p => p.id === selectingRoleFor ? { ...p, role, hiddenRole: "" } : p));
+                                setSelectingRoleFor(null);
+                              }}
+                              className="flex flex-col items-center p-3 bg-slate-800 hover:bg-indigo-600/30 rounded-xl border border-slate-700 transition-all group relative"
+                            >
+                              <img src={getIconUrl(role)} className="w-12 h-12 object-contain group-hover:scale-110 transition-transform mb-2" alt="" onError={(e)=>e.target.style.display='none'} />
+                              <span className="text-xs font-bold text-center w-full truncate">{role.name}</span>
+                              {role.team === 'traveller' && <span className="text-[8px] text-slate-500 opacity-60 absolute top-1 right-2">旅行者</span>}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden min-h-0 bg-[#020617]">
         
         <div className="flex-1 min-h-0 min-w-0 p-4 lg:p-6 overflow-y-auto custom-scrollbar border-r border-slate-800">
           {gamePhase.type === 'Setup' ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-500 py-10 opacity-50">
-              <span className="text-6xl mb-4">👥</span>
-              <h2 className="text-xl font-black">準備開局...</h2>
-              <p className="text-sm">請在上方座位區為玩家分配角色與暱稱。</p>
+            /*
+            <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-4 py-10">
+              <span className="text-6xl opacity-20">👥</span>
+              <h2 className="text-xl font-black text-slate-400">遊戲準備中</h2>
+              <p className="text-sm">請在上方的網格座位中，點擊加號為每位玩家分配角色。</p>
+              <p className="text-xs text-center">分配完成後點擊右上角的「進入準備階段」。<br/>⚠️ 如果想重置，點擊左上角的「🔄 重置」按鈕。</p>
             </div>
+               */
+          <div className="h-full flex flex-col items-center justify-center space-y-8 animate-fadeIn">
+     <div className="text-center">
+        <h2 className="text-2xl font-black text-slate-400 mb-2">準備開局</h2>
+        <p className="text-xs text-slate-600 uppercase tracking-widest">請先分配玩家角色或選擇官方劇本</p>
+     </div>
+  
+     <div className="flex flex-col gap-4 w-full max-w-sm">
+        <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest text-center">快速載入官方劇本</label>
+        <div className="grid grid-cols-3 gap-3">
+          {Object.keys(DEFAULT_SCRIPTS_DATA).map(name => (
+            <button 
+              key={name} 
+              type="button"
+              onClick={() => loadBuiltInScript(name)}
+              className={`p-3 rounded-2xl border-2 text-[14px] font-black transition-all ${scriptName === name ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-600'}`}
+            >
+              {name}
+            </button>
+          ))}
+        </div>
+       
+        <div className="h-px bg-slate-800 my-2"></div>
+              
+     </div>
+     
+     <p className="text-[14px] text-slate-700 italic text-center max-w-xs">或者點擊右上角「📜 載入劇本」上傳 JSON。完成後點擊右上角「進入準備階段」。</p>
+     </div>
           ) : gamePhase.type === 'Prep' ? (
             <div className="space-y-6">
-              <h2 className="text-xl font-black text-indigo-400">準備階段 - 隱藏資訊</h2>
-              <div className="bg-red-950/20 border border-red-900/30 p-5 rounded-3xl space-y-4">
-                <h3 className="text-xs font-black text-red-400 uppercase">惡魔首夜偽裝</h3>
-                <div className="grid grid-cols-3 gap-3">
-                  {[1, 2, 3].map(n => (
-                    <select key={n} value={demonBluffs[`r${n}`]} onChange={e => setDemonBluffs({...demonBluffs, [`r${n}`]: e.target.value})} className="bg-slate-900 border border-red-900/40 rounded-xl p-2 text-xs text-white">
-                      <option value="">選擇偽裝 {n}</option>
-                      {script.map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
-                    </select>
+              <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <span className="text-2xl opacity-80">📖</span>
+                <h2 className="text-xl font-black">準備階段 (配置隱藏資訊)</h2>
+              </div>
+              
+              <div className="bg-red-950/20 border border-red-900/30 p-5 rounded-3xl shadow-lg relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-red-600/10 blur-2xl rounded-full"></div>
+                <h3 className="text-sm font-black text-red-400 flex items-center gap-2 mb-4 relative z-10">
+                  <span className="text-sm">💀</span> 惡魔首夜偽裝 (三個不在場角色)
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 relative z-10">
+                  {[1, 2, 3].map(num => (
+                    <div key={num}>
+                      <label className="text-[10px] font-black text-red-500/70 uppercase">偽裝角色 {num}</label>
+                      <select 
+                        value={demonBluffs[`r${num}`]}
+                        onChange={e => setDemonBluffs({...demonBluffs, [`r${num}`]: e.target.value})}
+                        className="w-full bg-slate-900/80 border border-red-900/50 rounded-xl px-3 py-2 text-xs outline-none focus:border-red-500 mt-1 text-slate-200"
+                      >
+                        <option value="">選擇角色...</option>
+                        {script.map(r => (
+                          <option key={r.id} value={r.name}>{r.name}</option>
+                        ))}
+                      </select>
+                    </div>
                   ))}
                 </div>
-                <button onClick={()=>{ recordEvent("系統", "給予偽裝", "惡魔", `不在場:${demonBluffs.r1}, ${demonBluffs.r2}, ${demonBluffs.r3}`); setDemonBluffs({...demonBluffs, recorded: true}); }} className="w-full bg-red-900/40 text-red-200 py-2 rounded-xl text-xs font-black">{demonBluffs.recorded ? "✅ 已記錄" : "寫入日誌"}</button>
+                <button 
+                  onClick={() => {
+                    recordEvent("系統", "給予偽裝", "惡魔", `不在場角色: ${demonBluffs.r1 || '無'}, ${demonBluffs.r2 || '無'}, ${demonBluffs.r3 || '無'}`);
+                    setDemonBluffs({...demonBluffs, recorded: true});
+                  }}
+                  className={`mt-5 w-full font-black py-2.5 rounded-xl transition-all text-sm flex items-center justify-center gap-2 relative z-10 ${demonBluffs.recorded ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-900/50 hover:bg-red-800/80 text-red-200 border border-red-700/50'}`}
+                >
+                  {demonBluffs.recorded ? <><span className="text-sm">✅</span> 已記錄偽裝</> : '記錄惡魔偽裝'}
+                </button>
               </div>
-              <div className="bg-purple-950/20 border border-purple-900/30 p-5 rounded-3xl space-y-4">
-                <h3 className="text-xs font-black text-purple-400 uppercase">特殊身份標記</h3>
-                <div className="flex gap-3">
-                  <select value={hiddenTarget} onChange={e => setHiddenTarget(e.target.value)} className="bg-slate-900 border border-purple-900/40 rounded-xl p-2 text-xs flex-1">
-                    <option value="">選擇目標...</option>
-                    {players.filter(p => p.name).map(p => <option key={p.id} value={p.id}>{p.id}號 {p.name}</option>)}
+
+              <div className="bg-purple-950/20 border border-purple-900/30 p-5 rounded-3xl shadow-lg relative overflow-hidden mt-6">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-purple-600/10 blur-2xl rounded-full"></div>
+                <h3 className="text-sm font-black text-purple-400 flex items-center gap-2 mb-4 relative z-10">
+                  <span className="text-sm opacity-80">👥</span> 🎭 指派隱藏身分 (酒鬼、提線木偶、瘋子、悟道者)
+                </h3>
+                <div className="flex gap-3 relative z-10 items-center">
+                  <select 
+                    value={hiddenTarget}
+                    onChange={e => setHiddenTarget(e.target.value)}
+                    className="flex-1 bg-slate-900/80 border border-purple-900/50 rounded-xl px-3 py-2 text-xs outline-none focus:border-purple-500 text-slate-200"
+                  >
+                    <option value="">選擇目標玩家...</option>
+                    {players.filter(p => p.name).map(p => (
+                      <option key={p.id} value={p.id}>{p.id} 號 - {p.name} {p.role ? `(${p.role.name})` : ''}</option>
+                    ))}
                   </select>
-                  <input value={hiddenValue} onChange={e => setHiddenValue(e.target.value)} className="bg-slate-900 border border-purple-900/40 rounded-xl p-2 text-xs flex-1" placeholder="實際身份" />
-                  <button onClick={() => { if (!hiddenTarget || !hiddenValue) return; setPlayers(players.map(p => p.id == hiddenTarget ? { ...p, hiddenRole: hiddenValue } : p)); recordEvent("系統", "指派身分", players.find(p => p.id == hiddenTarget).name, `實際身分: ${hiddenValue}`); setHiddenTarget(""); setHiddenValue(""); }} className="bg-purple-600 px-6 rounded-xl text-xs font-black">記錄</button>
+                  <select 
+                    value={hiddenValue}
+                    onChange={e => setHiddenValue(e.target.value)}
+                    className="w-32 bg-slate-900/80 border border-purple-900/50 rounded-xl px-3 py-2 text-xs outline-none focus:border-purple-500 text-slate-200 shrink-0"
+                  >
+                    <option value="">選擇身分...</option>
+                    <option value="酒鬼">酒鬼</option>
+                    <option value="提線木偶">提線木偶</option>
+                    <option value="瘋子">瘋子</option>
+                    <option value="悟道者">悟道者</option>
+                  </select>
                 </div>
+                <button 
+                  onClick={() => {
+                    if (!hiddenTarget || !hiddenValue) return;
+                    const targetPlayer = players.find(p => p.id === Number(hiddenTarget));
+                    if (targetPlayer) {
+                      setPlayers(players.map(p => p.id === targetPlayer.id ? { ...p, hiddenRole: hiddenValue } : p));
+                      recordEvent("系統", "指派隱藏身分", targetPlayer.name, `表面角色: ${targetPlayer.role ? targetPlayer.role.name : '未指派'} | 實際身分: ${hiddenValue}`);
+                      setHiddenTarget("");
+                      setHiddenValue("");
+                    }
+                  }}
+                  className="mt-5 w-full bg-purple-900/50 hover:bg-purple-800/80 text-purple-200 border border-purple-700/50 font-black py-2.5 rounded-xl transition-all text-sm flex items-center justify-center gap-2 relative z-10"
+                >
+                  寫入日誌並標記
+                </button>
               </div>
+            </div>
+          ) : gamePhase.type === 'Night' ? (
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <span className="text-2xl">🌙</span>
+                <h2 className="text-xl font-black">第 {gamePhase.number} 夜 - 喚醒順序清單</h2>
+              </div>
+              
+              {wakingOrder.length === 0 ? (
+                <p className="text-slate-500 italic text-center py-10">今晚沒有任何角色需要被喚醒。</p>
+              ) : (
+                <div className="space-y-4">
+                  {wakingOrder.map((player) => {
+                    const reminderText = gamePhase.number === 1 ? player.role.firstNightReminder : player.role.otherNightReminder;
+                    return (
+                      <RoleActionCard 
+                        key={player.id} 
+                        player={player} 
+                        reminder={reminderText}
+                        onRecord={(action, target, detail) => recordEvent(player.role.name, action, target, detail)}
+                        players={players}
+                        script={script}
+                      />
+                    );
+                  })}
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-6">
-              <h2 className={`text-xl font-black ${gamePhase.type === 'Night' ? 'text-indigo-400' : 'text-yellow-400'}`}>第 {gamePhase.number} {gamePhase.type === 'Night' ? '夜' : '天'}</h2>
-              <div className="space-y-4">
-                {(gamePhase.type === 'Night' ? wakingOrder : dayActors).map(p => (
-                  <RoleActionCard key={p.id} player={p} reminder={gamePhase.type === 'Night' ? (gamePhase.number === 1 ? p.role.firstNightReminder : p.role.otherNightReminder) : p.role.ability} onRecord={(a, t, d) => recordEvent(p.role.name, a, t, d)} players={players} script={script} />
-                ))}
+              <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                <span className="text-2xl">☀️</span>
+                <h2 className="text-xl font-black">第 {gamePhase.number} 天 - 事件紀錄</h2>
               </div>
-              <FreeEventRecorder label={gamePhase.type === 'Night' ? '深夜自由紀錄' : '日間自由紀錄'} />
+
+              {dayActors.length > 0 && (
+                <div className="space-y-4 mb-6">
+                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <span className="text-sm">☀️</span> 專屬日間行動
+                  </h3>
+                  {dayActors.map(player => (
+                    <RoleActionCard 
+                      key={player.id} 
+                      player={player} 
+                      reminder={player.role.ability}
+                      onRecord={(action, target, detail) => recordEvent(player.role.name, action, target, detail)}
+                      players={players}
+                      script={script}
+                    />
+                  ))}
+                </div>
+              )}
+              
+              <div className="bg-slate-900 border border-slate-700 p-6 rounded-[2rem] shadow-xl space-y-4">
+                <h3 className="text-sm font-black text-yellow-500 flex items-center gap-2 mb-2">
+                  ⚖️ 提名與投票紀錄
+                </h3>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <label className="text-[10px] font-black text-slate-500 uppercase">提名人</label>
+                    <select 
+                      value={nominationRecord.nominator} 
+                      onChange={e => setNominationRecord({...nominationRecord, nominator: e.target.value})} 
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-3 mt-1 outline-none focus:border-yellow-500 text-sm"
+                    >
+                      <option value="">選擇玩家...</option>
+                      {players.filter(p => p.name).map(p => <option key={p.id} value={p.name}>{p.id} 號 - {p.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-slate-500 uppercase">被提名人</label>
+                    <select 
+                      value={nominationRecord.target} 
+                      onChange={e => setNominationRecord({...nominationRecord, target: e.target.value})} 
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-3 mt-1 outline-none focus:border-yellow-500 text-sm"
+                    >
+                      <option value="">選擇玩家...</option>
+                      {players.filter(p => p.name).map(p => <option key={p.id} value={p.name}>{p.id} 號 - {p.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-slate-500 uppercase">獲得票數</label>
+                    <input 
+                      type="number" min="0" 
+                      value={nominationRecord.votes} 
+                      onChange={e => setNominationRecord({...nominationRecord, votes: e.target.value})} 
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-yellow-500 text-sm" 
+                      placeholder="輸入票數..." 
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-slate-500 uppercase">表決結果</label>
+                    <select 
+                      value={nominationRecord.result} 
+                      onChange={e => setNominationRecord({...nominationRecord, result: e.target.value})} 
+                      className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-3 mt-1 outline-none focus:border-yellow-500 text-sm"
+                    >
+                      <option value="未達門檻">未達門檻</option>
+                      <option value="上處決台">上處決台</option>
+                    </select>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    if(!nominationRecord.nominator || !nominationRecord.target) return;
+                    recordEvent(nominationRecord.nominator, "發起提名", nominationRecord.target, `${nominationRecord.votes} 票 | 結果: ${nominationRecord.result}`);
+                    setNominationRecord({ nominator: "", target: "", votes: "", result: "未達門檻" });
+                  }}
+                  className="w-full bg-yellow-700 hover:bg-yellow-600 text-white font-black py-3 rounded-xl transition-all active:scale-95"
+                >
+                  記錄提名
+                </button>
+              </div>
+
+              <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-[2rem] shadow-inner space-y-4">
+                <h3 className="text-sm font-black text-slate-400 flex items-center gap-2 mb-2">
+                  📝 自由事件紀錄
+                </h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-black text-slate-500 uppercase">執行者 / 發起人</label>
+                    <input type="text" value={dayAction.actor} onChange={e => setDayAction({...dayAction, actor: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-slate-500 text-sm" placeholder="例如: 玩家A" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-slate-500 uppercase">動作</label>
+                    <input type="text" value={dayAction.action} onChange={e => setDayAction({...dayAction, action: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-slate-500 text-sm" placeholder="例如: 發動技能" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-slate-500 uppercase">目標對象 (選填)</label>
+                    <input type="text" value={dayAction.target} onChange={e => setDayAction({...dayAction, target: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-slate-500 text-sm" placeholder="例如: 玩家B" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black text-slate-500 uppercase">結果細節</label>
+                    <input type="text" value={dayAction.detail} onChange={e => setDayAction({...dayAction, detail: e.target.value})} onKeyPress={(e) => e.key === 'Enter' && recordEvent(dayAction.actor, dayAction.action, dayAction.target, dayAction.detail)} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-slate-500 text-sm" placeholder="例如: 額外資訊" />
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    recordEvent(dayAction.actor, dayAction.action, dayAction.target, dayAction.detail);
+                    setDayAction({ actor: "", action: "白天行動", target: "", detail: "" });
+                  }}
+                  className="w-full bg-slate-700 hover:bg-slate-600 text-white font-black py-3 rounded-xl transition-all active:scale-95"
+                >
+                  寫入自由紀錄
+                </button>
+              </div>
             </div>
           )}
+
         </div>
 
-        {/* 右側：時間軸 */}
         <div className="flex-1 min-h-0 min-w-0 bg-slate-950/50 p-4 lg:p-6 overflow-y-auto custom-scrollbar flex flex-col relative border-l border-slate-800">
           <div className="flex justify-between items-center mb-6 sticky top-0 bg-slate-950 py-2 z-10 px-2">
-            <h3 className="text-sm font-black text-slate-400 uppercase">時間軸紀錄 (Timeline)</h3>
-            <button onClick={() => setShowWinnerModal(true)} className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold bg-indigo-900/30 px-3 py-1.5 rounded-lg border border-indigo-800/30 transition-colors">📥 匯出文字檔</button>
+            <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">時間軸紀錄 (Timeline)</h3>
+        <button onClick={exportHistory} className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors">
+         <span className="text-sm">📥</span> 匯出文字檔
+            </button>
           </div>
-          <div className="space-y-6 pb-20">
-            {logs.slice().reverse().map((phaseLog, idx) => (
-              <div key={idx} className="relative border-l border-slate-800 pl-6 py-2">
-                <div className="absolute -left-1 top-2 w-2 h-2 rounded-full bg-indigo-500"></div>
-                <div className="text-[10px] font-black text-indigo-400 mb-4 uppercase">{phaseLog.phase}</div>
+
+          <div className="space-y-8 pb-20">
+            {logs.length === 0 && <p className="text-center text-slate-600 italic py-10">尚無紀錄...</p>}
+            
+            {logs.map((phaseLog, idx) => (
+              <div key={idx} className="animate-fadeIn">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="h-px flex-1 bg-slate-800"></div>
+                  <span className="text-xs font-black text-slate-500 tracking-[0.2em]">{phaseLog.phase}</span>
+                  <div className="h-px flex-1 bg-slate-800"></div>
+                </div>
+
                 <div className="space-y-2">
-                  {phaseLog.events.slice().reverse().map(e => (
-                    <div key={e.id} className="bg-slate-900 border border-slate-800 p-3 rounded-xl group relative">
-                      <button onClick={() => deleteLog(logs.length - 1 - idx, e.id)} className="absolute top-2 right-2 text-red-900 opacity-0 group-hover:opacity-100 transition-opacity text-xs">✕</button>
-                      <div className="flex justify-between text-[9px] text-slate-600 mb-1"><span>{e.time}</span><span>{e.actor}</span></div>
-                      <div className="text-xs font-bold text-slate-200">{e.action} → <span className="text-indigo-300">{e.target}</span></div>
-                      {e.detail && e.detail !== "無備註" && <div className="text-[10px] text-slate-500 mt-1 italic border-l border-slate-800 pl-2">{e.detail}</div>}
+                  {phaseLog.events.map((event) => (
+                    <div key={event.id} className="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex gap-4 hover:border-slate-700 transition-colors group relative">
+                      
+                      {editingLog?.id === event.id ? (
+                        <div className="flex-1 flex flex-col gap-2 w-full animate-in fade-in">
+                          <div className="flex gap-2">
+                            <input className="flex-1 bg-slate-950 border border-slate-700 focus:border-indigo-500 text-xs px-3 py-2 rounded-lg outline-none text-white" value={editingLog.actor} onChange={e=>setEditingLog({...editingLog, actor:e.target.value})} placeholder="執行者" />
+                            <input className="flex-1 bg-slate-950 border border-slate-700 focus:border-indigo-500 text-xs px-3 py-2 rounded-lg outline-none text-white" value={editingLog.action} onChange={e=>setEditingLog({...editingLog, action:e.target.value})} placeholder="動作" />
+                            <input className="flex-1 bg-slate-950 border border-slate-700 focus:border-indigo-500 text-xs px-3 py-2 rounded-lg outline-none text-white" value={editingLog.target} onChange={e=>setEditingLog({...editingLog, target:e.target.value})} placeholder="目標" />
+                          </div>
+                          <textarea className="w-full bg-slate-950 border border-slate-700 focus:border-indigo-500 text-xs px-3 py-2 rounded-lg outline-none text-white min-h-[60px]" value={editingLog.detail} onChange={e=>setEditingLog({...editingLog, detail:e.target.value})} placeholder="備註" />
+                          <div className="flex flex-wrap items-center justify-between gap-2 mt-2 pt-2 border-t border-slate-800">
+                            <div className="flex items-center gap-1">
+                              <button onClick={() => moveEvent(idx, event.id, 'up')} className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 transition-colors rounded-lg text-xs font-bold text-white flex items-center gap-1" title="上移">
+                                <span className="text-[10px]">⬆️</span> 上移
+                              </button>
+                              <button onClick={() => moveEvent(idx, event.id, 'down')} className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 transition-colors rounded-lg text-xs font-bold text-white flex items-center gap-1" title="下移">
+                                <span className="text-[10px]">⬇️</span> 下移
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => setEditingLog(null)} className="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 transition-colors rounded-lg text-xs font-bold text-white">取消</button>
+                              <button onClick={saveEditLog} className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 transition-colors rounded-lg text-xs font-bold text-white">儲存變更</button>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 flex items-center gap-1 transition-opacity">
+                            <button onClick={() => moveEvent(idx, event.id, 'up')} className="p-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-md transition-colors" title="上移"><span className="text-xs">⬆️</span></button>
+                            <button onClick={() => moveEvent(idx, event.id, 'down')} className="p-1.5 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-md transition-colors" title="下移"><span className="text-xs">⬇️</span></button>
+                            <button onClick={() => startEditLog(idx, event)} className="p-1.5 text-slate-400 hover:text-indigo-400 bg-slate-800 hover:bg-slate-700 rounded-md transition-colors ml-1" title="編輯"><span className="text-xs">✏️</span></button>
+                            <button onClick={() => deleteLog(idx, event.id)} className="p-1.5 text-slate-400 hover:text-red-400 bg-slate-800 hover:bg-slate-700 rounded-md transition-colors" title="刪除"><span className="text-xs">🗑️</span></button>
+                          </div>
+
+                          {event.action === '狀態快照' ? (
+                            <div className="flex-1 w-full text-xs text-slate-400 whitespace-pre-wrap leading-relaxed">
+                              {event.detail}
+                            </div>
+                          ) : (
+                            <>
+                              <div className="text-[10px] font-black text-slate-600 pt-1 shrink-0">{event.time}</div>
+                              <div className="flex-1 pr-24">
+                                <div className="text-sm font-bold text-white flex flex-wrap items-center gap-x-2">
+                                  <span className={`${event.actor === '系統' ? 'text-slate-400' : 'text-indigo-300'}`}>{event.actor}</span>
+                                  <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase ${event.actor === '系統' ? 'bg-slate-800 text-slate-500' : 'bg-slate-800 text-slate-400'}`}>{event.action}</span>
+                                  {event.target && event.target !== "無" && <span className={`${event.actor === '系統' ? 'text-slate-500' : 'text-emerald-300'}`}>{event.target}</span>}
+                                </div>
+                                {event.detail && event.detail !== "無備註" && event.detail.trim() !== "" && (
+                                  <div className="text-xs text-slate-400 mt-2 whitespace-pre-wrap leading-relaxed bg-black/20 p-2 rounded-lg border-l-2 border-slate-700">
+                                    └ {event.detail}
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </>
+                      )}
                     </div>
                   ))}
+                  {phaseLog.events.length === 0 && <div className="text-xs text-slate-600 italic pl-12">無動作紀錄</div>}
                 </div>
               </div>
             ))}
           </div>
         </div>
       </main>
-
-      {/* 角色選擇彈窗 */}
-      {selectingRoleFor && (
-        <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-6 backdrop-blur-xl">
-          <div className="bg-slate-900 w-full max-w-4xl max-h-[85vh] rounded-[2.5rem] border border-slate-700 flex flex-col overflow-hidden shadow-2xl">
-            <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-              <h2 className="font-black">分配角色</h2>
-              <input placeholder="搜尋..." value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} className="bg-slate-800 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500" />
-              <button onClick={()=>setSelectingRoleFor(null)} className="text-slate-400 font-bold">✕</button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-8 grid grid-cols-2 md:grid-cols-5 gap-4">
-              {allAvailableRoles.filter(r=>r.name.includes(searchTerm)||r.id.toLowerCase().includes(searchTerm.toLowerCase())).map(r => (
-                <button key={r.id} onClick={()=>{ setPlayers(players.map(p=>p.id===selectingRoleFor?{...p, role:r}:p)); setSelectingRoleFor(null); setSearchTerm(""); }} className="bg-slate-800/50 p-4 rounded-3xl border border-slate-700 flex flex-col items-center hover:bg-indigo-600/20 transition-all">
-                  <img src={getIconUrl(r)} className="w-10 h-10 mb-2 object-contain" />
-                  <span className="text-[10px] font-black">{r.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
