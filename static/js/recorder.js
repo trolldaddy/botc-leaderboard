@@ -1189,12 +1189,13 @@ const App = () => {
               <p className="text-sm">請在上方的網格座位中，點擊加號為每位玩家分配角色。</p>
               <p className="text-xs text-center">分配完成後點擊右上角的「進入準備階段」。<br/>⚠️ 如果想重置，點擊左上角的「🔄 重置」按鈕。</p>
             </div>
+               */
           <div className="h-full flex flex-col items-center justify-center space-y-8 animate-fadeIn">
      <div className="text-center">
         <h2 className="text-2xl font-black text-slate-400 mb-2">準備開局</h2>
         <p className="text-xs text-slate-600 uppercase tracking-widest">請先分配玩家角色或選擇官方劇本</p>
      </div>
-     */
+  
      <div className="flex flex-col gap-4 w-full max-w-sm">
         <label className="text-[10px] font-black text-indigo-500 uppercase tracking-widest text-center">快速載入官方劇本</label>
         <div className="grid grid-cols-3 gap-3">
