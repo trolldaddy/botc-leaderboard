@@ -1193,7 +1193,7 @@ const App = () => {
 
         <main className="flex-1 flex flex-col sm:flex-row bg-[#020617] ">
         
-        <div className="flex-1 min-w-0 p-4 lg:p-6 custom-scrollbar border-r border-slate-800">
+        <div className="flex-1 min-h-0 min-w-0 p-4 lg:p-6 overflow-y-auto custom-scrollbar border-r border-slate-800">
           {gamePhase.type === 'Setup' ? (
             /*
             <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-4 py-10">
@@ -1480,7 +1480,7 @@ const App = () => {
 
         </div>
 
-        <div className="flex-1 min-w-0 bg-slate-950/50 p-4 lg:p-6 custom-scrollbar flex flex-col relative border-l border-slate-800">
+        <div className="flex-1 min-h-0 min-w-0 bg-slate-950/50 p-4 lg:p-6 overflow-y-auto custom-scrollbar flex flex-col relative border-l border-slate-800">
           <div className="flex justify-between items-center mb-6 sticky top-0 bg-slate-950 py-2 z-10 px-2">
             <h3 className="text-sm font-black text-slate-400 uppercase tracking-widest">時間軸紀錄 (Timeline)</h3>
         <button onClick={exportHistory} className="flex items-center gap-2 text-xs text-indigo-400 hover:text-indigo-300 font-bold bg-indigo-900/30 px-3 py-1.5 rounded-lg transition-colors">
