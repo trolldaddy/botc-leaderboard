@@ -1191,7 +1191,6 @@ const App = () => {
         </div>
       )}
 
-      //可垂直展開 <main className="flex-1 flex flex-col sm:flex-row overflow-hidden min-h-0 bg-[#020617]">  
         <main className="flex-1 flex flex-col sm:flex-row min-h-screen bg-[#020617]">
         
         <div className="flex-1 min-h-0 min-w-0 p-4 lg:p-6 overflow-y-auto custom-scrollbar border-r border-slate-800">
