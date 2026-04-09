@@ -966,7 +966,7 @@ const App = () => {
   }, [players, gamePhase]);
 
   return (
-    <div className="h-full bg-slate-950 text-slate-200 font-sans flex flex-col relative overflow-hidden">
+    <div className="h-full bg-slate-950 text-slate-200 font-sans flex flex-col relative sm:overflow-hidden">
 
       {modalConfig.isOpen && (
         <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
