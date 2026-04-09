@@ -232,7 +232,7 @@ h1, h2, h3, h4 {
 @media (max-width: 639px) {
   html, body {
     overflow-y: auto !important; /* 允許垂直捲動 */
-    position: static !important; /* 解除 position: fixed */
+    position: relative !important; /* 解除 position: fixed */
     height: auto !important;
     min-height: 100%;
   }
