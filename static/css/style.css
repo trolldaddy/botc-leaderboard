@@ -196,6 +196,7 @@ h1, h2, h3, h4 {
 }
 
 /* 針對直向平板 (窄螢幕) 的微調 */
+/*
 @media (max-width: 1024px) {
     :root {
         --nav-height: 60px;
@@ -206,7 +207,7 @@ h1, h2, h3, h4 {
         padding-right: 1rem;
     }
     
-    /* 讓按鈕在小螢幕上稍微縮小一點以利排版 */
+
     #recorder-root button, 
     #recorder-root select,
     #recorder-root label {
@@ -215,8 +216,28 @@ h1, h2, h3, h4 {
         font-size: 0.75rem !important;
     }
 }
+*/
 
-/* --- 其他通用樣式 --- */
+@media (min-width: 640px) {
+  html, body {
+    overflow: hidden;
+    overscroll-behavior: none;
+    height: 100%;
+    width: 100%;
+    position: fixed; /* 維持 iPad/PC 的穩定感 */
+  }
+}
+
+/* 🟢 新增：手機版允許正常捲動 */
+@media (max-width: 639px) {
+  html, body {
+    overflow-y: auto; /* 允許垂直捲動 */
+    position: static; /* 解除固定定位 */
+    height: auto;
+    min-height: 100%;
+  }
+}
+
 .top-header {
     margin-bottom: 1.5rem;
     flex-shrink: 0;
