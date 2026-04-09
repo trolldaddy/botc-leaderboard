@@ -231,9 +231,9 @@ h1, h2, h3, h4 {
 /* 🟢 新增：手機版允許正常捲動 */
 @media (max-width: 639px) {
   html, body {
-    overflow-y: auto; /* 允許垂直捲動 */
-    position: static; /* 解除固定定位 */
-    height: auto;
+    overflow-y: auto !important; /* 允許垂直捲動 */
+    position: static !important; /* 解除 position: fixed */
+    height: auto !important;
     min-height: 100%;
   }
 }
