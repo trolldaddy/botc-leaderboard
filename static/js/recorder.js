@@ -1137,16 +1137,36 @@ const App = () => {
       {selectingRoleFor !== null && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
           <div className="bg-slate-900 rounded-3xl w-full max-w-5xl max-h-[85vh] border border-slate-700 flex flex-col shadow-2xl">
-            <div className="flex justify-between items-center p-5 border-b border-slate-800">
-              <h2 className="text-lg font-black flex items-center gap-2">為 <span className="text-indigo-400">{players.find(p=>p.id===selectingRoleFor)?.name}</span> 選擇劇本角色</h2>
-              <div className="flex gap-4">
-                <div className="relative">
-                  <span className="absolute left-3 top-2 opacity-50">🔍</span>
-                  <input type="text" placeholder="搜尋角色..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-sm outline-none focus:border-indigo-500 text-white" />
-                </div>
-                <button onClick={() => setSelectingRoleFor(null)} className="p-2 hover:bg-slate-800 rounded-xl text-slate-400"><span className="text-xl">❌</span></button>
-              </div>
-            </div>
+            /* 🟢 修改後的標頭：手機版為垂直堆疊，電腦版維持水平 */
+<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 sm:p-5 border-b border-slate-800 gap-3 sm:gap-0">
+  
+  {/* 標題區：縮小手機版字體並允許換行 */}
+  <h2 className="text-base sm:text-lg font-black flex flex-wrap items-center gap-1 sm:gap-2">
+    為 <span className="text-indigo-400">{players.find(p=>p.id===selectingRoleFor)?.name}</span> 選擇劇本角色
+  </h2>
+
+  {/* 操作區：手機版佔滿寬度，搜尋框與關閉按鈕並排 */}
+  <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
+    <div className="relative flex-1 sm:flex-none">
+      <span className="absolute left-3 top-2.5 sm:top-2 opacity-50">🔍</span>
+      <input 
+        type="text" 
+        placeholder="搜尋角色..." 
+        value={searchTerm} 
+        onChange={(e) => setSearchTerm(e.target.value)} 
+        className="bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs sm:text-sm outline-none focus:border-indigo-500 text-white w-full sm:w-64" 
+      />
+    </div>
+    
+    {/* 關閉按鈕 */}
+    <button 
+      onClick={() => setSelectingRoleFor(null)} 
+      className="p-2 hover:bg-slate-800 rounded-xl text-slate-400 shrink-0"
+    >
+      <span className="text-lg sm:text-xl">❌</span>
+    </button>
+  </div>
+</div>
             
             <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
               {allAvailableRoles.length === 0 ? (
