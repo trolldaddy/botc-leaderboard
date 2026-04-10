@@ -24,6 +24,15 @@
                 <button class="btn btn-ghost-full" onclick="if(window.loadPage) window.loadPage('history')">查看完整歷史紀錄</button>
             </div>
         </div>
+        <div class="submit-footer-sidebar" style="margin-top: auto;">
+        <div id="save-status" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem; text-align: center;">
+            草稿已備份至本地
+        </div>
+        <button type="submit" form="record-form" id="submit-btn" class="btn btn-submit-glow w-full">
+            <i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績
+        </button>
+    </div>
+        
     </aside>
 
     <!-- 右側：錄入區域 -->
@@ -84,7 +93,7 @@
                     <div class="form-group">
                         <label>獲勝陣營</label>
                         <select id="match-winner" class="form-control dark-input" oninput="saveDraft()">
-                            <option value="good">正義陣營 Good</option>
+                            <option value="good">善良陣營 Good</option>
                             <option value="evil">邪惡陣營 Evil</option>
                         </select>
                     </div>
@@ -144,12 +153,12 @@
             </div>
             </div>
 
-            <div class="submit-footer">
+           <!---   <div class="submit-footer">
                 <div id="save-status" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem;">草稿已備份至本地</div>
                 <button type="submit" id="submit-btn" class="btn btn-submit-glow">
                     <i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績
                 </button>
-            </div>
+            </div> --->
         </form>
     </div>
 </div>
