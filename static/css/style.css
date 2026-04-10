@@ -293,20 +293,7 @@ html, body {
     color: white;
 }
 
-@media (min-width: 640px) {
-  /* 1. 玩家卡片容器 */
-  /* 2. 玩家列表：這是唯一允許捲動的地方 */
-  #players-list {
-    flex: 1; /* 自動填滿卡片剩餘空間 */
-    overflow-y: auto !important; /* 啟用垂直捲動 */
-    padding-right: 8px; /* 為捲軸預留空間 */
-  }
-
-  /* 3. 提交按鈕區域：固定在卡片底部 */
-  .card-footer {
-    padding-top: 1rem;
-    background: var(--bg-card); /* 確保按鈕背景不透明 */
-    border-top: 1px solid var(--border-color);
-    z-index: 10;
-  }
+/* 🟢 停用縮放手勢，同時解決點擊延遲問題 */
+html, body, button, input, select, .player-row {
+  touch-action: manipulation;
 }
