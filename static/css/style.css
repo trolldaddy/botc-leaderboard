@@ -195,7 +195,44 @@ h1, h2, h3, h4 {
     overflow: visible !important; /* 確保下拉選單不被切掉 */
 }
 
+html, body {
+  height: auto !important;
+  overflow-y: auto !important;
+  position: static !important;
+  width: 100%;
+}
+
+/* 🟢 修改後的電腦版排版 */
+@media (min-width: 640px) {
+  html, body {
+    /* 移除 position: fixed，改用 min-height 確保背景填滿 */
+    height: auto !important; 
+    min-height: 100% !important;
+    overflow-y: auto !important; /* 允許垂直捲動 */
+    position: relative !important; /* 改回相對定位 */
+    overscroll-behavior: none;
+  }
+}
 /* 針對直向平板 (窄螢幕) 的微調 */
+/* 🟢 預設：手機版 (所有尺寸) 先恢復正常 */
+/*
+html, body {
+  height: auto !important;
+  overflow-y: auto !important;
+  position: static !important;
+  width: 100%;
+}
+
+
+ @media (min-width: 640px) {
+  html, body {
+    height: 100% !important;
+    overflow: hidden !important;
+    position: fixed !important;
+    overscroll-behavior: none;
+  }
+} 
+
 
 @media (max-width: 1024px) {
     :root {
@@ -216,7 +253,7 @@ h1, h2, h3, h4 {
         font-size: 0.75rem !important;
     }
 }
-
+*/
 
 .top-header {
     margin-bottom: 1.5rem;
