@@ -298,15 +298,6 @@ html, body {
 
 @media (min-width: 640px) {
   /* 1. 玩家卡片容器 */
-  #player-card {
-    /* 計算高度：總高度 - (頂部基礎資訊卡片的高度 + 間距) */
-    /* 你可以根據實際畫面微調 450px 這個數值 */
-    height: calc(100vh - 420px); 
-    display: flex;
-    flex-direction: column;
-    overflow: hidden !important; /* 卡片本身不溢出 */
-  }
-
   /* 2. 玩家列表：這是唯一允許捲動的地方 */
   #players-list {
     flex: 1; /* 自動填滿卡片剩餘空間 */
