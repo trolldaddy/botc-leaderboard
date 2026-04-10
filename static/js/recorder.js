@@ -492,7 +492,7 @@ const configs = getRoleInputConfig(player.role);
               {c.type === 'player' ? (
                 <select onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none">
                   <option value="">{c.label}...</option>
-                  {players.map(p => <option key={p.id} value={p.name}>{p.id}號 {p.name}</option>)}
+                  {players.map(p => <option key={p.id} value={`${p.id}. ${p.name} (${p.role?.name || "尚未選角"})`}>{p.id}號 {p.name} ({p.role?.name || "尚未選角"})</option>)}
                 </select>
               ) : c.type === 'role' ? (
                 <select onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none">
