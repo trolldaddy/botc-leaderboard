@@ -184,7 +184,7 @@ h1, h2, h3, h4 {
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow-subtle);
     margin-bottom: 1rem;
-    overflow: visible !important; /* 確保下拉選單不被切掉 */
+    /* overflow: visible !important;  確保下拉選單不被切掉 */
 }
 
 /* 🟢 統一全局設定：解決打架與 iPad 縮放 */
