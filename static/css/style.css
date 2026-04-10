@@ -31,6 +31,19 @@ body {
     flex-direction: column;
     overflow-x: hidden;
 }
+html, body {
+
+    overflow: hidden; /* 禁止全域滾動 */
+
+  overscroll-behavior: none; /* 現代瀏覽器禁止回彈的屬性 */
+
+  height: 100%;
+
+  width: 100%;
+
+  position: fixed; /* 這是對付 iOS 最暴力的做法 */
+
+}
 
 h1, h2, h3, h4 {
     font-family: 'Cinzel', serif;
