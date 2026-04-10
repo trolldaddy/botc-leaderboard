@@ -288,25 +288,42 @@ html, body {
     background: var(--accent-red);
     color: white;
 }
-@media (min-width: 1000px) {
-    /* 1. 限制玩家清單的最大高度 */
-    #players-list {
-        /* 核心修正：計算螢幕高度減去上方元素的高度 */
-        /* 如果你的螢幕較小導致底部還是被切到，請把 580px 調大 (例如 620px) */
-        max-height: calc(100vh - 580px); 
-        
-        /* 開啟內部垂直捲動 */
-        overflow-y: auto !important; 
-        
-        /* 解決首尾玩家被擋住的問題：增加上下內距 */
-        padding: 15px 5px; 
+@media (min-width: 1024px) {
+    /* 1. 鎖定外層佈局，確保不產生網頁大捲軸 */
+    .record-layout-wrapper {
+        height: calc(100vh - var(--nav-height) - 2rem); 
+        overflow: hidden;
     }
 
-    /* 2. 修復卡片外框與圓角 */
-    .card {
-        border-radius: 16px !important;
-        /* 核心修正：裁切內部的溢出內容，讓底部圓角顯現出來 */
-        overflow: hidden  !important; 
-        border: 1px solid var(--border-color);
+    /* 2. 讓右側表單區塊變成一個「垂直彈性盒子」 */
+    .record-main {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-width: 0;
+    }
+
+    /* 3. 因為你的卡片在 form 裡面，form 也必須變成彈性盒子 */
+    #record-form {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0; /* 這是讓內部捲動生效的關鍵 */
+    }
+
+    /* 4. 強制第三張卡片（玩家卡片）填滿剩餘空間 */
+    #record-form .card:last-of-type {
+        flex: 1;
+        min-height: 0; 
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0; /* 貼齊底部，解決外框爆掉問題 */
+    }
+
+    /* 5. 玩家列表：自動填滿卡片並開啟捲動 */
+    #players-list {
+        flex: 1;
+        overflow-y: auto !important;
+        padding: 15px 5px; /* 增加上下緩衝，解決首尾遮擋 */
     }
 }
