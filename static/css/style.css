@@ -218,26 +218,6 @@ h1, h2, h3, h4 {
 }
 
 
-/* 🟢 預設：手機版 (所有尺寸) 先恢復正常 */
-/*
-html, body {
-  height: auto !important;
-  overflow-y: auto !important;
-  position: static !important;
-  width: 100%;
-}
-*/
-/* 🟢 只在 iPad/電腦版 (sm 以上) 才啟動 App 鎖定模式 */
-/* @media (min-width: 640px) {
-  html, body {
-    height: 100% !important;
-    overflow: hidden !important;
-    position: fixed !important;
-    overscroll-behavior: none;
-  }
-} 
-*/
-
 .top-header {
     margin-bottom: 1.5rem;
     flex-shrink: 0;
