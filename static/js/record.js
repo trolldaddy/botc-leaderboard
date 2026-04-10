@@ -101,7 +101,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         const roleData = db.find(r => r.name === targetRole || r.id === targetRole);
         return (roleData && (roleData.team === 'minion' || roleData.team === 'demon')) ? "evil" : "good";
     };
-
+/**
     window.saveDraft = () => {
         const scriptEl = document.getElementById('match-script');
         if (!scriptEl) return;
@@ -121,7 +121,31 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         const statusEl = document.getElementById('save-status');
         if (statusEl) statusEl.innerText = "草稿已儲存 (" + new Date().toLocaleTimeString() + ")";
     };
+**/
 
+    window.saveDraft = () => {
+    const scriptEl = document.getElementById('match-script');
+    if (!scriptEl) return;
+    const draft = {
+        script: scriptEl.value, 
+        date: document.getElementById('match-date').value,
+        location: document.getElementById('match-location').value, 
+        storyteller: document.getElementById('match-storyteller').value,
+        winner: document.getElementById('match-winner').value,
+        // 🔴 關鍵修改：從 tr 改成 .player-row
+        players: Array.from(document.querySelectorAll('.player-row')).map(row => ({
+            name: row.querySelector('.p-name').value,
+            initial_character: row.querySelector('.p-initial').value,
+            final_character: row.querySelector('.p-final').value,
+            alignment: row.querySelector('.p-team').value,
+            survived: row.querySelector('.p-status').value === 'alive'
+        }))
+    };
+    localStorage.setItem('botc_record_draft', JSON.stringify(draft));
+    const statusEl = document.getElementById('save-status');
+    if (statusEl) statusEl.innerText = "草稿已儲存 (" + new Date().toLocaleTimeString() + ")";
+};
+    
     const restoreDraft = (data) => {
         const locSelect = document.getElementById('match-location');
         document.getElementById('match-script').value = data.script || "";
@@ -199,6 +223,59 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
     };
 **/
 
+window.addPlayerRow = (data = null) => {
+    const list = document.getElementById('players-list');
+    if (!list) return;
+
+    // 建立一個 div 容器，手機版 1 欄，電腦版 6 欄 (包含刪除按鈕)
+    const row = document.createElement('div');
+    row.className = "player-row grid grid-cols-2 sm:grid-cols-6 gap-2 p-3 mb-3 bg-slate-800/40 rounded-2xl border border-slate-700 items-end transition-all";
+    
+    // 呼叫你原本就有的自動陣營判斷邏輯
+    const alignment = data?.alignment || getAlignmentByRole(data?.final_character);
+    
+    row.innerHTML = `
+        <div class="col-span-2 sm:col-span-1 flex flex-col gap-1">
+            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">玩家暱稱</label>
+            <input type="text" class="form-control dark-input p-name w-full" list="player-names-list" value="${data?.name || ''}" placeholder="暱稱" oninput="saveDraft()">
+        </div>
+        
+        <div class="flex flex-col gap-1">
+            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">初始角色</label>
+            <input type="text" class="form-control dark-input p-initial w-full" list="all-roles-list" value="${data?.initial_character || ''}" placeholder="初始" oninput="saveDraft()">
+        </div>
+        
+        <div class="flex flex-col gap-1">
+            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">最終角色</label>
+            <input type="text" class="form-control dark-input p-final w-full" list="all-roles-list" value="${data?.final_character || ''}" placeholder="最終" oninput="saveDraft()">
+        </div>
+        
+        <div class="flex flex-col gap-1">
+            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">陣營</label>
+            <select class="form-control dark-input p-team w-full" oninput="saveDraft()">
+                <option value="good" ${alignment === 'good' ? 'selected' : ''}>善良</option>
+                <option value="evil" ${alignment === 'evil' ? 'selected' : ''}>邪惡</option>
+            </select>
+        </div>
+        
+        <div class="flex flex-col gap-1">
+            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">最終狀態</label>
+            <select class="form-control dark-input p-status w-full" oninput="saveDraft()">
+                <option value="alive" ${data?.survived !== false ? 'selected' : ''}>存活</option>
+                <option value="dead" ${data?.survived === false ? 'selected' : ''}>死亡</option>
+            </select>
+        </div>
+        
+        <div class="col-span-2 sm:col-span-1 flex justify-end sm:justify-center pb-1">
+            <button type="button" class="btn text-slate-600 hover:text-red-500 p-2" 
+                onclick="if(window.confirm('確定要移除這位玩家嗎？')) { this.closest('.player-row').remove(); saveDraft(); }">
+                <i class="fa-solid fa-trash-can"></i>
+            </button>
+        </div>
+    `;
+    list.appendChild(row);
+};
+
     document.getElementById('record-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = document.getElementById('submit-btn');
@@ -209,7 +286,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
             script: document.getElementById('match-script').value, date: document.getElementById('match-date').value,
             location: document.getElementById('match-location').value || "未知", storyteller: document.getElementById('match-storyteller').value,
             winning_team: document.getElementById('match-winner').value, password: password,
-            players: Array.from(document.querySelectorAll('#players-list tr')).map(row => ({
+            players: Array.from(document.querySelectorAll('.player-row')).map(row => ({
                 name: row.querySelector('.p-name').value.trim(), initial_character: row.querySelector('.p-initial').value.trim(),
                 final_character: row.querySelector('.p-final').value.trim(), alignment: row.querySelector('.p-team').value,
                 survived: row.querySelector('.p-status').value === 'alive'
