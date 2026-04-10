@@ -1669,7 +1669,6 @@ const App = () => {
         </div>
       </main>
     </div>
-{/* 🟢 新增一個全局的玩家建議清單，供所有 Input 使用 */}
 <datalist id="player-list">
   {players.map(p => (
     <option key={p.id} value={p.name}>
