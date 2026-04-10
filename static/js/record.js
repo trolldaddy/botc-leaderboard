@@ -1,6 +1,25 @@
 /**
  * BOTC Stats - 錄入對局邏輯 (RECORD MATCH)
  */
+function setupRoleDatalist() {
+    // 檢查頁面上是否已經有清單，沒有就建立一個
+    let datalist = document.getElementById('all-roles-list');
+    if (!datalist) {
+        datalist = document.createElement('datalist');
+        datalist.id = 'all-roles-list';
+        document.body.appendChild(datalist);
+    }
+    
+    // 從 window.MASTER_ROLE_DB 抓取角色
+    if (window.MASTER_ROLE_DB) {
+        datalist.innerHTML = window.MASTER_ROLE_DB
+            .map(role => `<option value="${role.name}">`)
+            .join('');
+    }
+}
+
+// 頁面載入完成後自動執行
+window.addEventListener('DOMContentLoaded', setupRoleDatalist);
 
 {
     const initRecord = async () => {
@@ -163,8 +182,8 @@
         renderPlayersFromData(Object.values(playerMap));
         saveDraft();
     };
-
-    window.addPlayerRow = (data = null) => {
+/**
+     window.addPlayerRow = (data = null) => {
         const list = document.getElementById('players-list');
         const row = document.createElement('tr');
         const alignment = data?.alignment || getAlignmentByRole(data?.final_character);
@@ -178,6 +197,7 @@
         `;
         list.appendChild(row);
     };
+**/
 
     document.getElementById('record-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
