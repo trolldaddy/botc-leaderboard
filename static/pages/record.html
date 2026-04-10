@@ -107,7 +107,7 @@
                         <i class="fa-solid fa-plus"></i> 添加玩家
                     </button>
                 </div>
-                <div class="table-responsive-container">
+                <!--- <div class="table-responsive-container">
                     <table class="record-table">
                         <thead>
                             <tr>
@@ -119,11 +119,29 @@
                                 <th style="width: 40px;"></th>
                             </tr>
                         </thead>
-                        <!--- <tbody id="players-list"></tbody> --->
+                        <tbody id="players-list"></tbody> 
 
                         <div id="players-list" class="space-y-2"></div>
                     </table>
+                </div>--->
+                <div class="mt-6">
+    <div class="flex justify-between items-end mb-4">
+        <h3 class="text-lg font-bold text-slate-200"><i class="fa-solid fa-users mr-2"></i>參與玩家</h3>
+        <button type="button" class="text-sm text-yellow-500 hover:text-yellow-400 font-bold" onclick="addPlayerRow()">+ 添加玩家</button>
                 </div>
+
+            <div class="hidden sm:grid sm:grid-cols-12 gap-2 px-4 mb-2 text-xs font-bold text-slate-500">
+                    <div class="sm:col-span-3">玩家暱稱</div>
+                    <div class="sm:col-span-2">初始角色</div>
+                    <div class="sm:col-span-2">最終角色</div>
+                    <div class="sm:col-span-2">陣營</div>
+                    <div class="sm:col-span-2">狀態</div>
+                    <div class="sm:col-span-1 text-center">刪除</div>
+                    </div>
+
+                    <div id="players-list" class="space-y-3 sm:space-y-2">
+                    </div>
+            </div>
             </div>
 
             <div class="submit-footer">
