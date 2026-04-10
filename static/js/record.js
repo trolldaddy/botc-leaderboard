@@ -2,19 +2,18 @@
  * BOTC Stats - 錄入對局邏輯 (RECORD MATCH)
  */
 function setupRoleDatalist() {
-    // 檢查頁面上是否已經有清單，沒有就建立一個
     let datalist = document.getElementById('all-roles-list');
     if (!datalist) {
         datalist = document.createElement('datalist');
         datalist.id = 'all-roles-list';
         document.body.appendChild(datalist);
     }
-    
-    // 從 window.MASTER_ROLE_DB 抓取角色
-    if (window.MASTER_ROLE_DB) {
+    // 確保 MASTER_ROLE_DB 存在
+    if (window.MASTER_ROLE_DB && window.MASTER_ROLE_DB.length > 0) {
         datalist.innerHTML = window.MASTER_ROLE_DB
             .map(role => `<option value="${role.name}">`)
             .join('');
+        console.log("角色建議清單已生成，共 " + window.MASTER_ROLE_DB.length + " 個角色。");
     }
 }
 
@@ -225,50 +224,42 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
 
 window.addPlayerRow = (data = null) => {
     const list = document.getElementById('players-list');
-    if (!list) return;
-
-    // 建立一個 div 容器，手機版 1 欄，電腦版 6 欄 (包含刪除按鈕)
     const row = document.createElement('div');
-    row.className = "player-row grid grid-cols-2 sm:grid-cols-6 gap-2 p-3 mb-3 bg-slate-800/40 rounded-2xl border border-slate-700 items-end transition-all";
     
-    // 呼叫你原本就有的自動陣營判斷邏輯
+    // 電腦版使用 sm:grid-cols-12 分配比例 (3:2:2:2:2:1)
+    row.className = "player-row grid grid-cols-2 sm:grid-cols-12 gap-2 p-3 sm:p-2 bg-slate-800/40 rounded-xl sm:rounded-lg border border-slate-700 sm:border-slate-800/50 items-center";
+    
     const alignment = data?.alignment || getAlignmentByRole(data?.final_character);
     
     row.innerHTML = `
-        <div class="col-span-2 sm:col-span-1 flex flex-col gap-1">
-            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">玩家暱稱</label>
-            <input type="text" class="form-control dark-input p-name w-full" list="player-names-list" value="${data?.name || ''}" placeholder="暱稱" oninput="saveDraft()">
+        <div class="col-span-2 sm:col-span-3">
+            <label class="sm:hidden text-[10px] text-slate-500 mb-1 block">玩家暱稱</label>
+            <input type="text" class="p-name w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-yellow-500" list="player-names-list" value="${data?.name || ''}" placeholder="暱稱" oninput="saveDraft()">
         </div>
-        
-        <div class="flex flex-col gap-1">
-            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">初始角色</label>
-            <input type="text" class="form-control dark-input p-initial w-full" list="all-roles-list" value="${data?.initial_character || ''}" placeholder="初始" oninput="saveDraft()">
+        <div class="col-span-1 sm:col-span-2">
+            <label class="sm:hidden text-[10px] text-slate-500 mb-1 block">初始角色</label>
+            <input type="text" class="p-initial w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-yellow-500" list="all-roles-list" value="${data?.initial_character || ''}" placeholder="初始" oninput="saveDraft()">
         </div>
-        
-        <div class="flex flex-col gap-1">
-            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">最終角色</label>
-            <input type="text" class="form-control dark-input p-final w-full" list="all-roles-list" value="${data?.final_character || ''}" placeholder="最終" oninput="saveDraft()">
+        <div class="col-span-1 sm:col-span-2">
+            <label class="sm:hidden text-[10px] text-slate-500 mb-1 block">最終角色</label>
+            <input type="text" class="p-final w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-yellow-500" list="all-roles-list" value="${data?.final_character || ''}" placeholder="最終" oninput="saveDraft()">
         </div>
-        
-        <div class="flex flex-col gap-1">
-            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">陣營</label>
-            <select class="form-control dark-input p-team w-full" oninput="saveDraft()">
+        <div class="col-span-1 sm:col-span-2">
+            <label class="sm:hidden text-[10px] text-slate-500 mb-1 block">陣營</label>
+            <select class="p-team w-full bg-slate-900/50 border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-200 outline-none">
                 <option value="good" ${alignment === 'good' ? 'selected' : ''}>善良</option>
                 <option value="evil" ${alignment === 'evil' ? 'selected' : ''}>邪惡</option>
             </select>
         </div>
-        
-        <div class="flex flex-col gap-1">
-            <label class="sm:hidden text-[10px] font-bold text-slate-500 ml-1">最終狀態</label>
-            <select class="form-control dark-input p-status w-full" oninput="saveDraft()">
+        <div class="col-span-1 sm:col-span-2">
+            <label class="sm:hidden text-[10px] text-slate-500 mb-1 block">狀態</label>
+            <select class="p-status w-full bg-slate-900/50 border border-slate-700 rounded-lg px-2 py-2 text-sm text-slate-200 outline-none">
                 <option value="alive" ${data?.survived !== false ? 'selected' : ''}>存活</option>
                 <option value="dead" ${data?.survived === false ? 'selected' : ''}>死亡</option>
             </select>
         </div>
-        
-        <div class="col-span-2 sm:col-span-1 flex justify-end sm:justify-center pb-1">
-            <button type="button" class="btn text-slate-600 hover:text-red-500 p-2" 
-                onclick="if(window.confirm('確定要移除這位玩家嗎？')) { this.closest('.player-row').remove(); saveDraft(); }">
+        <div class="col-span-2 sm:col-span-1 flex justify-end sm:justify-center">
+            <button type="button" class="text-slate-600 hover:text-red-500 p-2" onclick="if(confirm('確定刪除？')){this.closest('.player-row').remove();saveDraft();}">
                 <i class="fa-solid fa-trash-can"></i>
             </button>
         </div>
