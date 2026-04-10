@@ -1668,15 +1668,14 @@ const App = () => {
           </div>
         </div>
       </main>
-    </div>
-<datalist id="player-list">
+            <datalist id="player-list">
   {players.map(p => (
     <option key={p.id} value={p.name}>
       {p.id}. {p.name} ({p.role?.name || "尚未選角"})
     </option>
   ))}
 </datalist>
-
+    </div>
   );
 };
 
