@@ -1339,7 +1339,7 @@ const App = () => {
                   >
                     <option value="">選擇目標玩家...</option>
                     {players.filter(p => p.name).map(p => (
-                      <option key={p.id} value={p.id}>{p.id} 號 - {p.name} ({p.role?.name || "尚未選角"})</option>
+                      <option key={p.id} value={'{p.id} 號 - {p.name} ({p.role?.name || "尚未選角"})'} />
                     ))}
                   </select>
                   <select 
