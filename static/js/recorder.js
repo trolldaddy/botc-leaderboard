@@ -497,7 +497,7 @@ const configs = getRoleInputConfig(player.role);
               ) : c.type === 'role' ? (
                 <select onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none">
                   <option value="">{c.label}...</option>
-                  {script.map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
+                  {(script && script.length > 0 ? script : MASTER_ROLE_DB).map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
                 </select>
               ) : (
                 <input type="text" placeholder={c.label} onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none" />
