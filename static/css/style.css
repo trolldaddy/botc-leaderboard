@@ -289,13 +289,70 @@ html, body {
     color: white;
 }
 
-.card {
-    overflow: hidden !important; /* 核心：裁切內部內容，讓圓角顯現 */
-    border-radius: 16px;
+/* 🟢 全局高度鎖定 (電腦版) */
+@media (min-width: 1000px) {
+    html, body {
+        height: 100% !important;
+        overflow: hidden !important;
+        position: fixed !important;
+        width: 100%;
+    }
+
+    /* 左右並排佈局 */
+    .record-layout-wrapper {
+        display: flex !important;
+        flex-direction: row !important;
+        height: calc(100vh - 100px); /* 扣除 Header 高度 */
+        gap: 1.5rem;
+        padding-bottom: 20px;
+    }
+
+    .record-sidebar {
+        width: 320px;
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+
+    .record-main {
+        flex: 1;
+        overflow-y: auto; /* 右側主區域可滾動，但我們要限制玩家卡片內部捲動 */
+        padding-right: 10px;
+    }
+
+    /* 🔴 核心修復：限制玩家清單高度，讓按鈕與底部圓角出現 */
+    #players-list {
+        max-height: calc(100vh - 580px); /* 根據截圖精確計算剩餘空間 */
+        overflow-y: auto !important;
+        padding: 15px 5px; /* 增加上下間距，解決首尾被擋住的問題 */
+    }
 }
 
-#players-list {
-    padding: 15px 0; /* 增加上下內距，防止第一位與最後一位被遮擋 */
-    max-height: calc(100vh - 480px); /* 限制高度開啟內部捲動 */
-    overflow-y: auto !important;
+/* 🟢 手機版 (1000px 以下) 的順序：紀錄 -> 表單 -> 按鈕 */
+@media (max-width: 1000px) {
+    .record-layout-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 讓側邊欄的子元素可以參與外層排序 */
+    .record-sidebar { display: contents; }
+
+    .sidebar-card { order: 1; margin-bottom: 1.5rem; } /* 近期對局 */
+    .record-main { order: 2; } /* 錄入表單 */
+    .submit-footer-sidebar { order: 3; padding: 2rem 0; } /* 提交按鈕 */
+
+    /* 手機版恢復全網頁捲動 */
+    html, body { overflow-y: auto !important; position: static !important; height: auto !important; }
 }
+
+/* 🟢 通用卡片美化 */
+.card {
+    border-radius: 16px !important;
+    overflow: hidden !important; /* 強制裁切內部內容，讓圓角顯現 */
+    border: 1px solid var(--border-color);
+}
+
+/* 捲軸美化 */
+#players-list::-webkit-scrollbar { width: 5px; }
+#players-list::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 10px; }
