@@ -196,7 +196,7 @@ h1, h2, h3, h4 {
 }
 
 /* 針對直向平板 (窄螢幕) 的微調 */
-/*
+
 @media (max-width: 1024px) {
     :root {
         --nav-height: 60px;
@@ -216,25 +216,27 @@ h1, h2, h3, h4 {
         font-size: 0.75rem !important;
     }
 }
-*/
+
 
 /* 🟢 預設：手機版 (所有尺寸) 先恢復正常 */
+/*
 html, body {
   height: auto !important;
   overflow-y: auto !important;
   position: static !important;
   width: 100%;
 }
-
+*/
 /* 🟢 只在 iPad/電腦版 (sm 以上) 才啟動 App 鎖定模式 */
-@media (min-width: 640px) {
+/* @media (min-width: 640px) {
   html, body {
     height: 100% !important;
     overflow: hidden !important;
     position: fixed !important;
     overscroll-behavior: none;
   }
-}
+} 
+*/
 
 .top-header {
     margin-bottom: 1.5rem;
