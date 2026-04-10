@@ -1165,6 +1165,27 @@ const App = () => {
       <span className="text-lg sm:text-xl">❌</span>
     </button>
   </div>
+
+ <div className="flex gap-2 overflow-x-auto pb-2 px-1 no-scrollbar sm:flex-wrap">
+  {[
+    { id: 'townsfolk', name: '鎮民', color: 'border-blue-500 text-blue-400' },
+    { id: 'outsider', name: '外來者', color: 'border-blue-300 text-blue-200' },
+    { id: 'minion', name: '爪牙', color: 'border-red-500 text-red-400' },
+    { id: 'demon', name: '惡魔', color: 'border-red-700 text-red-600' },
+    { id: 'traveller', name: '旅行者', color: 'border-purple-500 text-purple-400' }
+  ].map(cat => (
+    <button
+      key={cat.id}
+      onClick={() => {
+        const el = document.getElementById(`role-section-${cat.id}`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }}
+      className={`px-3 py-1 rounded-full border bg-slate-800/50 text-[10px] sm:text-xs font-bold whitespace-nowrap transition-all hover:bg-slate-700 ${cat.color}`}
+    >
+      {cat.name}
+    </button>
+  ))}
+</div>
 </div>
             
             <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
@@ -1180,7 +1201,7 @@ const App = () => {
                     const teamRoles = source.filter(r => r.team === team && (r.name.includes(searchTerm) || r.id.toLowerCase().includes(searchTerm.toLowerCase())));
                     if (teamRoles.length === 0) return null;
                     return (
-                      <div key={team} className="space-y-3">
+                      <div key={team} id={`role-section-${team}`} className="space-y-3 pt-4">
                         <h3 className="text-xs font-black uppercase tracking-widest border-l-4 pl-2 border-indigo-500 text-slate-400">
                           {team === 'townsfolk' ? '鎮民' : team === 'outsider' ? '外來者' : team === 'minion' ? '爪牙' : team === 'demon' ? '惡魔' : '旅行者'}
                         </h3>
