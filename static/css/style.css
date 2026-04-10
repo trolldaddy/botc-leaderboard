@@ -201,7 +201,6 @@ html, body {
   position: static !important;
   width: 100%;
 }
-
 /* 🟢 修改後的電腦版排版 */
 @media (min-width: 640px) {
   html, body {
@@ -216,6 +215,7 @@ html, body {
 /* 針對直向平板 (窄螢幕) 的微調 */
 /* 🟢 預設：手機版 (所有尺寸) 先恢復正常 */
 /*
+
 html, body {
   height: auto !important;
   overflow-y: auto !important;
