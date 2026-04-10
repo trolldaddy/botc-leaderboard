@@ -1137,8 +1137,7 @@ const App = () => {
       {selectingRoleFor !== null && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
           <div className="bg-slate-900 rounded-3xl w-full max-w-5xl max-h-[85vh] border border-slate-700 flex flex-col shadow-2xl">
-            /* 🟢 修改後的標頭：手機版為垂直堆疊，電腦版維持水平 */
-<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 sm:p-5 border-b border-slate-800 gap-3 sm:gap-0">
+   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 sm:p-5 border-b border-slate-800 gap-3 sm:gap-0">
   
   {/* 標題區：縮小手機版字體並允許換行 */}
   <h2 className="text-base sm:text-lg font-black flex flex-wrap items-center gap-1 sm:gap-2">
