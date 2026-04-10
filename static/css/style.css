@@ -195,6 +195,29 @@ h1, h2, h3, h4 {
     overflow: visible !important; /* 確保下拉選單不被切掉 */
 }
 
+/* 針對直向平板 (窄螢幕) 的微調 */
+/*
+@media (max-width: 1024px) {
+    :root {
+        --nav-height: 60px;
+    }
+    .main-content {
+        padding-top: calc(var(--nav-height) + 1rem);
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+
+    #recorder-root button, 
+    #recorder-root select,
+    #recorder-root label {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        font-size: 0.75rem !important;
+    }
+}
+*/
+
 @media (min-width: 640px) {
   html, body {
     overflow: hidden;
