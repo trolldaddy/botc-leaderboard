@@ -1135,7 +1135,7 @@ const App = () => {
       </div>
 
       {selectingRoleFor !== null && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-start sm:items-center justify-center p-4 pt-24 sm:pt-4 backdrop-blur-sm animate-fadeIn">
           <div className="bg-slate-900 rounded-3xl w-full max-w-5xl max-h-[85vh] border border-slate-700 flex flex-col shadow-2xl">
    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 sm:p-5 border-b border-slate-800 gap-3 sm:gap-0">
   
