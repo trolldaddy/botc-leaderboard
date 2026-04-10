@@ -290,12 +290,13 @@ html, body {
 }
 
 /* 🟢 電腦版專屬：限制玩家列表高度並開啟捲動 */
-@media (min-width: 769px) {
+@media (min-width: 1024px) {
     #players-list {
         /* 計算高度：總高度 - (上方卡片 + 基礎資訊的高度) */
         max-height: calc(100vh - 580px); 
         overflow-y: auto !important;
         padding-right: 8px;
+        padding: 15px 5px;
     }
     
     /* 美化內部捲軸，不影響全域 */
