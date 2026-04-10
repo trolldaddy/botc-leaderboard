@@ -288,18 +288,29 @@ html, body {
     color: white;
 }
 
-#players-list {
-  /* 設定最大高度，超過 60vh (螢幕高度的 60%) 就出現內部捲軸 */
-  max-height: 65vh; 
-  overflow-y: auto;
-  padding-right: 8px;
-}
+@media (min-width: 640px) {
+  /* 1. 玩家卡片容器 */
+  #player-card {
+    /* 計算高度：總高度 - (頂部基礎資訊卡片的高度 + 間距) */
+    /* 你可以根據實際畫面微調 450px 這個數值 */
+    height: calc(100vh - 420px); 
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important; /* 卡片本身不溢出 */
+  }
 
-/* 針對電腦版捲軸的美化 */
-#players-list::-webkit-scrollbar {
-  width: 6px;
-}
-#players-list::-webkit-scrollbar-thumb {
-  background: rgba(234, 179, 8, 0.3); /* 配合黃金配色 */
-  border-radius: 10px;
+  /* 2. 玩家列表：這是唯一允許捲動的地方 */
+  #players-list {
+    flex: 1; /* 自動填滿卡片剩餘空間 */
+    overflow-y: auto !important; /* 啟用垂直捲動 */
+    padding-right: 8px; /* 為捲軸預留空間 */
+  }
+
+  /* 3. 提交按鈕區域：固定在卡片底部 */
+  .card-footer {
+    padding-top: 1rem;
+    background: var(--bg-card); /* 確保按鈕背景不透明 */
+    border-top: 1px solid var(--border-color);
+    z-index: 10;
+  }
 }
