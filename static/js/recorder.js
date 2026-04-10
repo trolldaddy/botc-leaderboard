@@ -559,6 +559,7 @@ const App = () => {
   const [demonBluffs, setDemonBluffs] = useState(() => loadState('botc_demonBluffs', { r1: "", r2: "", r3: "", recorded: false }));
   const [editingLog, setEditingLog] = useState(null); 
   const [dayAction, setDayAction] = useState({ actor: "", action: "白天行動", target: "", detail: "" });
+  const [nightAction, setNightAction] = useState({ actor: "", action: "夜間行動", target: "", detail: "" });
   const [nominationRecord, setNominationRecord] = useState({ nominator: "", target: "", votes: "", result: "未達門檻" });
 
   const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'alert', message: '', onConfirm: null });
@@ -1396,6 +1397,64 @@ const App = () => {
                   })}
                 </div>
               )}
+<div className="bg-slate-900/50 border border-slate-700 p-6 rounded-[2rem] shadow-xl space-y-4 mt-8 mb-10">
+  <h3 className="text-sm font-black text-indigo-400 flex items-center gap-2 mb-2">
+    🌙 自由夜間行動
+  </h3>
+  <div className="grid grid-cols-2 gap-4">
+    <div>
+      <label className="text-[10px] font-black text-slate-500 uppercase">執行者</label>
+      <input 
+        type="text" 
+        value={nightAction.actor} 
+        onChange={e => setNightAction({...nightAction, actor: e.target.value})} 
+        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-indigo-500 text-sm" 
+        placeholder="例如: 某玩家、系統..." 
+      />
+    </div>
+    <div>
+      <label className="text-[10px] font-black text-slate-500 uppercase">動作</label>
+      <input 
+        type="text" 
+        value={nightAction.action} 
+        onChange={e => setNightAction({...nightAction, action: e.target.value})} 
+        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-indigo-500 text-sm" 
+        placeholder="例如: 更改標記、筆記..." 
+      />
+    </div>
+    <div>
+      <label className="text-[10px] font-black text-slate-500 uppercase">目標對象 (選填)</label>
+      <input 
+        type="text" 
+        value={nightAction.target} 
+        onChange={e => setNightAction({...nightAction, target: e.target.value})} 
+        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-indigo-500 text-sm" 
+        placeholder="例如: 玩家B" 
+      />
+    </div>
+    <div>
+      <label className="text-[10px] font-black text-slate-500 uppercase">細節備註</label>
+      <input 
+        type="text" 
+        value={nightAction.detail} 
+        onChange={e => setNightAction({...nightAction, detail: e.target.value})} 
+        onKeyPress={(e) => e.key === 'Enter' && recordEvent(nightAction.actor, nightAction.action, nightAction.target, nightAction.detail)}
+        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-indigo-500 text-sm" 
+        placeholder="輸入更多細節..." 
+      />
+    </div>
+  </div>
+  <button 
+    onClick={() => {
+      if(!nightAction.actor && !nightAction.detail) return;
+      recordEvent(nightAction.actor || "說書人", nightAction.action, nightAction.target, nightAction.detail);
+      setNightAction({ actor: "", action: "夜間行動", target: "", detail: "" });
+    }}
+    className="w-full bg-indigo-900/40 hover:bg-indigo-800/60 text-indigo-200 border border-indigo-700/50 font-black py-3 rounded-xl transition-all active:scale-95"
+  >
+    寫入夜間日誌
+  </button>
+</div>
             </div>
           ) : (
             <div className="space-y-6">
