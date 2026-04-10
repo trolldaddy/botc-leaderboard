@@ -22,6 +22,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
 
 {
     const initRecord = async () => {
+        setupRoleDatalist();
         const dateInput = document.getElementById('match-date');
         if (dateInput && !dateInput.value) {
             dateInput.value = new Date().toISOString().split('T')[0];
