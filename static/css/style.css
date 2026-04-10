@@ -201,22 +201,14 @@ html, body {
   position: static !important;
   width: 100%;
 }
-/* 🟢 電腦版 (sm 以上) 鎖定全局捲動 */
 @media (min-width: 640px) {
   html, body {
-    height: 100% !important;
-    overflow: hidden !important; /* 徹底禁止網頁本體捲動 */
-    position: fixed;
-    width: 100%;
-  }
-
-  /* 確保主內容區域填滿剩餘高度 */
-  .record-layout-wrapper {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-    overflow: hidden;
+    /* 移除 position: fixed，改用 min-height 確保背景填滿 */
+    height: auto !important; 
+    min-height: 100% !important;
+    overflow-y: auto !important; /* 允許垂直捲動 */
+    position: relative !important; /* 改回相對定位 */
+    overscroll-behavior: none;
   }
 }
 
