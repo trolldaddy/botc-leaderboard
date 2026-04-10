@@ -211,36 +211,10 @@
     .btn-submit-glow { padding: 1.2rem 4rem; border-radius: 50px; background: var(--accent-red); color: #fff; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(230, 57, 70, 0.3); }
     .btn-ghost-full { width: 100%; background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.75rem; border: 1px solid var(--border-color); }
     
-    @media (max-width: 1000px) {
+    @media (max-width: 1023px) {
         .record-layout-wrapper { flex-direction: column; }
         .record-sidebar { width: 100%; }
         .form-grid-3 { grid-template-columns: 1fr; }
-    }
-
-    /* 🟢 電腦版專屬：限制玩家列表高度並開啟捲動 */
-@media (min-width: 769px) {
-    #players-list {
-        /* 計算高度：總高度 - (上方卡片 + 基礎資訊的高度) */
-        max-height: calc(100vh - 580px); 
-        overflow-y: auto !important;
-        padding-right: 8px;
-    }
-    
-    /* 美化內部捲軸，不影響全域 */
-    #players-list::-webkit-scrollbar { width: 5px; }
-    #players-list::-webkit-scrollbar-thumb { 
-        background: var(--accent-gold); 
-        border-radius: 10px; 
-    }
-
-    /* 確保提交按鈕區域固定在視線內 */
-    .submit-footer {
-        position: sticky;
-        bottom: 0;
-        background: var(--bg-dark); /* 確保背景不透明 */
-        padding-top: 1rem;
-        z-index: 10;
-        border-top: 1px solid var(--border-color);
     }
 }
 </style>
