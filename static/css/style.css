@@ -196,7 +196,7 @@ html, body {
 }
 
 /* 💻 電腦/平板版 (sm 以上)： App 鎖定模式 */
-@media (min-width: 640px) {
+@media (min-width: 1024px) {
     html, body {
         height: 100% !important;
         overflow: hidden !important; /* 禁止全域滾動 */
@@ -205,7 +205,7 @@ html, body {
 }
 
 /* 📱 手機版：恢復自然滾動 */
-@media (max-width: 639px) {
+@media (max-width: 1023px) {
     html, body {
         height: auto !important;
         overflow-y: auto !important;
