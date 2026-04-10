@@ -289,42 +289,58 @@ html, body {
     color: white;
 }
 @media (min-width: 1024px) {
-    /* 1. 鎖定外層佈局，確保不產生網頁大捲軸 */
+    /* 1. 鎖定最外層，不讓整個網頁捲動 */
+    html, body {
+        height: 100vh !important;
+        overflow: hidden !important;
+    }
+
+    /* 2. 讓主容器填滿螢幕高度 */
+    .main-content {
+        height: calc(100vh - var(--nav-height));
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 3. 佈局包裹層也必須鎖死高度 */
     .record-layout-wrapper {
-        height: calc(100vh - var(--nav-height) - 2rem); 
+        flex: 1;
+        height: 100%;
+        overflow: hidden; /* 防止溢出 */
+        display: flex;
+    }
+
+    /* 4. 關鍵：右側主區域必須鎖定高度，不能被內容撐開 */
+    .record-main {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* 重要：這行阻止了它被衝爆 */
+    }
+
+    /* 5. 表單也必須填滿高度並具備 Flex 屬性 */
+    #record-form {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0; /* 讓 Flex 子元素可以縮小，不被內容撐開 */
         overflow: hidden;
     }
 
-    /* 2. 讓右側表單區塊變成一個「垂直彈性盒子」 */
-    .record-main {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        min-width: 0;
-        padding-bottom: 20px;
-    }
-
-    /* 3. 因為你的卡片在 form 裡面，form 也必須變成彈性盒子 */
-    #record-form {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        min-height: 0; /* 這是讓內部捲動生效的關鍵 */
-    }
-
-    /* 4. 強制第三張卡片（玩家卡片）填滿剩餘空間 */
+    /* 6. 最後一張卡片（參與玩家）承接剩餘空間 */
     #record-form .card:last-of-type {
         flex: 1;
-        min-height: 0; 
         display: flex;
         flex-direction: column;
-        margin-bottom: 0; /* 貼齊底部，解決外框爆掉問題 */
+        min-height: 0; /* 再次確保這張卡片不會撐爆父層 */
+        margin-bottom: 0;
     }
 
-    /* 5. 玩家列表：自動填滿卡片並開啟捲動 */
+    /* 7. 內部的列表開啟捲動 */
     #players-list {
         flex: 1;
         overflow-y: auto !important;
-        padding: 15px 5px; /* 增加上下緩衝，解決首尾遮擋 */
+        padding: 15px 5px;
     }
 }
