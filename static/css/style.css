@@ -31,19 +31,6 @@ body {
     flex-direction: column;
     overflow-x: hidden;
 }
-html, body {
-
-    overflow: hidden; /* 禁止全域滾動 */
-
-  overscroll-behavior: none; /* 現代瀏覽器禁止回彈的屬性 */
-
-  height: 100%;
-
-  width: 100%;
-
-  position: fixed; /* 這是對付 iOS 最暴力的做法 */
-
-}
 
 h1, h2, h3, h4 {
     font-family: 'Cinzel', serif;
@@ -200,21 +187,30 @@ h1, h2, h3, h4 {
     overflow: visible !important; /* 確保下拉選單不被切掉 */
 }
 
+/* 🟢 統一全局設定：解決打架與 iPad 縮放 */
 html, body {
-  height: auto !important;
-  overflow-y: auto !important;
-  position: static !important;
-  width: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    touch-action: manipulation; /* 解決 iPad 雙擊放大與延遲 */
 }
+
+/* 💻 電腦/平板版 (sm 以上)： App 鎖定模式 */
 @media (min-width: 640px) {
-  html, body {
-    /* 移除 position: fixed，改用 min-height 確保背景填滿 */
-    height: auto !important; 
-    min-height: 100% !important;
-    overflow-y: auto !important; /* 允許垂直捲動 */
-    position: relative !important; /* 改回相對定位 */
-    overscroll-behavior: none;
-  }
+    html, body {
+        height: 100% !important;
+        overflow: hidden !important; /* 禁止全域滾動 */
+        position: fixed !important;
+    }
+}
+
+/* 📱 手機版：恢復自然滾動 */
+@media (max-width: 639px) {
+    html, body {
+        height: auto !important;
+        overflow-y: auto !important;
+        position: static !important;
+    }
 }
 
 /* 針對直向平板 (窄螢幕) 的微調 */
