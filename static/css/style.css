@@ -289,58 +289,35 @@ html, body {
     color: white;
 }
 @media (min-width: 1024px) {
-    /* 1. 鎖定最外層，不讓整個網頁捲動 */
-    html, body {
-        height: 100vh !important;
-        overflow: hidden !important;
-    }
-
-    /* 2. 讓主容器填滿螢幕高度 */
-    .main-content {
-        height: calc(100vh - var(--nav-height));
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* 3. 佈局包裹層也必須鎖死高度 */
-    .record-layout-wrapper {
-        flex: 1;
-        height: 100%;
-        overflow: hidden; /* 防止溢出 */
-        display: flex;
-    }
-
-    /* 4. 關鍵：右側主區域必須鎖定高度，不能被內容撐開 */
-    .record-main {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden; /* 重要：這行阻止了它被衝爆 */
-    }
-
-    /* 5. 表單也必須填滿高度並具備 Flex 屬性 */
-    #record-form {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        min-height: 0; /* 讓 Flex 子元素可以縮小，不被內容撐開 */
-        overflow: hidden;
-    }
-
-    /* 6. 最後一張卡片（參與玩家）承接剩餘空間 */
+    /* 1. 讓參與玩家這張卡片具備 Flex 能力 */
     #record-form .card:last-of-type {
         flex: 1;
         display: flex;
         flex-direction: column;
-        min-height: 0; /* 再次確保這張卡片不會撐爆父層 */
-        margin-bottom: 0;
+        min-height: 0; /* 🔴 核心：允許容器縮小 */
+        overflow: hidden; /* 確保圓角裁切 */
     }
 
-    /* 7. 內部的列表開啟捲動 */
+    /* 2. 關鍵修正：卡片內部的 mt-6 容器也要是 Flex */
+    #record-form .card:last-of-type > .mt-6 {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        margin-top: 0; /* 視情況調整原本的 mt-6 */
+    }
+
+    /* 3. 確保標題和欄位名稱不捲動 */
+    .flex.justify-between.items-end.mb-4,
+    .hidden.sm\:grid.sm\:grid-cols-12 {
+        flex-shrink: 0; /* 禁止標題被擠壓 */
+    }
+
+    /* 4. 讓列表承接所有剩餘空間並開啟捲動 */
     #players-list {
         flex: 1;
-        overflow-y: auto !important;
+        overflow-y: auto !important; /* 🟢 捲軸現在會出現了 */
         padding: 15px 5px;
+        min-height: 0;
     }
 }
