@@ -287,3 +287,19 @@ html, body {
     background: var(--accent-red);
     color: white;
 }
+
+#players-list {
+  /* 設定最大高度，超過 60vh (螢幕高度的 60%) 就出現內部捲軸 */
+  max-height: 65vh; 
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* 針對電腦版捲軸的美化 */
+#players-list::-webkit-scrollbar {
+  width: 6px;
+}
+#players-list::-webkit-scrollbar-thumb {
+  background: rgba(234, 179, 8, 0.3); /* 配合黃金配色 */
+  border-radius: 10px;
+}
