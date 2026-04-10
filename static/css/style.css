@@ -288,3 +288,25 @@ html, body {
     background: var(--accent-red);
     color: white;
 }
+@media (min-width: 1000px) {
+    /* 1. 限制玩家清單的最大高度 */
+    #players-list {
+        /* 核心修正：計算螢幕高度減去上方元素的高度 */
+        /* 如果你的螢幕較小導致底部還是被切到，請把 580px 調大 (例如 620px) */
+        max-height: calc(100vh - 580px); 
+        
+        /* 開啟內部垂直捲動 */
+        overflow-y: auto !important; 
+        
+        /* 解決首尾玩家被擋住的問題：增加上下內距 */
+        padding: 15px 5px; 
+    }
+
+    /* 2. 修復卡片外框與圓角 */
+    .card {
+        border-radius: 16px !important;
+        /* 核心修正：裁切內部的溢出內容，讓底部圓角顯現出來 */
+        overflow: hidden !important; 
+        border: 1px solid var(--border-color);
+    }
+}
