@@ -289,7 +289,13 @@ html, body {
     color: white;
 }
 
-/* 🟢 停用縮放手勢，同時解決點擊延遲問題 */
-html, body, button, input, select, .player-row {
-  touch-action: manipulation;
+.card {
+    overflow: hidden !important; /* 核心：裁切內部內容，讓圓角顯現 */
+    border-radius: 16px;
+}
+
+#players-list {
+    padding: 15px 0; /* 增加上下內距，防止第一位與最後一位被遮擋 */
+    max-height: calc(100vh - 480px); /* 限制高度開啟內部捲動 */
+    overflow-y: auto !important;
 }
