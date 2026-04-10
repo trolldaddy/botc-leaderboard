@@ -1406,6 +1406,7 @@ const App = () => {
       <label className="text-[10px] font-black text-slate-500 uppercase">執行者</label>
       <input 
         type="text" 
+        list="player-list"
         value={nightAction.actor} 
         onChange={e => setNightAction({...nightAction, actor: e.target.value})} 
         className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-indigo-500 text-sm" 
@@ -1426,6 +1427,7 @@ const App = () => {
       <label className="text-[10px] font-black text-slate-500 uppercase">目標對象 (選填)</label>
       <input 
         type="text" 
+        list="player-list"
         value={nightAction.target} 
         onChange={e => setNightAction({...nightAction, target: e.target.value})} 
         className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-indigo-500 text-sm" 
@@ -1494,7 +1496,7 @@ const App = () => {
                       className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-3 mt-1 outline-none focus:border-yellow-500 text-sm"
                     >
                       <option value="">選擇玩家...</option>
-                      {players.filter(p => p.name).map(p => <option key={p.id} value={p.name}>{p.id} 號 - {p.name}</option>)}
+                      {players.filter(p => p.name).map(p => <option key={p.id} value={p.name}>{p.id} 號 - {p.name} ({p.role?.name || "尚未選角"})</option>)}
                     </select>
                   </div>
                   <div>
@@ -1505,7 +1507,7 @@ const App = () => {
                       className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-3 mt-1 outline-none focus:border-yellow-500 text-sm"
                     >
                       <option value="">選擇玩家...</option>
-                      {players.filter(p => p.name).map(p => <option key={p.id} value={p.name}>{p.id} 號 - {p.name}</option>)}
+                      {players.filter(p => p.name).map(p => <option key={p.id} value={p.name}>{p.id} 號 - {p.name} ({p.role?.name || "尚未選角"})</option>)}
                     </select>
                   </div>
                   <div>
@@ -1549,7 +1551,7 @@ const App = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] font-black text-slate-500 uppercase">執行者 / 發起人</label>
-                    <input type="text" value={dayAction.actor} onChange={e => setDayAction({...dayAction, actor: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-slate-500 text-sm" placeholder="例如: 玩家A" />
+                    <input type="text" list="player-list" value={dayAction.actor} onChange={e => setDayAction({...dayAction, actor: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-slate-500 text-sm" placeholder="例如: 玩家A" />
                   </div>
                   <div>
                     <label className="text-[10px] font-black text-slate-500 uppercase">動作</label>
@@ -1557,7 +1559,7 @@ const App = () => {
                   </div>
                   <div>
                     <label className="text-[10px] font-black text-slate-500 uppercase">目標對象 (選填)</label>
-                    <input type="text" value={dayAction.target} onChange={e => setDayAction({...dayAction, target: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-slate-500 text-sm" placeholder="例如: 玩家B" />
+                    <input type="text" list="player-list" value={dayAction.target} onChange={e => setDayAction({...dayAction, target: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mt-1 outline-none focus:border-slate-500 text-sm" placeholder="例如: 玩家B" />
                   </div>
                   <div>
                     <label className="text-[10px] font-black text-slate-500 uppercase">結果細節</label>
@@ -1667,6 +1669,15 @@ const App = () => {
         </div>
       </main>
     </div>
+{/* 🟢 新增一個全局的玩家建議清單，供所有 Input 使用 */}
+<datalist id="player-list">
+  {players.map(p => (
+    <option key={p.id} value={p.name}>
+      {p.id}. {p.name} ({p.role?.name || "尚未選角"})
+    </option>
+  ))}
+</datalist>
+
   );
 };
 
