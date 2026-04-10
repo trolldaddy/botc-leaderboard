@@ -304,6 +304,7 @@ html, body {
 
     /* 2. 修復卡片外框與圓角 */
     .card {
+        max-height: calc(100vh - 580px);
         border-radius: 16px !important;
         /* 核心修正：裁切內部的溢出內容，讓底部圓角顯現出來 */
         overflow-y:auto  !important; 
