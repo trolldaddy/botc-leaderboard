@@ -1339,7 +1339,7 @@ const App = () => {
                   >
                     <option value="">選擇目標玩家...</option>
                     {players.filter(p => p.name).map(p => (
-                      <option key={p.id} value={p.id}>{p.id} 號 - {p.name} {p.role ? `(${p.role.name})` : ''}</option>
+                      <option key={p.id} value={p.id}>{p.id} 號 - {p.name} ({p.role?.name || "尚未選角"})` : ''}</option>
                     ))}
                   </select>
                   <select 
@@ -1544,7 +1544,7 @@ const App = () => {
 
               <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-[2rem] shadow-inner space-y-4">
                 <h3 className="text-sm font-black text-slate-400 flex items-center gap-2 mb-2">
-                  📝 自由事件紀錄
+                  📝 自由日間紀錄
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
