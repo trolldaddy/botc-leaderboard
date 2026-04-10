@@ -301,6 +301,7 @@ html, body {
         flex-direction: column;
         height: 100%;
         min-width: 0;
+        padding-bottom: 20px;
     }
 
     /* 3. 因為你的卡片在 form 裡面，form 也必須變成彈性盒子 */
