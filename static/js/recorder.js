@@ -1308,7 +1308,7 @@ const App = () => {
                         className="w-full bg-slate-900/80 border border-red-900/50 rounded-xl px-3 py-2 text-xs outline-none focus:border-red-500 mt-1 text-slate-200"
                       >
                         <option value="">選擇角色...</option>
-                        {script.map(r => (
+                        {(script && script.length > 0 ? script : MASTER_ROLE_DB).map(r => (
                           <option key={r.id} value={r.name}>{r.name}</option>
                         ))}
                       </select>
