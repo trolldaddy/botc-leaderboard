@@ -54,8 +54,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         }
     };
 
-    // --- 🟢 載入左側「最近錄入對局」：補上說書人資訊 ---
-  // --- 🟢 載入左側「最近錄入對局」：比照 history UI 增加資訊 ---
+// --- 🟢 載入左側「最近錄入對局」：加入右側日期方塊 ---
 const loadRecentMatches = async () => {
     const container = document.getElementById('recent-matches-list');
     if (!container) return;
@@ -73,26 +72,27 @@ const loadRecentMatches = async () => {
         }
 
         container.innerHTML = recent.map(m => {
-            const d = new Date(m.date); // 取得對局日期
+            const d = new Date(m.date); //
             const isGood = m.winning_team === 'good';
-            const playerCount = m.players ? m.players.length : 0; // 取得玩家人數
             
             return `
                 <div class="side-match-item">
-                    <span class="m-title">${m.script}</span>
-                    
-                    <div class="m-meta">
-                        <span><i class="fa-solid fa-calendar-day"></i> ${d.getMonth()+1}/${d.getDate()}</span>
-                        <span><i class="fa-solid fa-users"></i> ${playerCount} 人</span>
-                    </div>
-                    
-                    <div class="m-meta">
-                        <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
-                        <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
-                    </div>
-
-                    <div class="m-tag ${isGood ? 'tag-good' : 'tag-evil'}">
-                        ${isGood ? '善良陣營獲勝' : '邪惡陣營獲勝'}
+                    <div class="side-match-main">
+                        <div class="side-info-content">
+                            <span class="m-title">${m.script}</span>
+                            <div class="m-meta">
+                                <span><i class="fa-solid fa-users"></i> ${m.players ? m.players.length : 0} 人</span>
+                                <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
+                            </div>
+                            <div class="m-tag ${isGood ? 'tag-good' : 'tag-evil'}">
+                                ${isGood ? '善良獲勝' : '邪惡獲勝'}
+                            </div>
+                        </div>
+                        
+                        <div class="side-date-box">
+                            <span class="side-year-label">${d.getFullYear()}</span>
+                            <span class="side-date-label">${d.getMonth()+1}/${d.getDate()}</span>
+                        </div>
                     </div>
                 </div>
             `;
@@ -101,7 +101,6 @@ const loadRecentMatches = async () => {
         container.innerHTML = `<div style="text-align: center; color: var(--accent-red); font-size: 0.8rem; padding: 1rem;">載入失敗</div>`;
     }
 };
-
     const getAlignmentByRole = (roleStr) => {
         if (!roleStr) return "good";
         let targetRole = roleStr;
