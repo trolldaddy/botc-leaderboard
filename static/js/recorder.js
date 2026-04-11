@@ -581,7 +581,16 @@ const App = () => {
   const showConfirm = (message, onConfirm) => {
     setModalConfig({ isOpen: true, type: 'confirm', message, onConfirm });
   };
+  const triggerExportSelection = () => {
+  setModalConfig({
+    isOpen: true,
+    type: 'confirm', // 借用 confirm 的版型
+    message: "請選擇對局結果以完成匯出：",
+    onConfirm: null // 這裡改用下方的自訂按鈕
+  });
+};
 
+  
   const closeModal = () => {
     setModalConfig(prev => ({ ...prev, isOpen: false }));
   };
@@ -988,33 +997,41 @@ const App = () => {
     <div className="h-full bg-slate-950 text-slate-200 font-sans flex flex-col relative overflow-hidden">
 
       {modalConfig.isOpen && (
-        <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl flex flex-col gap-4">
-            <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-bold">
-              {modalConfig.message}
-            </p>
-            <div className="flex justify-end gap-3 mt-2">
-              {modalConfig.type === 'confirm' && (
-                <button 
-                  onClick={closeModal}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all"
-                >
-                  取消
-                </button>
-              )}
-              <button 
-                onClick={() => {
-                  if (modalConfig.onConfirm) modalConfig.onConfirm();
-                  closeModal();
-                }}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all"
-              >
-                確定
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm">
+    <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl flex flex-col gap-4">
+      <div className="flex items-center gap-3 mb-2">
+        <span className="text-xl">📥</span>
+        <h3 className="text-slate-200 font-black">匯出對局紀錄</h3>
+      </div>
+      
+      <p className="text-slate-400 text-xs leading-relaxed">
+        請標註本局結果，這將會自動寫入文字檔開頭，方便後續戰績錄入：
+      </p>
+      
+      <div className="flex flex-col gap-2 mt-2">
+        {/* 🏆 勝利選項 */}
+        <button onClick={() => { exportHistory('good'); closeModal(); }} className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2">
+          😇 善良陣營獲勝
+        </button>
+        <button onClick={() => { exportHistory('evil'); closeModal(); }} className="w-full py-3 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2">
+          😈 邪惡陣營獲勝
+        </button>
+        
+        <div className="h-px bg-slate-800 my-1"></div>
+
+        {/* 📝 其他選項 */}
+        <button onClick={() => { exportHistory('none'); closeModal(); }} className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all">
+          中途紀錄 (尚未結束)
+        </button>
+
+        {/* 🔴 取消選項：放在最下面且用不同顏色 */}
+        <button onClick={closeModal} className="w-full py-2.5 border border-slate-700 hover:bg-slate-800 text-slate-500 rounded-xl text-xs font-bold transition-all mt-1">
+          取消，回到對局
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       <header className="bg-slate-900 border-b border-slate-800 p-4 shrink-0 flex flex-col sm:flex-row justify-between items-center gap-4 z-20">
         <div className="flex items-center gap-4">
