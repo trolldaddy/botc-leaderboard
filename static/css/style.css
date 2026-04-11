@@ -336,6 +336,7 @@ html, body {
         flex-direction: column;
         min-height: 0; /* 再次確保這張卡片不會撐爆父層 */
         margin-bottom: 0;
+        overflow-y: auto !important;
     }
 
     /* 7. 內部的列表開啟捲動 */
