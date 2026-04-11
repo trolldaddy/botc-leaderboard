@@ -751,10 +751,15 @@ const App = () => {
     setEditingLog(null);
   };
 
-  const exportHistory = () => {
+  const exportHistory = (winner) => {
     if (logs.length === 0) return;
     const displayLocation = gameLocation === '其他' ? customLocation : gameLocation;
-    let header = `劇本名稱：${scriptName}\n遊戲日期：${gameDate}\n遊戲地點：${displayLocation}\n-----------------------------------\n\n`;
+
+    let winnerText = "";
+      if (winner === 'good') winnerText = "勝利陣營：善良陣營\n";
+      else if (winner === 'evil') winnerText = "勝利陣營：邪惡陣營\n";
+      else winnerText = "對局狀態：中途紀錄\n";
+    let header = `劇本名稱：${scriptName}\n遊戲日期：${gameDate}\n遊戲地點：${displayLocation}\n${winnerText}-----------------------------------\n\n`;
 
     const content = logs.map(p => {
       const events = p.events
@@ -778,7 +783,9 @@ const App = () => {
       return `=== ${p.phase} ===\n${events || '  (無紀錄)'}`;
     }).join('\n\n'); // 移除 .reverse() 保持時間序
     
-    const fullContent = header + content;
+    const footer = `\n\n===================================\n` + generatePlayerListText();
+    
+    const fullContent = header + content + footer;
     const blob = new Blob([fullContent], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
