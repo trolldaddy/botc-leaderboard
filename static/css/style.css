@@ -192,7 +192,12 @@ html, body {
     width: 100%;
     margin: 0;
     padding: 0;
-    touch-action: manipulation; /* 解決 iPad 雙擊放大與延遲 */
+}
+
+/* 🟢 應用於全域，尤其是會頻繁點擊的區域 */
+html, body, .record-layout-wrapper, .player-row, .side-match-item, .btn, .card {
+    /* manipulation 會自動關閉雙擊縮放，但完整保留捲動與雙指縮放功能 */
+    touch-action: manipulation !important; 
 }
 
 /* 💻 電腦/平板版 (sm 以上)： App 鎖定模式 */
