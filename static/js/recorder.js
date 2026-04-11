@@ -609,15 +609,24 @@ const App = () => {
     saveState('botc_customLocation', customLocation);
     saveState('botc_demonBluffs', demonBluffs);
   }, [script, players, gamePhase, logs, playerCount, scriptName, gameDate, gameLocation, customLocation, demonBluffs]);
+  // 🟢 最終更新：使用 ☠️ 與 ❤️ 作為生死標記
   const generatePlayerListText = () => {
-      let text = "\n【當前玩家狀態】\n";
-      players.forEach(p => {
-          const status = p.isAlive ? "存活" : "死亡";
-          const roleName = p.role ? p.role.name : "未知";
-          text += `[${p.id}號] ${status} - (${roleName}) ${p.name || "空"}\n`;
-      });
-      return text;
-  };
+    let text = "\n【最終玩家狀態快照】\n";
+    players.forEach(p => {
+        // 🔴 根據你的要求更換圖示
+        const status = p.isDead ? "☠️ 死亡" : "❤️ 存活";
+        
+        // 處理身分顯示邏輯
+        let roleDisplay = p.role ? p.role.name : "未知";
+        if (p.hiddenRole) {
+            roleDisplay += ` / 實際:${p.hiddenRole}`;
+        }
+        
+        // 格式：[1號] ❤️ 存活 - (角色) 暱稱
+        text += `[${p.id}號] ${status} - (${roleDisplay}) ${p.name || "空"}\n`;
+    });
+    return text;
+};
 
 
   const recordEvent = (actor, action, target, detail) => {
@@ -657,11 +666,13 @@ const App = () => {
       return;
     }
 
-    const snapshotDetail = players.map(p => {
-      let roleDisplay = p.role ? p.role.name : '未指派';
-      if (p.hiddenRole) roleDisplay += ` / 實際:${p.hiddenRole}`;
-      const statusDisplay = p.isDead ? '💀 死亡' : '存活';
-      return `[${p.id}號] ${statusDisplay} - (${roleDisplay}) ${p.name}`;
+  const snapshotDetail = players.map(p => {
+    let roleDisplay = p.role ? p.role.name : '未指派';
+    if (p.hiddenRole) roleDisplay += ` / 實際:${p.hiddenRole}`;
+    
+    // 🔴 同步更新為 ☠️ 與 ❤️
+    const statusDisplay = p.isDead ? '☠️ 死亡' : '❤️ 存活';
+    return `[${p.id}號] ${statusDisplay} - (${roleDisplay}) ${p.name}`;
     }).join('\n');
     
     const snapshotEvent = { 
@@ -1535,11 +1546,16 @@ const App = () => {
                   </div>
                 </div>
                 <button 
-                  onClick={() => {
-                    if(!nominationRecord.nominator || !nominationRecord.target) return;
-                    recordEvent(nominationRecord.nominator, "發起提名", nominationRecord.target, `${nominationRecord.votes} 票 | 結果: ${nominationRecord.result}`);
-                    setNominationRecord({ nominator: "", target: "", votes: "", result: "未達門檻" });
-                  }}
+           // 🟢 修改提名按鈕的 onClick 邏輯
+                onClick={() => {
+              if(!nominationRecord.nominator || !nominationRecord.target) return;
+  
+                // 🔴 格式微調：讓票數與結果更顯眼
+              const voteDetail = `【票數: ${nominationRecord.votes}】» 判決: ${nominationRecord.result}`;
+              recordEvent(nominationRecord.nominator, "發起提名", nominationRecord.target, voteDetail);
+  
+              setNominationRecord({ nominator: "", target: "", votes: "", result: "未達門檻" });
+              }}
                   className="w-full bg-yellow-700 hover:bg-yellow-600 text-white font-black py-3 rounded-xl transition-all active:scale-95"
                 >
                   記錄提名
