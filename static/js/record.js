@@ -194,6 +194,8 @@ const loadRecentMatches = async () => {
     const scriptMatch = text.match(/劇本名稱：(.+)/);
     const locationMatch = text.match(/遊戲地點：(.+)/);
     const dateMatch = text.match(/遊戲日期：(\d{4}-\d{2}-\d{2})/);
+
+    const winnerMatch = text.match(/勝利陣營：(.+)/);
     
     if (scriptMatch) document.getElementById('match-script').value = scriptMatch[1].trim();
     if (locationMatch) {
@@ -203,7 +205,16 @@ const loadRecentMatches = async () => {
         locSelect.value = exists ? locVal : "其他";
     }
     if (dateMatch) document.getElementById('match-date').value = dateMatch[1];
-
+    if (winnerMatch) {
+        const winnerText = winnerMatch[1].trim();
+        const teamSelect = document.getElementById('match-winning-team'); // 確保 ID 與 HTML 一致
+        if (winnerText.includes("善良")) {
+            teamSelect.value = "good";
+        } else if (winnerText.includes("邪惡")) {
+            teamSelect.value = "evil";
+        }
+    }
+    
     // 2. 玩家狀態解析
     const blocks = text.split('【當前玩家狀態】');
     if (blocks.length < 2) return;
