@@ -289,6 +289,18 @@ html, body {
     color: white;
 }
 
+/* 🟢 修正提交按鈕的文字置中問題 */
+.btn-submit-glow {
+    display: flex !important;
+    justify-content: center !important; /* 🔴 水平置中核心 */
+    align-items: center !important;     /* 垂直置中 */
+    text-align: center;
+    gap: 10px; /* 圖示與文字之間的間距 */
+    
+    /* 確保寬度撐滿父容器時依然置中 */
+    width: 100%; 
+    padding: 1.2rem 2rem; /* 重新調整內距 */
+}
 @media (min-width: 1024px) {
     /* 1. 鎖定最外層，不讓整個網頁捲動 */
     html, body {
@@ -352,4 +364,24 @@ html, body {
         overflow-y: auto !important;
         padding: 15px 5px;
     }
+}
+
+#players-list::-webkit-scrollbar {
+    width: 6px; /* 設定捲軸寬度，不要太粗 */
+}
+
+#players-list::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2); /* 軌道背景，保持低調 */
+    border-radius: 10px;
+}
+
+#players-list::-webkit-scrollbar-thumb {
+    /* 使用你定義的黃金顏色作為捲軸主體 */
+    background: linear-gradient(to bottom, var(--accent-gold), #b8860b); 
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.3); /* 增加一點邊框感 */
+}
+
+#players-list::-webkit-scrollbar-thumb:hover {
+    background: #ffd700; /* 滑鼠移上去時變亮 */
 }
