@@ -190,6 +190,14 @@ const loadRecentMatches = async () => {
     const text = document.getElementById('log-input').value;
     if (!text.trim()) return;
 
+     const safeSet = (id, value) => {
+        const el = document.getElementById(id);
+        if (el && value) {
+            el.value = value.trim();
+            return true;
+        }
+        return false;
+    };
     // 1. 基礎資訊解析
     const scriptMatch = text.match(/劇本名稱：(.+)/);
     const locationMatch = text.match(/遊戲地點：(.+)/);
