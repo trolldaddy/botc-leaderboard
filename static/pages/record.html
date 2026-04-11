@@ -282,11 +282,14 @@
 }
 /* 🟢 側邊欄卡片佈局優化 */
 .side-match-flex {
-    display: flex;
+    display: flex !important;
+    flex-direction: row !important; /* 確保是橫向 */
+    flex-wrap: nowrap !important;   /* 禁止折行 */
     justify-content: space-between;
     align-items: center;
     gap: 12px;
     width: 100%;
+   
 }
 
 .side-left-info {
@@ -314,16 +317,12 @@
     justify-content: center;
 }
 
-.side-mini-box .box-label {
-    display: block;
-    font-size: 0.6rem;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-}
-
+.side-mini-box .box-label, 
 .side-mini-box .box-value {
-    font-size: 0.75rem;
-    font-weight: 800;
+    font-size: 0.75rem !important; /* 🔴 四個字一樣大 */
+    line-height: 1.2;
+    display: block;
+    text-align: center;
 }
 
 /* 🟢 獲勝方格顏色分支 */
@@ -353,7 +352,15 @@
     display: flex;
     gap: 10px;
 }  
-    
+/* 🟢 強調陣營文字 */
+.faction-text {
+    font-weight: 900 !important; /* 讓善良/邪惡更粗更顯眼 */
+}
+
+.status-box .box-value {
+    font-weight: 500;
+    opacity: 0.9;
+}    
 
 </style>
 <script src="/js/roles_db.js"></script>
