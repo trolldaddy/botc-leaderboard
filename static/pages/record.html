@@ -302,18 +302,34 @@
 }
 /* 🟢 統一小方格樣式 */
 .side-mini-box {
-    width: 60px;
+    /* 使用 border-box 確保邊框不會撐開尺寸 */
+    box-sizing: border-box !important;
+    width: 60px !important;
     height: 60px !important;
-    text-align: center;
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 0;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    
+    /* 彈性佈局置中 */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    
+    /* 移除所有可能導致偏移的內外距 */
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    flex-shrink: 0 !important;
+    overflow: hidden !important;
 }
-
+/* 🟢 統一內部的文字塊行為 */
+.side-mini-box span {
+    display: block !important;
+    width: 100% !important;
+    text-align: center !important;
+    /* 🔴 關鍵：強制行高，防止不同字體撐開高度 */
+    line-height: 1.1 !important;
+    margin: 0 !important;
+}
     
 /* 🟢 右側雙方格：鎖定寬度 */
 .side-right-boxes {
