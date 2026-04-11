@@ -300,7 +300,20 @@
     flex: 1 !important;
     min-width: 0 !important; /* 核心：允許內容縮小，不把右邊擠下去 */
 }
+/* 🟢 統一小方格樣式 */
+.side-mini-box {
+    width: 52px;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 6px 2px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
+    
 /* 🟢 右側雙方格：鎖定寬度 */
 .side-right-boxes {
     display: flex !important;
