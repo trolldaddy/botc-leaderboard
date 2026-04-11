@@ -207,7 +207,7 @@ const loadRecentMatches = async () => {
     if (dateMatch) document.getElementById('match-date').value = dateMatch[1];
     if (winnerMatch) {
         const winnerText = winnerMatch[1].trim();
-        const teamSelect = document.getElementById('match-winning-team'); // 確保 ID 與 HTML 一致
+        const teamSelect = document.getElementById('match-winner'); // 確保 ID 與 HTML 一致
         if (winnerText.includes("善良")) {
             teamSelect.value = "good";
         } else if (winnerText.includes("邪惡")) {
