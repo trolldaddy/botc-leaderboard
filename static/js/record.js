@@ -54,7 +54,6 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         }
     };
 
-// --- 🟢 載入左側「最近錄入對局」：加入右側日期方塊 ---
 const loadRecentMatches = async () => {
     const container = document.getElementById('recent-matches-list');
     if (!container) return;
@@ -65,45 +64,50 @@ const loadRecentMatches = async () => {
         if (!resp.ok) throw new Error();
         const data = await resp.json();
         
-        const recent = data.slice(0, 6); // 取最近 6 筆
+        const recent = data.slice(0, 6);
         if (recent.length === 0) {
-            container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1.5rem;">尚未有錄入紀錄</div>`;
+            container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 2rem;">尚未有紀錄</div>`;
             return;
         }
 
         container.innerHTML = recent.map(m => {
-            const d = new Date(m.date); //
+            const d = new Date(m.date);
             const isGood = m.winning_team === 'good';
             
             return `
                 <div class="side-match-item">
-                    <div class="side-match-main">
-                        <div class="side-info-content">
-                            <span class="m-title">${m.script}</span>
+                    <div class="side-match-flex">
+                        <div class="side-left-info">
+                            <div class="m-title" title="${m.script}">${m.script}</div>
                             <div class="m-meta">
-                                <span><i class="fa-solid fa-users"></i> ${m.players ? m.players.length : 0} 人</span>
-                                <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
-                            </div>
-                            <div class="m-meta">
+                                <span><i class="fa-solid fa-users"></i> ${m.players?.length || 0}人</span>
                                 <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
                             </div>
-                            <div class="m-tag ${isGood ? 'tag-good' : 'tag-evil'}">
-                                ${isGood ? '善良獲勝' : '邪惡獲勝'}
+                            <div class="m-meta">
+                                <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
                             </div>
                         </div>
                         
-                        <div class="side-date-box">
-                            <span class="side-year-label">${d.getFullYear()}</span>
-                            <span class="side-date-label">${d.getMonth()+1}/${d.getDate()}</span>
+                        <div class="side-right-boxes">
+                            <div class="side-mini-box date-box">
+                                <span class="box-label">${d.getFullYear()}</span>
+                                <span class="box-value">${d.getMonth()+1}/${d.getDate()}</span>
+                            </div>
+                            <div class="side-mini-box status-box ${isGood ? 'box-good' : 'box-evil'}">
+                                <span class="box-label">${isGood ? '正義' : '邪惡'}</span>
+                                <span class="box-value">獲勝</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
         }).join('');
     } catch (err) {
-        container.innerHTML = `<div style="text-align: center; color: var(--accent-red); font-size: 0.8rem; padding: 1rem;">載入失敗</div>`;
+        container.innerHTML = `<div style="text-align: center; color: var(--accent-red); padding: 1rem;">載入失敗</div>`;
     }
 };
+
+    
     const getAlignmentByRole = (roleStr) => {
         if (!roleStr) return "good";
         let targetRole = roleStr;
