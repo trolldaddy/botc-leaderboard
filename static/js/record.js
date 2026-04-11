@@ -55,41 +55,52 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
     };
 
     // --- 🟢 載入左側「最近錄入對局」：補上說書人資訊 ---
-    const loadRecentMatches = async () => {
-        const container = document.getElementById('recent-matches-list');
-        if (!container) return;
-        const apiBase = window.API_BASE || "";
+  // --- 🟢 載入左側「最近錄入對局」：比照 history UI 增加資訊 ---
+const loadRecentMatches = async () => {
+    const container = document.getElementById('recent-matches-list');
+    if (!container) return;
+    const apiBase = window.API_BASE || "";
 
-        try {
-            const resp = await fetch(`${apiBase}/api/history`);
-            if (!resp.ok) throw new Error();
-            const data = await resp.json();
-            
-            const recent = data.slice(0, 6);
-            if (recent.length === 0) {
-                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1.5rem;">尚未有錄入紀錄</div>`;
-                return;
-            }
-
-            container.innerHTML = recent.map(m => {
-                const isGood = m.winning_team === 'good';
-                return `
-                    <div class="side-match-item">
-                        <span class="m-title">${m.script}</span>
-                        <div class="m-meta">
-                            <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
-                            <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
-                        </div>
-                        <div class="m-tag ${isGood ? 'tag-good' : 'tag-evil'}">
-                            ${isGood ? '善良陣營獲勝' : '邪惡陣營獲勝'}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        } catch (err) {
-            container.innerHTML = `<div style="text-align: center; color: var(--accent-red); font-size: 0.8rem; padding: 1rem;">載入失敗</div>`;
+    try {
+        const resp = await fetch(`${apiBase}/api/history`);
+        if (!resp.ok) throw new Error();
+        const data = await resp.json();
+        
+        const recent = data.slice(0, 6); // 取最近 6 筆
+        if (recent.length === 0) {
+            container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1.5rem;">尚未有錄入紀錄</div>`;
+            return;
         }
-    };
+
+        container.innerHTML = recent.map(m => {
+            const d = new Date(m.date); // 取得對局日期
+            const isGood = m.winning_team === 'good';
+            const playerCount = m.players ? m.players.length : 0; // 取得玩家人數
+            
+            return `
+                <div class="side-match-item">
+                    <span class="m-title">${m.script}</span>
+                    
+                    <div class="m-meta">
+                        <span><i class="fa-solid fa-calendar-day"></i> ${d.getMonth()+1}/${d.getDate()}</span>
+                        <span><i class="fa-solid fa-users"></i> ${playerCount} 人</span>
+                    </div>
+                    
+                    <div class="m-meta">
+                        <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
+                        <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
+                    </div>
+
+                    <div class="m-tag ${isGood ? 'tag-good' : 'tag-evil'}">
+                        ${isGood ? '善良陣營獲勝' : '邪惡陣營獲勝'}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        container.innerHTML = `<div style="text-align: center; color: var(--accent-red); font-size: 0.8rem; padding: 1rem;">載入失敗</div>`;
+    }
+};
 
     const getAlignmentByRole = (roleStr) => {
         if (!roleStr) return "good";
