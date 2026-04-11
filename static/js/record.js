@@ -94,7 +94,7 @@ const loadRecentMatches = async () => {
                                 <span class="box-value">${d.getMonth()+1}/${d.getDate()}</span>
                             </div>
                             <div class="side-mini-box status-box ${isGood ? 'box-good' : 'box-evil'}">
-                                <span class="box-label">${isGood ? '正義' : '邪惡'}</span>
+                                <span class="box-label">${isGood ? '善良' : '邪惡'}</span>
                                 <span class="box-value">獲勝</span>
                             </div>
                         </div>
