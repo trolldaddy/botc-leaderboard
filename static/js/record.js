@@ -202,7 +202,7 @@ const loadRecentMatches = async () => {
     const scriptMatch = text.match(/劇本名稱：(.+)/);
     const locationMatch = text.match(/遊戲地點：(.+)/);
     const dateMatch = text.match(/遊戲日期：(\d{4}-\d{2}-\d{2})/);
-
+    const storytellerMatch = text.match(/說書人：(.+)/) || text.match(/記錄者：(.+)/);
     const winnerMatch = text.match(/勝利陣營：(.+)/);
     
     if (scriptMatch) document.getElementById('match-script').value = scriptMatch[1].trim();
@@ -218,7 +218,9 @@ const loadRecentMatches = async () => {
         const teamVal = winnerText.includes("善良") ? "good" : (winnerText.includes("邪惡") ? "evil" : "");
         safeSet('match-winner', teamVal); // 使用你剛才傳給我的 ID
     }
-    
+    if (storytellerMatch) {
+        safeSet('match-storyteller', storytellerMatch[1]);
+    }
     // 2. 玩家狀態解析
     const blocks = text.split('【當前玩家狀態】');
     if (blocks.length < 2) return;
