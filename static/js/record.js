@@ -273,7 +273,7 @@ window.addPlayerRow = (data = null) => {
             </select>
         </div>
         <div class="col-span-2 sm:col-span-1 flex justify-end sm:justify-center">
-            <button type="button" class="text-slate-600 hover:text-red-500 p-2" onclick="if(confirm('確定刪除？')){this.closest('.player-row').remove();saveDraft();}">
+            <button type="button" class="text-slate-600 hover:text-red-500 p-2" onclick="if(confirm('確定刪除？')){this.closest('.player-row').remove(); updateRowNumbers(); saveDraft();}">
                 <i class="fa-solid fa-trash-can"></i>
             </button>
         </div>
