@@ -224,7 +224,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
 **/
 // 🟢 自動更新所有玩家列的編號
 // 🟢 1. 新增或更新編號的函式
-windwo.updateRowNumbers = () => {
+window.updateRowNumbers = () => {
     const rows = document.querySelectorAll('.player-row');
     rows.forEach((row, index) => {
         const numEl = row.querySelector('.row-index');
