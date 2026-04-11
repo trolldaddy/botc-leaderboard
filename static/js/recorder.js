@@ -526,7 +526,7 @@ const App = () => {
   const [logs, setLogs] = useState(() => loadState('botc_logs', [])); 
 
   const [playerCount, setPlayerCount] = useState(() => loadState('botc_playerCount', 12));
-
+  const [storyteller, setStoryteller] = useState(() => loadState('botc_storyteller', ''));
   const [scriptName, setScriptName] = useState(() => loadState('botc_scriptName', '未命名劇本'));
   const [gameDate, setGameDate] = useState(() => loadState('botc_gameDate', new Date().toISOString().split('T')[0]));
   const [gameLocation, setGameLocation] = useState(() => loadState('botc_gameLocation', '線上 (Discord)'));
@@ -617,7 +617,8 @@ const App = () => {
     saveState('botc_gameLocation', gameLocation);
     saveState('botc_customLocation', customLocation);
     saveState('botc_demonBluffs', demonBluffs);
-  }, [script, players, gamePhase, logs, playerCount, scriptName, gameDate, gameLocation, customLocation, demonBluffs]);
+    saveState('botc_storyteller', storyteller);
+  }, [script, players, gamePhase, logs, playerCount, scriptName, gameDate, gameLocation, customLocation, demonBluffs,storyteller]);
   // 🟢 最終更新：使用 ☠️ 與 ❤️ 作為生死標記
   const generatePlayerListText = () => {
     let text = "\n【最終玩家狀態快照】\n";
@@ -768,7 +769,7 @@ const App = () => {
       if (winner === 'good') winnerText = "勝利陣營：善良陣營\n";
       else if (winner === 'evil') winnerText = "勝利陣營：邪惡陣營\n";
       else winnerText = "對局狀態：中途紀錄\n";
-    let header = `劇本名稱：${scriptName}\n遊戲日期：${gameDate}\n遊戲地點：${displayLocation}\n${winnerText}-----------------------------------\n\n`;
+    let header = `劇本名稱：${scriptName}\n遊戲日期：${gameDate}\n遊戲地點：${displayLocation}\n說書人：${storyteller}\n${winnerText}-----------------------------------\n\n`;
 
     const content = logs.map(p => {
       const events = p.events
@@ -1126,6 +1127,16 @@ const App = () => {
             <input type="text" placeholder="自訂地點" value={customLocation} onChange={e=>setCustomLocation(e.target.value)} className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200 w-28" />
           )}
         </div>
+            <div className="flex items-center gap-2">
+        <span className="text-slate-400 font-bold uppercase tracking-widest">🎙️ 說書人</span>
+        <input 
+            type="text" 
+            value={storyteller} 
+            onChange={e => setStoryteller(e.target.value)} 
+            className="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1.5 outline-none focus:border-indigo-500 text-slate-200 w-28" 
+            placeholder="說書人姓名" 
+        />
+    </div>
       </div>
 
       <div className="bg-slate-900/50 border-b border-slate-800 p-4 shrink-0 shadow-inner z-10 w-full overflow-y-auto max-h-[35vh] custom-scrollbar"
