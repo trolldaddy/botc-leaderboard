@@ -302,11 +302,12 @@
 }
 /* 🟢 統一小方格樣式 */
 .side-mini-box {
-    width: 52px;
+    width: 60px;
+    height: 60px !important;
     text-align: center;
     background: rgba(0, 0, 0, 0.35);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    padding: 6px 2px;
+    padding: 0;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
@@ -318,7 +319,7 @@
 .side-right-boxes {
     display: flex !important;
     flex-direction: row !important;
-    gap: 4px !important;
+    gap: 8px !important;
     flex-shrink: 0 !important; /* 防止方格被擠扁 */
 }
 
@@ -339,7 +340,7 @@
 /* 🔴 重點強化：善良/邪惡 字體最粗 */
 .faction-text {
     font-weight: 900 !important; 
-    letter-spacing: 1px;
+    letter-spacing: 2px;
 }
 
 .status-box .box-value {
