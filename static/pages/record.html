@@ -201,8 +201,15 @@
         transition: all 0.3s ease;
     }
     .side-match-item:hover { background: rgba(255, 255, 255, 0.08); transform: translateX(5px); }
-    .side-match-item .m-title { font-weight: 800; color: #fff; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .side-match-item .m-meta { font-size: 0.7rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .side-match-item .m-title { font-weight: 800; color: #fff; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px;}
+    .side-match-item .m-meta { font-size: 0.7rem; color: var(--text-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 2px; }
+    .side-match-item .m-meta i {
+    color: var(--accent-gold); /* Icon 統一使用金色，呼應歷史紀錄 UI */
+    width: 12px;
+    text-align: center;
+    opacity: 0.8;
+}
+    
     
     .m-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 4px; align-self: flex-start; }
     .tag-good { color: #a8dadc; background: rgba(69, 123, 157, 0.2); border: 1px solid rgba(69, 123, 157, 0.3); }
