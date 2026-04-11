@@ -224,18 +224,18 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
 **/
 // 🟢 自動更新所有玩家列的編號
 // 🟢 1. 新增或更新編號的函式
-
-    
-window.addPlayerRow = (data = null) => {
-    const list = document.getElementById('players-list');
-    const row = document.createElement('div');
-    const updateRowNumbers = () => {
+windwo.updateRowNumbers = () => {
     const rows = document.querySelectorAll('.player-row');
     rows.forEach((row, index) => {
         const numEl = row.querySelector('.row-index');
         if (numEl) numEl.innerText = index + 1; // 顯示 1, 2, 3...
     });
 };
+    
+window.addPlayerRow = (data = null) => {
+    const list = document.getElementById('players-list');
+    const row = document.createElement('div');
+  
     
     // 電腦版使用 sm:grid-cols-12 分配比例 (3:2:2:2:2:1)
     row.className = "player-row grid grid-cols-2 sm:grid-cols-12 gap-2 p-3 sm:p-2 bg-slate-800/40 rounded-xl sm:rounded-lg border border-slate-700 sm:border-slate-800/50 items-center";
@@ -274,7 +274,7 @@ window.addPlayerRow = (data = null) => {
             </select>
         </div>
         <div class="col-span-2 sm:col-span-1 flex justify-end sm:justify-center">
-            <button type="button" class="text-slate-600 hover:text-red-500 p-2" onclick="if(confirm('確定刪除？')){this.closest('.player-row').remove(); updateRowNumbers(); saveDraft();}">
+            <button type="button" class="text-slate-600 hover:text-red-500 p-2" onclick="if(confirm('確定刪除？')){this.closest('.player-row').remove(); window.updateRowNumbers(); saveDraft();}">
                 <i class="fa-solid fa-trash-can"></i>
             </button>
         </div>
