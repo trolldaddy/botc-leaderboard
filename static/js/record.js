@@ -206,13 +206,9 @@ const loadRecentMatches = async () => {
     }
     if (dateMatch) document.getElementById('match-date').value = dateMatch[1];
     if (winnerMatch) {
-        const winnerText = winnerMatch[1].trim();
-        const teamSelect = document.getElementById('match-winner'); // 確保 ID 與 HTML 一致
-        if (winnerText.includes("善良")) {
-            teamSelect.value = "good";
-        } else if (winnerText.includes("邪惡")) {
-            teamSelect.value = "evil";
-        }
+        const winnerText = winnerMatch[1];
+        const teamVal = winnerText.includes("善良") ? "good" : (winnerText.includes("邪惡") ? "evil" : "");
+        safeSet('match-winner', teamVal); // 使用你剛才傳給我的 ID
     }
     
     // 2. 玩家狀態解析
