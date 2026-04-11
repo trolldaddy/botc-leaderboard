@@ -338,9 +338,17 @@ html, body {
         margin-bottom: 0;
    
     }
+    #record-form .card:last-of-type > .mt-6 {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        margin-top: 0; /* 視情況調整原本的 mt-6 */
+    }
 
     /* 7. 內部的列表開啟捲動 */
     #players-list {
+        flex: 1;
         overflow-y: auto !important;
         padding: 15px 5px;
     }
