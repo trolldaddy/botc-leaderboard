@@ -222,7 +222,16 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         list.appendChild(row);
     };
 **/
-
+// 🟢 自動更新所有玩家列的編號
+// 🟢 1. 新增或更新編號的函式
+const updateRowNumbers = () => {
+    const rows = document.querySelectorAll('.player-row');
+    rows.forEach((row, index) => {
+        const numEl = row.querySelector('.row-index');
+        if (numEl) numEl.innerText = index + 1; // 顯示 1, 2, 3...
+    });
+};
+    
 window.addPlayerRow = (data = null) => {
     const list = document.getElementById('players-list');
     const row = document.createElement('div');
@@ -233,7 +242,11 @@ window.addPlayerRow = (data = null) => {
     const alignment = data?.alignment || getAlignmentByRole(data?.final_character);
     
     row.innerHTML = `
-        <div class="col-span-2 sm:col-span-3">
+        <div class="hidden sm:flex sm:col-span-1 justify-center items-center font-mono text-gold font-bold">
+            <span class="row-index">0</span>
+        </div>    
+       
+        <div class="col-span-2 sm:col-span-2">
             <label class="sm:hidden text-[10px] text-slate-500 mb-1 block">玩家暱稱</label>
             <input type="text" class="p-name w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-yellow-500" list="player-names-list" value="${data?.name || ''}" placeholder="暱稱" oninput="saveDraft()">
         </div>
@@ -266,6 +279,7 @@ window.addPlayerRow = (data = null) => {
         </div>
     `;
     list.appendChild(row);
+    updateRowNumbers();
 };
 
     document.getElementById('record-form')?.addEventListener('submit', async (e) => {
