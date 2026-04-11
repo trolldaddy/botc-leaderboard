@@ -186,43 +186,69 @@ const loadRecentMatches = async () => {
 
     window.clearFullForm = () => { if (confirm("確定清空嗎？")) { localStorage.removeItem('botc_record_draft'); location.reload(); } };
 
-    window.autoFillFromLog = () => {
-        const text = document.getElementById('log-input').value;
-        if (!text.trim()) return;
-        const scriptMatch = text.match(/劇本名稱：(.+)/);
-        const locationMatch = text.match(/遊戲地點：(.+)/);
-        const dateMatch = text.match(/遊戲日期：(\d{4}-\d{2}-\d{2})/);
-        if (scriptMatch) document.getElementById('match-script').value = scriptMatch[1].trim();
-        
-        if (locationMatch) {
-            const locVal = locationMatch[1].trim();
-            const locSelect = document.getElementById('match-location');
-            // 如果解析的地點在選單中就選取，否則預設為「其他」
-            const exists = Array.from(locSelect.options).some(opt => opt.value === locVal);
-            locSelect.value = exists ? locVal : "其他";
-        }
+ window.autoFillFromLog = () => {
+    const text = document.getElementById('log-input').value;
+    if (!text.trim()) return;
 
-        if (dateMatch) document.getElementById('match-date').value = dateMatch[1];
-        const blocks = text.split('【當前玩家狀態】');
-        if (blocks.length < 2) return;
-        const firstBlock = blocks[1]; const lastBlock = blocks[blocks.length - 1]; 
-        const rowRegex = /\[(\d+)號\]\s+(.+?)\s+-\s+\(([^)]+)\)\s+(.+)/g;
-        const playerMap = {};
+    // 1. 基礎資訊解析
+    const scriptMatch = text.match(/劇本名稱：(.+)/);
+    const locationMatch = text.match(/遊戲地點：(.+)/);
+    const dateMatch = text.match(/遊戲日期：(\d{4}-\d{2}-\d{2})/);
+    
+    if (scriptMatch) document.getElementById('match-script').value = scriptMatch[1].trim();
+    if (locationMatch) {
+        const locSelect = document.getElementById('match-location');
+        const locVal = locationMatch[1].trim();
+        const exists = Array.from(locSelect.options).some(opt => opt.value === locVal);
+        locSelect.value = exists ? locVal : "其他";
+    }
+    if (dateMatch) document.getElementById('match-date').value = dateMatch[1];
+
+    // 2. 玩家狀態解析
+    const blocks = text.split('【當前玩家狀態】');
+    if (blocks.length < 2) return;
+
+    // 🔴 修正後的正則：更寬鬆的空格匹配，並將暱稱 (.*) 設為貪婪匹配
+    // [ID號] 狀態 - (角色) 暱稱
+    const rowRegex = /\[(\d+)號\]\s*(.*?)\s*-\s*\((.*?)\)\s*(.*)/g;
+    const playerMap = {};
+
+    // 遍歷所有狀態區塊（從初始到結尾），確保資料更新
+    blocks.forEach((block) => {
         let m;
-        while ((m = rowRegex.exec(firstBlock)) !== null) {
-            playerMap[m[1]] = { name: m[4].trim(), initial_character: m[3].trim(), final_character: m[3].trim(), survived: true };
-        }
-        rowRegex.lastIndex = 0;
-        while ((m = rowRegex.exec(lastBlock)) !== null) {
+        rowRegex.lastIndex = 0; // 重置正則索引
+        while ((m = rowRegex.exec(block)) !== null) {
             const id = m[1];
-            if (playerMap[id]) {
-                playerMap[id].final_character = m[3].trim();
-                playerMap[id].survived = !m[2].includes("死亡");
+            const status = m[2].trim();
+            const role = m[3].trim();
+            const name = m[4].trim();
+
+            if (!playerMap[id]) {
+                playerMap[id] = { 
+                    name: name, 
+                    initial_character: role, 
+                    final_character: role, 
+                    survived: !status.includes("死亡") 
+                };
+            } else {
+                // 🟢 關鍵修正：如果當前區塊有抓到暱稱，就更新它
+                if (name) playerMap[id].name = name;
+                // 以最後出現的角色作為最終角色，最後出現的狀態作為最終狀態
+                playerMap[id].final_character = role;
+                playerMap[id].survived = !status.includes("死亡");
             }
         }
-        renderPlayersFromData(Object.values(playerMap));
+    });
+
+    // 3. 渲染至畫面
+    const players = Object.values(playerMap);
+    if (players.length > 0) {
+        renderPlayersFromData(players);
+        // 如果你有實作自動編號，記得在這裡觸發一次
+        if (window.updateRowNumbers) window.updateRowNumbers();
         saveDraft();
-    };
+    }
+};
 /**
      window.addPlayerRow = (data = null) => {
         const list = document.getElementById('players-list');
