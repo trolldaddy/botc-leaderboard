@@ -84,6 +84,9 @@ const loadRecentMatches = async () => {
                                 <span><i class="fa-solid fa-users"></i> ${m.players ? m.players.length : 0} 人</span>
                                 <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
                             </div>
+                            <div class="m-meta">
+                                <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
+                            </div>
                             <div class="m-tag ${isGood ? 'tag-good' : 'tag-evil'}">
                                 ${isGood ? '善良獲勝' : '邪惡獲勝'}
                             </div>
