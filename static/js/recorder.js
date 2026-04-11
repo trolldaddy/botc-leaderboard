@@ -584,7 +584,7 @@ const App = () => {
   const triggerExportSelection = () => {
   setModalConfig({
     isOpen: true,
-    type: 'confirm', // 借用 confirm 的版型
+    type: 'export', // 借用 confirm 的版型
     message: "請選擇對局結果以完成匯出：",
     onConfirm: null // 這裡改用下方的自訂按鈕
   });
@@ -1000,7 +1000,9 @@ const App = () => {
       {modalConfig.isOpen && (
   <div className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm">
     <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl flex flex-col gap-4">
-      <div className="flex items-center gap-3 mb-2">
+    {modalConfig.type === 'export' ? (
+        <>  
+    <div className="flex items-center gap-3 mb-2">
         <span className="text-xl">📥</span>
         <h3 className="text-slate-200 font-black">匯出對局紀錄</h3>
       </div>
@@ -1030,6 +1032,28 @@ const App = () => {
           取消，回到對局
         </button>
       </div>
+          </>
+      ) : (
+        /* 🔵 情況 B：一般確認或警告視窗 (重置、刪除等) */
+        <>
+        <p className="text-slate-200 text-sm leading-relaxed whitespace-pre-wrap font-bold">
+            {modalConfig.message}
+          </p>
+          <div className="flex justify-end gap-3 mt-2">
+            {modalConfig.type === 'confirm' && (
+              <button onClick={closeModal} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all">
+                取消
+              </button>
+            )}
+            <button 
+              onClick={() => { if (modalConfig.onConfirm) modalConfig.onConfirm(); closeModal(); }}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all"
+            >
+              確定
+            </button>
+          </div>
+        </>
+      )}
     </div>
   </div>
 )}
