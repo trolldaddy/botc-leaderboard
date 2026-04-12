@@ -52,7 +52,7 @@
     </div>
 
     <!-- 歷史清單容器 -->
-    <div id="history-list-area" style="overflow-y:auto;"></div>
+    <div id="history-list-area"></div>
 </div>
 
 <style>
@@ -69,7 +69,7 @@
     .match-history-card { 
         background: rgba(30, 30, 35, 0.5); border: 1px solid var(--border-color); 
         border-radius: 16px; margin-bottom: 1rem; width: 100%; 
-        max-width: 100%; overflow: hidden; /* 關鍵：隔離內部溢出 */
+        max-width: 100%; overflow: auto; /* 關鍵：隔離內部溢出 */
         transition: all 0.2s ease; display: flex; flex-direction: column;
     }
     
