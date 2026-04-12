@@ -123,6 +123,34 @@
         .match-result-badge { width: 100%; order: 5; margin-top: 5px; }
         .hidden-mobile { display: none; }
     }
+    /* 專屬於歷史頁面的局部捲動修正 */
+
+/* 1. 針對主容器進行修正：確保當此頁面載入時，父層容器允許捲動 */
+.main-content {
+    overflow-y: auto !important; /* 強制開啟垂直捲動 */
+    max-height: calc(100vh - 80px); /* 減去頂部導覽列的高度，請依實際情況微調 */
+    display: flex;
+    flex-direction: column;
+}
+
+/* 2. 歷史紀錄容器：確保它能向外撐開或在內部捲動 */
+.history-container {
+    flex: 1; 
+    overflow-y: visible; /* 讓內容流動 */
+    padding-bottom: 100px; /* 留白確保底部不會被切掉 */
+}
+
+/* 3. 美化歷史頁面的捲動軸（選用，增加高級感） */
+.main-content::-webkit-scrollbar {
+    width: 6px;
+}
+.main-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+.main-content::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3); /* 你的靛藍主題色 */
+    border-radius: 10px;
+}
 </style>
 
 <script src="/js/history.js"></script>
