@@ -69,7 +69,7 @@
     .match-history-card { 
         background: rgba(30, 30, 35, 0.5); border: 1px solid var(--border-color); 
         border-radius: 16px; margin-bottom: 1rem; width: 100%; 
-        max-width: 100%; overflow: auto; /* 關鍵：隔離內部溢出 */
+        max-width: 100%; overflow: hidden; /* 關鍵：隔離內部溢出 */
         transition: all 0.2s ease; display: flex; flex-direction: column;
     }
     
@@ -125,30 +125,49 @@
     }
     /* 專屬於歷史頁面的局部捲動修正 */
 
-/* 1. 針對主容器進行修正：確保當此頁面載入時，父層容器允許捲動 */
+/* 🟢 1. 修正主內容區：禁止全域捲動，改為內部控制 */
 .main-content {
-    overflow-y: auto !important; /* 強制開啟垂直捲動 */
-    max-height: calc(100vh - 80px); /* 減去頂部導覽列的高度，請依實際情況微調 */
+    overflow: hidden !important; 
     display: flex;
     flex-direction: column;
 }
 
-/* 2. 歷史紀錄容器：確保它能向外撐開或在內部捲動 */
+/* 🟢 2. 歷史容器：撐滿剩餘空間並改為 Flex 佈局 */
 .history-container {
-    flex: 1; 
-    overflow-y: visible; /* 讓內容流動 */
-    padding-bottom: 100px; /* 留白確保底部不會被切掉 */
+    display: flex !important;
+    flex-direction: column !important;
+    /* 這裡的高度計算需扣除頂部 Header 的高度 (假設約 100px) */
+    height: calc(100vh - 100px) !important; 
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    overflow: hidden; /* 禁止容器本身出現雙捲動條 */
 }
 
-/* 3. 美化歷史頁面的捲動軸（選用，增加高級感） */
-.main-content::-webkit-scrollbar {
+/* 🟢 3. 統計看板：固定在上方，禁止收縮 */
+.summary-card {
+    flex-shrink: 0 !important; /* 強制不參與彈性收縮 */
+    margin-bottom: 1rem !important;
+}
+
+/* 🔴 4. 戰績清單區域：設定為唯一可捲動的範圍 */
+#history-list-area {
+    flex: 1 !important;        /* 自動填滿剩餘高度 */
+    overflow-y: auto !important; /* 只有這裡會出現捲動條 */
+    padding-right: 8px;          /* 預留位置給捲動軸，防止卡片被遮擋 */
+    padding-bottom: 3rem;        /* 底部留白，避免最後一張卡片貼齊底部 */
+}
+
+/* 🟢 5. 美化戰績區捲動軸 (讓它只出現在清單右側) */
+#history-list-area::-webkit-scrollbar {
     width: 6px;
 }
-.main-content::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.1);
+#history-list-area::-webkit-scrollbar-track {
+    background: transparent;
 }
-.main-content::-webkit-scrollbar-thumb {
-    background: rgba(99, 102, 241, 0.3); /* 你的靛藍主題色 */
+#history-list-area::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3); /* 你的主題靛藍色 */
     border-radius: 10px;
 }
 </style>
