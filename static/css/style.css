@@ -416,16 +416,30 @@ html, body {
 
     /* 2. 🔴 強制找回按鈕：給予顯眼顏色 */
     .hamburger-btn {
-        display: block !important;
+    display: flex !important;
+        align-items: center !important;
+        gap: 10px !important; /* 文字與圖示的間距 */
         background: transparent !important;
         border: none !important;
-        color: var(--accent-gold) !important; /* 金色圖示 */
-        font-size: 1.6rem !important;
+        color: var(--accent-gold) !important;
         cursor: pointer !important;
         z-index: 1001 !important;
-        padding: 5px !important;
     }
-
+    .menu-hint {
+        font-size: 0.7rem !important;
+        font-weight: bold !important;
+        letter-spacing: 1px;
+        opacity: 0.9;
+        /* 增加一點呼吸感 */
+        border: 1px solid rgba(241, 196, 15, 0.3);
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: rgba(241, 196, 15, 0.1);
+    }
+    .hamburger-btn i {
+        font-size: 1.4rem !important;
+        line-height: 1;
+    }
     /* 3. 🟢 書籤式選單佈局 */
   .nav-links {
         position: fixed !important;
