@@ -101,11 +101,33 @@
                     const page = e.currentTarget.getAttribute('data-page');
                     loadPage(page);
                     window.location.hash = page;
-                });
-            });
-/* 🟢 電腦版隱藏漢堡按鈕 */
 
-           
+                    const navMenu = document.getElementById('main-nav');
+                    if (navMenu.classList.contains('active')) {
+                        navMenu.classList.remove('active');
+                    }
+              });
+            });
+const menuBtn = document.getElementById('mobile-menu-btn');
+    const navMenu = document.getElementById('main-nav');
+
+    if (menuBtn && navMenu) {
+        menuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navMenu.classList.toggle('active');
+        });
+    }
+
+    // 點擊空白處關閉選單
+    document.addEventListener('click', (e) => {
+        if (navMenu && navMenu.classList.contains('active') && !navMenu.contains(e.target)) {
+            navMenu.classList.remove('active');
+        }
+    });
+
+    const hash = window.location.hash.replace('#', '');
+    loadPage(hash || 'dashboard');
+});            
     </script>
 </body>
 </html>
