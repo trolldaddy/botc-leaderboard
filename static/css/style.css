@@ -412,22 +412,33 @@ html, body {
         display: block !important; /* 🟢 手機版才顯示漢堡按鈕 */
     }
 
-    .nav-links {
-        /* 🟢 改為側邊滑出樣式 */
-        display: none !important; /* 預設隱藏，待 active 類名觸發 */
+  .nav-links {
         position: fixed;
+        right: -100%; /* 預設藏在右側 */
         top: 0;
-        right: -100%;
         width: 250px;
         height: 100vh;
-        background: var(--bg-card);
-        flex-direction: column;
-        transition: right 0.3s ease;
+        background: #1e1e23; /* 配合你的深色背景 */
+        transition: 0.3s ease;
         z-index: 9999;
+        display: flex !important;
+        flex-direction: column;
+        padding-top: 60px;
     }
 
     .nav-links.active {
         display: flex !important; /* 點擊後顯示 */
         right: 0;
+    }
+    /* 遮罩層樣式 */
+    .menu-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        display: none;
+        z-index: 9998;
+    }
+    .menu-overlay.active {
+        display: block;
     }
 }
