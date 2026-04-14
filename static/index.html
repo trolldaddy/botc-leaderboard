@@ -105,68 +105,7 @@
             });
 /* 🟢 電腦版隱藏漢堡按鈕 */
 
-.hamburger-btn {
-    display: none !important;
-}
-        
-/* 🟢 手機版 (767px 以下) */
-@media (max-width: 767px) {
-    /* 修正頂部列佈局：讓標題靠左，漢堡靠右 */
-    .sidebar {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        padding: 0.5rem 1rem !important;
-        width: 100% !important;
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        z-index: 1000;
-        background: var(--bg-card); /* 確保背景色一致 */
-    }
-
-    /* 🔴 找回按鈕：強制顯示並設定醒目顏色 */
-    .hamburger-btn {
-        display: block !important;
-        background: transparent;
-        border: none;
-        color: var(--accent-gold) !important; /* 改用金邊色確保看得到 */
-        font-size: 1.5rem !important;
-        cursor: pointer;
-        z-index: 10001;
-        outline: none;
-    }
-
-    /* 🟢 書籤式選單設計 (寬度約 30%) */
-    .nav-links {
-        position: fixed !important;
-        right: -35% !important; /* 預設完全藏在右邊 */
-        top: 0;
-        width: 30% !important;   /* 書籤寬度 */
-        height: 100vh;
-        background: rgba(30, 30, 35, 0.98) !important;
-        display: flex !important;
-        flex-direction: column;
-        padding: 80px 0.2rem 1rem 0.2rem !important;
-        z-index: 9999 !important;
-        transition: right 0.3s ease;
-        border-left: 2px solid var(--accent-purple); /* 書籤邊緣飾條 */
-        box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-    }
-
-    .nav-links.active {
-        right: 0 !important;
-    }
-
-    /* 書籤內的連結：隱藏文字，只留圖示與小標籤 */
-    .nav-links li a span {
-        font-size: 10px !important;
-        display: block !important;
-        text-align: center;
-    }
-}
-
-            
+           
     </script>
 </body>
 </html>
