@@ -391,11 +391,69 @@ html, body {
     background: #ffd700; /* 滑鼠移上去時變亮 */
 }
 
-/* 🟢 預設隱藏漢堡按鈕 (電腦版) */
-.hamburger-btn {
-    display: none !important;
+/* 🟢 1. 桌機與平板版 (>= 768px) 的佈局修正 */
+@media (min-width: 768px) {
+    /* 讓 sidebar 變成一個水準容器，雖然 nav-links 是它的兄弟 */
+    .sidebar {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 0 2rem !important;
+        height: 60px !important;
+        width: 100% !important;
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        z-index: 10010 !important;
+        background: var(--bg-card); /* 恢復原本的背景色 */
+    }
+
+    /* 🔴 關鍵修正：將脫隊的 nav-links 定位回 sidebar 上 */
+    .nav-links {
+        display: flex !important;
+        position: fixed !important;
+        top: 0 !important;
+        right: 2rem !important; /* 靠右對齊 */
+        height: 60px !important;
+        
+        /* 恢復桌機版外觀 */
+        transform: none !important; 
+        opacity: 1 !important;
+        flex-direction: row !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        z-index: 10011 !important; /* 確保在背景條之上 */
+        width: auto !important;
+        min-width: 0 !important;
+        pointer-events: auto !important; /* 確保可以點擊 */
+    }
+
+    .nav-links li {
+        display: flex;
+        align-items: center;
+        height: 100%;
+        margin: 0 !important;
+    }
+
+    .nav-links li a {
+        padding: 0 1rem !important;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem !important;
+        color: var(--text-muted);
+        white-space: nowrap;
+    }
+
+    /* 平板/桌機版隱藏漢堡按鈕 */
+    .hamburger-btn {
+        display: none !important;
+    }
 }
 
+/* 🟢 2. 確保原本的手機版 (@media (max-width: 767px)) 邏輯不受影響 */
 @media (max-width: 767px) {
     /* 1. 導覽列：確保標題在左，漢堡在右 */
     .sidebar {
