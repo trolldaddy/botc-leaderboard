@@ -408,10 +408,11 @@ html, body {
         position: fixed !important;
         top: 0;
         left: 0;
-        z-index: 10001; /* 確保在最前方 */
-        background: rgba(15, 15, 20, 0.98) !important;
+        z-index: 10010; /* 確保在最前方 */
+        background: rgba(15, 15, 20, 1) !important;
         backdrop-filter: blur(15px);
         border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     }
 
     /* 2. 🔴 強制找回按鈕：給予顯眼顏色 */
@@ -443,7 +444,7 @@ html, body {
     /* 3. 🟢 書籤式選單佈局 */
   .nav-links {
         position: fixed !important;
-        top: 60px !important;       /* 從導覽列下方開始展開 */
+        top: 55px !important;       /* 從導覽列下方開始展開 */
         right: 1.2rem !important;    /* 靠右對齊漢堡按鈕 */
 
         /* 🔴 關鍵修正：使用 clamp 或是同時設定 width 與 min-width */
@@ -462,7 +463,7 @@ html, body {
         flex-direction: column;
         padding: 1rem 0.5rem !important;
         
-        z-index: 10000 !important;
+        z-index: 10005 !important;
         /* 動態效果：改為垂直方向的緩動 */
         transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), 
                     opacity 0.3s ease !important;
