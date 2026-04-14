@@ -119,7 +119,21 @@
 
     if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', toggleMenu); // 點擊陰影處可收起選單
+            document.querySelectorAll('#main-nav a').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
             
+            // 執行換頁
+            const page = e.currentTarget.getAttribute('data-page');
+            loadPage(page);
+            window.location.hash = page;
+
+            // 🔴 重點：點擊後立即關閉手機版選單
+            if (navMenu.classList.contains('active')) {
+                toggleMenu();
+            }
+        });
+    });
             const hash = window.location.hash.replace('#', '');
             loadPage(hash || 'dashboard');
         });
