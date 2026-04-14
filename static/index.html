@@ -107,32 +107,38 @@
     const menuBtn = document.getElementById('mobile-menu-btn');
     const navMenu = document.getElementById('main-nav'); // 對接你的 id="main-nav"
     
-    // 自動建立手機版遮罩層
-    const overlay = document.createElement('div');
-    overlay.className = 'menu-overlay';
-    document.body.appendChild(overlay);
-
-    const toggleMenu = () => {
+const toggleMenu = () => {
         navMenu.classList.toggle('active');
-        overlay.classList.toggle('active');
     };
 
-    if (menuBtn) menuBtn.addEventListener('click', toggleMenu);
-    overlay.addEventListener('click', toggleMenu); // 點擊陰影處可收起選單
-            document.querySelectorAll('#main-nav a').forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // 執行換頁
-            const page = e.currentTarget.getAttribute('data-page');
-            loadPage(page);
-            window.location.hash = page;
+    if (menuBtn) menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // 防止點擊事件冒泡
+        toggleMenu();
+    });
 
-            // 🔴 重點：點擊後立即關閉手機版選單
-            if (navMenu.classList.contains('active')) {
-                toggleMenu();
-            }
-        });
+    // 處理導航點擊換頁
+    navMenu.addEventListener('click', (e) => {
+        const link = e.target.closest('a');
+        if (!link) return;
+
+        e.preventDefault();
+        const page = link.getAttribute('data-page');
+        if (!page) return;
+
+        loadPage(page);
+        window.location.hash = page;
+
+        // 🟢 換頁後自動收回書籤選單
+        if (navMenu.classList.contains('active')) {
+            toggleMenu();
+        }
+    });
+
+    // 點擊選單以外的區域自動收回
+    document.addEventListener('click', (e) => {
+        if (navMenu.classList.contains('active') && !navMenu.contains(e.target) && e.target !== menuBtn) {
+            toggleMenu();
+        }
     });
             const hash = window.location.hash.replace('#', '');
             loadPage(hash || 'dashboard');
