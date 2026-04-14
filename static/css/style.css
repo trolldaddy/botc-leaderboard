@@ -390,3 +390,64 @@ html, body {
 #players-list::-webkit-scrollbar-thumb:hover {
     background: #ffd700; /* 滑鼠移上去時變亮 */
 }
+
+/* 🟢 漢堡按鈕樣式 (電腦版隱藏) */
+.hamburger-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+/* 🟢 手機版響應式設定 */
+@media (max-width: 768px) {
+    .hamburger-btn {
+        display: block; /* 顯示漢堡按鈕 */
+    }
+
+    .nav-links {
+        /* 🔴 關鍵：改為固定定位的側邊選單 */
+        position: fixed;
+        top: 0;
+        right: -100%; /* 預設在螢幕外 */
+        width: 250px;
+        height: 100vh;
+        background: var(--bg-card); /* 使用你原本的深色背景 */
+        flex-direction: column;
+        padding: 2rem 1rem;
+        gap: 1rem;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+        transition: right 0.3s ease; /* 展開動畫 */
+        z-index: 9999;
+        display: flex !important; /* 強制覆蓋原本的 display 設定 */
+    }
+
+    /* 顯示選單時的狀態 */
+    .nav-links.active {
+        right: 0;
+    }
+
+    .nav-item {
+        width: 100%;
+        padding: 1rem;
+        border-radius: 12px;
+        justify-content: flex-start;
+        font-size: 1rem !important;
+    }
+
+    /* 手機版遮罩層 (點擊選單外可關閉) */
+    .menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0,0,0,0.6);
+        display: none;
+        z-index: 9998;
+    }
+    .menu-overlay.active { display: block; }
+}
