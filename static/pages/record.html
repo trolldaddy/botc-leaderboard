@@ -57,110 +57,77 @@
             </div>
         </div>
 
-        <form id="record-form">
-            <!-- 2. 基礎資訊卡片：三欄式排版 -->
-            <div class="card" style="margin-bottom: 1.5rem;">
-                <div class="card-header"><h3><i class="fa-solid fa-info-circle"></i> 對局基礎資訊</h3></div>
-                
-                <!-- 第一排：劇本、時間、地點 (改為下拉選單) -->
-                <div class="form-grid-3" style="margin-top: 1.2rem;">
-                    <div class="form-group">
-                        <label>劇本名稱</label>
-                        <input type="text" id="match-script" class="form-control dark-input" placeholder="例如：暗流湧動" required oninput="saveDraft()">
-                    </div>
-                    <div class="form-group">
-                        <label>對局日期</label>
-                        <input type="date" id="match-date" class="form-control dark-input" required oninput="saveDraft()">
-                    </div>
-                    <div class="form-group">
-                        <label>遊戲地點</label>
-                        <select id="match-location" class="form-control dark-input" oninput="saveDraft()">
-                            <option value="拉普拉斯">拉普拉斯</option>
-                            <option value="線上">線上</option>
-                            <option value="台北">台北</option>
-                            <option value="新北">新北</option>
-                            <option value="桃園">桃園</option>
-                            <option value="台中">台中</option>
-                            <option value="台南">台南</option>
-                            <option value="高雄">高雄</option>
-                            <option value="其他">其他</option>
-                        </select>
-                    </div>
+       <form id="record-form">
+    {/* 🟢 合併後的大型錄入卡片 */}
+    <div class="card merged-record-card">
+        
+        {/* 1. 對局基礎資訊：改為更緊湊的橫向排版 */}
+        <div class="sub-section info-section">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-circle-info text-purple"></i> 對局基礎資訊</h3>
+            </div>
+            
+            <div class="form-grid-compact" style="margin-top: 1rem;">
+                <div class="form-group">
+                    <label>劇本名稱</label>
+                    <input type="text" id="match-script" class="form-control dark-input" placeholder="例如：暗流湧動" required oninput="saveDraft()">
                 </div>
-
-                <!-- 第二排：獲勝陣營、說書人、管理密碼 -->
-                <div class="form-grid-3" style="margin-top: 1.2rem;">
-                    <div class="form-group">
-                        <label>獲勝陣營</label>
-                        <select id="match-winner" class="form-control dark-input" oninput="saveDraft()">
-                            <option value="good">善良陣營 Good</option>
-                            <option value="evil">邪惡陣營 Evil</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>說書人</label>
-                        <input type="text" id="match-storyteller" class="form-control dark-input" placeholder="說書人暱稱" oninput="saveDraft()">
-                    </div>
-                    <div class="form-group">
-                        <label>管理員密碼</label>
-                        <input type="password" id="admin-password" class="form-control dark-input" placeholder="••••" required>
-                    </div>
+                <div class="form-group">
+                    <label>對局日期</label>
+                    <input type="date" id="match-date" class="form-control dark-input" required oninput="saveDraft()">
+                </div>
+                <div class="form-group">
+                    <label>遊戲地點</label>
+                    <select id="match-location" class="form-control dark-input" oninput="saveDraft()">
+                        <option value="拉普拉斯">拉普拉斯</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>獲勝陣營</label>
+                    <select id="match-winner" class="form-control dark-input" oninput="saveDraft()">
+                        <option value="good">善良陣營 Good</option>
+                        <option value="evil">邪惡陣營 Evil</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>說書人</label>
+                    <input type="text" id="match-storyteller" class="form-control dark-input" placeholder="廚爹" oninput="saveDraft()">
+                </div>
+                <div class="form-group">
+                    <label>管理員密碼</label>
+                    <input type="password" id="admin-password" class="form-control dark-input" placeholder="••••" required>
                 </div>
             </div>
+        </div>
 
-            <!-- 3. 參與玩家卡片 -->
-            <div class="card">
-           <!---      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3><i class="fa-solid fa-users"></i> 參與玩家</h3>
-                    <button type="button" class="btn btn-blue-sm" onclick="addPlayerRow()">
-                        <i class="fa-solid fa-plus"></i> 添加玩家
-                    </button>
-                </div>
-                <div class="table-responsive-container">
-                    <table class="record-table">
-                        <thead>
-                            <tr>
-                                <th>玩家暱稱</th>
-                                <th>初始角色</th>
-                                <th>最終角色</th>
-                                <th>陣營</th>
-                                <th>狀態</th>
-                                <th style="width: 40px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="players-list"></tbody> 
+        {/* 2. 分隔線 */}
+        <div style="height: 1px; background: rgba(255,255,255,0.05); margin: 1.5rem 0;"></div>
 
-                        <div id="players-list" class="space-y-2"></div>
-                    </table>
-                </div>--->
-                <div class="mt-6">
-    <div class="flex justify-between items-end mb-4">
-        <h3 class="text-lg font-bold text-slate-200"><i class="fa-solid fa-users mr-2"></i>參與玩家</h3>
-        <button type="button" class="text-sm text-yellow-500 hover:text-yellow-400 font-bold" onclick="addPlayerRow()">+ 添加玩家</button>
-                </div>
+        {/* 3. 參與玩家：加入內部捲動區 */}
+        <div class="sub-section players-section">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3><i class="fa-solid fa-users text-purple"></i> 參與玩家</h3>
+                <button type="button" class="text-sm text-yellow-500 hover:text-yellow-400 font-bold" onclick="addPlayerRow()">+ 添加玩家</button>
+            </div>
 
+            {/* 欄位標題 */}
             <div class="hidden sm:grid sm:grid-cols-12 gap-2 px-4 mb-2 text-xs font-bold text-slate-500">
-                    <div class="sm:col-span-1 text-center">No.</div>    
-                    <div class="sm:col-span-2">玩家暱稱</div>
-                    <div class="sm:col-span-2">初始角色</div>
-                    <div class="sm:col-span-2">最終角色</div>
-                    <div class="sm:col-span-2">陣營</div>
-                    <div class="sm:col-span-2">狀態</div>
-                    <div class="sm:col-span-1 text-center">刪除</div>
-                    </div>
-
-                    <div id="players-list" class="space-y-3 sm:space-y-2">
-                    </div>
-            </div>
+                <div class="sm:col-span-1 text-center">No.</div>    
+                <div class="sm:col-span-2">玩家暱稱</div>
+                <div class="sm:col-span-2">初始角色</div>
+                <div class="sm:col-span-2">最終角色</div>
+                <div class="sm:col-span-2">陣營</div>
+                <div class="sm:col-span-2">狀態</div>
+                <div class="sm:col-span-1 text-center">刪除</div>
             </div>
 
-           <!---   <div class="submit-footer">
-                <div id="save-status" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem;">草稿已備份至本地</div>
-                <button type="submit" id="submit-btn" class="btn btn-submit-glow">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績
-                </button>
-            </div> --->
-        </form>
+            {/* 🔴 關鍵修正：玩家清單加入獨立捲動區，防止卡片撐太長 */}
+            <div id="players-list" class="space-y-2 scrollable-player-list">
+                </div>
+        </div>
+    </div>
+</form>
     </div>
 </div>
 
