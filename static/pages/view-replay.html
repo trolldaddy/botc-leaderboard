@@ -1,0 +1,45 @@
+<div class="view-replay-container">
+    <div class="replay-header">
+        <div class="title-group">
+            <h2 id="replay-title" style="font-family: 'Cinzel', serif; color: var(--accent-gold);">載入中...</h2>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">正在閱讀拉普拉斯魔典紀錄</p>
+        </div>
+        <button class="btn btn-outline" onclick="loadPage('history')">
+            <i class="fa-solid fa-rotate-left"></i> 返回歷史
+        </button>
+    </div>
+
+    <div class="replay-paper">
+        <pre id="replay-content" class="botc-log-style"></pre>
+    </div>
+</div>
+
+<script>
+    {
+        const data = JSON.parse(sessionStorage.getItem('current_replay_data') || '{}');
+        if (data.content) {
+            document.getElementById('replay-title').innerText = data.title;
+            document.getElementById('replay-content').innerText = data.content;
+        }
+    }
+</script>
+
+<style>
+    .view-replay-container { padding: 1rem; max-width: 900px; margin: 0 auto; }
+    .replay-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
+    .replay-paper { 
+        background: #0d0d12; 
+        border: 1px solid rgba(255,255,255,0.05); 
+        border-radius: 12px; 
+        padding: 2rem; 
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    }
+    .botc-log-style {
+        font-family: 'Inter', 'Monaco', monospace; /* 保持文字對齊 */
+        font-size: 0.9rem;
+        color: #b0b0b0;
+        line-height: 1.7;
+        white-space: pre-wrap; /* 自動換行且保留空白 */
+        tab-size: 4;
+    }
+</style>
