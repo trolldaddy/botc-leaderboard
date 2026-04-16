@@ -242,7 +242,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    ${m.players.map(p => `
+                                    ${m.players.map((p,idx) => `
                                         <tr>
                                             <td style="color:var(--accent-gold); font-family:monospace;">${p.seat_number || (idx + 1)}</td>
                                             <td style="font-weight:bold; color:#fff;">${p.player_name}</td>
