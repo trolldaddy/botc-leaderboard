@@ -25,33 +25,39 @@
 </script>
 
 <style>
- /* 1. 整個容器：確保在手機版有足夠的頂部間距，避免被瀏海遮到 */
+    /* 1. 整個容器：處理頂部被 Sidebar 擋住與底部被工作列擋住的問題 */
     .view-replay-container {
-        padding: 1rem;
+        padding: 0 1rem; /* 左右保留呼吸空間 */
         max-width: 1000px;
         margin: 0 auto;
-        height: 100vh; /* 🔴 關鍵：限制總高度為螢幕高度 */
+        
+        /* 🔴 關鍵修正：預留頂部 Sidebar 的 60px 空間 */
+        padding-top: 70px; 
+        
+        /* 🔴 關鍵修正：使用 100dvh (動態視窗高度) 解決底部被擋住的問題 */
+        height: 100dvh; 
         display: flex;
         flex-direction: column;
         box-sizing: border-box;
+        overflow: hidden; /* 防止整頁滾動，只讓內容區滾動 */
     }
 
-    /* 2. 標題列：設定為 Sticky 讓「返回按鈕」永遠停留在頂部 */
+    /* 2. 標題列：處理手機版重疊與按鈕位置 */
     .replay-header {
         position: sticky;
-        top: 0;
+        /* 🔴 關鍵：對齊到 Sidebar 下方而非螢幕頂部 */
+        top: 60px; 
         z-index: 100;
-        background: #0d0d12; /* 必須給背景色，否則捲動時文字會重疊 */
+        background: #0d0d12;
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        padding: 1rem 0;
-        margin-bottom: 0.5rem;
+        align-items: flex-end; /* 讓標題與按鈕底部對齊 */
+        padding: 10px 0 15px 0;
         border-bottom: 1px solid var(--border-color);
-        flex-shrink: 0; /* 防止標題被擠壓 */
+        flex-shrink: 0;
     }
 
-    /* 3. 內容紙張：設定自動捲軸 */
+    /* 3. 內容紙張：處理左右超出螢幕問題 */
     .replay-paper {
         background: #0d0d12;
         border: 1px solid rgba(255,255,255,0.05);
@@ -59,33 +65,46 @@
         padding: 1.5rem;
         box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         
-        /* 🔴 關鍵：讓內容區塊自動產生捲軸，且不撐開整個網頁 */
-        flex: 1; 
-        overflow-y: auto; 
-        margin-bottom: 1rem;
-        -webkit-overflow-scrolling: touch; /* 讓手機版捲動更滑順 */
+        flex: 1;
+        overflow-y: auto;
+        /* 🔴 關鍵：防止內容水平撐開容器 */
+        overflow-x: hidden; 
+        margin: 1rem 0;
+        -webkit-overflow-scrolling: touch;
     }
 
-    /* 4. 字體樣式調整  */
+    /* 4. 文字內容：處理長字串導致的水平溢出 */
     .botc-log-style {
         font-family: 'Inter', 'Monaco', monospace;
         font-size: 0.9rem;
         color: #b0b0b0;
         line-height: 1.7;
+        /* 🔴 關鍵：確保文字在窄螢幕也會自動換行 */
         white-space: pre-wrap;
+        word-break: break-all; 
         tab-size: 4;
         margin: 0;
     }
 
-    /* 5. 客製化捲動軸：讓網頁版也能看到漂亮的轉軸 */
-    .replay-paper::-webkit-scrollbar {
-        width: 8px;
-    }
-    .replay-paper::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.02);
-    }
-    .replay-paper::-webkit-scrollbar-thumb {
-        background: var(--accent-purple);
-        border-radius: 10px;
+    /* 5. 客製化捲動軸 (保持不變) */
+    .replay-paper::-webkit-scrollbar { width: 6px; }
+    .replay-paper::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 10px; }
+
+    /* 📱 手機版微調：處理左右超出與間距 */
+    @media (max-width: 767px) {
+        .view-replay-container {
+            padding: 0 0.5rem;
+            padding-top: 65px; /* 緊貼 Sidebar */
+        }
+        .replay-paper {
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+        .replay-header h2 {
+            font-size: 1.1rem !important; /* 防止標題太長擠壓按鈕 */
+        }
+        .botc-log-style {
+            font-size: 0.8rem; /* 窄螢幕稍微縮小字體 */
+        }
     }
 </style>
