@@ -1,7 +1,7 @@
 <div class="replay-master-container">
     <header class="replay-magic-header">
         <div class="title-wrapper">
-            <h2 id="replay-title" class="cinzel-font">召喚紀錄中...</h2>
+            <h2 id="replay-title" class="cinzel-font">正在召喚魔典...</h2>
             <div class="decorative-line">
                 <span class="dot"></span>
                 <span class="line"></span>
@@ -19,8 +19,37 @@
     </div>
 </div>
 
+<script>
+    // 🟢 核心修正：加入讀取邏輯
+    (function() {
+        // 從 sessionStorage 抓取由 history.js 存入的資料
+        const rawData = sessionStorage.getItem('current_replay_data');
+        
+        if (!rawData) {
+            document.getElementById('replay-title').innerText = "找不到魔典紀錄";
+            document.getElementById('replay-content').innerText = "請嘗試從歷史紀錄頁面重新點擊「查閱覆盤」。";
+            return;
+        }
+
+        try {
+            const data = JSON.parse(rawData);
+            
+            // 渲染標題與內容
+            if (data.title) {
+                document.getElementById('replay-title').innerText = data.title;
+            }
+            if (data.content) {
+                document.getElementById('replay-content').innerText = data.content;
+            }
+        } catch (e) {
+            console.error("解析紀錄資料失敗:", e);
+            document.getElementById('replay-title').innerText = "紀錄格式錯誤";
+        }
+    })();
+</script>
+
 <style>
-    /* 🔴 全域佈局優化 */
+    /* 延續之前的精緻樣式 */
     .replay-master-container {
         padding: 75px 1.5rem 2rem;
         max-width: 900px;
@@ -31,7 +60,6 @@
         box-sizing: border-box;
     }
 
-    /* 🔴 標題區美化 */
     .replay-magic-header {
         display: flex;
         justify-content: space-between;
@@ -41,7 +69,7 @@
     }
 
     .cinzel-font {
-        font-family: 'Cinzel', serif; /* 延續 Logo 字體 */
+        font-family: 'Cinzel', serif;
         color: var(--accent-gold);
         font-size: 1.6rem;
         margin: 0;
@@ -60,7 +88,6 @@
 
     .subtitle { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 3px; margin: 0; }
 
-    /* 🔴 神祕感按鈕 */
     .btn-return-magic {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(212, 175, 55, 0.3);
@@ -69,19 +96,13 @@
         border-radius: 50px;
         font-size: 0.8rem;
         cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.3s ease;
         display: flex;
         align-items: center;
         gap: 8px;
     }
-    .btn-return-magic:hover {
-        background: var(--accent-gold);
-        color: #000;
-        box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-        transform: translateY(-2px);
-    }
+    .btn-return-magic:hover { background: var(--accent-gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
 
-    /* 🔴 魔典紙張樣式 */
     .replay-scroll-paper {
         background: #0d0d12;
         border: 1px solid rgba(255,255,255,0.03);
@@ -89,14 +110,9 @@
         padding: 2.5rem;
         flex: 1;
         overflow-y: auto;
-        position: relative;
-        /* 增加邊框陰影讓它看起來有深度 */
-        box-shadow: 
-            inset 0 0 50px rgba(0,0,0,0.8),
-            0 10px 30px rgba(0,0,0,0.5);
+        box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5);
     }
 
-    /* 內容文字樣式優化 */
     .botc-classic-log {
         font-family: 'Inter', 'Monaco', monospace;
         font-size: 0.95rem;
@@ -106,13 +122,11 @@
         margin: 0;
     }
 
-    /* 🔴 捲動軸美化 (改為紫色細條) */
     .replay-scroll-paper::-webkit-scrollbar { width: 5px; }
     .replay-scroll-paper::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 10px; }
 
-    /* 📱 手機版 RWD 修正 */
     @media (max-width: 767px) {
-        .replay-master-container { padding-top: 70px; padding-left: 1rem; padding-right: 1rem; }
+        .replay-master-container { padding-top: 70px; }
         .replay-magic-header { flex-direction: column; gap: 1rem; }
         .cinzel-font { font-size: 1.2rem; }
         .replay-scroll-paper { padding: 1.5rem; }
