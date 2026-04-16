@@ -67,7 +67,8 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
             date=match_date,
             location=data.get("location", "未知"),
             storyteller=data.get("storyteller", "佚名"),
-            winning_team=data.get("winning_team", "good")
+            winning_team=data.get("winning_team", "good"),
+            replay_log=data.get("replay_log")
         )
         db.add(new_match)
         db.commit()
@@ -157,7 +158,7 @@ async def get_history(db: Session = Depends(get_db)):
     result = []
     for m in matches:
         m_data = {
-            "id": m.id, "script": m.script, "date": m.date, "location": m.location, "storyteller": m.storyteller, "winning_team": m.winning_team,
+            "id": m.id, "script": m.script, "date": m.date, "location": m.location, "storyteller": m.storyteller, "winning_team": m.winning_team,"replay_log": m.replay_log,
             "players": [{"player_name": p.player.name, "initial_character": p.initial_character, "final_character": p.final_character, "alignment": p.alignment, "survived": p.survived} for p in m.players]
         }
         result.append(m_data)
