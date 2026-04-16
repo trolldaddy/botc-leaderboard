@@ -158,7 +158,7 @@ async def get_history(db: Session = Depends(get_db)):
     
     result = []
     for m in matches:
-        sorted_players = sorted(m.players, key=lambda x: x.seat_number if x.seat_number else 0)
+        sorted_players = sorted(m.players, key=lambda x: x.seat_number if x.seat_number is not None else 99)
         m_data = {
             "id": m.id, "script": m.script, "date": m.date, "location": m.location, "storyteller": m.storyteller, "winning_team": m.winning_team,"replay_log": m.replay_log,
             "players": [{"player_name": p.player.name,"seat_number": p.seat_number, "initial_character": p.initial_character, "final_character": p.final_character, "alignment": p.alignment, "survived": p.survived} for p in sorted_players]
