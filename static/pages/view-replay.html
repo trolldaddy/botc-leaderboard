@@ -1,110 +1,121 @@
-<div class="view-replay-container">
-    <div class="replay-header">
-        <div class="title-group">
-            <h2 id="replay-title" style="font-family: 'Cinzel', serif; color: var(--accent-gold);">載入中...</h2>
-            <p style="font-size: 0.8rem; color: var(--text-muted);">正在閱讀拉普拉斯魔典紀錄</p>
+<div class="replay-master-container">
+    <header class="replay-magic-header">
+        <div class="title-wrapper">
+            <h2 id="replay-title" class="cinzel-font">召喚紀錄中...</h2>
+            <div class="decorative-line">
+                <span class="dot"></span>
+                <span class="line"></span>
+                <span class="dot"></span>
+            </div>
+            <p class="subtitle">拉普拉斯 · 血染魔典正式卷宗</p>
         </div>
-        <button class="btn btn-outline" onclick="loadPage('history')">
-            <i class="fa-solid fa-rotate-left"></i> 返回歷史
+        <button class="btn-return-magic" onclick="loadPage('history')">
+            <i class="fa-solid fa-book-bookmark"></i> 返回歷史紀錄
         </button>
-    </div>
+    </header>
 
-    <div class="replay-paper">
-        <pre id="replay-content" class="botc-log-style"></pre>
+    <div class="replay-scroll-paper">
+        <pre id="replay-content" class="botc-classic-log"></pre>
     </div>
 </div>
 
-<script>
-    {
-        const data = JSON.parse(sessionStorage.getItem('current_replay_data') || '{}');
-        if (data.content) {
-            document.getElementById('replay-title').innerText = data.title;
-            document.getElementById('replay-content').innerText = data.content;
-        }
-    }
-</script>
-
 <style>
-    /* 1. 整個容器：處理頂部被 Sidebar 擋住與底部被工作列擋住的問題 */
-    .view-replay-container {
-        padding: 0 1rem; /* 左右保留呼吸空間 */
-        max-width: 1000px;
+    /* 🔴 全域佈局優化 */
+    .replay-master-container {
+        padding: 75px 1.5rem 2rem;
+        max-width: 900px;
         margin: 0 auto;
-        
-        /* 🔴 關鍵修正：預留頂部 Sidebar 的 60px 空間 */
-        padding-top: 70px; 
-        
-        /* 🔴 關鍵修正：使用 100dvh (動態視窗高度) 解決底部被擋住的問題 */
-        height: 100dvh; 
+        height: 100dvh;
         display: flex;
         flex-direction: column;
         box-sizing: border-box;
-        overflow: hidden; /* 防止整頁滾動，只讓內容區滾動 */
     }
 
-    /* 2. 標題列：處理手機版重疊與按鈕位置 */
-    .replay-header {
-        position: sticky;
-        /* 🔴 關鍵：對齊到 Sidebar 下方而非螢幕頂部 */
-        top: 60px; 
-        z-index: 100;
-        background: #0d0d12;
+    /* 🔴 標題區美化 */
+    .replay-magic-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-end; /* 讓標題與按鈕底部對齊 */
-        padding: 10px 0 15px 0;
-        border-bottom: 1px solid var(--border-color);
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
         flex-shrink: 0;
     }
 
-    /* 3. 內容紙張：處理左右超出螢幕問題 */
-    .replay-paper {
-        background: #0d0d12;
-        border: 1px solid rgba(255,255,255,0.05);
-        border-radius: 12px;
-        padding: 1.5rem;
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-        
-        flex: 1;
-        overflow-y: auto;
-        /* 🔴 關鍵：防止內容水平撐開容器 */
-        overflow-x: hidden; 
-        margin: 1rem 0;
-        -webkit-overflow-scrolling: touch;
+    .cinzel-font {
+        font-family: 'Cinzel', serif; /* 延續 Logo 字體 */
+        color: var(--accent-gold);
+        font-size: 1.6rem;
+        margin: 0;
+        letter-spacing: 2px;
+        text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
     }
 
-    /* 4. 文字內容：處理長字串導致的水平溢出 */
-    .botc-log-style {
+    .decorative-line {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 8px 0;
+    }
+    .decorative-line .line { height: 1px; flex: 1; background: linear-gradient(90deg, transparent, var(--accent-gold), transparent); opacity: 0.5; }
+    .decorative-line .dot { width: 4px; height: 4px; background: var(--accent-gold); transform: rotate(45deg); }
+
+    .subtitle { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 3px; margin: 0; }
+
+    /* 🔴 神祕感按鈕 */
+    .btn-return-magic {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        color: var(--accent-gold);
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .btn-return-magic:hover {
+        background: var(--accent-gold);
+        color: #000;
+        box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        transform: translateY(-2px);
+    }
+
+    /* 🔴 魔典紙張樣式 */
+    .replay-scroll-paper {
+        background: #0d0d12;
+        border: 1px solid rgba(255,255,255,0.03);
+        border-radius: 12px;
+        padding: 2.5rem;
+        flex: 1;
+        overflow-y: auto;
+        position: relative;
+        /* 增加邊框陰影讓它看起來有深度 */
+        box-shadow: 
+            inset 0 0 50px rgba(0,0,0,0.8),
+            0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    /* 內容文字樣式優化 */
+    .botc-classic-log {
         font-family: 'Inter', 'Monaco', monospace;
-        font-size: 0.9rem;
-        color: #b0b0b0;
-        line-height: 1.7;
-        /* 🔴 關鍵：確保文字在窄螢幕也會自動換行 */
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: #d1d1d1;
         white-space: pre-wrap;
-        word-break: break-all; 
-        tab-size: 4;
         margin: 0;
     }
 
-    /* 5. 客製化捲動軸 (保持不變) */
-    .replay-paper::-webkit-scrollbar { width: 6px; }
-    .replay-paper::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 10px; }
+    /* 🔴 捲動軸美化 (改為紫色細條) */
+    .replay-scroll-paper::-webkit-scrollbar { width: 5px; }
+    .replay-scroll-paper::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 10px; }
 
-    /* 📱 手機版微調：處理左右超出與間距 */
+    /* 📱 手機版 RWD 修正 */
     @media (max-width: 767px) {
-        .view-replay-container {
-            padding: 0 0.5rem;
-            padding-top: 65px; /* 緊貼 Sidebar */
-        }
-        .replay-paper {
-            padding: 1rem;
-            margin: 0.5rem 0;
-        }
-        .replay-header h2 {
-            font-size: 1.1rem !important; /* 防止標題太長擠壓按鈕 */
-        }
-        .botc-log-style {
-            font-size: 0.8rem; /* 窄螢幕稍微縮小字體 */
-        }
+        .replay-master-container { padding-top: 70px; padding-left: 1rem; padding-right: 1rem; }
+        .replay-magic-header { flex-direction: column; gap: 1rem; }
+        .cinzel-font { font-size: 1.2rem; }
+        .replay-scroll-paper { padding: 1.5rem; }
+        .btn-return-magic { width: 100%; justify-content: center; }
     }
 </style>
