@@ -149,6 +149,7 @@ const loadRecentMatches = async () => {
         location: document.getElementById('match-location').value, 
         storyteller: document.getElementById('match-storyteller').value,
         winner: document.getElementById('match-winner').value,
+        replay_log: document.getElementById('log-input').value,
         // 🔴 關鍵修改：從 tr 改成 .player-row
         players: Array.from(document.querySelectorAll('.player-row')).map(row => ({
             name: row.querySelector('.p-name').value,
@@ -172,7 +173,9 @@ const loadRecentMatches = async () => {
         if (locSelect) {
             locSelect.value = data.location || "拉普拉斯";
         }
-
+        if (data.replay_log) {
+        document.getElementById('log-input').value = data.replay_log;
+        }
         document.getElementById('match-storyteller').value = data.storyteller || "";
         document.getElementById('match-winner').value = data.winner || "good";
         renderPlayersFromData(data.players || []);
@@ -353,6 +356,7 @@ window.addPlayerRow = (data = null) => {
             script: document.getElementById('match-script').value, date: document.getElementById('match-date').value,
             location: document.getElementById('match-location').value || "未知", storyteller: document.getElementById('match-storyteller').value,
             winning_team: document.getElementById('match-winner').value, password: password,
+            replay_log: document.getElementById('log-input').value,
             players: Array.from(document.querySelectorAll('.player-row')).map(row => ({
                 name: row.querySelector('.p-name').value.trim(), initial_character: row.querySelector('.p-initial').value.trim(),
                 final_character: row.querySelector('.p-final').value.trim(), alignment: row.querySelector('.p-team').value,
