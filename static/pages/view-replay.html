@@ -25,21 +25,67 @@
 </script>
 
 <style>
-    .view-replay-container { padding: 1rem; max-width: 900px; margin: 0 auto; }
-    .replay-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
-    .replay-paper { 
-        background: #0d0d12; 
-        border: 1px solid rgba(255,255,255,0.05); 
-        border-radius: 12px; 
-        padding: 2rem; 
-        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+ /* 1. 整個容器：確保在手機版有足夠的頂部間距，避免被瀏海遮到 */
+    .view-replay-container {
+        padding: 1rem;
+        max-width: 1000px;
+        margin: 0 auto;
+        height: 100vh; /* 🔴 關鍵：限制總高度為螢幕高度 */
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
     }
+
+    /* 2. 標題列：設定為 Sticky 讓「返回按鈕」永遠停留在頂部 */
+    .replay-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #0d0d12; /* 必須給背景色，否則捲動時文字會重疊 */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+        flex-shrink: 0; /* 防止標題被擠壓 */
+    }
+
+    /* 3. 內容紙張：設定自動捲軸 */
+    .replay-paper {
+        background: #0d0d12;
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        
+        /* 🔴 關鍵：讓內容區塊自動產生捲軸，且不撐開整個網頁 */
+        flex: 1; 
+        overflow-y: auto; 
+        margin-bottom: 1rem;
+        -webkit-overflow-scrolling: touch; /* 讓手機版捲動更滑順 */
+    }
+
+    /* 4. 字體樣式調整  */
     .botc-log-style {
-        font-family: 'Inter', 'Monaco', monospace; /* 保持文字對齊 */
+        font-family: 'Inter', 'Monaco', monospace;
         font-size: 0.9rem;
         color: #b0b0b0;
         line-height: 1.7;
-        white-space: pre-wrap; /* 自動換行且保留空白 */
+        white-space: pre-wrap;
         tab-size: 4;
+        margin: 0;
+    }
+
+    /* 5. 客製化捲動軸：讓網頁版也能看到漂亮的轉軸 */
+    .replay-paper::-webkit-scrollbar {
+        width: 8px;
+    }
+    .replay-paper::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.02);
+    }
+    .replay-paper::-webkit-scrollbar-thumb {
+        background: var(--accent-purple);
+        border-radius: 10px;
     }
 </style>
