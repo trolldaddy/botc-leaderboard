@@ -170,50 +170,6 @@
     background: rgba(99, 102, 241, 0.3); /* 你的主題靛藍色 */
     border-radius: 10px;
 }
-
-/* 查閱覆盤按鈕基礎樣式 */
-.view-log-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 3px 10px;
-    background: rgba(212, 175, 55, 0.1); /* 淡淡的金光 */
-    color: var(--accent-gold); /* 使用你定義的金色 */
-    border: 1px solid rgba(212, 175, 55, 0.4);
-    border-radius: 6px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-left: 8px;
-    vertical-align: middle;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* 懸停效果：變亮並有發光感 */
-.view-log-btn:hover {
-    background: var(--accent-gold);
-    color: #1a1a1a; /* 變成深色背景 */
-    box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
-    border-color: var(--accent-gold);
-    transform: translateY(-1px);
-}
-
-/* 點擊時的縮小反饋 */
-.view-log-btn:active {
-    transform: translateY(0);
-    opacity: 0.8;
-}
-
-/* 修正手機版在窄螢幕下的間距 */
-@media (max-width: 767px) {
-    .view-log-btn {
-        padding: 2px 6px;
-        font-size: 0.65rem;
-        margin-left: 4px;
-    }
-}
 </style>
 
 <script src="/js/history.js"></script>
