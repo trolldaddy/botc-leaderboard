@@ -30,6 +30,8 @@ class Match(Base):
     location = Column(String, default="未知", index=True) # 遊戲地點 (支援分區統計)
     storyteller = Column(String)                      # 說書人姓名
     winning_team = Column(String)                     # 獲勝陣營 (good/evil)
+    # 在 Match 類別中新增欄位定義
+    replay_log = Column(Text, nullable=True) # 使用 Text 類型來存長篇文字
     
     # 關聯：一場對局會有多名玩家參與的紀錄 (一對多)
     # 當對局被刪除時，關聯的玩家紀錄也會一併刪除 (cascade)
