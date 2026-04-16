@@ -152,6 +152,7 @@ const loadRecentMatches = async () => {
         replay_log: document.getElementById('log-input').value,
         // 🔴 關鍵修改：從 tr 改成 .player-row
         players: Array.from(document.querySelectorAll('.player-row')).map(row => ({
+            seat_number: index + 1,
             name: row.querySelector('.p-name').value,
             initial_character: row.querySelector('.p-initial').value,
             final_character: row.querySelector('.p-final').value,
