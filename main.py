@@ -75,7 +75,7 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
         db.refresh(new_match)
 
         players_list = data.get("players", [])
-        for p in players_list:
+        for i, p in enumerate(players_list):
             player_name = p.get("name", "").strip()
             if not player_name: continue
 
