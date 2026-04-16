@@ -47,7 +47,7 @@ class MatchPlayer(Base):
     id = Column(Integer, primary_key=True, index=True)
     match_id = Column(Integer, ForeignKey("matches.id")) # 關聯對局 UID
     player_id = Column(Integer, ForeignKey("players.id")) # 關聯玩家 UID
-    
+    seat_number = Column(Integer, nullable=True) # 🟢 務必加上這行
     # --- 對局細節 (支援覆盤魔法書的首尾狀態) ---
     initial_character = Column(String) # 初始角色 (遊戲開始時的角色，含酒鬼等隱藏資訊)
     final_character = Column(String)   # 最終角色 (遊戲結束時的角色，處理轉職或變體身分)
