@@ -233,6 +233,7 @@
                             <table class="detail-table">
                                 <thead>
                                     <tr>
+                                        <th>座位</th>
                                         <th>玩家暱稱</th>
                                         <th>初始角色</th>
                                         <th>最終角色</th>
@@ -243,6 +244,7 @@
                                 <tbody>
                                     ${m.players.map(p => `
                                         <tr>
+                                            <td style="color:var(--accent-gold); font-family:monospace;">${p.seat_number || (idx + 1)}</td>
                                             <td style="font-weight:bold; color:#fff;">${p.player_name}</td>
                                             <td>${p.initial_character}</td>
                                             <td>${p.final_character}</td>
