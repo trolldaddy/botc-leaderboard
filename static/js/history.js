@@ -8,6 +8,22 @@
     let currentFilterType = 'all'; 
     let currentKeyword = '';
 
+    window.viewFullLog = (id) => {
+        const match = allMatches.find(m => m.id === id);
+        // 檢查是否有 replay_log 欄位
+        if (!match || !match.replay_log) {
+            alert("此對局尚未上傳詳細覆盤紀錄");
+            return;
+        }
+
+        // 存入 sessionStorage
+        sessionStorage.setItem('current_replay_data', JSON.stringify({
+            title: `${match.script} (${match.date})`,
+            content: match.replay_log
+        }));
+
+        if (window.loadPage) window.loadPage('view-replay');
+    };
     const initHistory = async () => {
         const container = document.getElementById('history-list-area');
         const apiBase = window.API_BASE || "";
@@ -194,6 +210,11 @@
                                     <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
                                     <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
                                     <span><i class="fa-solid fa-users"></i> ${m.players.length} 人</span>
+                                    ${m.replay_log ? `
+                                    <button class="view-log-btn" onclick="event.stopPropagation(); viewFullLog(${m.id})">
+                                    <i class="fa-solid fa-book-open"></i> 查閱覆盤
+                                    </button>
+                                    ` : ''}
                                 </div>
                             </div>
                             <div class="info-row-bottom">
