@@ -95,8 +95,8 @@
                 // if (currentFilterType === 'storyteller') return (m.storyteller || "").toLowerCase() === currentKeyword;
                 if (currentFilterType === 'storyteller') return (m.storyteller || "").toLowerCase().includes(currentKeyword);
                 
-                if (currentFilterType === 'location') return (m.location || "").toLowerCase() === currentKeyword;
-                if (currentFilterType === 'script') return m.script.toLowerCase() === currentKeyword;
+                if (currentFilterType === 'location') return (m.location || "").toLowerCase().includes(currentKeyword);
+                if (currentFilterType === 'script') return m.script.toLowerCase().includes(currentKeyword);
                 return false;
             });
         }
