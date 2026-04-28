@@ -92,7 +92,9 @@
                 
                 // 🟢 關鍵修正：特定身分搜尋改用 === (完全匹配)，避免「魚」搜到「熱帶魚」
                 if (currentFilterType === 'player') return m.players.some(p => p.player_name.toLowerCase() === currentKeyword);
-                if (currentFilterType === 'storyteller') return (m.storyteller || "").toLowerCase() === currentKeyword;
+                // if (currentFilterType === 'storyteller') return (m.storyteller || "").toLowerCase() === currentKeyword;
+                if (currentFilterType === 'storyteller') return (m.storyteller || "").toLowerCase().includes(currentKeyword);
+                
                 if (currentFilterType === 'location') return (m.location || "").toLowerCase() === currentKeyword;
                 if (currentFilterType === 'script') return m.script.toLowerCase() === currentKeyword;
                 return false;
