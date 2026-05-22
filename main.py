@@ -1,24 +1,61 @@
+import base64
+import hashlib
+import hmac
+import json
 import os
+import secrets
+import time
 from datetime import datetime
-from typing import List, Optional
+from typing import Optional
+from urllib.parse import urlencode
 
-from fastapi import FastAPI, Depends, HTTPException, Query, status
+import requests
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session, joinedload 
-from sqlalchemy import func
+from sqlalchemy import inspect, text
+from sqlalchemy.orm import Session, joinedload
 
 import models
 from database import engine, get_db
 
 app = FastAPI(title="BOTC Stats Leaderboard API")
 
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mmmm")
+SESSION_SECRET = os.getenv("SESSION_SECRET") or ADMIN_PASSWORD
+LINE_CHANNEL_ID = os.getenv("LINE_CHANNEL_ID", "")
+LINE_CHANNEL_SECRET = os.getenv("LINE_CHANNEL_SECRET", "")
+LINE_CALLBACK_URL = os.getenv("LINE_CALLBACK_URL", "")
+ALLOWED_LINE_USER_IDS = {
+    item.strip() for item in os.getenv("ALLOWED_LINE_USER_IDS", "").split(",") if item.strip()
+}
+SESSION_COOKIE = "botc_session"
+LINE_STATE_COOKIE = "botc_line_state"
+LINE_NEXT_COOKIE = "botc_line_next"
+SESSION_MAX_AGE = 60 * 60 * 24 * 30
+
 # 確保資料庫表已建立
 try:
     models.Base.metadata.create_all(bind=engine)
 except Exception as e:
     print(f"資料庫初始化失敗: {e}")
+
+
+def ensure_runtime_schema():
+    """補齊舊資料庫缺少的新欄位。create_all 不會自動 ALTER 已存在的表。"""
+    try:
+        inspector = inspect(engine)
+        if "matches" in inspector.get_table_names():
+            columns = {col["name"] for col in inspector.get_columns("matches")}
+            if "uploaded_by_id" not in columns:
+                with engine.begin() as conn:
+                    conn.execute(text("ALTER TABLE matches ADD COLUMN uploaded_by_id INTEGER"))
+    except Exception as e:
+        print(f"資料庫結構補齊失敗: {e}")
+
+
+ensure_runtime_schema()
 
 app.add_middleware(
     CORSMiddleware,
@@ -28,47 +65,266 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mmmm")
 
-# --- 🟢 PWA 支援路由 🟢 ---
+def _b64encode(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).decode("utf-8").rstrip("=")
+
+
+def _b64decode(data: str) -> bytes:
+    padding = "=" * (-len(data) % 4)
+    return base64.urlsafe_b64decode(data + padding)
+
+
+def _sign(value: str) -> str:
+    return hmac.new(SESSION_SECRET.encode("utf-8"), value.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def create_session_cookie(account_id: int) -> str:
+    payload = {
+        "account_id": account_id,
+        "exp": int(time.time()) + SESSION_MAX_AGE,
+    }
+    body = _b64encode(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+    return f"{body}.{_sign(body)}"
+
+
+def read_session_cookie(request: Request) -> Optional[dict]:
+    raw_cookie = request.cookies.get(SESSION_COOKIE)
+    if not raw_cookie or "." not in raw_cookie:
+        return None
+    body, signature = raw_cookie.rsplit(".", 1)
+    if not hmac.compare_digest(_sign(body), signature):
+        return None
+    try:
+        payload = json.loads(_b64decode(body).decode("utf-8"))
+    except Exception:
+        return None
+    if int(payload.get("exp", 0)) < int(time.time()):
+        return None
+    return payload
+
+
+def is_secure_request(request: Request) -> bool:
+    return request.url.scheme == "https" or request.headers.get("x-forwarded-proto") == "https"
+
+
+def set_auth_cookie(response: RedirectResponse, request: Request, account_id: int):
+    response.set_cookie(
+        SESSION_COOKIE,
+        create_session_cookie(account_id),
+        max_age=SESSION_MAX_AGE,
+        httponly=True,
+        secure=is_secure_request(request),
+        samesite="lax",
+    )
+
+
+def clear_auth_cookie(response):
+    response.delete_cookie(SESSION_COOKIE)
+    response.delete_cookie(LINE_STATE_COOKIE)
+    response.delete_cookie(LINE_NEXT_COOKIE)
+
+
+def line_callback_url(request: Request) -> str:
+    return LINE_CALLBACK_URL or str(request.url_for("line_callback"))
+
+
+def storyteller_can_upload(account: models.StorytellerAccount) -> bool:
+    if ALLOWED_LINE_USER_IDS:
+        return account.line_user_id in ALLOWED_LINE_USER_IDS or bool(account.is_allowed)
+    return True
+
+
+def get_optional_storyteller(request: Request, db: Session = Depends(get_db)) -> Optional[models.StorytellerAccount]:
+    session = read_session_cookie(request)
+    if not session:
+        return None
+    account_id = session.get("account_id")
+    if not account_id:
+        return None
+    return db.query(models.StorytellerAccount).filter(models.StorytellerAccount.id == account_id).first()
+
+
+def require_upload_storyteller(
+    account: Optional[models.StorytellerAccount] = Depends(get_optional_storyteller),
+) -> models.StorytellerAccount:
+    if not account:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="請先使用 LINE 登入")
+    if not storyteller_can_upload(account):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="此 LINE 帳號尚未開放上傳戰績")
+    return account
+
+
+# --- LINE Login ---
+@app.get("/auth/line/login")
+async def line_login(request: Request):
+    if not LINE_CHANNEL_ID or not LINE_CHANNEL_SECRET:
+        raise HTTPException(status_code=500, detail="尚未設定 LINE_CHANNEL_ID 或 LINE_CHANNEL_SECRET")
+
+    state = secrets.token_urlsafe(32)
+    nonce = secrets.token_urlsafe(32)
+    next_url = request.query_params.get("next", "/")
+    if not next_url.startswith("/"):
+        next_url = "/"
+
+    params = {
+        "response_type": "code",
+        "client_id": LINE_CHANNEL_ID,
+        "redirect_uri": line_callback_url(request),
+        "state": state,
+        "scope": "profile openid",
+        "nonce": nonce,
+    }
+    response = RedirectResponse(f"https://access.line.me/oauth2/v2.1/authorize?{urlencode(params)}")
+    response.set_cookie(LINE_STATE_COOKIE, state, max_age=600, httponly=True, secure=is_secure_request(request), samesite="lax")
+    response.set_cookie(LINE_NEXT_COOKIE, next_url, max_age=600, httponly=True, secure=is_secure_request(request), samesite="lax")
+    return response
+
+
+@app.get("/auth/line/callback")
+async def line_callback(request: Request, db: Session = Depends(get_db)):
+    error = request.query_params.get("error")
+    if error:
+        raise HTTPException(status_code=400, detail=f"LINE 登入失敗: {error}")
+
+    state = request.query_params.get("state")
+    expected_state = request.cookies.get(LINE_STATE_COOKIE)
+    if not state or not expected_state or not hmac.compare_digest(state, expected_state):
+        raise HTTPException(status_code=400, detail="LINE 登入狀態驗證失敗，請重新登入")
+
+    code = request.query_params.get("code")
+    if not code:
+        raise HTTPException(status_code=400, detail="LINE 未回傳授權碼")
+
+    token_resp = requests.post(
+        "https://api.line.me/oauth2/v2.1/token",
+        data={
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": line_callback_url(request),
+            "client_id": LINE_CHANNEL_ID,
+            "client_secret": LINE_CHANNEL_SECRET,
+        },
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        timeout=10,
+    )
+    if not token_resp.ok:
+        raise HTTPException(status_code=400, detail="無法向 LINE 交換登入權杖")
+
+    access_token = token_resp.json().get("access_token")
+    if not access_token:
+        raise HTTPException(status_code=400, detail="LINE 未回傳 access token")
+
+    profile_resp = requests.get(
+        "https://api.line.me/v2/profile",
+        headers={"Authorization": f"Bearer {access_token}"},
+        timeout=10,
+    )
+    if not profile_resp.ok:
+        raise HTTPException(status_code=400, detail="無法取得 LINE 使用者資料")
+
+    profile = profile_resp.json()
+    line_user_id = profile.get("userId")
+    if not line_user_id:
+        raise HTTPException(status_code=400, detail="LINE 使用者資料缺少 userId")
+
+    account = db.query(models.StorytellerAccount).filter(models.StorytellerAccount.line_user_id == line_user_id).first()
+    allowed_by_env = not ALLOWED_LINE_USER_IDS or line_user_id in ALLOWED_LINE_USER_IDS
+    if not account:
+        account = models.StorytellerAccount(
+            line_user_id=line_user_id,
+            display_name=profile.get("displayName"),
+            picture_url=profile.get("pictureUrl"),
+            is_allowed=allowed_by_env,
+            last_login_at=datetime.now(),
+        )
+        db.add(account)
+    else:
+        account.display_name = profile.get("displayName") or account.display_name
+        account.picture_url = profile.get("pictureUrl") or account.picture_url
+        account.last_login_at = datetime.now()
+        if allowed_by_env:
+            account.is_allowed = True
+    db.commit()
+    db.refresh(account)
+
+    next_url = request.cookies.get(LINE_NEXT_COOKIE, "/")
+    if not next_url.startswith("/"):
+        next_url = "/"
+    response = RedirectResponse(next_url)
+    set_auth_cookie(response, request, account.id)
+    response.delete_cookie(LINE_STATE_COOKIE)
+    response.delete_cookie(LINE_NEXT_COOKIE)
+    return response
+
+
+@app.get("/auth/logout")
+@app.post("/auth/logout")
+async def logout():
+    response = RedirectResponse("/")
+    clear_auth_cookie(response)
+    return response
+
+
+@app.get("/api/me")
+async def get_me(account: Optional[models.StorytellerAccount] = Depends(get_optional_storyteller)):
+    if not account:
+        return {"authenticated": False, "can_upload": False}
+    return {
+        "authenticated": True,
+        "can_upload": storyteller_can_upload(account),
+        "user": {
+            "display_name": account.display_name,
+            "picture_url": account.picture_url,
+            "line_user_id": account.line_user_id,
+        },
+    }
+
+
+# --- PWA 支援路由 ---
 # 確保瀏覽器可以在根目錄找到 manifest 和 service worker
 @app.get("/manifest.json")
 async def serve_manifest():
     paths = ["static/manifest.json", "manifest.json"]
     for path in paths:
-        if os.path.exists(path): return FileResponse(path)
-    return HTTPException(status_code=404, detail="manifest.json not found")
+        if os.path.exists(path):
+            return FileResponse(path)
+    raise HTTPException(status_code=404, detail="manifest.json not found")
+
 
 @app.get("/sw.js")
 async def serve_sw():
     paths = ["static/sw.js", "sw.js"]
     for path in paths:
-        if os.path.exists(path): return FileResponse(path)
-    return HTTPException(status_code=404, detail="sw.js not found")
+        if os.path.exists(path):
+            return FileResponse(path)
+    raise HTTPException(status_code=404, detail="sw.js not found")
+
 
 # --- 戰績錄入 API ---
 @app.post("/api/matches")
-async def create_match(data: dict, db: Session = Depends(get_db)):
+async def create_match(
+    data: dict,
+    db: Session = Depends(get_db),
+    uploader: models.StorytellerAccount = Depends(require_upload_storyteller),
+):
     try:
-        received_pw = data.get("password") or data.get("admin_password")
-        if received_pw != ADMIN_PASSWORD:
-            raise HTTPException(status_code=403, detail="管理員密鑰錯誤")
-
         raw_date = data.get("date")
         match_date = datetime.now()
         if raw_date:
             try:
                 match_date = datetime.strptime(raw_date, "%Y-%m-%d")
-            except:
+            except Exception:
                 pass
 
         new_match = models.Match(
             script=data.get("script", "未知劇本"),
             date=match_date,
             location=data.get("location", "未知"),
-            storyteller=data.get("storyteller", "佚名"),
+            storyteller=data.get("storyteller") or uploader.display_name or "佚名",
             winning_team=data.get("winning_team", "good"),
-            replay_log=data.get("replay_log")
+            replay_log=data.get("replay_log"),
+            uploaded_by_id=uploader.id,
         )
         db.add(new_match)
         db.commit()
@@ -77,7 +333,8 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
         players_list = data.get("players", [])
         for i, p in enumerate(players_list):
             player_name = p.get("name", "").strip()
-            if not player_name: continue
+            if not player_name:
+                continue
 
             db_player = db.query(models.Player).filter(models.Player.name == player_name).first()
             if not db_player:
@@ -93,7 +350,7 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
                 initial_character=p.get("initial_character") or p.get("character") or "未知",
                 final_character=p.get("final_character") or p.get("character") or "未知",
                 alignment=p.get("alignment") or p.get("final_alignment") or "good",
-                survived=p.get("survived") if p.get("survived") is not None else True
+                survived=p.get("survived") if p.get("survived") is not None else True,
             )
             db.add(performance)
         
@@ -102,6 +359,7 @@ async def create_match(data: dict, db: Session = Depends(get_db)):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"伺服器內部錯誤: {str(e)}")
+
 
 # 統計數據 API
 @app.get("/api/stats")
@@ -131,7 +389,7 @@ async def get_dashboard_summary(db: Session = Depends(get_db)):
             "good_wins": s["good"],
             "evil_wins": s["evil"],
             "good_rate": round(s["good"] / s["total"] * 100, 1) if s["total"] > 0 else 0,
-            "evil_rate": round(s["evil"] / s["total"] * 100, 1) if s["total"] > 0 else 0
+            "evil_rate": round(s["evil"] / s["total"] * 100, 1) if s["total"] > 0 else 0,
         })
 
     return {
@@ -140,38 +398,61 @@ async def get_dashboard_summary(db: Session = Depends(get_db)):
             "good_wins": global_good,
             "evil_wins": global_evil,
             "good_rate": round(global_good / total_games * 100, 1) if total_games > 0 else 0,
-            "evil_rate": round(global_evil / total_games * 100, 1) if total_games > 0 else 0
+            "evil_rate": round(global_evil / total_games * 100, 1) if total_games > 0 else 0,
         },
-        "locations": sorted(location_stats, key=lambda x: x["total"], reverse=True)
+        "locations": sorted(location_stats, key=lambda x: x["total"], reverse=True),
     }
+
 
 @app.get("/api/players")
 async def get_all_players(db: Session = Depends(get_db)):
     players = db.query(models.Player.name).order_by(models.Player.name).all()
     return [p[0] for p in players]
 
+
 @app.get("/api/history")
 async def get_history(db: Session = Depends(get_db)):
     matches = db.query(models.Match).options(
-        joinedload(models.Match.players).joinedload(models.MatchPlayer.player)
+        joinedload(models.Match.players).joinedload(models.MatchPlayer.player),
+        joinedload(models.Match.uploader),
     ).order_by(models.Match.date.desc()).limit(50).all()
     
     result = []
     for m in matches:
         sorted_players = sorted(m.players, key=lambda x: x.seat_number if x.seat_number is not None else 99)
         m_data = {
-            "id": m.id, "script": m.script, "date": m.date, "location": m.location, "storyteller": m.storyteller, "winning_team": m.winning_team,"replay_log": m.replay_log,
-            "players": [{"player_name": p.player.name,"seat_number": p.seat_number, "initial_character": p.initial_character, "final_character": p.final_character, "alignment": p.alignment, "survived": p.survived} for p in sorted_players]
+            "id": m.id,
+            "script": m.script,
+            "date": m.date,
+            "location": m.location,
+            "storyteller": m.storyteller,
+            "winning_team": m.winning_team,
+            "replay_log": m.replay_log,
+            "uploaded_by": m.uploader.display_name if m.uploader else None,
+            "players": [
+                {
+                    "player_name": p.player.name,
+                    "seat_number": p.seat_number,
+                    "initial_character": p.initial_character,
+                    "final_character": p.final_character,
+                    "alignment": p.alignment,
+                    "survived": p.survived,
+                }
+                for p in sorted_players
+            ],
         }
         result.append(m_data)
     return result
+
 
 @app.get("/")
 @app.get("/index.html")
 async def serve_home():
     for path in ["static/index.html", "index.html"]:
-        if os.path.exists(path): return FileResponse(path)
+        if os.path.exists(path):
+            return FileResponse(path)
     return {"message": "找不到 index.html"}
+
 
 # 掛載靜態資源資料夾
 for folder in ["js", "css", "pages", "static", "icons"]:
