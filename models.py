@@ -18,7 +18,24 @@ class Player(Base):
     match_history = relationship("MatchPlayer", back_populates="player")
 
 # ==========================================
-# 2. 對局總表 (Matches)
+# 2. 說書人登入帳號 (StorytellerAccounts)
+# 由 LINE Login 建立，用來限制誰可以上傳戰績
+# ==========================================
+class StorytellerAccount(Base):
+    __tablename__ = "storyteller_accounts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    line_user_id = Column(String, unique=True, index=True, nullable=False)
+    display_name = Column(String, nullable=True)
+    picture_url = Column(Text, nullable=True)
+    is_allowed = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.now)
+    last_login_at = Column(DateTime, default=datetime.now)
+
+    uploaded_matches = relationship("Match", back_populates="uploader")
+
+# ==========================================
+# 3. 對局總表 (Matches)
 # 儲存每一場遊戲的環境資訊（時間、地點、劇本、結果）
 # ==========================================
 class Match(Base):
@@ -30,15 +47,16 @@ class Match(Base):
     location = Column(String, default="未知", index=True) # 遊戲地點 (支援分區統計)
     storyteller = Column(String)                      # 說書人姓名
     winning_team = Column(String)                     # 獲勝陣營 (good/evil)
-    # 在 Match 類別中新增欄位定義
-    replay_log = Column(Text, nullable=True) # 使用 Text 類型來存長篇文字
+    replay_log = Column(Text, nullable=True)          # 使用 Text 類型來存長篇文字
+    uploaded_by_id = Column(Integer, ForeignKey("storyteller_accounts.id"), nullable=True)
     
     # 關聯：一場對局會有多名玩家參與的紀錄 (一對多)
     # 當對局被刪除時，關聯的玩家紀錄也會一併刪除 (cascade)
     players = relationship("MatchPlayer", back_populates="match", cascade="all, delete-orphan")
+    uploader = relationship("StorytellerAccount", back_populates="uploaded_matches")
 
 # ==========================================
-# 3. 對局表現紀錄表 (MatchPlayers)
+# 4. 對局表現紀錄表 (MatchPlayers)
 # 核心關聯表：記錄「哪個玩家」在「哪一局」中玩了「什麼角色」
 # ==========================================
 class MatchPlayer(Base):
@@ -47,10 +65,10 @@ class MatchPlayer(Base):
     id = Column(Integer, primary_key=True, index=True)
     match_id = Column(Integer, ForeignKey("matches.id")) # 關聯對局 UID
     player_id = Column(Integer, ForeignKey("players.id")) # 關聯玩家 UID
-    seat_number = Column(Integer, nullable=True) # 🟢 務必加上這行
+    seat_number = Column(Integer, nullable=True)
     # --- 對局細節 (支援覆盤魔法書的首尾狀態) ---
     initial_character = Column(String) # 初始角色 (遊戲開始時的角色，含酒鬼等隱藏資訊)
-    final_character = Column(String)   # 最終角色 (遊戲結束時的角色，處理轉職或變體身分)
+    final_character = Column(String)   # 最終角色 (遊戲結束時的角色，處理轉職或變體身份)
     alignment = Column(String)         # 陣營 (計算個人勝率用的最終陣營：good/evil)
     survived = Column(Boolean)         # 狀態 (True = 存活 / False = 死亡)
     
