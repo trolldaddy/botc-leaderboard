@@ -18,7 +18,7 @@
                 <h3><i class="fa-solid fa-clock-rotate-left text-gold"></i> 最近錄入對局</h3>
             </div>
             <div id="recent-matches-list" class="sidebar-list">
-                <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 2rem;">⏳ 正在翻閱魔典...</div>
+                <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 2rem;">正在翻閱魔典...</div>
             </div>
             <div style="margin-top: 1rem;">
                 <button class="btn btn-ghost-full" onclick="if(window.loadPage) window.loadPage('history')">查看完整歷史紀錄</button>
@@ -28,8 +28,8 @@
         <div id="save-status" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem; text-align: center;">
             草稿已備份至本地
         </div>
-        <button type="submit" form="record-form" id="submit-btn" class="btn btn-submit-glow w-full">
-            <i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績
+        <button type="submit" form="record-form" id="submit-btn" class="btn btn-submit-glow w-full" disabled>
+            <i class="fa-solid fa-lock"></i> 請先使用 LINE 登入
         </button>
     </div>
         
@@ -37,6 +37,16 @@
 
     <!-- 右側：錄入區域 -->
     <div class="record-main">
+        <div id="line-auth-panel" class="card line-auth-card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-shield-halved text-gold"></i> 說書人登入</h3>
+            </div>
+            <div id="line-auth-status" style="margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                正在確認登入狀態...
+            </div>
+            <div id="line-auth-actions" style="display: flex; gap: 0.8rem; margin-top: 1rem; flex-wrap: wrap;"></div>
+        </div>
+
         <!-- 1. 快速導入卡片 -->
         <div class="card import-card" style="margin-bottom: 1.5rem;">
             <div class="card-header">
@@ -62,7 +72,6 @@
             <div class="card" style="margin-bottom: 1.5rem;">
                 <div class="card-header"><h3><i class="fa-solid fa-info-circle"></i> 對局基礎資訊</h3></div>
                 
-                <!-- 第一排：劇本、時間、地點 (改為下拉選單) -->
                 <div class="form-grid-3" style="margin-top: 1.2rem;">
                     <div class="form-group">
                         <label>劇本名稱</label>
@@ -88,7 +97,6 @@
                     </div>
                 </div>
 
-                <!-- 第二排：獲勝陣營、說書人、管理密碼 -->
                 <div class="form-grid-3" style="margin-top: 1.2rem;">
                     <div class="form-group">
                         <label>獲勝陣營</label>
@@ -102,37 +110,16 @@
                         <input type="text" id="match-storyteller" class="form-control dark-input" placeholder="說書人暱稱" oninput="saveDraft()">
                     </div>
                     <div class="form-group">
-                        <label>管理員密碼</label>
-                        <input type="password" id="admin-password" class="form-control dark-input" placeholder="••••" required>
+                        <label>上傳權限</label>
+                        <div id="upload-auth-summary" class="dark-input" style="min-height: 45px; display: flex; align-items: center; color: var(--text-muted);">
+                            請先使用 LINE 登入
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- 3. 參與玩家卡片 -->
             <div class="card">
-           <!---      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <h3><i class="fa-solid fa-users"></i> 參與玩家</h3>
-                    <button type="button" class="btn btn-blue-sm" onclick="addPlayerRow()">
-                        <i class="fa-solid fa-plus"></i> 添加玩家
-                    </button>
-                </div>
-                <div class="table-responsive-container">
-                    <table class="record-table">
-                        <thead>
-                            <tr>
-                                <th>玩家暱稱</th>
-                                <th>初始角色</th>
-                                <th>最終角色</th>
-                                <th>陣營</th>
-                                <th>狀態</th>
-                                <th style="width: 40px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="players-list"></tbody> 
-
-                        <div id="players-list" class="space-y-2"></div>
-                    </table>
-                </div>--->
                 <div class="mt-6">
     <div class="flex justify-between items-end mb-4">
         <h3 class="text-lg font-bold text-slate-200"><i class="fa-solid fa-users mr-2"></i>參與玩家</h3>
@@ -153,13 +140,6 @@
                     </div>
             </div>
             </div>
-
-           <!---   <div class="submit-footer">
-                <div id="save-status" style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.8rem;">草稿已備份至本地</div>
-                <button type="submit" id="submit-btn" class="btn btn-submit-glow">
-                    <i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績
-                </button>
-            </div> --->
         </form>
     </div>
 </div>
@@ -203,22 +183,21 @@
     .side-match-item .m-title { font-weight: 800; color: #fff; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 5px;}
     .side-match-item .m-meta { font-size: 0.7rem; color: var(--text-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 2px; }
     .side-match-item .m-meta i {
-    color: var(--accent-gold); /* Icon 統一使用金色，呼應歷史紀錄 UI */
+    color: var(--accent-gold);
     width: 12px;
     text-align: center;
     opacity: 0.8;
 }
-    /* 🟢 側邊欄佈局鎖定：確保按鈕始終在底部 */
 @media (min-width: 1000px) {
     .record-sidebar {
         display: flex;
         flex-direction: column;
-        height: 100%; /* 撐滿父容器高度 */
+        height: 100%;
         overflow: hidden;
     }
     
     .sidebar-card {
-        flex: 1; /* 讓卡片填滿剩餘空間 */
+        flex: 1;
         display: flex;
         flex-direction: column;
         min-height: 0;
@@ -226,24 +205,23 @@
     }
 
     #recent-matches-list {
-        flex: 1; /* 列表區域開啟內部捲動，防止擠壓按鈕 */
+        flex: 1;
         overflow-y: auto;
         padding-right: 5px;
     }
 
     .submit-footer-sidebar {
-        flex-shrink: 0; /* 🔴 關鍵：禁止按鈕區塊縮小或被擠出畫面 */
+        flex-shrink: 0;
         margin-top: auto;
         padding-top: 1rem;
         border-top: 1px solid var(--border-color);
     }
 }
 
-/* 🟢 右側日期方塊樣式 */
 .side-match-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
 .side-info-content { flex: 1; min-width: 0; }
 .side-info-content .m-meta {
-    margin-bottom: 2px; /* 縮小行間距 */
+    margin-bottom: 2px;
     line-height: 1.2;
 }
 
@@ -258,133 +236,6 @@
     padding: 6px 4px; border-radius: 10px; flex-shrink: 0;
     border: 1px solid rgba(255,255,255,0.05);
 }
-.side-year-label { display: block; font-size: 0.6rem; color: var(--text-muted); margin-bottom: 2px; }
-.side-date-label { font-size: 0.85rem; font-weight: 800; color: var(--accent-gold); }
-
-/* 微調原本的 side-match-item */
-.side-match-item { padding: 0.8rem !important; margin-bottom: 0.6rem; }
-    
-    
-    .m-tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 4px; align-self: flex-start; }
-    .tag-good { color: #a8dadc; background: rgba(69, 123, 157, 0.2); border: 1px solid rgba(69, 123, 157, 0.3); }
-    .tag-evil { color: #ffb3b3; background: rgba(230, 57, 70, 0.2); border: 1px solid rgba(230, 57, 70, 0.3); }
-
-    .record-table { width: 100%; min-width: 700px; border-collapse: separate; border-spacing: 0 5px; }
-    .btn-submit-glow { padding: 1.2rem 4rem; border-radius: 50px; background: var(--accent-red); color: #fff; font-weight: bold; border: none; cursor: pointer; box-shadow: 0 10px 30px rgba(230, 57, 70, 0.3); }
-    .btn-ghost-full { width: 100%; background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 0.75rem; border: 1px solid var(--border-color); }
-    
-    @media (max-width: 1023px) {
-        .record-layout-wrapper { flex-direction: column; }
-        .record-sidebar { width: 100%; }
-        .form-grid-3 { grid-template-columns: 1fr; }
-    }
-}
-/* 🟢 側邊欄卡片：強制水平佈局 */
-.side-match-item {
-    display: block !important; /* 確保外框是塊狀 */
-    padding: 12px 10px !important;
-}
-
-.side-match-flex {
-    display: flex !important;
-    flex-direction: row !important; /* 強制橫向 */
-    flex-wrap: nowrap !important;   /* 禁止換行 */
-    justify-content: space-between !important;
-    align-items: center !important;
-    width: 100% !important;
-    gap: 8px !important;
-}
-
-/* 🟢 左側資訊區：防止撐開寬度 */
-.side-left-info {
-    flex: 1 !important;
-    min-width: 0 !important; /* 核心：允許內容縮小，不把右邊擠下去 */
-}
-/* 🟢 統一小方格樣式 */
-.side-mini-box {
-    /* 使用 border-box 確保邊框不會撐開尺寸 */
-    box-sizing: border-box !important;
-    width: 60px !important;
-    height: 60px !important;
-    
-    /* 彈性佈局置中 */
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    
-    /* 移除所有可能導致偏移的內外距 */
-    padding: 0 !important;
-    margin: 0 !important;
-    border-radius: 10px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    flex-shrink: 0 !important;
-    overflow: hidden !important;
-}
-/* 🟢 統一內部的文字塊行為 */
-.side-mini-box span {
-    display: block !important;
-    width: 100% !important;
-    text-align: center !important;
-    /* 🔴 關鍵：強制行高，防止不同字體撐開高度 */
-    line-height: 1.1 !important;
-    margin: 0 !important;
-}
-    
-/* 🟢 右側雙方格：鎖定寬度 */
-.side-right-boxes {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 8px !important;
-    flex-shrink: 0 !important; /* 防止方格被擠扁 */
-}
-
-.side-mini-box .box-label, 
-.side-mini-box .box-value {
-    font-size: 1rem !important; /* 統一大小 */
-    line-height: 1.1 !important;
-    display: block !important;
-    text-align: center !important;
-}
-
-/* 🔴 重點強化：善良/邪惡 字體最粗 */
-.faction-text {
-    font-weight: 900 !important; 
-    letter-spacing: 2px;
-}
-
-.status-box .box-value {
-    font-weight: 400; /* 「獲勝」二字維持正常粗細 */
-    opacity: 0.8;
-}
-/* 🟢 獲勝方格顏色分支 */
-.date-box .box-value { color: var(--accent-gold); }
-
-.box-good { background: rgba(69, 123, 157, 0.2); border-color: rgba(69, 123, 157, 0.3); }
-.box-good .box-value, .box-good .box-label { color: #a8dadc; }
-
-.box-evil { background: rgba(230, 57, 70, 0.2); border-color: rgba(230, 57, 70, 0.3); }
-.box-evil .box-value, .box-evil .box-label { color: #ffb3b3; }
-
-/* 左側文字細節 */
-.side-left-info .m-title {
-    font-weight: 800;
-    font-size: 1.2rem;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; /* 劇本太長自動省略號 */
-    margin-bottom: 4px;
-}
-
-.side-left-info .m-meta {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-    display: flex;
-    gap: 10px;
-}
-    
 </style>
-<script src="/js/roles_db.js"></script>
+
 <script src="/js/record.js"></script>
