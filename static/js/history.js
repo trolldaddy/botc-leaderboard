@@ -212,6 +212,7 @@
                                 <div class="meta-tags">
                                     <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
                                     <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
+                                    ${m.uploaded_by ? `<span><i class="fa-solid fa-cloud-arrow-up"></i> 上傳人：${m.uploaded_by}</span>` : ''}
                                     <span><i class="fa-solid fa-users"></i> ${m.players.length} 人</span>
                                     ${m.replay_log ? `
                                     <button class="view-log-btn" onclick="event.stopPropagation(); viewFullLog(${m.id})">
