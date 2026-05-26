@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>血染鐘樓：覆盤／紀錄／排行榜by 廚爹</title>
+    <title>血染鐘樓：覆盤／紀錄／排行榜by 廚爸</title>
 
     <!-- 字體與圖示 -->
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
@@ -54,6 +54,7 @@
             <li><a href="#" data-page="recorder"><i class="fa-solid fa-book-open"></i> <span>覆盤紀錄器</span></a></li>
             <li><a href="#" data-page="record"><i class="fa-solid fa-feather-pointed"></i> <span>錄入對局</span></a></li>
             <li><a href="#" data-page="history"><i class="fa-solid fa-clock-rotate-left"></i> <span>歷史紀錄＆戰績查詢</span></a></li>
+            <li id="admin-nav-item" style="display:none;"><a href="#" data-page="admin"><i class="fa-solid fa-shield-halved"></i> <span>管理後台</span></a></li>
         </ul>
     
     
@@ -96,6 +97,18 @@
                 area.style.opacity = '1';
             }
         }
+
+        async function revealAdminNav() {
+            const adminItem = document.getElementById('admin-nav-item');
+            if (!adminItem) return;
+            try {
+                const resp = await fetch(`${window.API_BASE || ''}/api/me`, { credentials: 'same-origin' });
+                if (!resp.ok) return;
+                const me = await resp.json();
+                adminItem.style.display = me.is_admin ? 'flex' : 'none';
+            } catch (err) {}
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('#main-nav a').forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -127,6 +140,7 @@ const menuBtn = document.getElementById('mobile-menu-btn');
         }
     });
 
+    revealAdminNav();
     const hash = window.location.hash.replace('#', '');
     loadPage(hash || 'dashboard');
 });            
