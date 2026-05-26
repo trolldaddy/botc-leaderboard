@@ -35,6 +35,15 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
             : `<i class="fa-solid fa-lock"></i> 請先使用 LINE 登入`;
     };
 
+    const applyDefaultStoryteller = () => {
+        const storytellerInput = document.getElementById('match-storyteller');
+        const displayName = currentAuth.user?.display_name;
+        if (storytellerInput && currentAuth.authenticated && displayName && !storytellerInput.value.trim()) {
+            storytellerInput.value = displayName;
+            saveDraft();
+        }
+    };
+
     const renderAuthState = () => {
         const statusEl = document.getElementById('line-auth-status');
         const actionsEl = document.getElementById('line-auth-actions');
@@ -118,6 +127,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
             list.innerHTML = "";
             for (let i = 0; i < 12; i++) addPlayerRow();
         }
+        applyDefaultStoryteller();
     };
 
     const loadRecentMatches = async () => {
