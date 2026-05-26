@@ -29,6 +29,8 @@ class StorytellerAccount(Base):
     display_name = Column(String, nullable=True)
     picture_url = Column(Text, nullable=True)
     is_allowed = Column(Boolean, default=False)
+    is_banned = Column(Boolean, default=False)
+    banned_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
     last_login_at = Column(DateTime, default=datetime.now)
 
@@ -49,6 +51,7 @@ class Match(Base):
     winning_team = Column(String)                     # 獲勝陣營 (good/evil)
     replay_log = Column(Text, nullable=True)          # 使用 Text 類型來存長篇文字
     uploaded_by_id = Column(Integer, ForeignKey("storyteller_accounts.id"), nullable=True)
+    created_at = Column(DateTime, default=datetime.now)
     
     # 關聯：一場對局會有多名玩家參與的紀錄 (一對多)
     # 當對局被刪除時，關聯的玩家紀錄也會一併刪除 (cascade)
