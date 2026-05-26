@@ -1,0 +1,137 @@
+<header class="top-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <h2 style="font-family: 'Cinzel', serif; letter-spacing: 2px;">管理後台 (ADMIN)</h2>
+        <button class="btn" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);" onclick="refreshAdminPanel()">
+            <i class="fa-solid fa-rotate"></i> 重新整理
+        </button>
+    </div>
+</header>
+
+<div class="admin-layout">
+    <section class="card admin-card">
+        <div class="card-header">
+            <h3><i class="fa-solid fa-users-gear text-gold"></i> LINE 登入帳號</h3>
+        </div>
+        <div id="admin-users-area" class="admin-list-status">正在讀取帳號...</div>
+    </section>
+
+    <section class="card admin-card admin-replay-card">
+        <div class="card-header">
+            <h3><i class="fa-solid fa-scroll text-gold"></i> Replay 紀錄管理</h3>
+        </div>
+        <div id="admin-replays-area" class="admin-list-status">正在讀取 Replay...</div>
+    </section>
+</div>
+
+<style>
+    .admin-layout {
+        display: grid;
+        grid-template-columns: minmax(320px, 0.8fr) minmax(520px, 1.6fr);
+        gap: 1.5rem;
+        min-height: 0;
+        flex: 1;
+    }
+
+    .admin-card {
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-list-status {
+        color: var(--text-muted);
+        padding: 1rem 0;
+    }
+
+    .admin-user-list,
+    .admin-replay-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.8rem;
+        overflow-y: auto;
+        padding-right: 0.4rem;
+    }
+
+    .admin-user-item,
+    .admin-replay-item {
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 10px;
+        padding: 1rem;
+    }
+
+    .admin-user-top,
+    .admin-replay-top {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .admin-title {
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 0.3rem;
+    }
+
+    .admin-meta {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .admin-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.72rem;
+        padding: 0.18rem 0.5rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        color: var(--text-muted);
+        margin-right: 0.35rem;
+    }
+
+    .admin-chip.good { color: #cfe9ff; background: rgba(69,123,157,0.22); }
+    .admin-chip.danger { color: #ffd0d4; background: rgba(230,57,70,0.22); }
+    .admin-chip.gold { color: var(--accent-gold); background: rgba(255,183,3,0.12); }
+
+    .admin-edit-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.8rem;
+        margin-top: 1rem;
+    }
+
+    .admin-edit-grid .wide {
+        grid-column: 1 / -1;
+    }
+
+    .admin-edit-grid label {
+        display: block;
+        font-size: 0.68rem;
+        color: var(--accent-gold);
+        margin-bottom: 0.35rem;
+        font-weight: 700;
+    }
+
+    .admin-replay-log {
+        min-height: 140px;
+        resize: vertical;
+    }
+
+    @media (max-width: 1023px) {
+        .admin-layout { grid-template-columns: 1fr; }
+        .admin-edit-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<script src="/js/admin.js"></script>
