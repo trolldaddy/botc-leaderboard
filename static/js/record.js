@@ -1,5 +1,28 @@
+/**
+ * BOTC Stats - Record Match page
+ */
+function setupRoleDatalist() {
+    let datalist = document.getElementById('all-roles-list');
+    if (!datalist) {
+        datalist = document.createElement('datalist');
+        datalist.id = 'all-roles-list';
+        document.body.appendChild(datalist);
+    }
+    if (window.MASTER_ROLE_DB && window.MASTER_ROLE_DB.length > 0) {
+        datalist.innerHTML = window.MASTER_ROLE_DB
+            .map(role => `<option value="${role.name}">`)
+            .join('');
+    }
+}
+
+window.addEventListener('DOMContentLoaded', setupRoleDatalist);
+
 {
-    let currentAuth = { authenticated: false, can_upload: false };
+    let currentAuth = { authenticated: false, logged_in: false, can_upload: false };
+
+    const apiBase = () => window.API_BASE || '';
+
+    const isLoggedIn = () => Boolean(currentAuth.logged_in || currentAuth.authenticated);
 
     const lineLoginUrl = () => {
         const next = encodeURIComponent(`${window.location.pathname}${window.location.hash || '#record'}`);
@@ -7,11 +30,16 @@
     };
 
     const setSubmitEnabled = (enabled) => {
-        const submitBtn = document.getElementById('submit-btn');
-        if (!submitBtn) return;
-        submitBtn.disabled = !enabled;
-        submitBtn.classList.toggle('is-locked', !enabled);
-        submitBtn.innerHTML = enabled
+        const btn = document.getElementById('submit-btn');
+        if (!btn) return;
+        btn.disabled = !enabled;
+        btn.style.background = 'var(--accent-red)';
+        btn.style.color = '#fff';
+        btn.style.borderRadius = '999px';
+        btn.style.opacity = '1';
+        btn.style.boxShadow = enabled ? 'var(--shadow-glow)' : 'none';
+        btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
+        btn.innerHTML = enabled
             ? `<i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績`
             : `<i class="fa-solid fa-lock"></i> 請先使用 LINE 登入`;
     };
@@ -19,7 +47,7 @@
     const applyDefaultStoryteller = () => {
         const storytellerInput = document.getElementById('match-storyteller');
         const displayName = currentAuth.user?.display_name;
-        if (storytellerInput && currentAuth.authenticated && displayName && !storytellerInput.value.trim()) {
+        if (storytellerInput && isLoggedIn() && displayName && !storytellerInput.value.trim()) {
             storytellerInput.value = displayName;
             saveDraft();
         }
@@ -31,13 +59,18 @@
         const summaryEl = document.getElementById('upload-auth-summary');
         if (!statusEl || !actionsEl || !summaryEl) return;
 
+        summaryEl.classList.remove('dark-input', 'is-verified', 'is-warning');
+        summaryEl.style.minHeight = '44px';
+        summaryEl.style.padding = '0';
+        summaryEl.style.background = 'transparent';
+        summaryEl.style.border = '0';
+        summaryEl.style.display = 'flex';
+        summaryEl.style.alignItems = 'center';
         actionsEl.innerHTML = '';
         actionsEl.style.display = 'none';
         statusEl.style.display = 'none';
-        summaryEl.classList.remove('is-verified');
-        summaryEl.classList.remove('is-warning');
 
-        if (!currentAuth.authenticated) {
+        if (!isLoggedIn()) {
             statusEl.innerHTML = `尚未登入。上傳戰績前，請先使用 LINE 登入來確認說書人身分。`;
             summaryEl.innerHTML = `
                 <a class="line-login-button" href="${lineLoginUrl()}" aria-label="使用 LINE 登入" title="使用 LINE 登入"></a>
@@ -56,7 +89,7 @@
                 </a>
             `;
             summaryEl.classList.add('is-warning');
-            summaryEl.innerHTML = `<span style="color: var(--accent-red);">${user.display_name || 'LINE 使用者'} 尚未開放上傳權限</span>`;
+            summaryEl.innerHTML = `<span style="color: var(--accent-red); padding: 0.85rem 1rem;">${user.display_name || 'LINE 使用者'} 尚未開放上傳權限</span>`;
             setSubmitEnabled(false);
             return;
         }
@@ -68,16 +101,16 @@
             </a>
         `;
         summaryEl.classList.add('is-verified');
-        summaryEl.innerHTML = `<span style="color: var(--text-muted);">${user.display_name || 'LINE 使用者'} 已通過登入驗證</span>`;
+        summaryEl.innerHTML = `<span style="color: var(--text-muted); padding: 0.85rem 1rem;">${user.display_name || 'LINE 使用者'} 已通過登入驗證</span>`;
         setSubmitEnabled(true);
     };
 
     const refreshAuthState = async () => {
         try {
-            const resp = await fetch(`${window.API_BASE || ''}/api/me`, { credentials: 'same-origin' });
-            currentAuth = resp.ok ? await resp.json() : { authenticated: false, can_upload: false };
+            const resp = await fetch(`${apiBase()}/api/me`, { credentials: 'same-origin' });
+            currentAuth = resp.ok ? await resp.json() : { logged_in: false, authenticated: false, can_upload: false };
         } catch (err) {
-            currentAuth = { authenticated: false, can_upload: false };
+            currentAuth = { logged_in: false, authenticated: false, can_upload: false };
         }
         renderAuthState();
     };
@@ -101,17 +134,18 @@
 
         if (transferData) {
             const data = JSON.parse(transferData);
-            renderPlayersFromData(data.players.map(p => ({
+            renderPlayersFromData((data.players || []).map(p => ({
                 name: p.name,
                 initial_character: p.role,
                 final_character: p.actualRole || p.role,
-                survived: p.isAlive
+                survived: p.isAlive,
+                alignment: p.team || 'good'
             })));
             localStorage.removeItem('botc_transfer_data');
         } else if (draftData) {
             restoreDraft(JSON.parse(draftData));
         } else {
-            list.innerHTML = "";
+            list.innerHTML = '';
             for (let i = 0; i < 12; i++) addPlayerRow();
         }
         applyDefaultStoryteller();
@@ -120,10 +154,9 @@
     const loadRecentMatches = async () => {
         const container = document.getElementById('recent-matches-list');
         if (!container) return;
-        const apiBase = window.API_BASE || "";
 
         try {
-            const resp = await fetch(`${apiBase}/api/history`);
+            const resp = await fetch(`${apiBase()}/api/history`);
             if (!resp.ok) throw new Error();
             const data = await resp.json();
             const recent = data.slice(0, 6);
@@ -139,7 +172,7 @@
                     <div class="side-match-item">
                         <div class="side-match-flex">
                             <div class="side-left-info">
-                                <div class="m-title" title="${m.script}">${m.script}</div>
+                                <div class="m-title" title="${m.script || ''}">${m.script || '未知劇本'}</div>
                                 <div class="m-meta">
                                     <span><i class="fa-solid fa-users"></i> ${m.players?.length || 0}人</span>
                                     <span><i class="fa-solid fa-user-tie"></i> ${m.storyteller || '未知'}</span>
@@ -149,8 +182,8 @@
                                 </div>
                             </div>
                             <div class="side-mini-box date-box">
-                                <div class="box-label">${d.getFullYear()}</div>
-                                <div class="box-value">${d.getMonth()+1}/${d.getDate()}</div>
+                                <div class="box-label">${Number.isNaN(d.getTime()) ? '' : d.getFullYear()}</div>
+                                <div class="box-value">${Number.isNaN(d.getTime()) ? '-' : `${d.getMonth()+1}/${d.getDate()}`}</div>
                             </div>
                             <div class="side-mini-box status-box ${isGood ? 'box-good' : 'box-evil'}">
                                 <div class="box-value">${isGood ? '善良' : '邪惡'}</div>
@@ -228,7 +261,7 @@
         const players = [];
         lines.forEach(line => {
             const match = line.match(/^(\d+)\.?\s*([^\s]+)\s+(.+)$/);
-            if (match && parseInt(match[1]) < 20) {
+            if (match && parseInt(match[1], 10) < 20) {
                 players.push({ name: match[2], initial_character: '', final_character: '', survived: true });
             }
         });
@@ -283,36 +316,39 @@
 
     document.getElementById('record-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!currentAuth.authenticated || !currentAuth.can_upload) {
-            alert(currentAuth.authenticated ? "此 LINE 帳號尚未開放上傳權限。" : "請先使用 LINE 登入。");
-            if (!currentAuth.authenticated) window.location.href = lineLoginUrl();
+        if (!isLoggedIn() || !currentAuth.can_upload) {
+            alert(isLoggedIn() ? '此 LINE 帳號尚未開放上傳權限。' : '請先使用 LINE 登入。');
+            if (!isLoggedIn()) window.location.href = lineLoginUrl();
             return;
         }
 
         const btn = document.getElementById('submit-btn');
-        const apiBase = window.API_BASE || "";
         btn.disabled = true;
-        btn.innerText = "寫入中...";
+        btn.innerText = '寫入中...';
 
         const payload = {
             script: document.getElementById('match-script').value,
             date: document.getElementById('match-date').value,
-            location: document.getElementById('match-location').value || "未知",
+            location: document.getElementById('match-location').value || '未知',
             storyteller: document.getElementById('match-storyteller').value,
             winning_team: document.getElementById('match-winner').value,
             replay_log: document.getElementById('log-input').value,
             players: Array.from(document.querySelectorAll('.player-row')).map((row, index) => ({
                 seat_number: index + 1,
+                seat: index + 1,
                 name: row.querySelector('.p-name').value.trim(),
                 initial_character: row.querySelector('.p-initial').value.trim(),
+                initial_role: row.querySelector('.p-initial').value.trim(),
                 final_character: row.querySelector('.p-final').value.trim(),
+                final_role: row.querySelector('.p-final').value.trim(),
                 alignment: row.querySelector('.p-team').value,
+                status: row.querySelector('.p-status').value,
                 survived: row.querySelector('.p-status').value === 'alive'
-            })).filter(p => p.name !== "")
+            })).filter(p => p.name !== '')
         };
 
         try {
-            const resp = await fetch(`${apiBase}/api/matches`, {
+            const resp = await fetch(`${apiBase()}/api/matches`, {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
@@ -325,7 +361,7 @@
                 loadRecentMatches();
             } else {
                 const err = await resp.json().catch(() => ({}));
-                alert("失敗: " + (err.detail || "沒有上傳權限"));
+                alert('失敗: ' + (err.detail || '沒有上傳權限'));
                 await refreshAuthState();
             }
         } catch (err) {
@@ -339,7 +375,7 @@
         const datalist = document.getElementById('player-names-list');
         if (!datalist) return;
         try {
-            const resp = await fetch(`${window.API_BASE || ''}/api/players`);
+            const resp = await fetch(`${apiBase()}/api/players`);
             if (resp.ok) {
                 const names = await resp.json();
                 datalist.innerHTML = names.map(name => `<option value="${name}">`).join('');
