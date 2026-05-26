@@ -153,7 +153,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ is_banned: isBanned })
             }).then(requireOk);
-            await refreshAdminPanel();
+            await window.refreshAdminPanel();
         } catch (err) {
             alert(err.message);
         }
@@ -167,7 +167,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ is_allowed: isAllowed })
             }).then(requireOk);
-            await refreshAdminPanel();
+            await window.refreshAdminPanel();
         } catch (err) {
             alert(err.message);
         }
@@ -192,7 +192,7 @@
                 body: JSON.stringify(payload),
             }).then(requireOk);
             alert('已儲存');
-            await refreshAdminPanel();
+            await window.refreshAdminPanel();
         } catch (err) {
             alert(err.message);
         }
@@ -205,11 +205,11 @@
                 method: 'DELETE',
                 credentials: 'same-origin',
             }).then(requireOk);
-            await refreshAdminPanel();
+            await window.refreshAdminPanel();
         } catch (err) {
             alert(err.message);
         }
     };
 
-    refreshAdminPanel();
+    window.refreshAdminPanel();
 }
