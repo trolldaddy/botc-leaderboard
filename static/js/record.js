@@ -1,42 +1,17 @@
-/**
- * BOTC Stats - 錄入對局邏輯 (RECORD MATCH)
- */
-function setupRoleDatalist() {
-    let datalist = document.getElementById('all-roles-list');
-    if (!datalist) {
-        datalist = document.createElement('datalist');
-        datalist.id = 'all-roles-list';
-        document.body.appendChild(datalist);
-    }
-    if (window.MASTER_ROLE_DB && window.MASTER_ROLE_DB.length > 0) {
-        datalist.innerHTML = window.MASTER_ROLE_DB
-            .map(role => `<option value="${role.name}">`)
-            .join('');
-        console.log("角色建議清單已生成，共 " + window.MASTER_ROLE_DB.length + " 個角色。");
-    }
-}
-
-window.addEventListener('DOMContentLoaded', setupRoleDatalist);
-
 {
     let currentAuth = { authenticated: false, can_upload: false };
 
     const lineLoginUrl = () => {
         const next = encodeURIComponent(`${window.location.pathname}${window.location.hash || '#record'}`);
-        return `/auth/line/login?next=${next}`;
+        return `/api/auth/line/login?next=${next}`;
     };
 
     const setSubmitEnabled = (enabled) => {
-        const btn = document.getElementById('submit-btn');
-        if (!btn) return;
-        btn.disabled = !enabled;
-        btn.style.background = 'var(--accent-red)';
-        btn.style.color = '#fff';
-        btn.style.borderRadius = '999px';
-        btn.style.opacity = '1';
-        btn.style.boxShadow = enabled ? 'var(--shadow-glow)' : 'none';
-        btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
-        btn.innerHTML = enabled
+        const submitBtn = document.getElementById('submit-btn');
+        if (!submitBtn) return;
+        submitBtn.disabled = !enabled;
+        submitBtn.classList.toggle('is-locked', !enabled);
+        submitBtn.innerHTML = enabled
             ? `<i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績`
             : `<i class="fa-solid fa-lock"></i> 請先使用 LINE 登入`;
     };
@@ -56,15 +31,11 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         const summaryEl = document.getElementById('upload-auth-summary');
         if (!statusEl || !actionsEl || !summaryEl) return;
 
-        summaryEl.classList.remove('dark-input');
-        summaryEl.style.minHeight = '44px';
-        summaryEl.style.padding = '0';
-        summaryEl.style.background = 'transparent';
-        summaryEl.style.border = '0';
-        summaryEl.style.display = 'flex';
-        summaryEl.style.alignItems = 'center';
         actionsEl.innerHTML = '';
         actionsEl.style.display = 'none';
+        statusEl.style.display = 'none';
+        summaryEl.classList.remove('is-verified');
+        summaryEl.classList.remove('is-warning');
 
         if (!currentAuth.authenticated) {
             statusEl.innerHTML = `尚未登入。上傳戰績前，請先使用 LINE 登入來確認說書人身分。`;
@@ -84,7 +55,8 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
                     <i class="fa-solid fa-right-from-bracket"></i> 登出
                 </a>
             `;
-            summaryEl.innerHTML = `<span style="color: var(--text-muted);">已登入，但尚未開放上傳權限</span>`;
+            summaryEl.classList.add('is-warning');
+            summaryEl.innerHTML = `<span style="color: var(--accent-red);">${user.display_name || 'LINE 使用者'} 尚未開放上傳權限</span>`;
             setSubmitEnabled(false);
             return;
         }
@@ -95,6 +67,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
                 <i class="fa-solid fa-right-from-bracket"></i> 登出
             </a>
         `;
+        summaryEl.classList.add('is-verified');
         summaryEl.innerHTML = `<span style="color: var(--text-muted);">${user.display_name || 'LINE 使用者'} 已通過登入驗證</span>`;
         setSubmitEnabled(true);
     };
@@ -175,175 +148,33 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
                                     <span><i class="fa-solid fa-location-dot"></i> ${m.location || '未知'}</span>
                                 </div>
                             </div>
-                            <div class="side-right-boxes">
-                                <div class="side-mini-box date-box">
-                                    <span class="box-label">${d.getFullYear()}</span>
-                                    <span class="box-value">${d.getMonth()+1}/${d.getDate()}</span>
-                                </div>
-                                <div class="side-mini-box status-box ${isGood ? 'box-good' : 'box-evil'}">
-                                    <span class="box-label">${isGood ? '善良' : '邪惡'}</span>
-                                    <span class="box-value">獲勝</span>
-                                </div>
+                            <div class="side-mini-box date-box">
+                                <div class="box-label">${d.getFullYear()}</div>
+                                <div class="box-value">${d.getMonth()+1}/${d.getDate()}</div>
+                            </div>
+                            <div class="side-mini-box status-box ${isGood ? 'box-good' : 'box-evil'}">
+                                <div class="box-value">${isGood ? '善良' : '邪惡'}</div>
+                                <div class="box-label">獲勝</div>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
         } catch (err) {
-            container.innerHTML = `<div style="text-align: center; color: var(--accent-red); padding: 1rem;">載入失敗</div>`;
+            container.innerHTML = `<div style="color: var(--accent-red); padding: 1rem; text-align:center;">讀取失敗</div>`;
         }
-    };
-
-    const getAlignmentByRole = (roleStr) => {
-        if (!roleStr) return "good";
-        let targetRole = roleStr;
-        if (roleStr.includes("實際:")) targetRole = roleStr.split("實際:")[1].trim();
-        else if (roleStr.includes("/")) targetRole = roleStr.split("/")[1]?.trim() || roleStr.split("/")[0].trim();
-        targetRole = targetRole.replace(/[()（）]/g, "").trim();
-        const db = window.MASTER_ROLE_DB || [];
-        const roleData = db.find(r => r.name === targetRole || r.id === targetRole);
-        return (roleData && (roleData.team === 'minion' || roleData.team === 'demon')) ? "evil" : "good";
-    };
-
-    window.saveDraft = () => {
-        const scriptEl = document.getElementById('match-script');
-        if (!scriptEl) return;
-        const draft = {
-            script: scriptEl.value,
-            date: document.getElementById('match-date').value,
-            location: document.getElementById('match-location').value,
-            storyteller: document.getElementById('match-storyteller').value,
-            winner: document.getElementById('match-winner').value,
-            replay_log: document.getElementById('log-input').value,
-            players: Array.from(document.querySelectorAll('.player-row')).map((row, index) => ({
-                seat_number: index + 1,
-                name: row.querySelector('.p-name').value,
-                initial_character: row.querySelector('.p-initial').value,
-                final_character: row.querySelector('.p-final').value,
-                alignment: row.querySelector('.p-team').value,
-                survived: row.querySelector('.p-status').value === 'alive'
-            }))
-        };
-        localStorage.setItem('botc_record_draft', JSON.stringify(draft));
-        const statusEl = document.getElementById('save-status');
-        if (statusEl) statusEl.innerText = "草稿已儲存 (" + new Date().toLocaleTimeString() + ")";
-    };
-
-    const restoreDraft = (data) => {
-        const locSelect = document.getElementById('match-location');
-        document.getElementById('match-script').value = data.script || "";
-        document.getElementById('match-date').value = data.date || "";
-        if (locSelect) locSelect.value = data.location || "拉普拉斯";
-        if (data.replay_log) document.getElementById('log-input').value = data.replay_log;
-        document.getElementById('match-storyteller').value = data.storyteller || "";
-        document.getElementById('match-winner').value = data.winner || "good";
-        renderPlayersFromData(data.players || []);
-    };
-
-    const renderPlayersFromData = (players) => {
-        const list = document.getElementById('players-list');
-        list.innerHTML = "";
-        players.forEach(p => addPlayerRow(p));
-    };
-
-    window.clearFullForm = () => {
-        if (confirm("確定清空嗎？")) {
-            localStorage.removeItem('botc_record_draft');
-            location.reload();
-        }
-    };
-
-    window.autoFillFromLog = () => {
-        const text = document.getElementById('log-input').value;
-        if (!text.trim()) return;
-
-        const safeSet = (id, value) => {
-            const el = document.getElementById(id);
-            if (el && value) {
-                el.value = value.trim();
-                return true;
-            }
-            return false;
-        };
-
-        const scriptMatch = text.match(/劇本名稱：(.+)/);
-        const locationMatch = text.match(/遊戲地點：(.+)/);
-        const dateMatch = text.match(/遊戲日期：(\d{4}-\d{2}-\d{2})/);
-        const storytellerMatch = text.match(/說書人：(.+)/) || text.match(/記錄者：(.+)/);
-        const winnerMatch = text.match(/勝利陣營：(.+)/);
-
-        if (scriptMatch) document.getElementById('match-script').value = scriptMatch[1].trim();
-        if (locationMatch) {
-            const locSelect = document.getElementById('match-location');
-            const locVal = locationMatch[1].trim();
-            const exists = Array.from(locSelect.options).some(opt => opt.value === locVal);
-            locSelect.value = exists ? locVal : "其他";
-        }
-        if (dateMatch) document.getElementById('match-date').value = dateMatch[1];
-        if (winnerMatch) {
-            const winnerText = winnerMatch[1];
-            const teamVal = winnerText.includes("善良") ? "good" : (winnerText.includes("邪惡") ? "evil" : "");
-            safeSet('match-winner', teamVal);
-        }
-        if (storytellerMatch) safeSet('match-storyteller', storytellerMatch[1]);
-
-        const blocks = text.split('【當前玩家狀態】');
-        if (blocks.length < 2) return;
-
-        const rowRegex = /\[(\d+)號\]\s*(.*?)\s*-\s*\((.*?)\)\s*(.*)/g;
-        const playerMap = {};
-
-        blocks.forEach((block) => {
-            let m;
-            rowRegex.lastIndex = 0;
-            while ((m = rowRegex.exec(block)) !== null) {
-                const id = m[1];
-                const status = m[2].trim();
-                const role = m[3].trim();
-                const name = m[4].trim();
-
-                if (!playerMap[id]) {
-                    playerMap[id] = {
-                        name,
-                        initial_character: role,
-                        final_character: role,
-                        survived: !status.includes("死亡")
-                    };
-                } else {
-                    if (name) playerMap[id].name = name;
-                    playerMap[id].final_character = role;
-                    playerMap[id].survived = !status.includes("死亡");
-                }
-            }
-        });
-
-        const players = Object.values(playerMap);
-        if (players.length > 0) {
-            renderPlayersFromData(players);
-            if (window.updateRowNumbers) window.updateRowNumbers();
-            saveDraft();
-        }
-    };
-
-    window.updateRowNumbers = () => {
-        const rows = document.querySelectorAll('.player-row');
-        rows.forEach((row, index) => {
-            const numEl = row.querySelector('.row-index');
-            if (numEl) numEl.innerText = index + 1;
-        });
     };
 
     window.addPlayerRow = (data = null) => {
         const list = document.getElementById('players-list');
+        if (!list) return;
+        const index = list.children.length + 1;
+        const alignment = data?.alignment || (data?.team === 'evil' ? 'evil' : 'good');
         const row = document.createElement('div');
-        row.className = "player-row grid grid-cols-2 sm:grid-cols-12 gap-2 p-3 sm:p-2 bg-slate-800/40 rounded-xl sm:rounded-lg border border-slate-700 sm:border-slate-800/50 items-center";
-        const alignment = data?.alignment || getAlignmentByRole(data?.final_character);
-
+        row.className = 'player-row grid grid-cols-12 gap-2 items-center bg-slate-900/60 p-2 rounded-lg border border-slate-800';
         row.innerHTML = `
-            <div class="hidden sm:flex sm:col-span-1 justify-center items-center font-mono text-gold font-bold">
-                <span class="row-index">0</span>
-            </div>
-            <div class="col-span-2 sm:col-span-2">
+            <div class="col-span-1 text-center font-bold text-slate-300">${index}</div>
+            <div class="col-span-3 sm:col-span-2">
                 <label class="sm:hidden text-[10px] text-slate-500 mb-1 block">玩家暱稱</label>
                 <input type="text" class="p-name w-full bg-slate-900/50 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 outline-none focus:border-yellow-500" list="player-names-list" value="${data?.name || ''}" placeholder="暱稱" oninput="saveDraft()">
             </div>
@@ -369,14 +200,85 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
                     <option value="dead" ${data?.survived === false ? 'selected' : ''}>死亡</option>
                 </select>
             </div>
-            <div class="col-span-2 sm:col-span-1 flex justify-end sm:justify-center">
-                <button type="button" class="text-slate-600 hover:text-red-500 p-2" onclick="if(confirm('確定刪除？')){this.closest('.player-row').remove(); window.updateRowNumbers(); saveDraft();}">
-                    <i class="fa-solid fa-trash-can"></i>
-                </button>
+            <div class="col-span-1 text-center">
+                <button type="button" onclick="this.closest('.player-row').remove(); renumberRows(); saveDraft();" class="text-slate-500 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
             </div>
         `;
         list.appendChild(row);
-        updateRowNumbers();
+    };
+
+    window.renumberRows = () => {
+        document.querySelectorAll('.player-row').forEach((row, i) => {
+            row.querySelector('div').textContent = i + 1;
+        });
+    };
+
+    window.renderPlayersFromData = (players) => {
+        const list = document.getElementById('players-list');
+        if (!list) return;
+        list.innerHTML = '';
+        players.forEach(p => addPlayerRow(p));
+        if (players.length === 0) addPlayerRow();
+    };
+
+    window.autoFillFromLog = () => {
+        const text = document.getElementById('log-input').value;
+        if (!text) return alert('請先貼上文字紀錄');
+        const lines = text.split('\n');
+        const players = [];
+        lines.forEach(line => {
+            const match = line.match(/^(\d+)\.?\s*([^\s]+)\s+(.+)$/);
+            if (match && parseInt(match[1]) < 20) {
+                players.push({ name: match[2], initial_character: '', final_character: '', survived: true });
+            }
+        });
+        if (players.length > 0) {
+            renderPlayersFromData(players);
+            saveDraft();
+        } else {
+            alert('無法自動解析玩家，請確認格式或手動輸入。');
+        }
+    };
+
+    window.saveDraft = () => {
+        const data = collectFormData();
+        localStorage.setItem('botc_record_draft', JSON.stringify(data));
+    };
+
+    const collectFormData = () => ({
+        script: document.getElementById('match-script')?.value || '',
+        date: document.getElementById('match-date')?.value || '',
+        location: document.getElementById('match-location')?.value || '',
+        storyteller: document.getElementById('match-storyteller')?.value || '',
+        winner: document.getElementById('match-winner')?.value || 'good',
+        log: document.getElementById('log-input')?.value || '',
+        players: Array.from(document.querySelectorAll('.player-row')).map(row => ({
+            name: row.querySelector('.p-name').value,
+            initial_character: row.querySelector('.p-initial').value,
+            final_character: row.querySelector('.p-final').value,
+            alignment: row.querySelector('.p-team').value,
+            survived: row.querySelector('.p-status').value === 'alive'
+        }))
+    });
+
+    window.restoreDraft = (data) => {
+        document.getElementById('match-script').value = data.script || '';
+        document.getElementById('match-date').value = data.date || '';
+        document.getElementById('match-location').value = data.location || '';
+        document.getElementById('match-storyteller').value = data.storyteller || '';
+        document.getElementById('match-winner').value = data.winner || 'good';
+        document.getElementById('log-input').value = data.log || '';
+        renderPlayersFromData(data.players || []);
+    };
+
+    window.clearForm = () => {
+        if (!confirm('確定清空目前表單？')) return;
+        localStorage.removeItem('botc_record_draft');
+        document.getElementById('record-form').reset();
+        document.getElementById('players-list').innerHTML = '';
+        for (let i = 0; i < 12; i++) addPlayerRow();
+        document.getElementById('match-date').value = new Date().toISOString().split('T')[0];
+        applyDefaultStoryteller();
     };
 
     document.getElementById('record-form')?.addEventListener('submit', async (e) => {
@@ -417,16 +319,17 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
                 body: JSON.stringify(payload)
             });
             if (resp.ok) {
-                alert("錄入成功！");
+                alert('上傳成功！');
                 localStorage.removeItem('botc_record_draft');
-                if (window.loadPage) window.loadPage('history');
+                clearForm();
+                loadRecentMatches();
             } else {
-                const err = await resp.json();
+                const err = await resp.json().catch(() => ({}));
                 alert("失敗: " + (err.detail || "沒有上傳權限"));
                 await refreshAuthState();
             }
         } catch (err) {
-            alert(`網路錯誤：${err.message}`);
+            alert('連線錯誤，請稍後再試');
         } finally {
             renderAuthState();
         }
@@ -436,7 +339,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         const datalist = document.getElementById('player-names-list');
         if (!datalist) return;
         try {
-            const resp = await fetch(`${window.API_BASE}/api/players`);
+            const resp = await fetch(`${window.API_BASE || ''}/api/players`);
             if (resp.ok) {
                 const names = await resp.json();
                 datalist.innerHTML = names.map(name => `<option value="${name}">`).join('');
