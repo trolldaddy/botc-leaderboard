@@ -30,6 +30,12 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         const btn = document.getElementById('submit-btn');
         if (!btn) return;
         btn.disabled = !enabled;
+        btn.style.background = 'var(--accent-red)';
+        btn.style.color = '#fff';
+        btn.style.borderRadius = '999px';
+        btn.style.opacity = '1';
+        btn.style.boxShadow = enabled ? 'var(--shadow-glow)' : 'none';
+        btn.style.cursor = enabled ? 'pointer' : 'not-allowed';
         btn.innerHTML = enabled
             ? `<i class="fa-solid fa-cloud-arrow-up"></i> 確認並提交戰績`
             : `<i class="fa-solid fa-lock"></i> 請先使用 LINE 登入`;
@@ -48,19 +54,29 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         const statusEl = document.getElementById('line-auth-status');
         const actionsEl = document.getElementById('line-auth-actions');
         const summaryEl = document.getElementById('upload-auth-summary');
-        if (!statusEl || !actionsEl) return;
+        if (!statusEl || !actionsEl || !summaryEl) return;
+
+        summaryEl.classList.remove('dark-input');
+        summaryEl.style.minHeight = '44px';
+        summaryEl.style.padding = '0';
+        summaryEl.style.background = 'transparent';
+        summaryEl.style.border = '0';
+        summaryEl.style.display = 'flex';
+        summaryEl.style.alignItems = 'center';
+        actionsEl.innerHTML = '';
+        actionsEl.style.display = 'none';
 
         if (!currentAuth.authenticated) {
             statusEl.innerHTML = `尚未登入。上傳戰績前，請先使用 LINE 登入來確認說書人身分。`;
-            actionsEl.innerHTML = `
+            summaryEl.innerHTML = `
                 <a class="line-login-button" href="${lineLoginUrl()}" aria-label="使用 LINE 登入" title="使用 LINE 登入"></a>
             `;
-            if (summaryEl) summaryEl.innerText = '尚未登入，不能上傳戰績';
             setSubmitEnabled(false);
             return;
         }
 
         const user = currentAuth.user || {};
+        actionsEl.style.display = 'flex';
         if (!currentAuth.can_upload) {
             statusEl.innerHTML = `已登入：<strong style="color:#fff;">${user.display_name || 'LINE 使用者'}</strong>。此帳號尚未開放上傳權限。`;
             actionsEl.innerHTML = `
@@ -68,7 +84,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
                     <i class="fa-solid fa-right-from-bracket"></i> 登出
                 </a>
             `;
-            if (summaryEl) summaryEl.innerText = '已登入，但尚未開放上傳權限';
+            summaryEl.innerHTML = `<span style="color: var(--text-muted);">已登入，但尚未開放上傳權限</span>`;
             setSubmitEnabled(false);
             return;
         }
@@ -79,7 +95,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
                 <i class="fa-solid fa-right-from-bracket"></i> 登出
             </a>
         `;
-        if (summaryEl) summaryEl.innerText = `${user.display_name || 'LINE 使用者'} 已通過登入驗證`;
+        summaryEl.innerHTML = `<span style="color: var(--text-muted);">${user.display_name || 'LINE 使用者'} 已通過登入驗證</span>`;
         setSubmitEnabled(true);
     };
 
