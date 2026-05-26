@@ -65,6 +65,12 @@ def ensure_runtime_schema():
         if "storyteller_accounts" in inspector.get_table_names():
             columns = {col["name"] for col in inspector.get_columns("storyteller_accounts")}
             with engine.begin() as conn:
+                if "created_at" not in columns:
+                    conn.execute(text(add_column_sql("storyteller_accounts", "created_at", timestamp_type)))
+                    if "last_login_at" in columns:
+                        conn.execute(text("UPDATE storyteller_accounts SET created_at = last_login_at WHERE created_at IS NULL"))
+                if "last_login_at" not in columns:
+                    conn.execute(text(add_column_sql("storyteller_accounts", "last_login_at", timestamp_type)))
                 if "is_banned" not in columns:
                     conn.execute(text(add_column_sql("storyteller_accounts", "is_banned", f"BOOLEAN DEFAULT {boolean_default}")))
                 if "banned_at" not in columns:
@@ -178,21 +184,25 @@ def enforce_upload_rate_limit(db: Session, account: models.StorytellerAccount):
         raise HTTPException(status_code=429, detail=f"此 LINE 帳號 24 小時內最多只能上傳 {UPLOAD_LIMIT_PER_24H} 筆紀錄")
 
 
+def serialize_datetime(value):
+    return value.isoformat() if value else None
+
+
 def serialize_match(m: models.Match, include_players: bool = True):
     payload = {
         "id": m.id,
         "script": m.script,
-        "date": m.date.isoformat() if m.date else None,
+        "date": serialize_datetime(m.date),
         "location": m.location,
         "storyteller": m.storyteller,
         "winning_team": m.winning_team,
         "replay_log": m.replay_log,
-        "created_at": m.created_at.isoformat() if m.created_at else None,
+        "created_at": serialize_datetime(m.created_at),
         "uploaded_by": m.uploader.display_name if m.uploader else None,
         "uploaded_by_line_user_id": m.uploader.line_user_id if m.uploader else None,
     }
     if include_players:
-        payload["players"] = [{"seat": p.seat, "name": p.player.name if p.player else "", "initial_role": p.initial_role, "final_role": p.final_role, "alignment": p.alignment, "status": p.status} for p in sorted(m.players, key=lambda x: x.seat)]
+        payload["players"] = [{"seat": p.seat, "name": p.player.name if p.player else "", "initial_role": p.initial_role, "final_role": p.final_role, "alignment": p.alignment, "status": p.status} for p in sorted(m.players, key=lambda x: x.seat if x.seat is not None else 999)]
     return payload
 
 
@@ -304,7 +314,10 @@ async def create_match(data: dict, db: Session = Depends(get_db), uploader: mode
 @app.get("/api/admin/users")
 async def admin_get_users(db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_storyteller)):
     accounts = db.query(models.StorytellerAccount).order_by(models.StorytellerAccount.last_login_at.desc()).all()
-    return [{"id": account.id, "line_user_id": account.line_user_id, "display_name": account.display_name, "picture_url": account.picture_url, "is_allowed": bool(account.is_allowed), "is_banned": bool(account.is_banned), "is_admin": storyteller_is_admin(account), "created_at": account.created_at, "last_login_at": account.last_login_at, "upload_count": len(account.uploaded_matches)} for account in accounts]
+    upload_counts = {}
+    for uploader_id, in db.query(models.Match.uploaded_by_id).filter(models.Match.uploaded_by_id.isnot(None)).all():
+        upload_counts[uploader_id] = upload_counts.get(uploader_id, 0) + 1
+    return [{"id": account.id, "line_user_id": account.line_user_id, "display_name": account.display_name, "picture_url": account.picture_url, "is_allowed": bool(account.is_allowed), "is_banned": bool(account.is_banned), "is_admin": storyteller_is_admin(account), "created_at": serialize_datetime(account.created_at), "last_login_at": serialize_datetime(account.last_login_at), "upload_count": upload_counts.get(account.id, 0)} for account in accounts]
 
 
 @app.patch("/api/admin/users/{account_id}")
@@ -326,7 +339,7 @@ async def admin_update_user(account_id: int, data: dict, db: Session = Depends(g
 
 @app.get("/api/admin/replays")
 async def admin_get_replays(db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_storyteller)):
-    matches = db.query(models.Match).options(joinedload(models.Match.players).joinedload(models.MatchPlayer.player), joinedload(models.Match.uploader)).order_by(models.Match.created_at.desc(), models.Match.date.desc()).all()
+    matches = db.query(models.Match).options(joinedload(models.Match.players).joinedload(models.MatchPlayer.player), joinedload(models.Match.uploader)).order_by(models.Match.date.desc(), models.Match.id.desc()).all()
     return [serialize_match(m) for m in matches]
 
 
