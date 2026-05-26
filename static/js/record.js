@@ -53,9 +53,7 @@ window.addEventListener('DOMContentLoaded', setupRoleDatalist);
         if (!currentAuth.authenticated) {
             statusEl.innerHTML = `尚未登入。上傳戰績前，請先使用 LINE 登入來確認說書人身分。`;
             actionsEl.innerHTML = `
-                <a class="btn btn-purple" href="${lineLoginUrl()}">
-                    <i class="fa-brands fa-line"></i> 使用 LINE 登入
-                </a>
+                <a class="line-login-button" href="${lineLoginUrl()}" aria-label="使用 LINE 登入" title="使用 LINE 登入"></a>
             `;
             if (summaryEl) summaryEl.innerText = '尚未登入，不能上傳戰績';
             setSubmitEnabled(false);
