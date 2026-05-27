@@ -207,6 +207,7 @@ def serialize_match(m: models.Match, include_players: bool = True):
                 "seat": getattr(p, "seat_number", None),
                 "seat_number": getattr(p, "seat_number", None),
                 "name": p.player.name if p.player else "",
+                "player_name": p.player.name if p.player else "",
                 "initial_role": getattr(p, "initial_character", None),
                 "initial_character": getattr(p, "initial_character", None),
                 "final_role": getattr(p, "final_character", None),
