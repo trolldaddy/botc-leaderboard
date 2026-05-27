@@ -202,7 +202,21 @@ def serialize_match(m: models.Match, include_players: bool = True):
         "uploaded_by_line_user_id": m.uploader.line_user_id if m.uploader else None,
     }
     if include_players:
-        payload["players"] = [{"seat": p.seat, "name": p.player.name if p.player else "", "initial_role": p.initial_role, "final_role": p.final_role, "alignment": p.alignment, "status": p.status} for p in sorted(m.players, key=lambda x: x.seat if x.seat is not None else 999)]
+        payload["players"] = [
+            {
+                "seat": getattr(p, "seat_number", None),
+                "seat_number": getattr(p, "seat_number", None),
+                "name": p.player.name if p.player else "",
+                "initial_role": getattr(p, "initial_character", None),
+                "initial_character": getattr(p, "initial_character", None),
+                "final_role": getattr(p, "final_character", None),
+                "final_character": getattr(p, "final_character", None),
+                "alignment": p.alignment,
+                "status": "alive" if p.survived else "dead",
+                "survived": bool(p.survived),
+            }
+            for p in sorted(m.players, key=lambda x: x.seat_number if x.seat_number is not None else 999)
+        ]
     return payload
 
 
@@ -299,7 +313,10 @@ async def create_match(data: dict, db: Session = Depends(get_db), uploader: mode
                 player = models.Player(name=name)
                 db.add(player)
                 db.flush()
-            mp = models.MatchPlayer(match_id=match.id, player_id=player.id, seat=p.get("seat") or p.get("seat_number"), initial_role=p.get("initial_role") or p.get("initial_character"), final_role=p.get("final_role") or p.get("final_character"), alignment=p.get("alignment"), status=p.get("status") or ("alive" if p.get("survived") else "dead"))
+            survived = p.get("survived")
+            if survived is None:
+                survived = p.get("status") != "dead"
+            mp = models.MatchPlayer(match_id=match.id, player_id=player.id, seat_number=p.get("seat_number") or p.get("seat"), initial_character=p.get("initial_character") or p.get("initial_role"), final_character=p.get("final_character") or p.get("final_role"), alignment=p.get("alignment"), survived=bool(survived))
             db.add(mp)
         db.commit()
         return {"status": "success", "match_id": match.id}
