@@ -40,13 +40,17 @@
         overflow: hidden;
     }
 
-    .admin-card > .card-header {
-        flex: 0 0 auto;
-    }
+    .admin-card > .card-header { flex: 0 0 auto; }
 
     .admin-list-status {
         color: var(--text-muted);
         padding: 1rem 0;
+    }
+
+    #admin-users-area,
+    #admin-replays-area {
+        min-height: 0;
+        overflow: hidden;
     }
 
     .admin-user-list,
@@ -57,16 +61,6 @@
         overflow-y: auto;
         padding-right: 0.4rem;
         min-height: 0;
-    }
-
-    #admin-users-area,
-    #admin-replays-area {
-        min-height: 0;
-        overflow: hidden;
-    }
-
-    #admin-users-area .admin-user-list,
-    #admin-replays-area .admin-replay-list {
         height: 100%;
     }
 
@@ -80,14 +74,34 @@
         overflow: hidden;
     }
 
+    .admin-replay-item.is-expanded {
+        background: rgba(255,255,255,0.055);
+        border-color: rgba(255,183,3,0.18);
+    }
+
     .admin-user-top,
     .admin-replay-top {
         display: flex;
         justify-content: space-between;
         gap: 1rem;
-        align-items: flex-start;
+        align-items: center;
         min-width: 0;
     }
+
+    .admin-replay-summary {
+        appearance: none;
+        border: 0;
+        background: transparent;
+        padding: 0;
+        margin: 0;
+        color: inherit;
+        text-align: left;
+        min-width: 0;
+        flex: 1 1 auto;
+        cursor: pointer;
+    }
+
+    .admin-replay-summary:hover .admin-title { color: var(--accent-gold); }
 
     .admin-title {
         font-weight: 800;
@@ -108,6 +122,21 @@
         flex-wrap: wrap;
         justify-content: flex-end;
         flex: 0 0 auto;
+    }
+
+    .admin-replay-details {
+        display: none;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .admin-replay-item.is-expanded .admin-replay-details { display: block; }
+
+    .admin-detail-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 0.8rem;
     }
 
     .admin-chip-row {
@@ -136,12 +165,9 @@
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 0.8rem;
-        margin-top: 1rem;
     }
 
-    .admin-edit-grid .wide {
-        grid-column: span 2;
-    }
+    .admin-edit-grid .wide { grid-column: span 2; }
 
     .admin-edit-grid label,
     .admin-section-title {
@@ -186,9 +212,7 @@
         font-weight: 700;
     }
 
-    .admin-player-table td:first-child {
-        width: 72px;
-    }
+    .admin-player-table td:first-child { width: 72px; }
 
     .admin-player-table .dark-input,
     .admin-edit-grid .dark-input,
@@ -237,7 +261,7 @@
     @media (max-width: 760px) {
         .admin-edit-grid { grid-template-columns: 1fr; }
         .admin-edit-grid .wide { grid-column: auto; }
-        .admin-user-top, .admin-replay-top { flex-direction: column; }
+        .admin-user-top, .admin-replay-top { flex-direction: column; align-items: flex-start; }
         .admin-actions { justify-content: flex-start; }
     }
 </style>
