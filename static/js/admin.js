@@ -2,6 +2,7 @@
     const apiBase = window.API_BASE || '';
     let adminUsers = [];
     let adminReplays = [];
+    const expandedReplays = new Set();
 
     const escapeHtml = (value) => String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -96,40 +97,48 @@
             return;
         }
         area.innerHTML = `<div class="admin-replay-list">
-            ${adminReplays.map(match => `
-                <div class="admin-replay-item" id="admin-replay-${match.id}">
-                    <div class="admin-replay-top">
-                        <div>
-                            <div class="admin-title">#${match.id} ${escapeHtml(match.script || '未知劇本')}</div>
-                            <div class="admin-meta">上傳人：${escapeHtml(match.uploaded_by || '未知')} ｜ 說書人：${escapeHtml(match.storyteller || '未知')} ｜ ${fmtDateTime(match.created_at || match.date)}</div>
+            ${adminReplays.map(match => {
+                const isOpen = expandedReplays.has(match.id);
+                return `
+                    <div class="admin-replay-item ${isOpen ? 'is-expanded' : ''}" id="admin-replay-${match.id}">
+                        <div class="admin-replay-top">
+                            <button class="admin-replay-summary" type="button" onclick="toggleReplayEditor(${match.id})">
+                                <div class="admin-title">#${match.id} ${escapeHtml(match.script || '未知劇本')}</div>
+                                <div class="admin-meta">上傳人：${escapeHtml(match.uploaded_by || '未知')} ｜ 說書人：${escapeHtml(match.storyteller || '未知')} ｜ ${fmtDateTime(match.created_at || match.date)} ｜ ${match.players?.length || 0} 人</div>
+                            </button>
+                            <div class="admin-actions">
+                                <button class="btn btn-outline" onclick="toggleReplayEditor(${match.id})">${isOpen ? '收合' : '展開'}</button>
+                                <button class="btn" style="background:var(--accent-red); color:#fff;" onclick="deleteReplay(${match.id})">刪除</button>
+                            </div>
                         </div>
-                        <div class="admin-actions">
-                            <button class="btn btn-outline" onclick="saveReplay(${match.id})">儲存</button>
-                            <button class="btn" style="background:var(--accent-red); color:#fff;" onclick="deleteReplay(${match.id})">刪除</button>
+
+                        <div class="admin-replay-details">
+                            <div class="admin-detail-actions">
+                                <button class="btn btn-outline" onclick="saveReplay(${match.id})"><i class="fa-solid fa-floppy-disk"></i> 儲存修改</button>
+                            </div>
+                            <div class="admin-edit-grid">
+                                <div><label>劇本</label><input class="dark-input js-script" value="${escapeHtml(match.script || '')}"></div>
+                                <div><label>日期</label><input class="dark-input js-date" type="date" value="${toDateInput(match.date)}"></div>
+                                <div><label>地點</label><input class="dark-input js-location" value="${escapeHtml(match.location || '')}"></div>
+                                <div><label>勝利陣營</label><select class="dark-input js-winning-team"><option value="good" ${match.winning_team === 'good' ? 'selected' : ''}>善良</option><option value="evil" ${match.winning_team === 'evil' ? 'selected' : ''}>邪惡</option></select></div>
+                                <div class="wide"><label>說書人</label><input class="dark-input js-storyteller" value="${escapeHtml(match.storyteller || '')}"></div>
+                            </div>
+
+                            <div class="admin-section-title"><i class="fa-solid fa-users"></i> 參與玩家</div>
+                            <div class="admin-player-table-wrap">
+                                <table class="admin-player-table">
+                                    <thead><tr><th>No.</th><th>玩家暱稱</th><th>初始角色</th><th>最終角色</th><th>最終陣營</th><th>存活狀態</th><th></th></tr></thead>
+                                    <tbody class="js-player-body">${playerRows(match.players || [])}</tbody>
+                                </table>
+                            </div>
+                            <button class="admin-add-player" type="button" onclick="addAdminPlayerRow(${match.id})"><i class="fa-solid fa-plus"></i> 新增玩家</button>
+
+                            <div class="admin-section-title"><i class="fa-solid fa-file-lines"></i> Replay 文字</div>
+                            <textarea class="dark-input admin-replay-log js-replay-log">${escapeHtml(match.replay_log || '')}</textarea>
                         </div>
                     </div>
-
-                    <div class="admin-edit-grid">
-                        <div><label>劇本</label><input class="dark-input js-script" value="${escapeHtml(match.script || '')}"></div>
-                        <div><label>日期</label><input class="dark-input js-date" type="date" value="${toDateInput(match.date)}"></div>
-                        <div><label>地點</label><input class="dark-input js-location" value="${escapeHtml(match.location || '')}"></div>
-                        <div><label>勝利陣營</label><select class="dark-input js-winning-team"><option value="good" ${match.winning_team === 'good' ? 'selected' : ''}>善良</option><option value="evil" ${match.winning_team === 'evil' ? 'selected' : ''}>邪惡</option></select></div>
-                        <div class="wide"><label>說書人</label><input class="dark-input js-storyteller" value="${escapeHtml(match.storyteller || '')}"></div>
-                    </div>
-
-                    <div class="admin-section-title"><i class="fa-solid fa-users"></i> 參與玩家</div>
-                    <div class="admin-player-table-wrap">
-                        <table class="admin-player-table">
-                            <thead><tr><th>No.</th><th>玩家暱稱</th><th>初始角色</th><th>最終角色</th><th>最終陣營</th><th>存活狀態</th><th></th></tr></thead>
-                            <tbody class="js-player-body">${playerRows(match.players || [])}</tbody>
-                        </table>
-                    </div>
-                    <button class="admin-add-player" type="button" onclick="addAdminPlayerRow(${match.id})"><i class="fa-solid fa-plus"></i> 新增玩家</button>
-
-                    <div class="admin-section-title"><i class="fa-solid fa-file-lines"></i> Replay 文字</div>
-                    <textarea class="dark-input admin-replay-log js-replay-log">${escapeHtml(match.replay_log || '')}</textarea>
-                </div>
-            `).join('')}
+                `;
+            }).join('')}
         </div>`;
     };
 
@@ -141,6 +150,12 @@
         alignment: row.querySelector('.js-player-alignment').value,
         survived: row.querySelector('.js-player-survived').value === 'alive',
     })).filter(p => p.player_name);
+
+    window.toggleReplayEditor = (matchId) => {
+        if (expandedReplays.has(matchId)) expandedReplays.delete(matchId);
+        else expandedReplays.add(matchId);
+        renderReplays();
+    };
 
     window.addAdminPlayerRow = (matchId) => {
         const body = document.querySelector(`#admin-replay-${matchId} .js-player-body`);
@@ -211,6 +226,7 @@
         if (!confirm(`確定刪除 #${id} 這筆 Replay 與所有玩家紀錄嗎？`)) return;
         try {
             await fetch(`${apiBase}/api/admin/matches/${id}`, { method: 'DELETE', credentials: 'same-origin' }).then(requireOk);
+            expandedReplays.delete(id);
             await window.refreshAdminPanel();
         } catch (err) { alert(err.message); }
     };
