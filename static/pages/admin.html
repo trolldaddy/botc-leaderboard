@@ -1,5 +1,5 @@
 <header class="top-header">
-    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 1rem;">
         <h2 style="font-family: 'Cinzel', serif; letter-spacing: 2px;">管理後台 (ADMIN)</h2>
         <button class="btn" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1);" onclick="refreshAdminPanel()">
             <i class="fa-solid fa-rotate"></i> 重新整理
@@ -7,106 +7,109 @@
     </div>
 </header>
 
-<div class="admin-layout">
-    <section class="card admin-card">
-        <div class="card-header">
-            <h3><i class="fa-solid fa-users-gear text-gold"></i> LINE 登入帳號</h3>
+<div class="admin-shell">
+    <aside class="card admin-panel admin-sidebar">
+        <div class="card-header admin-sidebar-header">
+            <h3><i class="fa-solid fa-layer-group text-gold"></i> 管理清單</h3>
+            <div class="admin-switch" role="group" aria-label="切換管理清單">
+                <button id="admin-mode-matches" type="button" onclick="setAdminMode('matches')">戰績</button>
+                <button id="admin-mode-users" type="button" onclick="setAdminMode('users')">說書人</button>
+            </div>
         </div>
-        <div id="admin-users-area" class="admin-list-status">正在讀取帳號...</div>
-    </section>
+        <div id="admin-sidebar-list" class="admin-list-status">正在讀取...</div>
+    </aside>
 
-    <section class="card admin-card admin-replay-card">
-        <div class="card-header">
-            <h3><i class="fa-solid fa-scroll text-gold"></i> Replay 紀錄管理</h3>
-        </div>
-        <div id="admin-replays-area" class="admin-list-status">正在讀取 Replay...</div>
+    <section class="card admin-panel admin-detail-panel">
+        <div id="admin-detail-area" class="admin-list-status">請先選擇一筆資料。</div>
     </section>
 </div>
 
 <style>
-    .admin-layout {
+    .admin-shell {
         display: grid;
-        grid-template-columns: minmax(320px, 0.8fr) minmax(620px, 1.6fr);
+        grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
         gap: 1.5rem;
         height: calc(100vh - 220px);
-        min-height: 520px;
+        min-height: 560px;
         overflow: hidden;
     }
 
-    .admin-card {
+    .admin-panel {
         min-height: 0;
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
 
-    .admin-card > .card-header { flex: 0 0 auto; }
+    .admin-sidebar-header {
+        align-items: stretch;
+        gap: 0.9rem;
+    }
+
+    .admin-switch {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.25rem;
+        padding: 0.25rem;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.035);
+    }
+
+    .admin-switch button {
+        border: 0;
+        border-radius: 6px;
+        padding: 0.5rem 0.7rem;
+        color: var(--text-muted);
+        background: transparent;
+        cursor: pointer;
+        font-weight: 800;
+    }
+
+    .admin-switch button.is-active {
+        color: #fff;
+        background: rgba(255,255,255,0.1);
+    }
 
     .admin-list-status {
         color: var(--text-muted);
         padding: 1rem 0;
     }
 
-    #admin-users-area,
-    #admin-replays-area {
+    #admin-sidebar-list,
+    #admin-detail-area {
         min-height: 0;
-        overflow: hidden;
+        overflow-y: auto;
+        padding-right: 0.35rem;
     }
 
-    .admin-user-list,
-    .admin-replay-list {
+    .admin-sidebar-list {
         display: flex;
         flex-direction: column;
-        gap: 0.8rem;
-        overflow-y: auto;
-        padding-right: 0.4rem;
-        min-height: 0;
-        height: 100%;
+        gap: 0.65rem;
     }
 
-    .admin-user-item,
-    .admin-replay-item {
+    .admin-list-item {
+        width: 100%;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 8px;
+        padding: 0.85rem;
         background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 10px;
-        padding: 1rem;
-        max-width: 100%;
-        overflow: hidden;
-    }
-
-    .admin-replay-item.is-expanded {
-        background: rgba(255,255,255,0.055);
-        border-color: rgba(255,183,3,0.18);
-    }
-
-    .admin-user-top,
-    .admin-replay-top {
-        display: flex;
-        justify-content: space-between;
-        gap: 1rem;
-        align-items: center;
-        min-width: 0;
-    }
-
-    .admin-replay-summary {
-        appearance: none;
-        border: 0;
-        background: transparent;
-        padding: 0;
-        margin: 0;
         color: inherit;
         text-align: left;
-        min-width: 0;
-        flex: 1 1 auto;
         cursor: pointer;
     }
 
-    .admin-replay-summary:hover .admin-title { color: var(--accent-gold); }
+    .admin-list-item:hover,
+    .admin-list-item.is-active {
+        border-color: rgba(255,183,3,0.28);
+        background: rgba(255,255,255,0.065);
+    }
 
-    .admin-title {
-        font-weight: 800;
+    .admin-list-title {
         color: #fff;
-        margin-bottom: 0.3rem;
+        font-weight: 900;
+        margin-bottom: 0.35rem;
     }
 
     .admin-meta {
@@ -116,34 +119,11 @@
         overflow-wrap: anywhere;
     }
 
-    .admin-actions {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        flex: 0 0 auto;
-    }
-
-    .admin-replay-details {
-        display: none;
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .admin-replay-item.is-expanded .admin-replay-details { display: block; }
-
-    .admin-detail-actions {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 0.8rem;
-    }
-
     .admin-chip-row {
-        margin-top: 0.5rem;
         display: flex;
         flex-wrap: wrap;
         gap: 0.35rem;
+        margin-top: 0.5rem;
     }
 
     .admin-chip {
@@ -155,52 +135,89 @@
         border-radius: 999px;
         background: rgba(255,255,255,0.08);
         color: var(--text-muted);
+        white-space: nowrap;
     }
 
-    .admin-chip.good { color: #cfe9ff; background: rgba(69,123,157,0.22); }
-    .admin-chip.danger { color: #ffd0d4; background: rgba(230,57,70,0.22); }
-    .admin-chip.gold { color: var(--accent-gold); background: rgba(255,183,3,0.12); }
+    .admin-chip.good { color: #cfe9ff; background: rgba(69,123,157,0.24); }
+    .admin-chip.danger { color: #ffd0d4; background: rgba(230,57,70,0.24); }
+    .admin-chip.gold { color: var(--accent-gold); background: rgba(255,183,3,0.13); }
 
-    .admin-edit-grid {
+    .admin-detail-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        margin-bottom: 1rem;
+    }
+
+    .admin-detail-title {
+        color: #fff;
+        font-size: 1.1rem;
+        font-weight: 900;
+        margin-bottom: 0.35rem;
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        flex: 0 0 auto;
+    }
+
+    .admin-form-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 0.8rem;
+        gap: 0.85rem;
+        margin-bottom: 1rem;
     }
 
-    .admin-edit-grid .wide { grid-column: span 2; }
+    .admin-form-grid .span-2 { grid-column: span 2; }
+    .admin-form-grid .span-4 { grid-column: 1 / -1; }
 
-    .admin-edit-grid label,
+    .admin-field label,
     .admin-section-title {
         display: block;
-        font-size: 0.68rem;
         color: var(--accent-gold);
+        font-size: 0.72rem;
+        font-weight: 800;
         margin-bottom: 0.35rem;
-        font-weight: 700;
     }
 
     .admin-section-title {
         margin-top: 1rem;
-        text-transform: none;
-        letter-spacing: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .admin-form-grid .dark-input,
+    .admin-player-table .dark-input,
+    .admin-replay-log {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
     }
 
     .admin-player-table-wrap {
         width: 100%;
         overflow-x: auto;
-        border: 1px solid rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.08);
         border-radius: 8px;
-        background: rgba(0,0,0,0.18);
+        background: rgba(0,0,0,0.2);
     }
 
     .admin-player-table {
         width: 100%;
-        min-width: 760px;
+        min-width: 900px;
         border-collapse: collapse;
     }
 
     .admin-player-table th,
     .admin-player-table td {
-        padding: 0.35rem;
+        padding: 0.4rem;
         border-bottom: 1px solid rgba(255,255,255,0.06);
         vertical-align: middle;
     }
@@ -209,18 +226,11 @@
         color: var(--text-muted);
         font-size: 0.72rem;
         text-align: left;
-        font-weight: 700;
+        font-weight: 800;
     }
 
-    .admin-player-table td:first-child { width: 72px; }
-
-    .admin-player-table .dark-input,
-    .admin-edit-grid .dark-input,
-    .admin-replay-log {
-        width: 100%;
-        min-width: 0;
-        box-sizing: border-box;
-    }
+    .admin-player-table td:first-child { width: 76px; }
+    .admin-player-table td:last-child { width: 52px; }
 
     .admin-icon-btn,
     .admin-add-player {
@@ -243,26 +253,46 @@
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        width: fit-content;
     }
 
     .admin-replay-log {
-        min-height: 120px;
-        max-height: 260px;
+        min-height: 220px;
         resize: vertical;
+        line-height: 1.6;
+    }
+
+    .admin-user-records {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        margin-top: 0.8rem;
+    }
+
+    .admin-user-record {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        align-items: center;
+        gap: 0.65rem;
+        padding: 0.75rem;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 8px;
+        background: rgba(255,255,255,0.035);
     }
 
     @media (max-width: 1200px) {
-        .admin-layout { grid-template-columns: 1fr; height: auto; overflow: visible; }
-        .admin-card { max-height: none; }
-        .admin-user-list, .admin-replay-list { max-height: 70vh; }
+        .admin-shell { grid-template-columns: 1fr; height: auto; overflow: visible; }
+        .admin-panel { max-height: none; }
+        #admin-sidebar-list, #admin-detail-area { max-height: none; overflow: visible; }
     }
 
     @media (max-width: 760px) {
-        .admin-edit-grid { grid-template-columns: 1fr; }
-        .admin-edit-grid .wide { grid-column: auto; }
-        .admin-user-top, .admin-replay-top { flex-direction: column; align-items: flex-start; }
+        .admin-detail-head,
+        .admin-user-record { grid-template-columns: 1fr; }
+        .admin-detail-head { flex-direction: column; }
         .admin-actions { justify-content: flex-start; }
+        .admin-form-grid { grid-template-columns: 1fr; }
+        .admin-form-grid .span-2,
+        .admin-form-grid .span-4 { grid-column: auto; }
     }
 </style>
 
