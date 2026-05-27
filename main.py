@@ -374,9 +374,38 @@ async def admin_update_match(match_id: int, data: dict, db: Session = Depends(ge
             match.date = datetime.strptime(data.get("date"), "%Y-%m-%d")
         except Exception:
             raise HTTPException(status_code=400, detail="日期格式需為 YYYY-MM-DD")
+    if "players" in data:
+        for existing in list(match.players):
+            db.delete(existing)
+        db.flush()
+        for index, p in enumerate(data.get("players") or []):
+            name = (p.get("player_name") or p.get("name") or "").strip()
+            if not name:
+                continue
+            player = db.query(models.Player).filter(models.Player.name == name).first()
+            if not player:
+                player = models.Player(name=name)
+                db.add(player)
+                db.flush()
+            survived = p.get("survived")
+            if survived is None:
+                survived = p.get("status") != "dead"
+            mp = models.MatchPlayer(
+                match_id=match.id,
+                player_id=player.id,
+                seat_number=p.get("seat_number") or p.get("seat") or index + 1,
+                initial_character=p.get("initial_character") or p.get("initial_role"),
+                final_character=p.get("final_character") or p.get("final_role"),
+                alignment=p.get("alignment") or "good",
+                survived=bool(survived),
+            )
+            db.add(mp)
     db.commit()
-    db.refresh(match)
-    return {"status": "success", "match": serialize_match(match, include_players=False)}
+    match = db.query(models.Match).options(
+        joinedload(models.Match.players).joinedload(models.MatchPlayer.player),
+        joinedload(models.Match.uploader),
+    ).filter(models.Match.id == match_id).first()
+    return {"status": "success", "match": serialize_match(match)}
 
 
 @app.delete("/api/admin/matches/{match_id}")
