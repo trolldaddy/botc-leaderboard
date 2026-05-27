@@ -2,7 +2,9 @@
     const apiBase = window.API_BASE || '';
     let adminUsers = [];
     let adminReplays = [];
-    const expandedReplays = new Set();
+    let currentMode = 'matches';
+    let selectedUserId = null;
+    let selectedMatchId = null;
 
     const escapeHtml = (value) => String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -16,6 +18,11 @@
         const d = new Date(value);
         if (Number.isNaN(d.getTime())) return '';
         return d.toISOString().slice(0, 10);
+    };
+
+    const fmtDate = (value) => {
+        const dateText = toDateInput(value);
+        return dateText || '未知日期';
     };
 
     const fmtDateTime = (value) => {
@@ -33,6 +40,126 @@
             message = body.detail || message;
         } catch (err) {}
         throw new Error(message);
+    };
+
+    const getMatchPlayers = (match) => Array.isArray(match?.players) ? match.players : [];
+
+    const getMatchUploaderLineId = (match) => match.uploaded_by_line_user_id || match.uploader_line_user_id || match.line_user_id || '';
+
+    const getUserRecords = (user) => adminReplays.filter((match) => {
+        const uploaderLineId = getMatchUploaderLineId(match);
+        return uploaderLineId && uploaderLineId === user.line_user_id;
+    });
+
+    const activeUser = () => adminUsers.find((user) => user.id === selectedUserId) || adminUsers[0] || null;
+    const activeMatch = () => adminReplays.find((match) => match.id === selectedMatchId) || adminReplays[0] || null;
+
+    const statusChip = (match) => match.winning_team === 'evil'
+        ? '<span class="admin-chip danger">邪惡獲勝</span>'
+        : '<span class="admin-chip good">善良獲勝</span>';
+
+    const setModeButtons = () => {
+        document.getElementById('admin-mode-matches')?.classList.toggle('is-active', currentMode === 'matches');
+        document.getElementById('admin-mode-users')?.classList.toggle('is-active', currentMode === 'users');
+    };
+
+    const renderSidebar = () => {
+        setModeButtons();
+        const area = document.getElementById('admin-sidebar-list');
+        if (!area) return;
+
+        if (currentMode === 'users') {
+            if (!adminUsers.length) {
+                area.innerHTML = '<div class="admin-list-status">目前還沒有 LINE 登入紀錄。</div>';
+                return;
+            }
+            area.innerHTML = `<div class="admin-sidebar-list">
+                ${adminUsers.map((user) => `
+                    <button class="admin-list-item ${user.id === selectedUserId ? 'is-active' : ''}" type="button" onclick="selectAdminUser(${user.id})">
+                        <div class="admin-list-title">${escapeHtml(user.display_name || 'LINE 使用者')}</div>
+                        <div class="admin-meta">${escapeHtml(user.line_user_id || '')}</div>
+                        <div class="admin-chip-row">
+                            ${user.is_admin ? '<span class="admin-chip gold"><i class="fa-solid fa-shield-halved"></i> 管理員</span>' : ''}
+                            ${user.is_banned ? '<span class="admin-chip danger">已 BAN</span>' : '<span class="admin-chip good">可登入</span>'}
+                            ${user.is_allowed ? '<span class="admin-chip good">允許上傳</span>' : '<span class="admin-chip">未開放上傳</span>'}
+                            <span class="admin-chip">${user.upload_count || 0} 筆</span>
+                        </div>
+                    </button>
+                `).join('')}
+            </div>`;
+            return;
+        }
+
+        if (!adminReplays.length) {
+            area.innerHTML = '<div class="admin-list-status">目前還沒有 Replay 紀錄。</div>';
+            return;
+        }
+        area.innerHTML = `<div class="admin-sidebar-list">
+            ${adminReplays.map((match) => `
+                <button class="admin-list-item ${match.id === selectedMatchId ? 'is-active' : ''}" type="button" onclick="selectAdminMatch(${match.id})">
+                    <div class="admin-list-title">#${match.id} ${escapeHtml(match.script || '未知劇本')}</div>
+                    <div class="admin-meta"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(match.location || '未知地點')}　<i class="fa-solid fa-user-tie"></i> ${escapeHtml(match.storyteller || '未知說書人')}</div>
+                    <div class="admin-meta"><i class="fa-solid fa-calendar-days"></i> ${fmtDate(match.date || match.created_at)}　<i class="fa-solid fa-users"></i> ${getMatchPlayers(match).length || 0} 人</div>
+                    <div class="admin-chip-row">
+                        ${statusChip(match)}
+                        <span class="admin-chip">上傳：${escapeHtml(match.uploaded_by || '未知')}</span>
+                    </div>
+                </button>
+            `).join('')}
+        </div>`;
+    };
+
+    const renderDetail = () => {
+        const area = document.getElementById('admin-detail-area');
+        if (!area) return;
+        if (currentMode === 'users') {
+            renderUserDetail(activeUser());
+        } else {
+            renderMatchDetail(activeMatch());
+        }
+    };
+
+    const renderUserDetail = (user) => {
+        const area = document.getElementById('admin-detail-area');
+        if (!area) return;
+        if (!user) {
+            area.innerHTML = '<div class="admin-list-status">請先選擇一個說書人。</div>';
+            return;
+        }
+        const records = getUserRecords(user);
+        area.innerHTML = `
+            <div class="admin-detail-head">
+                <div>
+                    <div class="admin-detail-title">${escapeHtml(user.display_name || 'LINE 使用者')}</div>
+                    <div class="admin-meta">LINE ID：${escapeHtml(user.line_user_id || '')}</div>
+                    <div class="admin-meta">最近登入：${fmtDateTime(user.last_login_at)}</div>
+                    <div class="admin-chip-row">
+                        ${user.is_admin ? '<span class="admin-chip gold"><i class="fa-solid fa-shield-halved"></i> 管理員</span>' : ''}
+                        ${user.is_banned ? '<span class="admin-chip danger">已 BAN</span>' : '<span class="admin-chip good">可登入</span>'}
+                        ${user.is_allowed ? '<span class="admin-chip good">允許上傳</span>' : '<span class="admin-chip">未開放上傳</span>'}
+                        <span class="admin-chip">${records.length} 筆上傳</span>
+                    </div>
+                </div>
+                <div class="admin-actions">
+                    <button class="btn btn-outline" onclick="toggleUserAllowed(${user.id}, ${!user.is_allowed})">${user.is_allowed ? '移除上傳權限' : '允許上傳'}</button>
+                    <button class="btn" style="background:${user.is_banned ? 'rgba(69,123,157,0.8)' : 'var(--accent-red)'}; color:#fff;" onclick="toggleUserBan(${user.id}, ${!user.is_banned})">${user.is_banned ? '解除 BAN' : 'BAN'}</button>
+                </div>
+            </div>
+
+            <div class="admin-section-title"><i class="fa-solid fa-scroll"></i> 此帳號上傳的戰績</div>
+            <div class="admin-user-records">
+                ${records.length ? records.map((match) => `
+                    <div class="admin-user-record">
+                        <div>
+                            <div class="admin-list-title">#${match.id} ${escapeHtml(match.script || '未知劇本')}</div>
+                            <div class="admin-meta">${fmtDate(match.date || match.created_at)} ｜ ${escapeHtml(match.location || '未知地點')} ｜ ${escapeHtml(match.storyteller || '未知說書人')}</div>
+                        </div>
+                        <button class="btn btn-outline" onclick="selectAdminMatchFromUser(${match.id})">編輯</button>
+                        <button class="btn" style="background:var(--accent-red); color:#fff;" onclick="deleteReplay(${match.id})">刪除</button>
+                    </div>
+                `).join('') : '<div class="admin-list-status">這個帳號目前沒有上傳戰績。</div>'}
+            </div>
+        `;
     };
 
     const playerRows = (players = []) => players.map((p, index) => `
@@ -57,111 +184,98 @@
         </tr>
     `).join('');
 
-    const renderUsers = () => {
-        const area = document.getElementById('admin-users-area');
+    const renderMatchDetail = (match) => {
+        const area = document.getElementById('admin-detail-area');
         if (!area) return;
-        if (!adminUsers.length) {
-            area.innerHTML = '<div class="admin-list-status">目前還沒有 LINE 登入紀錄。</div>';
+        if (!match) {
+            area.innerHTML = '<div class="admin-list-status">請先選擇一筆戰績。</div>';
             return;
         }
-        area.innerHTML = `<div class="admin-user-list">
-            ${adminUsers.map(user => `
-                <div class="admin-user-item">
-                    <div class="admin-user-top">
-                        <div>
-                            <div class="admin-title">${escapeHtml(user.display_name || 'LINE 使用者')}</div>
-                            <div class="admin-meta">${escapeHtml(user.line_user_id)}</div>
-                            <div class="admin-chip-row">
-                                ${user.is_admin ? '<span class="admin-chip gold"><i class="fa-solid fa-shield-halved"></i> 管理員</span>' : ''}
-                                ${user.is_banned ? '<span class="admin-chip danger"><i class="fa-solid fa-ban"></i> 已 BAN</span>' : '<span class="admin-chip good"><i class="fa-solid fa-circle-check"></i> 可登入</span>'}
-                                ${user.is_allowed ? '<span class="admin-chip good">允許上傳</span>' : '<span class="admin-chip">未白名單</span>'}
-                                <span class="admin-chip">${user.upload_count || 0} 筆上傳</span>
-                            </div>
-                            <div class="admin-meta" style="margin-top:0.45rem;">最近登入：${fmtDateTime(user.last_login_at)}</div>
-                        </div>
-                        <div class="admin-actions">
-                            <button class="btn btn-outline" onclick="toggleUserAllowed(${user.id}, ${!user.is_allowed})">${user.is_allowed ? '移除上傳' : '允許上傳'}</button>
-                            <button class="btn" style="background:${user.is_banned ? 'rgba(69,123,157,0.8)' : 'var(--accent-red)'}; color:#fff;" onclick="toggleUserBan(${user.id}, ${!user.is_banned})">${user.is_banned ? '解除 BAN' : 'BAN'}</button>
-                        </div>
+        const players = getMatchPlayers(match);
+        area.innerHTML = `
+            <div id="admin-match-detail" data-match-id="${match.id}">
+                <div class="admin-detail-head">
+                    <div>
+                        <div class="admin-detail-title">#${match.id} ${escapeHtml(match.script || '未知劇本')}</div>
+                        <div class="admin-meta">上傳人：${escapeHtml(match.uploaded_by || '未知')} ｜ 建立時間：${fmtDateTime(match.created_at)} ｜ ${players.length} 人</div>
+                        <div class="admin-chip-row">${statusChip(match)}<span class="admin-chip">${escapeHtml(match.location || '未知地點')}</span></div>
+                    </div>
+                    <div class="admin-actions">
+                        <button class="btn btn-outline" onclick="saveSelectedMatch()"><i class="fa-solid fa-floppy-disk"></i> 儲存修改</button>
+                        <button class="btn" style="background:var(--accent-red); color:#fff;" onclick="deleteReplay(${match.id})">刪除整筆</button>
                     </div>
                 </div>
-            `).join('')}
-        </div>`;
+
+                <div class="admin-form-grid">
+                    <div class="admin-field span-2"><label>劇本</label><input class="dark-input js-script" value="${escapeHtml(match.script || '')}"></div>
+                    <div class="admin-field"><label>日期</label><input class="dark-input js-date" type="date" value="${toDateInput(match.date)}"></div>
+                    <div class="admin-field"><label>勝利陣營</label><select class="dark-input js-winning-team"><option value="good" ${match.winning_team === 'good' ? 'selected' : ''}>善良</option><option value="evil" ${match.winning_team === 'evil' ? 'selected' : ''}>邪惡</option></select></div>
+                    <div class="admin-field span-2"><label>地點</label><input class="dark-input js-location" value="${escapeHtml(match.location || '')}"></div>
+                    <div class="admin-field span-2"><label>說書人名稱</label><input class="dark-input js-storyteller" value="${escapeHtml(match.storyteller || '')}"></div>
+                </div>
+
+                <div class="admin-section-title"><i class="fa-solid fa-users"></i> 參與玩家</div>
+                <div class="admin-player-table-wrap">
+                    <table class="admin-player-table">
+                        <thead><tr><th>No.</th><th>玩家暱稱</th><th>初始角色</th><th>最終角色</th><th>最終陣營</th><th>存活狀態</th><th></th></tr></thead>
+                        <tbody class="js-player-body">${playerRows(players)}</tbody>
+                    </table>
+                </div>
+                <button class="admin-add-player" type="button" onclick="addAdminPlayerRow()"><i class="fa-solid fa-plus"></i> 新增玩家</button>
+
+                <div class="admin-section-title"><i class="fa-solid fa-file-lines"></i> Replay 文字</div>
+                <textarea class="dark-input admin-replay-log js-replay-log">${escapeHtml(match.replay_log || '')}</textarea>
+            </div>
+        `;
     };
 
-    const renderReplays = () => {
-        const area = document.getElementById('admin-replays-area');
-        if (!area) return;
-        if (!adminReplays.length) {
-            area.innerHTML = '<div class="admin-list-status">目前還沒有 Replay 紀錄。</div>';
-            return;
-        }
-        area.innerHTML = `<div class="admin-replay-list">
-            ${adminReplays.map(match => {
-                const isOpen = expandedReplays.has(match.id);
-                return `
-                    <div class="admin-replay-item ${isOpen ? 'is-expanded' : ''}" id="admin-replay-${match.id}">
-                        <div class="admin-replay-top">
-                            <button class="admin-replay-summary" type="button" onclick="toggleReplayEditor(${match.id})">
-                                <div class="admin-title">#${match.id} ${escapeHtml(match.script || '未知劇本')}</div>
-                                <div class="admin-meta">上傳人：${escapeHtml(match.uploaded_by || '未知')} ｜ 說書人：${escapeHtml(match.storyteller || '未知')} ｜ ${fmtDateTime(match.created_at || match.date)} ｜ ${match.players?.length || 0} 人</div>
-                            </button>
-                            <div class="admin-actions">
-                                <button class="btn btn-outline" onclick="toggleReplayEditor(${match.id})">${isOpen ? '收合' : '展開'}</button>
-                                <button class="btn" style="background:var(--accent-red); color:#fff;" onclick="deleteReplay(${match.id})">刪除</button>
-                            </div>
-                        </div>
+    const collectPlayers = (root) => Array.from(root.querySelectorAll('.admin-player-row')).map((row, index) => ({
+        seat_number: Number(row.querySelector('.js-player-seat')?.value) || index + 1,
+        player_name: row.querySelector('.js-player-name')?.value.trim() || '',
+        initial_character: row.querySelector('.js-player-initial')?.value.trim() || '',
+        final_character: row.querySelector('.js-player-final')?.value.trim() || '',
+        alignment: row.querySelector('.js-player-alignment')?.value || 'good',
+        survived: row.querySelector('.js-player-survived')?.value !== 'dead',
+    })).filter((player) => player.player_name || player.initial_character || player.final_character);
 
-                        <div class="admin-replay-details">
-                            <div class="admin-detail-actions">
-                                <button class="btn btn-outline" onclick="saveReplay(${match.id})"><i class="fa-solid fa-floppy-disk"></i> 儲存修改</button>
-                            </div>
-                            <div class="admin-edit-grid">
-                                <div><label>劇本</label><input class="dark-input js-script" value="${escapeHtml(match.script || '')}"></div>
-                                <div><label>日期</label><input class="dark-input js-date" type="date" value="${toDateInput(match.date)}"></div>
-                                <div><label>地點</label><input class="dark-input js-location" value="${escapeHtml(match.location || '')}"></div>
-                                <div><label>勝利陣營</label><select class="dark-input js-winning-team"><option value="good" ${match.winning_team === 'good' ? 'selected' : ''}>善良</option><option value="evil" ${match.winning_team === 'evil' ? 'selected' : ''}>邪惡</option></select></div>
-                                <div class="wide"><label>說書人</label><input class="dark-input js-storyteller" value="${escapeHtml(match.storyteller || '')}"></div>
-                            </div>
-
-                            <div class="admin-section-title"><i class="fa-solid fa-users"></i> 參與玩家</div>
-                            <div class="admin-player-table-wrap">
-                                <table class="admin-player-table">
-                                    <thead><tr><th>No.</th><th>玩家暱稱</th><th>初始角色</th><th>最終角色</th><th>最終陣營</th><th>存活狀態</th><th></th></tr></thead>
-                                    <tbody class="js-player-body">${playerRows(match.players || [])}</tbody>
-                                </table>
-                            </div>
-                            <button class="admin-add-player" type="button" onclick="addAdminPlayerRow(${match.id})"><i class="fa-solid fa-plus"></i> 新增玩家</button>
-
-                            <div class="admin-section-title"><i class="fa-solid fa-file-lines"></i> Replay 文字</div>
-                            <textarea class="dark-input admin-replay-log js-replay-log">${escapeHtml(match.replay_log || '')}</textarea>
-                        </div>
-                    </div>
-                `;
-            }).join('')}
-        </div>`;
+    const ensureSelections = () => {
+        if (!adminReplays.some((match) => match.id === selectedMatchId)) selectedMatchId = adminReplays[0]?.id ?? null;
+        if (!adminUsers.some((user) => user.id === selectedUserId)) selectedUserId = adminUsers[0]?.id ?? null;
     };
 
-    const collectPlayers = (item) => Array.from(item.querySelectorAll('.admin-player-row')).map((row, index) => ({
-        seat_number: Number(row.querySelector('.js-player-seat').value) || index + 1,
-        player_name: row.querySelector('.js-player-name').value.trim(),
-        initial_character: row.querySelector('.js-player-initial').value.trim(),
-        final_character: row.querySelector('.js-player-final').value.trim(),
-        alignment: row.querySelector('.js-player-alignment').value,
-        survived: row.querySelector('.js-player-survived').value === 'alive',
-    })).filter(p => p.player_name);
-
-    window.toggleReplayEditor = (matchId) => {
-        if (expandedReplays.has(matchId)) expandedReplays.delete(matchId);
-        else expandedReplays.add(matchId);
-        renderReplays();
+    window.setAdminMode = (mode) => {
+        currentMode = mode === 'users' ? 'users' : 'matches';
+        ensureSelections();
+        renderSidebar();
+        renderDetail();
     };
 
-    window.addAdminPlayerRow = (matchId) => {
-        const body = document.querySelector(`#admin-replay-${matchId} .js-player-body`);
+    window.selectAdminUser = (id) => {
+        selectedUserId = id;
+        currentMode = 'users';
+        renderSidebar();
+        renderDetail();
+    };
+
+    window.selectAdminMatch = (id) => {
+        selectedMatchId = id;
+        currentMode = 'matches';
+        renderSidebar();
+        renderDetail();
+    };
+
+    window.selectAdminMatchFromUser = (id) => {
+        selectedMatchId = id;
+        currentMode = 'matches';
+        renderSidebar();
+        renderDetail();
+    };
+
+    window.addAdminPlayerRow = () => {
+        const body = document.querySelector('#admin-match-detail .js-player-body');
         if (!body) return;
         const index = body.querySelectorAll('tr').length + 1;
-        body.insertAdjacentHTML('beforeend', playerRows([{ seat_number: index, survived: true, alignment: 'good' }]));
+        body.insertAdjacentHTML('beforeend', playerRows([{ seat_number: index, alignment: 'good', survived: true }]));
     };
 
     window.removeAdminPlayerRow = (button) => {
@@ -169,10 +283,10 @@
     };
 
     window.refreshAdminPanel = async () => {
-        const usersArea = document.getElementById('admin-users-area');
-        const replaysArea = document.getElementById('admin-replays-area');
-        if (usersArea) usersArea.innerHTML = '<div class="admin-list-status">正在讀取帳號...</div>';
-        if (replaysArea) replaysArea.innerHTML = '<div class="admin-list-status">正在讀取 Replay...</div>';
+        const sidebar = document.getElementById('admin-sidebar-list');
+        const detail = document.getElementById('admin-detail-area');
+        if (sidebar) sidebar.innerHTML = '<div class="admin-list-status">正在讀取清單...</div>';
+        if (detail) detail.innerHTML = '<div class="admin-list-status">正在整理資料...</div>';
         try {
             const [usersResp, replaysResp] = await Promise.all([
                 fetch(`${apiBase}/api/admin/users`, { credentials: 'same-origin' }).then(requireOk),
@@ -180,55 +294,86 @@
             ]);
             adminUsers = await usersResp.json();
             adminReplays = await replaysResp.json();
-            renderUsers();
-            renderReplays();
+            ensureSelections();
+            renderSidebar();
+            renderDetail();
         } catch (err) {
             const message = escapeHtml(err.message || '無法讀取管理後台');
-            if (usersArea) usersArea.innerHTML = `<div style="color:var(--accent-red); padding:1rem 0;">${message}</div>`;
-            if (replaysArea) replaysArea.innerHTML = `<div style="color:var(--accent-red); padding:1rem 0;">${message}</div>`;
+            if (sidebar) sidebar.innerHTML = `<div style="color:var(--accent-red); padding:1rem 0;">${message}</div>`;
+            if (detail) detail.innerHTML = `<div style="color:var(--accent-red); padding:1rem 0;">${message}</div>`;
         }
     };
 
     window.toggleUserBan = async (id, isBanned) => {
         try {
-            await fetch(`${apiBase}/api/admin/users/${id}`, { method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ is_banned: isBanned }) }).then(requireOk);
+            await fetch(`${apiBase}/api/admin/users/${id}`, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ is_banned: isBanned }),
+            }).then(requireOk);
+            selectedUserId = id;
             await window.refreshAdminPanel();
-        } catch (err) { alert(err.message); }
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
     window.toggleUserAllowed = async (id, isAllowed) => {
         try {
-            await fetch(`${apiBase}/api/admin/users/${id}`, { method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ is_allowed: isAllowed }) }).then(requireOk);
+            await fetch(`${apiBase}/api/admin/users/${id}`, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ is_allowed: isAllowed }),
+            }).then(requireOk);
+            selectedUserId = id;
             await window.refreshAdminPanel();
-        } catch (err) { alert(err.message); }
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
-    window.saveReplay = async (id) => {
-        const item = document.getElementById(`admin-replay-${id}`);
-        if (!item) return;
+    window.saveSelectedMatch = async () => {
+        const root = document.getElementById('admin-match-detail');
+        if (!root) return;
+        const id = Number(root.dataset.matchId);
         const payload = {
-            script: item.querySelector('.js-script').value,
-            date: item.querySelector('.js-date').value,
-            location: item.querySelector('.js-location').value,
-            storyteller: item.querySelector('.js-storyteller').value,
-            winning_team: item.querySelector('.js-winning-team').value,
-            replay_log: item.querySelector('.js-replay-log').value,
-            players: collectPlayers(item),
+            script: root.querySelector('.js-script')?.value || '',
+            date: root.querySelector('.js-date')?.value || '',
+            location: root.querySelector('.js-location')?.value || '',
+            storyteller: root.querySelector('.js-storyteller')?.value || '',
+            winning_team: root.querySelector('.js-winning-team')?.value || 'good',
+            replay_log: root.querySelector('.js-replay-log')?.value || '',
+            players: collectPlayers(root),
         };
         try {
-            await fetch(`${apiBase}/api/admin/matches/${id}`, { method: 'PATCH', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(requireOk);
+            await fetch(`${apiBase}/api/admin/matches/${id}`, {
+                method: 'PATCH',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            }).then(requireOk);
+            selectedMatchId = id;
             alert('已儲存');
             await window.refreshAdminPanel();
-        } catch (err) { alert(err.message); }
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
     window.deleteReplay = async (id) => {
         if (!confirm(`確定刪除 #${id} 這筆 Replay 與所有玩家紀錄嗎？`)) return;
         try {
-            await fetch(`${apiBase}/api/admin/matches/${id}`, { method: 'DELETE', credentials: 'same-origin' }).then(requireOk);
-            expandedReplays.delete(id);
+            await fetch(`${apiBase}/api/admin/matches/${id}`, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+            }).then(requireOk);
+            if (selectedMatchId === id) selectedMatchId = null;
             await window.refreshAdminPanel();
-        } catch (err) { alert(err.message); }
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
     window.refreshAdminPanel();
