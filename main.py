@@ -10,7 +10,7 @@ from typing import Optional
 from urllib.parse import urlencode
 
 import requests
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -34,6 +34,7 @@ SESSION_COOKIE = "botc_session"
 LINE_STATE_COOKIE = "botc_line_state"
 LINE_NEXT_COOKIE = "botc_line_next"
 SESSION_MAX_AGE = 60 * 60 * 24 * 30
+DEFAULT_LOCATION_NAMES = ["拉普拉斯", "線上", "台北", "新北", "桃園", "台中", "台南", "高雄", "其他"]
 
 try:
     models.Base.metadata.create_all(bind=engine)
@@ -42,7 +43,6 @@ except Exception as e:
 
 
 def ensure_runtime_schema():
-    """補齊舊資料庫缺少的新欄位。create_all 不會自動 ALTER 已存在的表。"""
     try:
         inspector = inspect(engine)
         dialect = engine.dialect.name
@@ -54,7 +54,8 @@ def ensure_runtime_schema():
                 return f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {column} {definition}"
             return f"ALTER TABLE {table} ADD COLUMN {column} {definition}"
 
-        if "matches" in inspector.get_table_names():
+        table_names = inspector.get_table_names()
+        if "matches" in table_names:
             columns = {col["name"] for col in inspector.get_columns("matches")}
             with engine.begin() as conn:
                 if "uploaded_by_id" not in columns:
@@ -62,7 +63,7 @@ def ensure_runtime_schema():
                 if "created_at" not in columns:
                     conn.execute(text(add_column_sql("matches", "created_at", timestamp_type)))
                     conn.execute(text("UPDATE matches SET created_at = date WHERE created_at IS NULL"))
-        if "storyteller_accounts" in inspector.get_table_names():
+        if "storyteller_accounts" in table_names:
             columns = {col["name"] for col in inspector.get_columns("storyteller_accounts")}
             with engine.begin() as conn:
                 if "created_at" not in columns:
@@ -75,6 +76,24 @@ def ensure_runtime_schema():
                     conn.execute(text(add_column_sql("storyteller_accounts", "is_banned", f"BOOLEAN DEFAULT {boolean_default}")))
                 if "banned_at" not in columns:
                     conn.execute(text(add_column_sql("storyteller_accounts", "banned_at", timestamp_type)))
+        if "locations" in table_names:
+            columns = {col["name"] for col in inspector.get_columns("locations")}
+            with engine.begin() as conn:
+                for column, definition in {
+                    "type": "VARCHAR DEFAULT 'store'",
+                    "address": "TEXT",
+                    "link_url": "TEXT",
+                    "image_url": "TEXT",
+                    "description": "TEXT",
+                    "schedule_note": "TEXT",
+                    "contact_note": "TEXT",
+                    "is_public": f"BOOLEAN DEFAULT {boolean_default}",
+                    "sort_order": "INTEGER DEFAULT 0",
+                    "created_at": timestamp_type,
+                    "updated_at": timestamp_type,
+                }.items():
+                    if column not in columns:
+                        conn.execute(text(add_column_sql("locations", column, definition)))
     except Exception as e:
         print(f"資料庫結構補齊失敗: {e}")
 
@@ -188,6 +207,31 @@ def serialize_datetime(value):
     return value.isoformat() if value else None
 
 
+def serialize_location(location: models.Location):
+    return {
+        "id": location.id,
+        "name": location.name,
+        "type": location.type or "store",
+        "address": location.address,
+        "link_url": location.link_url,
+        "image_url": location.image_url,
+        "description": location.description,
+        "schedule_note": location.schedule_note,
+        "contact_note": location.contact_note,
+        "is_public": bool(location.is_public),
+        "sort_order": location.sort_order or 0,
+        "created_at": serialize_datetime(location.created_at),
+        "updated_at": serialize_datetime(location.updated_at),
+    }
+
+
+def location_lookup(db: Session, public_only: bool = True):
+    query = db.query(models.Location)
+    if public_only:
+        query = query.filter(models.Location.is_public == True)  # noqa: E712
+    return {loc.name: serialize_location(loc) for loc in query.all()}
+
+
 def serialize_match(m: models.Match, include_players: bool = True):
     payload = {
         "id": m.id,
@@ -278,10 +322,7 @@ async def line_callback(request: Request, code: str = "", state: str = "", db: S
 
 @app.post("/api/auth/logout")
 async def logout():
-    response = {"status": "success"}
-    redirect = RedirectResponse("/#record")
-    clear_auth_cookie(redirect)
-    return response
+    return {"status": "success"}
 
 
 @app.get("/auth/logout")
@@ -296,6 +337,17 @@ async def get_me(account: Optional[models.StorytellerAccount] = Depends(get_opti
     if not account:
         return {"logged_in": False, "can_upload": False, "is_admin": False, "user": None}
     return {"logged_in": True, "can_upload": storyteller_can_upload(account), "is_admin": storyteller_is_admin(account), "user": {"display_name": account.display_name, "line_user_id": account.line_user_id, "picture_url": account.picture_url, "is_allowed": account.is_allowed, "is_banned": bool(account.is_banned)}}
+
+
+@app.get("/api/locations")
+async def get_locations(db: Session = Depends(get_db)):
+    saved = db.query(models.Location).filter(models.Location.is_public == True).order_by(models.Location.sort_order.asc(), models.Location.name.asc()).all()  # noqa: E712
+    by_name = {loc.name: serialize_location(loc) for loc in saved}
+    results = list(by_name.values())
+    for index, name in enumerate(DEFAULT_LOCATION_NAMES):
+        if name not in by_name:
+            results.append({"id": None, "name": name, "type": "discord" if name == "線上" else "store", "address": None, "link_url": None, "image_url": None, "description": None, "schedule_note": None, "contact_note": None, "is_public": True, "sort_order": 1000 + index})
+    return results
 
 
 @app.post("/api/matches")
@@ -317,8 +369,7 @@ async def create_match(data: dict, db: Session = Depends(get_db), uploader: mode
             survived = p.get("survived")
             if survived is None:
                 survived = p.get("status") != "dead"
-            mp = models.MatchPlayer(match_id=match.id, player_id=player.id, seat_number=p.get("seat_number") or p.get("seat"), initial_character=p.get("initial_character") or p.get("initial_role"), final_character=p.get("final_character") or p.get("final_role"), alignment=p.get("alignment"), survived=bool(survived))
-            db.add(mp)
+            db.add(models.MatchPlayer(match_id=match.id, player_id=player.id, seat_number=p.get("seat_number") or p.get("seat"), initial_character=p.get("initial_character") or p.get("initial_role"), final_character=p.get("final_character") or p.get("final_role"), alignment=p.get("alignment"), survived=bool(survived)))
         db.commit()
         return {"status": "success", "match_id": match.id}
     except HTTPException:
@@ -353,6 +404,69 @@ async def admin_update_user(account_id: int, data: dict, db: Session = Depends(g
     db.commit()
     db.refresh(account)
     return {"status": "success", "account": {"id": account.id, "is_banned": bool(account.is_banned), "is_allowed": bool(account.is_allowed)}}
+
+
+@app.get("/api/admin/locations")
+async def admin_get_locations(db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_storyteller)):
+    locations = db.query(models.Location).order_by(models.Location.sort_order.asc(), models.Location.name.asc()).all()
+    return [serialize_location(location) for location in locations]
+
+
+@app.post("/api/admin/locations")
+async def admin_create_location(data: dict, db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_storyteller)):
+    name = (data.get("name") or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="地點名稱必填")
+    if db.query(models.Location).filter(models.Location.name == name).first():
+        raise HTTPException(status_code=400, detail="此地點名稱已存在")
+    location = models.Location(name=name)
+    apply_location_payload(location, data)
+    db.add(location)
+    db.commit()
+    db.refresh(location)
+    return {"status": "success", "location": serialize_location(location)}
+
+
+@app.patch("/api/admin/locations/{location_id}")
+async def admin_update_location(location_id: int, data: dict, db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_storyteller)):
+    location = db.query(models.Location).filter(models.Location.id == location_id).first()
+    if not location:
+        raise HTTPException(status_code=404, detail="找不到此地點")
+    new_name = (data.get("name") or location.name or "").strip()
+    if not new_name:
+        raise HTTPException(status_code=400, detail="地點名稱必填")
+    duplicate = db.query(models.Location).filter(models.Location.name == new_name, models.Location.id != location_id).first()
+    if duplicate:
+        raise HTTPException(status_code=400, detail="此地點名稱已存在")
+    location.name = new_name
+    apply_location_payload(location, data)
+    location.updated_at = datetime.now()
+    db.commit()
+    db.refresh(location)
+    return {"status": "success", "location": serialize_location(location)}
+
+
+@app.delete("/api/admin/locations/{location_id}")
+async def admin_delete_location(location_id: int, db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_storyteller)):
+    location = db.query(models.Location).filter(models.Location.id == location_id).first()
+    if not location:
+        raise HTTPException(status_code=404, detail="找不到此地點")
+    db.delete(location)
+    db.commit()
+    return {"status": "success"}
+
+
+def apply_location_payload(location: models.Location, data: dict):
+    for field in ["type", "address", "link_url", "image_url", "description", "schedule_note", "contact_note"]:
+        if field in data:
+            setattr(location, field, data.get(field))
+    if "is_public" in data:
+        location.is_public = bool(data.get("is_public"))
+    if "sort_order" in data:
+        try:
+            location.sort_order = int(data.get("sort_order") or 0)
+        except Exception:
+            location.sort_order = 0
 
 
 @app.get("/api/admin/replays")
@@ -390,21 +504,9 @@ async def admin_update_match(match_id: int, data: dict, db: Session = Depends(ge
             survived = p.get("survived")
             if survived is None:
                 survived = p.get("status") != "dead"
-            mp = models.MatchPlayer(
-                match_id=match.id,
-                player_id=player.id,
-                seat_number=p.get("seat_number") or p.get("seat") or index + 1,
-                initial_character=p.get("initial_character") or p.get("initial_role"),
-                final_character=p.get("final_character") or p.get("final_role"),
-                alignment=p.get("alignment") or "good",
-                survived=bool(survived),
-            )
-            db.add(mp)
+            db.add(models.MatchPlayer(match_id=match.id, player_id=player.id, seat_number=p.get("seat_number") or p.get("seat") or index + 1, initial_character=p.get("initial_character") or p.get("initial_role"), final_character=p.get("final_character") or p.get("final_role"), alignment=p.get("alignment") or "good", survived=bool(survived)))
     db.commit()
-    match = db.query(models.Match).options(
-        joinedload(models.Match.players).joinedload(models.MatchPlayer.player),
-        joinedload(models.Match.uploader),
-    ).filter(models.Match.id == match_id).first()
+    match = db.query(models.Match).options(joinedload(models.Match.players).joinedload(models.MatchPlayer.player), joinedload(models.Match.uploader)).filter(models.Match.id == match_id).first()
     return {"status": "success", "match": serialize_match(match)}
 
 
@@ -419,11 +521,13 @@ async def admin_delete_match(match_id: int, db: Session = Depends(get_db), admin
 
 
 @app.get("/api/stats")
+@app.get("/stats/")
 async def get_dashboard_summary(db: Session = Depends(get_db)):
     all_matches = db.query(models.Match).all()
     total_games = len(all_matches)
     global_good = sum(1 for m in all_matches if m.winning_team == "good")
     global_evil = total_games - global_good
+    location_details = location_lookup(db, public_only=True)
     location_map = {}
     for m in all_matches:
         loc = m.location or "未知"
@@ -434,7 +538,9 @@ async def get_dashboard_summary(db: Session = Depends(get_db)):
             location_map[loc]["good"] += 1
         else:
             location_map[loc]["evil"] += 1
-    location_stats = [{"name": loc, "total": s["total"], "good_wins": s["good"], "evil_wins": s["evil"], "good_rate": round(s["good"] / s["total"] * 100, 1) if s["total"] > 0 else 0, "evil_rate": round(s["evil"] / s["total"] * 100, 1) if s["total"] > 0 else 0} for loc, s in location_map.items()]
+    location_stats = []
+    for loc, s in location_map.items():
+        location_stats.append({"name": loc, "total": s["total"], "good_wins": s["good"], "evil_wins": s["evil"], "good_rate": round(s["good"] / s["total"] * 100, 1) if s["total"] > 0 else 0, "evil_rate": round(s["evil"] / s["total"] * 100, 1) if s["total"] > 0 else 0, "detail": location_details.get(loc)})
     return {"global": {"total": total_games, "good_wins": global_good, "evil_wins": global_evil, "good_rate": round(global_good / total_games * 100, 1) if total_games > 0 else 0, "evil_rate": round(global_evil / total_games * 100, 1) if total_games > 0 else 0}, "locations": sorted(location_stats, key=lambda x: x["total"], reverse=True)}
 
 
