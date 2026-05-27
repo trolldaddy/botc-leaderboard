@@ -26,16 +26,22 @@
 <style>
     .admin-layout {
         display: grid;
-        grid-template-columns: minmax(320px, 0.8fr) minmax(520px, 1.6fr);
+        grid-template-columns: minmax(320px, 0.8fr) minmax(620px, 1.6fr);
         gap: 1.5rem;
-        min-height: 0;
-        flex: 1;
+        height: calc(100vh - 220px);
+        min-height: 520px;
+        overflow: hidden;
     }
 
     .admin-card {
         min-height: 0;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
+    }
+
+    .admin-card > .card-header {
+        flex: 0 0 auto;
     }
 
     .admin-list-status {
@@ -50,6 +56,18 @@
         gap: 0.8rem;
         overflow-y: auto;
         padding-right: 0.4rem;
+        min-height: 0;
+    }
+
+    #admin-users-area,
+    #admin-replays-area {
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    #admin-users-area .admin-user-list,
+    #admin-replays-area .admin-replay-list {
+        height: 100%;
     }
 
     .admin-user-item,
@@ -58,6 +76,8 @@
         border: 1px solid rgba(255,255,255,0.07);
         border-radius: 10px;
         padding: 1rem;
+        max-width: 100%;
+        overflow: hidden;
     }
 
     .admin-user-top,
@@ -66,6 +86,7 @@
         justify-content: space-between;
         gap: 1rem;
         align-items: flex-start;
+        min-width: 0;
     }
 
     .admin-title {
@@ -86,6 +107,14 @@
         gap: 0.5rem;
         flex-wrap: wrap;
         justify-content: flex-end;
+        flex: 0 0 auto;
+    }
+
+    .admin-chip-row {
+        margin-top: 0.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.35rem;
     }
 
     .admin-chip {
@@ -97,7 +126,6 @@
         border-radius: 999px;
         background: rgba(255,255,255,0.08);
         color: var(--text-muted);
-        margin-right: 0.35rem;
     }
 
     .admin-chip.good { color: #cfe9ff; background: rgba(69,123,157,0.22); }
@@ -112,10 +140,11 @@
     }
 
     .admin-edit-grid .wide {
-        grid-column: 1 / -1;
+        grid-column: span 2;
     }
 
-    .admin-edit-grid label {
+    .admin-edit-grid label,
+    .admin-section-title {
         display: block;
         font-size: 0.68rem;
         color: var(--accent-gold);
@@ -123,14 +152,93 @@
         font-weight: 700;
     }
 
+    .admin-section-title {
+        margin-top: 1rem;
+        text-transform: none;
+        letter-spacing: 0;
+    }
+
+    .admin-player-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 8px;
+        background: rgba(0,0,0,0.18);
+    }
+
+    .admin-player-table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+    }
+
+    .admin-player-table th,
+    .admin-player-table td {
+        padding: 0.35rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        vertical-align: middle;
+    }
+
+    .admin-player-table th {
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        text-align: left;
+        font-weight: 700;
+    }
+
+    .admin-player-table td:first-child {
+        width: 72px;
+    }
+
+    .admin-player-table .dark-input,
+    .admin-edit-grid .dark-input,
     .admin-replay-log {
-        min-height: 140px;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .admin-icon-btn,
+    .admin-add-player {
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.04);
+        color: var(--text-muted);
+        border-radius: 7px;
+        padding: 0.45rem 0.6rem;
+        cursor: pointer;
+    }
+
+    .admin-icon-btn:hover,
+    .admin-add-player:hover {
+        color: #fff;
+        border-color: rgba(255,255,255,0.22);
+    }
+
+    .admin-add-player {
+        margin-top: 0.55rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        width: fit-content;
+    }
+
+    .admin-replay-log {
+        min-height: 120px;
+        max-height: 260px;
         resize: vertical;
     }
 
-    @media (max-width: 1023px) {
-        .admin-layout { grid-template-columns: 1fr; }
+    @media (max-width: 1200px) {
+        .admin-layout { grid-template-columns: 1fr; height: auto; overflow: visible; }
+        .admin-card { max-height: none; }
+        .admin-user-list, .admin-replay-list { max-height: 70vh; }
+    }
+
+    @media (max-width: 760px) {
         .admin-edit-grid { grid-template-columns: 1fr; }
+        .admin-edit-grid .wide { grid-column: auto; }
+        .admin-user-top, .admin-replay-top { flex-direction: column; }
+        .admin-actions { justify-content: flex-start; }
     }
 </style>
 
