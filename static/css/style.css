@@ -316,7 +316,7 @@ html, body {
     /* 2. 讓主容器填滿螢幕高度 */
     .main-content {
         height: calc(100vh - var(--nav-height));
-        overflow: hidden;
+        overflow: auto;
         display: flex;
         flex-direction: column;
     }
