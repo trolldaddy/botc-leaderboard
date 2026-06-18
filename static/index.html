@@ -81,15 +81,56 @@
                 if (!response.ok) throw new Error("頁面載入失敗");
                 const html = await response.text();
                 area.innerHTML = html;
-                const scripts = area.querySelectorAll('script');
-                for (let oldScript of scripts) {
-                    const newScript = document.createElement('script');
-                    Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-                    if (oldScript.src) newScript.src = oldScript.src + '?v=' + new Date().getTime();
-                    else newScript.appendChild(document.createTextNode(oldScript.innerHTML));
-                    oldScript.parentNode.replaceChild(newScript, oldScript);
-                }
-                if (window.Babel) window.Babel.transformScriptTags();
+               
+                for (const oldScript of scripts) {
+    const type = oldScript.getAttribute('type');
+    const src = oldScript.getAttribute('src');
+
+    oldScript.remove();
+
+    // 專門處理 React JSX / text-babel
+    if (type === 'text/babel') {
+        let sourceCode = '';
+
+        if (src) {
+            const scriptUrl = `${src}?v=${new Date().getTime()}`;
+            const scriptResp = await fetch(scriptUrl);
+            if (!scriptResp.ok) {
+                throw new Error(`腳本載入失敗：${src}`);
+            }
+            sourceCode = await scriptResp.text();
+        } else {
+            sourceCode = oldScript.textContent || '';
+        }
+
+        const transformed = Babel.transform(sourceCode, {
+            presets: [
+                ['react', { runtime: 'classic' }]
+            ],
+            sourceType: 'script'
+        }).code;
+
+        const newScript = document.createElement('script');
+        newScript.textContent = transformed;
+        document.body.appendChild(newScript);
+        continue;
+    }
+
+    // 一般 JS，例如 location-options.js
+    const newScript = document.createElement('script');
+    Array.from(oldScript.attributes).forEach(attr => {
+        if (attr.name !== 'type') newScript.setAttribute(attr.name, attr.value);
+    });
+
+    if (src) {
+        newScript.src = `${src}?v=${new Date().getTime()}`;
+    } else {
+        newScript.textContent = oldScript.textContent || '';
+    }
+
+    document.body.appendChild(newScript);
+}
+                
                 area.style.opacity = '1';
                 document.querySelectorAll('#main-nav li').forEach(li => {
                     const link = li.querySelector('a');
