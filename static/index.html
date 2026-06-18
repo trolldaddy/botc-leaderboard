@@ -81,7 +81,8 @@
                 if (!response.ok) throw new Error("頁面載入失敗");
                 const html = await response.text();
                 area.innerHTML = html;
-               
+
+    const scripts = Array.from(area.querySelectorAll('script'));
                 for (const oldScript of scripts) {
     const type = oldScript.getAttribute('type');
     const src = oldScript.getAttribute('src');
