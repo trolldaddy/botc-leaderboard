@@ -7,69 +7,64 @@
   </div>
 </header>
 
-<div class="town-layout">
-  <section class="card town-card">
+<div class="town-layout-v2">
+  <section class="card town-card player-profile-card">
     <div class="card-header">
-      <h3><i class="fa-solid fa-door-open text-gold"></i> 建立 / 載入房間</h3>
+      <h3><i class="fa-solid fa-id-card text-gold"></i> 玩家資料</h3>
     </div>
 
-    <div class="town-grid" style="margin-top:1rem;">
-      <div class="form-group">
-        <label>房間名稱</label>
-        <input id="room-title" class="form-control dark-input" placeholder="例如：週五血染場" value="小鎮報到">
-      </div>
-      <div class="form-group">
-        <label>劇本名稱</label>
-        <input id="room-script" class="form-control dark-input" placeholder="例如：意氣用事">
-      </div>
-      <div class="form-group">
-        <label>日期</label>
-        <input id="room-date" type="date" class="form-control dark-input">
-      </div>
-      <div class="form-group">
-        <label>地點</label>
-        <input id="room-location" class="form-control dark-input" value="拉普拉斯">
-      </div>
-      <div class="form-group">
-        <label>說書人</label>
-        <input id="room-storyteller" class="form-control dark-input" placeholder="說書人暱稱">
-      </div>
-      <div class="form-group">
-        <label>房間代碼</label>
-        <input id="room-code-input" class="form-control dark-input" placeholder="已有房間代碼可輸入載入">
+    <div class="profile-main">
+      <div id="player-line-avatar" class="profile-avatar"><i class="fa-solid fa-user"></i></div>
+      <div class="profile-info">
+        <div id="player-line-name" class="profile-name">讀取 LINE 狀態中...</div>
+        <div id="player-line-state" class="profile-state">請稍候</div>
       </div>
     </div>
 
-    <div class="town-actions">
-      <button class="btn btn-purple" onclick="TownCheckin.createRoom()"><i class="fa-solid fa-plus"></i> 建立房間</button>
-      <button class="btn btn-outline" onclick="TownCheckin.loadRoomFromInput()"><i class="fa-solid fa-rotate"></i> 載入房間</button>
-      <button class="btn btn-outline" onclick="TownCheckin.lockRoom()"><i class="fa-solid fa-lock"></i> 鎖定房間</button>
-      <button class="btn btn-outline" onclick="TownCheckin.openRoom()"><i class="fa-solid fa-lock-open"></i> 重新開放</button>
+    <div class="form-group" style="margin-top:1rem;">
+      <label>店內顯示暱稱</label>
+      <input id="join-display-name" class="form-control dark-input" placeholder="例如：廚爹、阿陳、棋宣">
     </div>
 
-    <div id="town-status" class="town-status">尚未建立房間。</div>
+    <div class="town-actions compact-actions">
+      <button class="btn btn-outline" onclick="TownCheckinUI.saveDisplayName()"><i class="fa-solid fa-floppy-disk"></i> 儲存暱稱</button>
+      <button class="btn btn-purple" onclick="TownCheckinUI.lineLoginWithCode()"><i class="fa-brands fa-line"></i> LINE 登入</button>
+    </div>
+    <div id="player-profile-status" class="town-status">正在確認玩家資料...</div>
   </section>
 
-  <section class="card town-card">
+  <section class="card town-card join-room-card">
     <div class="card-header">
-      <h3><i class="fa-solid fa-qrcode text-purple"></i> 玩家掃碼加入</h3>
+      <h3><i class="fa-solid fa-right-to-bracket text-purple"></i> 加入房間</h3>
     </div>
-    <div class="qr-wrap">
-      <div id="room-qr" class="qr-box">建立房間後顯示 QR Code</div>
-      <div class="qr-info">
-        <div class="qr-code-label">房間代碼</div>
-        <div id="room-code-display" class="qr-code-value">---</div>
-        <div id="room-join-url" class="qr-url">尚未建立連結</div>
-        <button class="btn btn-outline" onclick="TownCheckin.copyJoinUrl()"><i class="fa-solid fa-copy"></i> 複製加入連結</button>
+
+    <div id="active-room-summary" class="active-room-summary">
+      <div class="empty-room-summary">
+        <div class="summary-title">尚未加入房間</div>
+        <div class="summary-subtitle">輸入房間五碼，或使用攝影機掃描 QR Code。</div>
       </div>
+    </div>
+
+    <div class="room-key-row">
+      <input id="room-code-input" class="form-control dark-input room-key-input" maxlength="8" placeholder="輸入房間五碼">
+      <button class="btn btn-purple" onclick="TownCheckinUI.joinByCode()"><i class="fa-solid fa-arrow-right"></i> 加入</button>
+      <button class="btn btn-outline" onclick="TownCheckinUI.startQrScanner()"><i class="fa-solid fa-camera"></i> 掃描</button>
+    </div>
+
+    <div id="qr-scan-panel" class="qr-scan-panel" style="display:none;">
+      <video id="qr-scan-video" playsinline muted></video>
+      <div class="scan-hint">將 QR Code 放在畫面中央。若瀏覽器不支援掃描，請改用手動輸入五碼。</div>
+      <button class="btn btn-outline" onclick="TownCheckinUI.stopQrScanner()"><i class="fa-solid fa-xmark"></i> 關閉攝影機</button>
     </div>
   </section>
 
-  <section class="card town-card full-span">
+  <section class="card town-card full-span room-members-card">
     <div class="card-header">
-      <h3><i class="fa-solid fa-users text-gold"></i> 玩家名單與座號</h3>
+      <h3><i class="fa-solid fa-users text-gold"></i> 房間內玩家</h3>
       <button class="btn btn-outline" onclick="TownCheckin.addTemporaryPlayer()"><i class="fa-solid fa-user-plus"></i> 新增臨時玩家</button>
     </div>
+
+    <div id="town-status" class="town-status">尚未建立或加入房間。</div>
 
     <div id="join-panel" class="join-panel" style="display:none;">
       <div>
@@ -77,9 +72,8 @@
         <div id="join-login-hint" class="hint-text">可使用 LINE 登入，或用臨時玩家名稱加入。</div>
       </div>
       <div class="join-form">
-        <input id="join-display-name" class="form-control dark-input" placeholder="你的店內暱稱">
-        <button class="btn btn-purple" onclick="TownCheckin.joinRoom()"><i class="fa-solid fa-right-to-bracket"></i> 加入房間</button>
-        <button class="btn btn-outline" onclick="TownCheckin.goLineLogin()"><i class="fa-brands fa-line"></i> LINE 登入後加入</button>
+        <button class="btn btn-purple" onclick="TownCheckin.joinRoom()"><i class="fa-solid fa-right-to-bracket"></i> 使用目前暱稱加入</button>
+        <button class="btn btn-outline" onclick="TownCheckinUI.lineLoginWithCode()"><i class="fa-brands fa-line"></i> LINE 登入後加入</button>
       </div>
     </div>
 
@@ -105,17 +99,84 @@
       <button class="btn btn-outline" onclick="TownCheckin.refreshRoom()"><i class="fa-solid fa-arrows-rotate"></i> 重新整理名單</button>
     </div>
   </section>
+
+  <section class="card town-card full-span storyteller-room-card">
+    <div class="card-header">
+      <h3><i class="fa-solid fa-door-open text-gold"></i> 說書人開房間</h3>
+    </div>
+
+    <div class="storyteller-layout">
+      <div>
+        <div class="town-grid" style="margin-top:1rem;">
+          <div class="form-group">
+            <label>房間名稱</label>
+            <input id="room-title" class="form-control dark-input" placeholder="例如：週五血染場" value="小鎮報到">
+          </div>
+          <div class="form-group">
+            <label>劇本名稱</label>
+            <input id="room-script" class="form-control dark-input" placeholder="例如：意氣用事">
+          </div>
+          <div class="form-group">
+            <label>日期</label>
+            <input id="room-date" type="date" class="form-control dark-input">
+          </div>
+          <div class="form-group">
+            <label>地點</label>
+            <input id="room-location" class="form-control dark-input" value="拉普拉斯">
+          </div>
+          <div class="form-group">
+            <label>說書人</label>
+            <input id="room-storyteller" class="form-control dark-input" placeholder="說書人暱稱">
+          </div>
+        </div>
+
+        <div class="town-actions">
+          <button class="btn btn-purple" onclick="TownCheckin.createRoom()"><i class="fa-solid fa-plus"></i> 建立房間</button>
+          <button class="btn btn-outline" onclick="TownCheckin.loadRoomFromInput()"><i class="fa-solid fa-rotate"></i> 載入上方房間碼</button>
+          <button class="btn btn-outline" onclick="TownCheckin.lockRoom()"><i class="fa-solid fa-lock"></i> 鎖定房間</button>
+          <button class="btn btn-outline" onclick="TownCheckin.openRoom()"><i class="fa-solid fa-lock-open"></i> 重新開放</button>
+        </div>
+      </div>
+
+      <div class="qr-wrap storyteller-qr">
+        <div id="room-qr" class="qr-box">建立房間後顯示 QR Code</div>
+        <div class="qr-info">
+          <div class="qr-code-label">房間代碼</div>
+          <div id="room-code-display" class="qr-code-value">---</div>
+          <div id="room-join-url" class="qr-url">尚未建立連結</div>
+          <button class="btn btn-outline" onclick="TownCheckin.copyJoinUrl()"><i class="fa-solid fa-copy"></i> 複製加入連結</button>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 
 <style>
-  .town-layout { display:grid; grid-template-columns:1.1fr .9fr; gap:1.5rem; }
+  .town-layout-v2 { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
   .town-card { min-width:0; }
   .full-span { grid-column:1 / -1; }
   .town-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
   .form-group label { display:block; font-size:.7rem; color:var(--accent-gold); margin-bottom:.4rem; font-weight:bold; letter-spacing:1px; }
   .dark-input { background:rgba(0,0,0,.3)!important; border:1px solid var(--border-color)!important; color:#fff!important; border-radius:8px; padding:.8rem!important; width:100%; box-sizing:border-box; }
   .town-actions { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:1rem; }
+  .compact-actions { gap:.6rem; }
   .town-status { margin-top:1rem; color:var(--text-muted); font-size:.9rem; }
+  .profile-main { display:flex; gap:1rem; align-items:center; margin-top:1rem; }
+  .profile-avatar { width:64px; height:64px; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-size:1.6rem; overflow:hidden; flex-shrink:0; }
+  .profile-avatar img { width:100%; height:100%; object-fit:cover; }
+  .profile-name { color:#fff; font-size:1.05rem; font-weight:800; }
+  .profile-state { color:var(--text-muted); font-size:.85rem; margin-top:.2rem; }
+  .active-room-summary { min-height:118px; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.22); border-radius:16px; padding:1rem; margin-top:1rem; }
+  .empty-room-summary { color:var(--text-muted); }
+  .summary-title { color:#fff; font-size:1.05rem; font-weight:900; margin-bottom:.35rem; }
+  .summary-subtitle { color:var(--text-muted); font-size:.85rem; line-height:1.5; }
+  .summary-grid { display:grid; grid-template-columns:1fr 1fr; gap:.45rem .75rem; margin:.75rem 0; color:var(--text-muted); font-size:.85rem; }
+  .room-code-pill { display:inline-flex; align-items:center; margin:.45rem 0; padding:.35rem .65rem; border-radius:999px; background:rgba(255,183,3,.13); color:var(--accent-gold); font-weight:900; letter-spacing:.12em; }
+  .room-key-row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-top:1rem; }
+  .room-key-input { max-width:240px; text-transform:uppercase; letter-spacing:.12em; font-weight:800; }
+  .qr-scan-panel { margin-top:1rem; border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:1rem; background:rgba(0,0,0,.28); }
+  #qr-scan-video { width:100%; max-height:280px; border-radius:12px; background:#000; object-fit:cover; }
+  .scan-hint { color:var(--text-muted); font-size:.85rem; margin:.75rem 0; }
   .qr-wrap { display:flex; gap:1rem; align-items:center; margin-top:1rem; }
   .qr-box { width:180px; height:180px; border:1px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); background:rgba(0,0,0,.25); text-align:center; padding:1rem; }
   .qr-box img { width:100%; height:100%; border-radius:12px; background:#fff; }
@@ -125,7 +186,6 @@
   .qr-url { color:var(--text-muted); font-size:.8rem; word-break:break-all; margin-bottom:1rem; }
   .join-panel { margin:1rem 0; border:1px solid rgba(255,255,255,.08); background:rgba(99,102,241,.08); border-radius:14px; padding:1rem; }
   .join-form { display:flex; gap:.75rem; margin-top:.8rem; flex-wrap:wrap; }
-  .join-form input { max-width:260px; }
   .hint-text { color:var(--text-muted); font-size:.85rem; margin-top:.25rem; }
   .table-scroll { overflow-x:auto; margin-top:1rem; }
   .town-table { width:100%; border-collapse:collapse; }
@@ -135,15 +195,19 @@
   .empty-row { color:var(--text-muted); text-align:center!important; padding:2rem!important; }
   .player-avatar { width:30px; height:30px; border-radius:999px; object-fit:cover; background:rgba(255,255,255,.08); vertical-align:middle; margin-right:.5rem; }
   .footer-actions { justify-content:flex-end; }
-  @media (max-width:900px) {
-    .town-layout, .town-grid { grid-template-columns:1fr; }
+  .storyteller-layout { display:grid; grid-template-columns:minmax(0,1fr) 420px; gap:1.5rem; align-items:start; }
+  .storyteller-qr { margin-top:1rem; }
+  @media (max-width:1000px) {
+    .town-layout-v2, .town-grid, .storyteller-layout, .summary-grid { grid-template-columns:1fr; }
     .qr-wrap { flex-direction:column; align-items:flex-start; }
     .qr-box { width:160px; height:160px; }
+    .room-key-input { max-width:100%; }
   }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="/js/rooms.js"></script>
+<script src="/js/rooms-ui-patch.js"></script>
 <script src="/js/rooms-qr-patch.js"></script>
 <script src="/js/rooms-seat-select-patch.js"></script>
 <script src="/js/rooms-transfer-patch.js"></script>
