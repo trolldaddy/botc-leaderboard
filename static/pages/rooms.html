@@ -131,7 +131,7 @@
   .town-table { width:100%; border-collapse:collapse; }
   .town-table th, .town-table td { padding:.75rem; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; vertical-align:middle; }
   .town-table th { color:var(--accent-gold); font-size:.75rem; letter-spacing:1px; text-transform:uppercase; }
-  .town-table input { max-width:90px; }
+  .town-table input, .town-table select { max-width:120px; }
   .empty-row { color:var(--text-muted); text-align:center!important; padding:2rem!important; }
   .player-avatar { width:30px; height:30px; border-radius:999px; object-fit:cover; background:rgba(255,255,255,.08); vertical-align:middle; margin-right:.5rem; }
   .footer-actions { justify-content:flex-end; }
@@ -144,4 +144,5 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="/js/rooms.js"></script>
+<script src="/js/rooms-seat-select-patch.js"></script>
 <script src="/js/rooms-transfer-patch.js"></script>
