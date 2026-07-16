@@ -151,3 +151,36 @@ class MatchPlayer(Base):
         if not self.match:
             return False
         return self.alignment == self.match.winning_team
+
+
+# ==========================================
+# 測試分支：小鎮報到 API 自動掛載器
+# main.py 是大型入口檔，為避免整檔覆蓋風險，這裡在 FastAPI app 建立時自動掛上 room_routes。
+# 等功能穩定合併前，可再改成 main.py 裡明確 app.include_router(room_routes.router)。
+# ==========================================
+def _install_town_checkin_router_patch():
+    try:
+        import fastapi
+    except Exception as exc:
+        print(f"小鎮報到 API 掛載器初始化失敗: {exc}")
+        return
+
+    if getattr(fastapi.FastAPI, "_botc_town_checkin_router_patch", False):
+        return
+
+    original_init = fastapi.FastAPI.__init__
+
+    def patched_init(self, *args, **kwargs):
+        original_init(self, *args, **kwargs)
+        try:
+            import room_routes
+            self.include_router(room_routes.router)
+            print("小鎮報到 API 已掛載: /api/rooms")
+        except Exception as exc:
+            print(f"小鎮報到 API 掛載失敗: {exc}")
+
+    fastapi.FastAPI.__init__ = patched_init
+    fastapi.FastAPI._botc_town_checkin_router_patch = True
+
+
+_install_town_checkin_router_patch()
