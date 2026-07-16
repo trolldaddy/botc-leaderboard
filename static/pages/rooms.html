@@ -103,7 +103,10 @@
   <section class="card town-card full-span storyteller-room-card">
     <div class="card-header">
       <h3><i class="fa-solid fa-door-open text-gold"></i> 說書人開房間</h3>
+      <button id="storyteller-login-button" class="btn btn-outline" onclick="TownCheckinUI.storytellerLogin()"><i class="fa-brands fa-line"></i> 說書人 LINE 登入</button>
     </div>
+
+    <div id="storyteller-auth-status" class="storyteller-auth-status">正在確認說書人登入狀態...</div>
 
     <div class="storyteller-layout">
       <div>
@@ -131,7 +134,8 @@
         </div>
 
         <div class="town-actions">
-          <button class="btn btn-purple" onclick="TownCheckin.createRoom()"><i class="fa-solid fa-plus"></i> 建立房間</button>
+          <button id="storyteller-create-button" class="btn btn-purple" onclick="TownCheckin.createRoom()"><i class="fa-solid fa-plus"></i> 建立房間</button>
+          <button id="storyteller-update-button" class="btn btn-outline" onclick="TownCheckinUI.updateRoomDetails()"><i class="fa-solid fa-pen-to-square"></i> 更新房間資料</button>
           <button class="btn btn-outline" onclick="TownCheckin.loadRoomFromInput()"><i class="fa-solid fa-rotate"></i> 載入上方房間碼</button>
           <button class="btn btn-outline" onclick="TownCheckin.lockRoom()"><i class="fa-solid fa-lock"></i> 鎖定房間</button>
           <button class="btn btn-outline" onclick="TownCheckin.openRoom()"><i class="fa-solid fa-lock-open"></i> 重新開放</button>
@@ -160,7 +164,8 @@
   .dark-input { background:rgba(0,0,0,.3)!important; border:1px solid var(--border-color)!important; color:#fff!important; border-radius:8px; padding:.8rem!important; width:100%; box-sizing:border-box; }
   .town-actions { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:1rem; }
   .compact-actions { gap:.6rem; }
-  .town-status { margin-top:1rem; color:var(--text-muted); font-size:.9rem; }
+  .town-status, .storyteller-auth-status { margin-top:1rem; color:var(--text-muted); font-size:.9rem; }
+  .storyteller-auth-status { border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.035); border-radius:12px; padding:.85rem 1rem; }
   .profile-main { display:flex; gap:1rem; align-items:center; margin-top:1rem; }
   .profile-avatar { width:64px; height:64px; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-size:1.6rem; overflow:hidden; flex-shrink:0; }
   .profile-avatar img { width:100%; height:100%; object-fit:cover; }
@@ -197,6 +202,7 @@
   .footer-actions { justify-content:flex-end; }
   .storyteller-layout { display:grid; grid-template-columns:minmax(0,1fr) 420px; gap:1.5rem; align-items:start; }
   .storyteller-qr { margin-top:1rem; }
+  button:disabled { opacity:.45; cursor:not-allowed; }
   @media (max-width:1000px) {
     .town-layout-v2, .town-grid, .storyteller-layout, .summary-grid { grid-template-columns:1fr; }
     .qr-wrap { flex-direction:column; align-items:flex-start; }
