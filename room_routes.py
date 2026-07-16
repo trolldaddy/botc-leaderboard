@@ -75,6 +75,21 @@ def get_optional_account(request: Request, db: Session = Depends(get_db)) -> Opt
     return db.query(models.StorytellerAccount).filter(models.StorytellerAccount.id == account_id).first()
 
 
+def require_account(account: Optional[models.StorytellerAccount] = Depends(get_optional_account)) -> models.StorytellerAccount:
+    if not account:
+        raise HTTPException(status_code=401, detail="請先使用 LINE 登入")
+    if bool(getattr(account, "is_banned", False)):
+        raise HTTPException(status_code=403, detail="此 LINE 帳號已被停權")
+    return account
+
+
+def ensure_room_owner(room: models.GameRoom, account: models.StorytellerAccount):
+    if not room.created_by_id:
+        raise HTTPException(status_code=403, detail="此房間沒有綁定建立者，請重新建立房間")
+    if room.created_by_id != account.id:
+        raise HTTPException(status_code=403, detail="只有房間建立者可以管理此房間")
+
+
 def generate_room_code(db: Session) -> str:
     alphabet = string.ascii_uppercase + string.digits
     for _ in range(30):
@@ -111,6 +126,7 @@ def serialize_room_player(entry: models.RoomPlayer):
 
 
 def serialize_room(room: models.GameRoom):
+    creator = getattr(room, "creator", None)
     return {
         "id": room.id,
         "room_code": room.room_code,
@@ -120,6 +136,9 @@ def serialize_room(room: models.GameRoom):
         "location": room.location,
         "storyteller": room.storyteller,
         "status": normalize_room_status(room.status),
+        "created_by_id": room.created_by_id,
+        "created_by_line_user_id": creator.line_user_id if creator else None,
+        "created_by_display_name": creator.display_name if creator else None,
         "created_at": room.created_at.isoformat() if room.created_at else None,
         "players": [
             serialize_room_player(p)
@@ -129,7 +148,7 @@ def serialize_room(room: models.GameRoom):
 
 
 @router.post("")
-async def create_room(data: dict, db: Session = Depends(get_db), account: Optional[models.StorytellerAccount] = Depends(get_optional_account)):
+async def create_room(data: dict, db: Session = Depends(get_db), account: models.StorytellerAccount = Depends(require_account)):
     code = generate_room_code(db)
     date_value = data.get("date")
     try:
@@ -143,21 +162,22 @@ async def create_room(data: dict, db: Session = Depends(get_db), account: Option
         script=(data.get("script") or "").strip() or None,
         date=date,
         location=(data.get("location") or "拉普拉斯").strip(),
-        storyteller=(data.get("storyteller") or (account.display_name if account else "")).strip() or None,
+        storyteller=(data.get("storyteller") or account.display_name or "").strip() or None,
         status="open",
-        created_by_id=account.id if account else None,
+        created_by_id=account.id,
         created_at=datetime.now(),
         updated_at=datetime.now(),
     )
     db.add(room)
     db.commit()
     db.refresh(room)
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
     return {"status": "success", "room": serialize_room(room)}
 
 
 @router.get("/{room_code}")
 async def get_room(room_code: str, db: Session = Depends(get_db)):
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account)).filter(models.GameRoom.room_code == room_code.upper()).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
     return serialize_room(room)
@@ -165,7 +185,7 @@ async def get_room(room_code: str, db: Session = Depends(get_db)):
 
 @router.post("/{room_code}/join")
 async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), account: Optional[models.StorytellerAccount] = Depends(get_optional_account)):
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players)).filter(models.GameRoom.room_code == room_code.upper()).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players), joinedload(models.GameRoom.creator)).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
     ensure_room_open(room)
@@ -183,7 +203,7 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
             existing.is_temporary = False
             db.commit()
             db.refresh(existing)
-            room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account)).filter(models.GameRoom.id == room.id).first()
+            room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
             return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room)}
 
     entry = models.RoomPlayer(
@@ -196,15 +216,16 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
     db.add(entry)
     db.commit()
     db.refresh(entry)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account)).filter(models.GameRoom.id == room.id).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
     return {"status": "success", "player": serialize_room_player(entry), "room": serialize_room(room)}
 
 
 @router.patch("/{room_code}/players/{room_player_id}")
-async def update_room_player(room_code: str, room_player_id: int, data: dict, db: Session = Depends(get_db)):
+async def update_room_player(room_code: str, room_player_id: int, data: dict, db: Session = Depends(get_db), account: models.StorytellerAccount = Depends(require_account)):
     room = db.query(models.GameRoom).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
+    ensure_room_owner(room, account)
     entry = db.query(models.RoomPlayer).filter(models.RoomPlayer.room_id == room.id, models.RoomPlayer.id == room_player_id).first()
     if not entry:
         raise HTTPException(status_code=404, detail="找不到玩家")
@@ -226,15 +247,16 @@ async def update_room_player(room_code: str, room_player_id: int, data: dict, db
 
     db.commit()
     db.refresh(entry)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account)).filter(models.GameRoom.id == room.id).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
     return {"status": "success", "player": serialize_room_player(entry), "room": serialize_room(room)}
 
 
 @router.delete("/{room_code}/players/{room_player_id}")
-async def delete_room_player(room_code: str, room_player_id: int, db: Session = Depends(get_db)):
+async def delete_room_player(room_code: str, room_player_id: int, db: Session = Depends(get_db), account: models.StorytellerAccount = Depends(require_account)):
     room = db.query(models.GameRoom).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
+    ensure_room_owner(room, account)
     entry = db.query(models.RoomPlayer).filter(models.RoomPlayer.room_id == room.id, models.RoomPlayer.id == room_player_id).first()
     if not entry:
         raise HTTPException(status_code=404, detail="找不到玩家")
@@ -244,10 +266,11 @@ async def delete_room_player(room_code: str, room_player_id: int, db: Session = 
 
 
 @router.patch("/{room_code}")
-async def update_room(room_code: str, data: dict, db: Session = Depends(get_db)):
+async def update_room(room_code: str, data: dict, db: Session = Depends(get_db), account: models.StorytellerAccount = Depends(require_account)):
     room = db.query(models.GameRoom).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
+    ensure_room_owner(room, account)
     for field in ["title", "script", "location", "storyteller"]:
         if field in data:
             setattr(room, field, data.get(field))
@@ -261,5 +284,5 @@ async def update_room(room_code: str, data: dict, db: Session = Depends(get_db))
     room.updated_at = datetime.now()
     db.commit()
     db.refresh(room)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account)).filter(models.GameRoom.id == room.id).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
     return {"status": "success", "room": serialize_room(room)}
