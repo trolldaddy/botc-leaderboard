@@ -6,6 +6,8 @@
   let syncing = false;
   let lastSignature = '';
 
+  const $ = (id) => document.getElementById(id);
+
   const readRoom = () => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }
     catch (err) { return null; }
@@ -34,37 +36,62 @@
     }))
   });
 
-  const syncOnce = async () => {
+  const setStatus = (message, isError = false) => {
+    const el = $('town-status');
+    if (!el) return;
+    el.textContent = message;
+    el.style.color = isError ? 'var(--accent-red)' : 'var(--text-muted)';
+  };
+
+  const getActiveCode = () => {
     const room = readRoom();
-    const code = room?.room_code || new URLSearchParams(window.location.search).get('join');
+    const inputCode = $('room-code-input')?.value;
+    const urlCode = new URLSearchParams(window.location.search).get('join');
+    return String(room?.room_code || inputCode || urlCode || '').trim().toUpperCase();
+  };
+
+  const hydrateTownCheckinFromServer = async (freshRoom) => {
+    writeRoom(freshRoom);
+    if ($('room-code-input')) $('room-code-input').value = freshRoom.room_code || '';
+
+    // 重要：rooms.js 的 currentRoom 是閉包狀態，只改 localStorage 不會讓畫面重畫。
+    // 透過公開的 loadRoomFromInput 讓主程式自己走一次後端載入與 render。
+    if (window.TownCheckin?.loadRoomFromInput && !window.TownCheckin.__syncLoadingRoom) {
+      window.TownCheckin.__syncLoadingRoom = true;
+      try {
+        await window.TownCheckin.loadRoomFromInput();
+      } finally {
+        window.TownCheckin.__syncLoadingRoom = false;
+      }
+    }
+
+    if (window.TownCheckinUI?.renderRoomSummary) {
+      window.TownCheckinUI.renderRoomSummary();
+    }
+    if (window.TownCheckinSeatPatch?.refresh) {
+      window.TownCheckinSeatPatch.refresh();
+    }
+  };
+
+  const syncOnce = async () => {
+    const code = getActiveCode();
     if (!code || syncing) return;
     syncing = true;
     try {
-      const resp = await fetch(`${apiBase()}/api/rooms/${encodeURIComponent(String(code).toUpperCase())}`, { credentials: 'same-origin' });
-      if (!resp.ok) return;
+      const resp = await fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}`, { credentials: 'same-origin' });
+      if (!resp.ok) {
+        if (resp.status !== 404) setStatus(`房間同步失敗：HTTP ${resp.status}`, true);
+        return;
+      }
       const freshRoom = await resp.json();
       const signature = roomSignature(freshRoom);
       if (signature === lastSignature) return;
       lastSignature = signature;
-      writeRoom(freshRoom);
-
-      if (window.TownCheckin?.refreshRoom && !window.TownCheckin.__syncRefreshing) {
-        window.TownCheckin.__syncRefreshing = true;
-        try {
-          await window.TownCheckin.refreshRoom();
-        } finally {
-          window.TownCheckin.__syncRefreshing = false;
-        }
-      }
-
-      if (window.TownCheckinUI?.renderRoomSummary) {
-        window.TownCheckinUI.renderRoomSummary();
-      }
-      if (window.TownCheckinSeatPatch?.refresh) {
-        window.TownCheckinSeatPatch.refresh();
-      }
+      await hydrateTownCheckinFromServer(freshRoom);
+      setStatus(`房間 ${freshRoom.room_code}｜${freshRoom.status === 'open' ? '開放報到' : '已鎖定'}｜${(freshRoom.players || []).length} 位玩家`);
     } catch (err) {
-      // 靜默失敗，下一輪再試。
+      setStatus('房間同步失敗，稍後會再試。', true);
+      console.warn('[TownCheckin sync] failed', err);
     } finally {
       syncing = false;
     }
@@ -92,13 +119,13 @@
       schedule();
     });
 
-    ['createRoom', 'loadRoomFromInput', 'joinRoom', 'refreshRoom', 'updateSeat', 'updateName', 'removePlayer', 'lockRoom', 'openRoom'].forEach((key) => {
+    ['createRoom', 'joinRoom', 'updateSeat', 'updateName', 'removePlayer', 'lockRoom', 'openRoom'].forEach((key) => {
       const api = window.TownCheckin;
       if (!api || typeof api[key] !== 'function' || api[key].__roomSyncWrapped) return;
       const original = api[key];
       api[key] = async (...args) => {
         const result = await original(...args);
-        setTimeout(syncOnce, 250);
+        setTimeout(syncOnce, 350);
         return result;
       };
       api[key].__roomSyncWrapped = true;
