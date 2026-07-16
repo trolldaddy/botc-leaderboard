@@ -3,12 +3,17 @@
   const NICKNAME_KEY = 'botc_player_display_name';
   let scannerStream = null;
   let scanTimer = null;
+  let profileState = { logged_in: false, user: null };
 
   const $ = (id) => document.getElementById(id);
 
   const readRoom = () => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }
     catch (err) { return null; }
+  };
+
+  const writeRoom = (room) => {
+    if (room) localStorage.setItem(STORAGE_KEY, JSON.stringify(room));
   };
 
   const setText = (id, value) => {
@@ -28,6 +33,8 @@
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 
+  const today = () => new Date().toISOString().split('T')[0];
+
   const getJoinCode = () => {
     const params = new URLSearchParams(window.location.search);
     const fromUrl = params.get('join');
@@ -35,11 +42,48 @@
     return String(fromInput || fromUrl || '').trim().toUpperCase();
   };
 
+  const getRoomFormData = () => ({
+    title: ($('room-title')?.value || '小鎮報到').trim() || '小鎮報到',
+    script: ($('room-script')?.value || '').trim(),
+    date: ($('room-date')?.value || today()).trim(),
+    location: ($('room-location')?.value || '拉普拉斯').trim() || '拉普拉斯',
+    storyteller: ($('room-storyteller')?.value || profileState.user?.display_name || '').trim()
+  });
+
   const setProfileStatus = (message, isError = false) => {
     const el = $('player-profile-status');
     if (!el) return;
     el.textContent = message;
     el.style.color = isError ? 'var(--accent-red)' : 'var(--text-muted)';
+  };
+
+  const setStorytellerStatus = (message, isError = false) => {
+    const el = $('storyteller-auth-status');
+    if (!el) return;
+    el.textContent = message;
+    el.style.color = isError ? 'var(--accent-red)' : 'var(--text-muted)';
+  };
+
+  const renderStorytellerAuth = () => {
+    const loginButton = $('storyteller-login-button');
+    const createButton = $('storyteller-create-button');
+    const updateButton = $('storyteller-update-button');
+    const room = readRoom();
+
+    if (profileState.logged_in && profileState.user) {
+      setStorytellerStatus(`已使用 LINE 登入：${profileState.user.display_name || 'LINE 使用者'}。開房與更新房間資料會使用這個身分。`);
+      if (loginButton) loginButton.style.display = 'none';
+      if (createButton) createButton.disabled = false;
+      if (updateButton) updateButton.disabled = !room;
+      if ($('room-storyteller') && !$('room-storyteller').value) {
+        $('room-storyteller').value = profileState.user.display_name || '';
+      }
+    } else {
+      setStorytellerStatus('說書人建議先 LINE 登入再開房，房間才會綁定建立者。', true);
+      if (loginButton) loginButton.style.display = '';
+      if (createButton) createButton.disabled = false;
+      if (updateButton) updateButton.disabled = !room;
+    }
   };
 
   const renderProfile = async () => {
@@ -52,6 +96,7 @@
       const resp = await fetch(`${window.API_BASE || ''}/api/me`, { credentials: 'same-origin' });
       const data = resp.ok ? await resp.json() : { logged_in: false, user: null };
       const user = data.user || null;
+      profileState = { logged_in: !!data.logged_in, user };
       if (data.logged_in && user) {
         setText('player-line-name', user.display_name || 'LINE 使用者');
         setText('player-line-state', '已連結 LINE');
@@ -73,10 +118,12 @@
         if ($('player-line-avatar')) $('player-line-avatar').innerHTML = '<i class="fa-solid fa-user"></i>';
       }
     } catch (err) {
+      profileState = { logged_in: false, user: null };
       setText('player-line-name', '無法讀取登入狀態');
       setText('player-line-state', '仍可臨時加入');
       setProfileStatus('登入狀態讀取失敗。', true);
     }
+    renderStorytellerAuth();
   };
 
   const saveDisplayName = () => {
@@ -99,6 +146,7 @@
           ${pendingCode ? `<div class="room-code-pill">目前代碼：${escapeHtml(pendingCode.toUpperCase())}</div>` : ''}
         </div>
       `);
+      renderStorytellerAuth();
       return;
     }
 
@@ -112,9 +160,10 @@
           <span><i class="fa-solid fa-calendar-day"></i> ${escapeHtml(String(room.date || '').slice(0, 10) || '未設定日期')}</span>
           <span><i class="fa-solid fa-user-tie"></i> ${escapeHtml(room.storyteller || '未設定說書人')}</span>
         </div>
-        <div class="summary-subtitle">目前 ${Array.isArray(room.players) ? room.players.length : 0} 位玩家在房間內。</div>
+        <div class="summary-subtitle">目前 ${Array.isArray(room.players) ? room.players.length : 0} 位玩家在房間內。狀態：${room.status === 'locked' ? '已鎖定' : '開放報到'}</div>
       </div>
     `);
+    renderStorytellerAuth();
   };
 
   const joinByCode = async () => {
@@ -146,6 +195,51 @@
     url.hash = 'rooms';
     const next = `${url.pathname}${url.search}${url.hash}`;
     window.location.href = `/api/auth/line/login?next=${encodeURIComponent(next)}`;
+  };
+
+  const storytellerLogin = () => {
+    const url = new URL(window.location.href);
+    url.hash = 'rooms';
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    window.location.href = `/api/auth/line/login?next=${encodeURIComponent(next)}`;
+  };
+
+  const updateRoomDetails = async () => {
+    const room = readRoom();
+    if (!room?.room_code) return alert('請先建立或載入房間。');
+
+    const payload = getRoomFormData();
+    const previous = { ...room };
+    const optimisticRoom = { ...room, ...payload };
+    writeRoom(optimisticRoom);
+    renderRoomSummary();
+    setStorytellerStatus('正在更新房間資料...');
+
+    try {
+      const resp = await fetch(`${window.API_BASE || ''}/api/rooms/${encodeURIComponent(room.room_code)}`, {
+        method: 'PATCH',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!resp.ok) {
+        let message = '更新房間資料失敗';
+        try {
+          const error = await resp.json();
+          message = error.detail || message;
+        } catch (err) {}
+        throw new Error(message);
+      }
+      const data = await resp.json();
+      if (data.room) writeRoom(data.room);
+      if (window.TownCheckin?.refreshRoom) await window.TownCheckin.refreshRoom();
+      renderRoomSummary();
+      setStorytellerStatus('房間資料已更新，上方摘要也已同步。');
+    } catch (err) {
+      writeRoom(previous);
+      renderRoomSummary();
+      setStorytellerStatus(err.message || '更新房間資料失敗。', true);
+    }
   };
 
   const startQrScanner = async () => {
@@ -197,7 +291,22 @@
 
   const wrapTownCheckinMethods = () => {
     if (!window.TownCheckin || window.TownCheckin.__uiWrapped) return;
-    ['createRoom', 'loadRoomFromInput', 'joinRoom', 'addTemporaryPlayer', 'updateSeat', 'updateName', 'removePlayer', 'lockRoom', 'openRoom', 'refreshRoom', 'clearLocalRoom'].forEach((key) => {
+    const originalCreateRoom = window.TownCheckin.createRoom;
+    if (typeof originalCreateRoom === 'function') {
+      window.TownCheckin.createRoom = async (...args) => {
+        await renderProfile();
+        if (!profileState.logged_in) {
+          setStorytellerStatus('請先用 LINE 登入再建立房間。正在前往登入...', true);
+          setTimeout(storytellerLogin, 500);
+          return null;
+        }
+        const result = await originalCreateRoom(...args);
+        setTimeout(renderRoomSummary, 120);
+        return result;
+      };
+    }
+
+    ['loadRoomFromInput', 'joinRoom', 'addTemporaryPlayer', 'updateSeat', 'updateName', 'removePlayer', 'lockRoom', 'openRoom', 'refreshRoom', 'clearLocalRoom'].forEach((key) => {
       const original = window.TownCheckin[key];
       if (typeof original !== 'function') return;
       window.TownCheckin[key] = async (...args) => {
@@ -222,6 +331,8 @@
     saveDisplayName,
     joinByCode,
     lineLoginWithCode,
+    storytellerLogin,
+    updateRoomDetails,
     startQrScanner,
     stopQrScanner,
     renderRoomSummary,
