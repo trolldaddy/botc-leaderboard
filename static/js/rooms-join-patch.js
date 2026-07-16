@@ -19,6 +19,8 @@
 
   const getDisplayName = () => String($('join-display-name')?.value || '').trim();
 
+  const normalizeStatus = (value) => String(value || 'open').trim().toLowerCase();
+
   const showStatus = (message, isError = false) => {
     const el = $('town-status');
     if (el) {
@@ -40,6 +42,21 @@
     players: Array.isArray(room?.players) ? room.players : []
   });
 
+  const fetchRoomBeforeJoin = async (code) => {
+    const resp = await fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}`, { credentials: 'same-origin' });
+    let data = null;
+    try { data = await resp.json(); } catch (err) {}
+    if (!resp.ok) {
+      throw new Error(data?.detail || `讀取房間失敗（HTTP ${resp.status}）`);
+    }
+    const room = normalizeRoom(data);
+    writeRoom(room);
+    if (normalizeStatus(room.status) !== 'open') {
+      throw new Error('房間已鎖定，無法加入');
+    }
+    return room;
+  };
+
   const joinRoomStrict = async () => {
     const code = getCode();
     const displayName = getDisplayName();
@@ -49,6 +66,8 @@
     if ($('room-code-input')) $('room-code-input').value = code;
 
     try {
+      await fetchRoomBeforeJoin(code);
+
       const resp = await fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}/join`, {
         method: 'POST',
         credentials: 'same-origin',
@@ -73,7 +92,7 @@
       if (window.TownCheckinUI?.renderRoomSummary) window.TownCheckinUI.renderRoomSummary();
       if (window.TownCheckinRoomSync?.syncNow) setTimeout(() => window.TownCheckinRoomSync.syncNow(), 200);
     } catch (err) {
-      showStatus(`加入房間時發生網路或程式錯誤：${err?.message || err}`, true);
+      showStatus(err?.message || `加入房間時發生錯誤：${err}`, true);
     }
   };
 
