@@ -162,6 +162,7 @@
   .town-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
   .form-group label { display:block; font-size:.7rem; color:var(--accent-gold); margin-bottom:.4rem; font-weight:bold; letter-spacing:1px; }
   .dark-input { background:rgba(0,0,0,.3)!important; border:1px solid var(--border-color)!important; color:#fff!important; border-radius:8px; padding:.8rem!important; width:100%; box-sizing:border-box; }
+  .permission-readonly { opacity:.75; }
   .town-actions { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:1rem; }
   .compact-actions { gap:.6rem; }
   .town-status, .storyteller-auth-status { margin-top:1rem; color:var(--text-muted); font-size:.9rem; }
@@ -218,4 +219,5 @@
 <script src="/js/rooms-join-patch.js"></script>
 <script src="/js/rooms-seat-select-patch.js"></script>
 <script src="/js/rooms-sync-patch.js"></script>
+<script src="/js/rooms-permission-patch.js"></script>
 <script src="/js/rooms-transfer-patch.js"></script>
