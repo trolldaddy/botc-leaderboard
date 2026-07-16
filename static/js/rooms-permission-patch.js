@@ -2,17 +2,23 @@
   const STORAGE_KEY = 'botc_town_checkin_room';
   let currentUser = null;
   let refreshTimer = null;
+  let hydrating = false;
 
   const $ = (id) => document.getElementById(id);
+  const apiBase = () => window.API_BASE || '';
 
   const readRoom = () => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }
     catch (err) { return null; }
   };
 
+  const writeRoom = (room) => {
+    if (room) localStorage.setItem(STORAGE_KEY, JSON.stringify(room));
+  };
+
   const fetchMe = async () => {
     try {
-      const resp = await fetch(`${window.API_BASE || ''}/api/me`, { credentials: 'same-origin' });
+      const resp = await fetch(`${apiBase()}/api/me`, { credentials: 'same-origin' });
       const data = resp.ok ? await resp.json() : null;
       currentUser = data?.logged_in ? data.user : null;
     } catch (err) {
@@ -20,10 +26,38 @@
     }
   };
 
+  const hydrateRoomOwner = async () => {
+    const room = readRoom();
+    const code = room?.room_code || new URLSearchParams(window.location.search).get('join') || $('room-code-input')?.value;
+    if (!code || hydrating) return room;
+    if (room?.created_by_line_user_id || room?.created_by_id || room?.created_by_display_name) return room;
+
+    hydrating = true;
+    try {
+      const resp = await fetch(`${apiBase()}/api/rooms/${encodeURIComponent(String(code).toUpperCase())}`, { credentials: 'same-origin' });
+      if (!resp.ok) return room;
+      const freshRoom = await resp.json();
+      const merged = { ...(room || {}), ...freshRoom };
+      writeRoom(merged);
+      if (window.TownCheckinUI?.renderRoomSummary) window.TownCheckinUI.renderRoomSummary();
+      return merged;
+    } catch (err) {
+      return room;
+    } finally {
+      hydrating = false;
+    }
+  };
+
   const isRoomOwner = () => {
     const room = readRoom();
     if (!room || !currentUser) return false;
-    return Boolean(room.created_by_line_user_id && currentUser.line_user_id && room.created_by_line_user_id === currentUser.line_user_id);
+    if (room.created_by_line_user_id && currentUser.line_user_id) {
+      return room.created_by_line_user_id === currentUser.line_user_id;
+    }
+    if (room.created_by_id && currentUser.id) {
+      return Number(room.created_by_id) === Number(currentUser.id);
+    }
+    return false;
   };
 
   const setDisabled = (el, disabled, title = '') => {
@@ -69,12 +103,14 @@
     if (room.created_by_display_name) {
       hostBox.textContent = `此房間由 ${room.created_by_display_name} 建立。你可以查看與加入，但不能管理房間。`;
     } else {
-      hostBox.textContent = '此房間沒有建立者資訊，請重新開房以啟用管理權限。';
+      hostBox.textContent = '正在補抓房間建立者資訊...';
+      setTimeout(() => hydrateRoomOwner().then(applyPermissions), 100);
     }
     hostBox.style.color = 'var(--accent-red)';
   };
 
-  const applyPermissions = () => {
+  const applyPermissions = async () => {
+    await hydrateRoomOwner();
     const room = readRoom();
     const owner = isRoomOwner();
     const hasRoom = Boolean(room?.room_code);
@@ -113,10 +149,10 @@
   const init = async () => {
     await fetchMe();
     wrapMethods();
-    applyPermissions();
+    await applyPermissions();
     if (refreshTimer) clearInterval(refreshTimer);
     refreshTimer = setInterval(applyPermissions, 1500);
-    window.TownCheckinPermissions = { refresh: applyPermissions, fetchMe };
+    window.TownCheckinPermissions = { refresh: applyPermissions, fetchMe, hydrateRoomOwner };
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
