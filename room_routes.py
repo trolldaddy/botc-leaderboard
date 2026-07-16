@@ -21,6 +21,24 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mmmm")
 SESSION_SECRET = os.getenv("SESSION_SECRET") or ADMIN_PASSWORD
 SESSION_COOKIE = "botc_session"
 
+OPEN_STATUSES = {"open", "opened", "active"}
+LOCKED_STATUSES = {"locked", "lock", "closed", "close", "disabled", "off", "鎖定", "已鎖定"}
+
+
+def normalize_room_status(value: Optional[str]) -> str:
+    raw = str(value or "open").strip().lower()
+    if raw in LOCKED_STATUSES:
+        return "locked"
+    if raw in OPEN_STATUSES:
+        return "open"
+    return raw or "open"
+
+
+def ensure_room_open(room: models.GameRoom):
+    status = normalize_room_status(room.status)
+    if status != "open":
+        raise HTTPException(status_code=400, detail="房間已鎖定，無法加入")
+
 
 def _b64decode(data: str) -> bytes:
     padding = "=" * (-len(data) % 4)
@@ -101,7 +119,7 @@ def serialize_room(room: models.GameRoom):
         "date": room.date.date().isoformat() if room.date else None,
         "location": room.location,
         "storyteller": room.storyteller,
-        "status": room.status,
+        "status": normalize_room_status(room.status),
         "created_at": room.created_at.isoformat() if room.created_at else None,
         "players": [
             serialize_room_player(p)
@@ -150,8 +168,7 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
     room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players)).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
-    if room.status != "open":
-        raise HTTPException(status_code=400, detail="房間已鎖定，無法加入")
+    ensure_room_open(room)
 
     is_temporary = bool(data.get("is_temporary")) or account is None
     display_name = (data.get("display_name") or data.get("name") or (account.display_name if account else "")).strip()
@@ -161,10 +178,12 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
     if account and not is_temporary:
         existing = db.query(models.RoomPlayer).filter(models.RoomPlayer.room_id == room.id, models.RoomPlayer.account_id == account.id).first()
         if existing:
+            ensure_room_open(room)
             existing.display_name = display_name
             existing.is_temporary = False
             db.commit()
             db.refresh(existing)
+            room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account)).filter(models.GameRoom.id == room.id).first()
             return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room)}
 
     entry = models.RoomPlayer(
@@ -229,9 +248,11 @@ async def update_room(room_code: str, data: dict, db: Session = Depends(get_db))
     room = db.query(models.GameRoom).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
-    for field in ["title", "script", "location", "storyteller", "status"]:
+    for field in ["title", "script", "location", "storyteller"]:
         if field in data:
             setattr(room, field, data.get(field))
+    if "status" in data:
+        room.status = normalize_room_status(data.get("status"))
     if data.get("date"):
         try:
             room.date = datetime.strptime(data.get("date"), "%Y-%m-%d")
