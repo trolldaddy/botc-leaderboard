@@ -151,6 +151,9 @@
 </div>
 
 <style>
+  .town-mode-tabs { display:flex; gap:.75rem; margin:0 0 1.25rem; padding:.35rem; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.22); border-radius:999px; width:min(100%,520px); }
+  .town-mode-tab { flex:1; border:0; border-radius:999px; padding:.85rem 1rem; background:transparent; color:var(--text-muted); font-weight:900; letter-spacing:.08em; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:.5rem; transition:.18s ease; }
+  .town-mode-tab.active { background:linear-gradient(135deg,rgba(124,58,237,.95),rgba(167,139,250,.82)); color:#fff; box-shadow:0 10px 24px rgba(124,58,237,.25); }
   .town-layout-v2 { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
   .town-card { min-width:0; }
   .full-span { grid-column:1 / -1; }
@@ -203,10 +206,19 @@
     .qr-box { width:160px; height:160px; }
     .room-key-input { max-width:100%; }
   }
+  @media (max-width:640px) {
+    .town-mode-tabs { width:100%; margin-bottom:1rem; border-radius:18px; }
+    .town-mode-tab { min-height:52px; font-size:1rem; }
+    .town-table th, .town-table td { padding:1rem .8rem; }
+    .town-table input, .town-table select { min-width:92px; max-width:140px; min-height:48px; font-size:1rem; border-radius:12px; }
+    .town-table td:first-child, .town-table th:first-child { position:sticky; left:0; z-index:2; background:rgba(20,16,32,.98); }
+    .room-members-card .table-scroll { margin-left:-.25rem; margin-right:-.25rem; padding-bottom:.35rem; }
+  }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="/js/rooms.js"></script>
+<script src="/js/rooms-tabs-patch.js"></script>
 <script src="/js/rooms-ui-patch.js"></script>
 <script src="/js/rooms-qr-patch.js"></script>
 <script src="/js/rooms-join-patch.js"></script>
