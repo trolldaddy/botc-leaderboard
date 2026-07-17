@@ -211,7 +211,18 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
             db.commit()
             db.refresh(existing)
             room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
-            return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room)}
+            return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room), "deduped": True}
+
+    if is_temporary:
+        existing = db.query(models.RoomPlayer).filter(
+            models.RoomPlayer.room_id == room.id,
+            models.RoomPlayer.account_id.is_(None),
+            models.RoomPlayer.is_temporary == True,
+            models.RoomPlayer.display_name == display_name,
+        ).first()
+        if existing:
+            room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
+            return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room), "deduped": True}
 
     entry = models.RoomPlayer(
         room_id=room.id,
@@ -224,7 +235,7 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
     db.commit()
     db.refresh(entry)
     room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
-    return {"status": "success", "player": serialize_room_player(entry), "room": serialize_room(room)}
+    return {"status": "success", "player": serialize_room_player(entry), "room": serialize_room(room), "deduped": False}
 
 
 @router.patch("/{room_code}/players/{room_player_id}")
