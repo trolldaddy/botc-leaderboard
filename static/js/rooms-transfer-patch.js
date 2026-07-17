@@ -41,7 +41,10 @@
         hiddenRole: '',
         isDead: false,
         roomPlayerId: p.id || null,
+        accountId: p.account_id || null,
         lineUserId: p.line_user_id || null,
+        playerId: p.player_id || null,
+        playerName: p.player_name || null,
         isTemporary: !!p.is_temporary
       }));
   };
