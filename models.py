@@ -181,6 +181,12 @@ def _install_town_checkin_router_patch():
     def patched_init(self, *args, **kwargs):
         original_init(self, *args, **kwargs)
         try:
+            import match_override_routes
+            self.include_router(match_override_routes.router)
+            print("綁定感知上傳 API 已掛載: /api/matches")
+        except Exception as exc:
+            print(f"綁定感知上傳 API 掛載失敗: {exc}")
+        try:
             import room_routes
             self.include_router(room_routes.router)
             print("小鎮報到 API 已掛載: /api/rooms")
