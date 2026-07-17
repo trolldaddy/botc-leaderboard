@@ -1,10 +1,64 @@
 (() => {
   const TAB_KEY = 'botc_town_checkin_active_tab';
   const DEVICE_TOKEN_KEY = 'botc_town_checkin_device_token';
+  const ROOM_KEY = 'botc_town_checkin_room';
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+  let currentUser = null;
+  let userLoaded = false;
 
   const getSavedTab = () => localStorage.getItem(TAB_KEY) || 'player';
+
+  const readRoom = () => {
+    try { return JSON.parse(localStorage.getItem(ROOM_KEY) || 'null'); }
+    catch (err) { return null; }
+  };
+
+  const fetchCurrentUser = async () => {
+    if (userLoaded) return currentUser;
+    userLoaded = true;
+    try {
+      const resp = await fetch('/api/me', { credentials: 'same-origin' });
+      const data = await resp.json();
+      currentUser = data?.user || null;
+    } catch (err) {
+      currentUser = null;
+    }
+    return currentUser;
+  };
+
+  const isRoomOwner = () => {
+    const room = readRoom();
+    const user = currentUser;
+    if (!room || !user) return false;
+
+    const userIds = [
+      user.id,
+      user.account_id,
+      user.storyteller_account_id,
+      user.line_user_id,
+    ].filter((value) => value !== undefined && value !== null).map(String);
+
+    const ownerIds = [
+      room.created_by_id,
+      room.created_by_account_id,
+      room.created_by_line_user_id,
+    ].filter((value) => value !== undefined && value !== null).map(String);
+
+    return ownerIds.some((ownerId) => userIds.includes(ownerId));
+  };
+
+  const shouldShowManagementControls = (activeTab) => {
+    if (activeTab === 'storyteller') return true;
+    return isRoomOwner();
+  };
+
+  const updateManagementVisibility = (activeTab) => {
+    const showControls = shouldShowManagementControls(activeTab);
+    $$('.room-members-card .card-header button, .room-members-card .footer-actions').forEach((el) => {
+      el.style.display = showControls ? '' : 'none';
+    });
+  };
 
   const getDeviceToken = () => {
     try {
@@ -66,11 +120,9 @@
       el.style.display = nextTab === 'storyteller' ? '' : 'none';
     });
 
-    // 玩家頁保留玩家列表，但避免管理操作吃版面；說書人頁才顯示這些控制。
-    const playerTab = nextTab === 'player';
-    $$('.room-members-card .card-header button, .room-members-card .footer-actions').forEach((el) => {
-      el.style.display = playerTab ? 'none' : '';
-    });
+    // 玩家分頁保留玩家列表。若使用者是房主，仍顯示管理操作；一般玩家則隱藏。
+    updateManagementVisibility(nextTab);
+    fetchCurrentUser().then(() => updateManagementVisibility(nextTab));
   };
 
   const install = () => {
@@ -94,8 +146,8 @@
         <span>玩家</span>
       </button>
       <button class="town-mode-tab" type="button" role="tab" data-town-tab-target="storyteller">
-        <i class="fa-solid fa-user-tie"></i>
-        <span>說書人</span>
+        <i class="fa-solid fa-user-gear"></i>
+        <span>房主管理</span>
       </button>
     `;
     header.insertAdjacentElement('afterend', tabs);
@@ -106,6 +158,9 @@
     $$('.town-mode-tab').forEach((button) => {
       button.addEventListener('click', () => setActiveTab(button.dataset.townTabTarget));
     });
+
+    window.addEventListener('storage', () => updateManagementVisibility(getSavedTab()));
+    setInterval(() => updateManagementVisibility(getSavedTab()), 1500);
 
     setActiveTab(getSavedTab());
     return true;
