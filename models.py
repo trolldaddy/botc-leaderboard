@@ -94,6 +94,7 @@ class GameRoom(Base):
 # ==========================================
 # 5. 小鎮報到玩家 (RoomPlayers)
 # 記錄玩家加入房間與座號分配，可為 LINE 玩家或臨時玩家
+# device_token 是每支手機瀏覽器的本機報到識別碼，用來避免同手機重複加入。
 # ==========================================
 class RoomPlayer(Base):
     __tablename__ = "room_players"
@@ -105,6 +106,7 @@ class RoomPlayer(Base):
     id = Column(Integer, primary_key=True, index=True)
     room_id = Column(Integer, ForeignKey("game_rooms.id"), nullable=False)
     account_id = Column(Integer, ForeignKey("storyteller_accounts.id"), nullable=True)
+    device_token = Column(String, index=True, nullable=True)
     seat_number = Column(Integer, nullable=True)
     display_name = Column(String, nullable=False)
     is_temporary = Column(Boolean, default=False)
