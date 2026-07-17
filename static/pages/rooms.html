@@ -41,21 +41,16 @@
     <div id="active-room-summary" class="active-room-summary">
       <div class="empty-room-summary">
         <div class="summary-title">尚未加入房間</div>
-        <div class="summary-subtitle">輸入房間五碼，或使用攝影機掃描 QR Code。</div>
+        <div class="summary-subtitle">請掃描說書人畫面上的 QR Code 加入房間。若無法掃描，請輸入五碼房間代碼。</div>
       </div>
     </div>
 
     <div class="room-key-row">
       <input id="room-code-input" class="form-control dark-input room-key-input" maxlength="8" placeholder="輸入房間五碼">
       <button class="btn btn-purple" onclick="TownCheckinUI.joinByCode()"><i class="fa-solid fa-arrow-right"></i> 加入</button>
-      <button class="btn btn-outline" onclick="TownCheckinUI.startQrScanner()"><i class="fa-solid fa-camera"></i> 掃描</button>
     </div>
 
-    <div id="qr-scan-panel" class="qr-scan-panel" style="display:none;">
-      <video id="qr-scan-video" playsinline muted></video>
-      <div id="qr-scan-hint" class="scan-hint">將 QR Code 放在畫面中央。第一次使用時請允許相機權限。</div>
-      <button class="btn btn-outline" onclick="TownCheckinUI.stopQrScanner()"><i class="fa-solid fa-xmark"></i> 關閉攝影機</button>
-    </div>
+    <div class="scan-hint">手機可用內建相機、LINE 或 Google Lens 掃描 QR Code；網站內保留五碼加入作為穩定備援。</div>
   </section>
 
   <section class="card town-card full-span room-members-card">
@@ -180,12 +175,7 @@
   .room-code-pill { display:inline-flex; align-items:center; margin:.45rem 0; padding:.35rem .65rem; border-radius:999px; background:rgba(255,183,3,.13); color:var(--accent-gold); font-weight:900; letter-spacing:.12em; }
   .room-key-row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-top:1rem; }
   .room-key-input { max-width:240px; text-transform:uppercase; letter-spacing:.12em; font-weight:800; }
-  .qr-scan-panel { margin-top:1rem; border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:1rem; background:rgba(0,0,0,.28); }
-  #qr-scan-video, #qr-scan-reader { width:100%; min-height:260px; border-radius:12px; background:#000; overflow:hidden; }
-  #qr-scan-reader video { border-radius:12px; object-fit:cover!important; }
-  #qr-scan-reader__scan_region { border-radius:12px; }
-  #qr-scan-reader__dashboard_section_csr button, #qr-scan-reader__dashboard_section button { color:#111!important; }
-  .scan-hint { color:var(--text-muted); font-size:.85rem; margin:.75rem 0; }
+  .scan-hint { color:var(--text-muted); font-size:.85rem; margin:.75rem 0; line-height:1.5; }
   .qr-wrap { display:flex; gap:1rem; align-items:center; margin-top:1rem; }
   .qr-box { width:180px; height:180px; border:1px dashed var(--border-color); border-radius:16px; display:flex; align-items:center; justify-content:center; color:var(--text-muted); background:rgba(0,0,0,.25); text-align:center; padding:1rem; }
   .qr-box img { width:100%; height:100%; border-radius:12px; background:#fff; }
@@ -216,12 +206,10 @@
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="/js/rooms.js"></script>
 <script src="/js/rooms-ui-patch.js"></script>
 <script src="/js/rooms-qr-patch.js"></script>
 <script src="/js/rooms-join-patch.js"></script>
-<script src="/js/rooms-mobile-qr-patch.js"></script>
 <script src="/js/rooms-seat-select-patch.js"></script>
 <script src="/js/rooms-sync-patch.js"></script>
 <script src="/js/rooms-permission-patch.js"></script>
