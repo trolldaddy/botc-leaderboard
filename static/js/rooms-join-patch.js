@@ -4,6 +4,7 @@
   const OFFICIAL_ACCOUNT_URL = 'https://line.me/R/ti/p/@210huawo';
   const apiBase = () => window.API_BASE || '';
   const $ = (id) => document.getElementById(id);
+  let joinInFlight = false;
 
   const readRoom = () => {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }
@@ -35,6 +36,28 @@
       el.style.color = isError ? 'var(--accent-red)' : 'var(--text-muted)';
     }
     if (isError) alert(message);
+  };
+
+  const findJoinButtons = () => Array.from(document.querySelectorAll('button')).filter((button) => {
+    const text = String(button.textContent || '');
+    return text.includes('使用目前暱稱加入') || text.includes('加入');
+  });
+
+  const setJoinButtonsBusy = (busy) => {
+    findJoinButtons().forEach((button) => {
+      if (busy) {
+        button.dataset.prevDisabled = String(button.disabled ? '1' : '0');
+        button.disabled = true;
+      } else if (button.dataset.prevDisabled !== '1') {
+        button.disabled = false;
+      }
+    });
+  };
+
+  const hasSameNameInRoom = (room, displayName) => {
+    const target = String(displayName || '').trim().toLowerCase();
+    if (!target || !Array.isArray(room?.players)) return false;
+    return room.players.some((player) => String(player?.display_name || player?.name || '').trim().toLowerCase() === target);
   };
 
   const ensureInviteStyles = () => {
@@ -242,6 +265,8 @@
   };
 
   const joinRoomStrict = async () => {
+    if (joinInFlight) return showStatus('正在加入房間，請稍候。');
+
     const code = getCode();
     const displayName = getDisplayName();
     if (!code) return showStatus('缺少房間代碼。', true);
@@ -249,8 +274,17 @@
 
     if ($('room-code-input')) $('room-code-input').value = code;
 
+    joinInFlight = true;
+    setJoinButtonsBusy(true);
+
     try {
-      await fetchRoomBeforeJoin(code);
+      const beforeRoom = await fetchRoomBeforeJoin(code);
+      if (hasSameNameInRoom(beforeRoom, displayName)) {
+        showStatus(`你已經用「${displayName}」加入房間 ${beforeRoom.room_code}`);
+        ensureInviteCard(beforeRoom);
+        if (window.TownCheckinUI?.renderRoomSummary) window.TownCheckinUI.renderRoomSummary();
+        return;
+      }
 
       const resp = await fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}/join`, {
         method: 'POST',
@@ -279,6 +313,9 @@
       if (window.TownCheckinRoomSync?.syncNow) setTimeout(() => window.TownCheckinRoomSync.syncNow(), 200);
     } catch (err) {
       showStatus(err?.message || `加入房間時發生錯誤：${err}`, true);
+    } finally {
+      joinInFlight = false;
+      setJoinButtonsBusy(false);
     }
   };
 
