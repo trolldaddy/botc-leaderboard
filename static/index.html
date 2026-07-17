@@ -65,6 +65,7 @@
         <li><a href="#" data-page="recorder"><i class="fa-solid fa-book-open"></i> <span>覆盤紀錄器</span></a></li>
         <li><a href="#" data-page="record"><i class="fa-solid fa-feather-pointed"></i> <span>錄入對局</span></a></li>
         <li><a href="#" data-page="history"><i class="fa-solid fa-clock-rotate-left"></i> <span>歷史紀錄＆戰績查詢</span></a></li>
+        <li id="admin-bindings-nav-item" style="display:none;"><a href="#" data-page="account_bindings"><i class="fa-solid fa-link"></i> <span>帳號綁定</span></a></li>
         <li id="admin-nav-item" style="display:none;"><a href="#" data-page="admin"><i class="fa-solid fa-shield-halved"></i> <span>管理後台</span></a></li>
     </ul>
 
@@ -147,12 +148,14 @@
 
         async function revealAdminNav() {
             const adminItem = document.getElementById('admin-nav-item');
-            if (!adminItem) return;
+            const bindingItem = document.getElementById('admin-bindings-nav-item');
             try {
                 const resp = await fetch(`${window.API_BASE || ''}/api/me`, { credentials: 'same-origin' });
                 if (!resp.ok) return;
                 const me = await resp.json();
-                adminItem.style.display = me.is_admin ? 'flex' : 'none';
+                const showAdmin = !!me.is_admin;
+                if (adminItem) adminItem.style.display = showAdmin ? 'flex' : 'none';
+                if (bindingItem) bindingItem.style.display = showAdmin ? 'flex' : 'none';
             } catch (err) {}
         }
 
