@@ -107,16 +107,23 @@ def serialize_account(account: Optional[models.StorytellerAccount]):
         "line_user_id": account.line_user_id,
         "display_name": account.display_name,
         "picture_url": account.picture_url,
+        "player_id": getattr(account, "player_id", None),
+        "player_name": account.player.name if getattr(account, "player", None) else None,
+        "can_host": bool(getattr(account, "can_host", True)),
     }
 
 
 def serialize_room_player(entry: models.RoomPlayer):
+    account = entry.account
+    linked_player = account.player if account and getattr(account, "player", None) else None
     return {
         "id": entry.id,
         "room_id": entry.room_id,
         "account_id": entry.account_id,
-        "line_user_id": entry.account.line_user_id if entry.account else None,
-        "picture_url": entry.account.picture_url if entry.account else None,
+        "line_user_id": account.line_user_id if account else None,
+        "picture_url": account.picture_url if account else None,
+        "player_id": linked_player.id if linked_player else None,
+        "player_name": linked_player.name if linked_player else None,
         "seat_number": entry.seat_number,
         "display_name": entry.display_name,
         "name": entry.display_name,
@@ -171,13 +178,13 @@ async def create_room(data: dict, db: Session = Depends(get_db), account: models
     db.add(room)
     db.commit()
     db.refresh(room)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
     return {"status": "success", "room": serialize_room(room)}
 
 
 @router.get("/{room_code}")
 async def get_room(room_code: str, db: Session = Depends(get_db)):
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.room_code == room_code.upper()).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
     return serialize_room(room)
@@ -203,7 +210,7 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
             existing.is_temporary = False
             db.commit()
             db.refresh(existing)
-            room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
+            room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
             return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room)}
 
     entry = models.RoomPlayer(
@@ -216,7 +223,7 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
     db.add(entry)
     db.commit()
     db.refresh(entry)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
     return {"status": "success", "player": serialize_room_player(entry), "room": serialize_room(room)}
 
 
@@ -247,7 +254,7 @@ async def update_room_player(room_code: str, room_player_id: int, data: dict, db
 
     db.commit()
     db.refresh(entry)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
     return {"status": "success", "player": serialize_room_player(entry), "room": serialize_room(room)}
 
 
@@ -284,5 +291,5 @@ async def update_room(room_code: str, data: dict, db: Session = Depends(get_db),
     room.updated_at = datetime.now()
     db.commit()
     db.refresh(room)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
+    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
     return {"status": "success", "room": serialize_room(room)}
