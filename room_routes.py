@@ -10,6 +10,7 @@ from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
+from sqlalchemy import text
 from sqlalchemy.orm import Session, joinedload
 
 import models
@@ -23,6 +24,33 @@ SESSION_COOKIE = "botc_session"
 
 OPEN_STATUSES = {"open", "opened", "active"}
 LOCKED_STATUSES = {"locked", "lock", "closed", "close", "disabled", "off", "鎖定", "已鎖定"}
+_ROOM_PLAYER_DEVICE_SCHEMA_READY = False
+
+
+def ensure_room_player_device_schema(db: Session):
+    global _ROOM_PLAYER_DEVICE_SCHEMA_READY
+    if _ROOM_PLAYER_DEVICE_SCHEMA_READY:
+        return
+    try:
+        bind = db.get_bind()
+        dialect = bind.dialect.name if bind is not None else ""
+        if dialect == "sqlite":
+            rows = db.execute(text("PRAGMA table_info(room_players)")).fetchall()
+            columns = {row[1] for row in rows}
+        else:
+            rows = db.execute(text("""
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name = 'room_players'
+            """)).fetchall()
+            columns = {row[0] for row in rows}
+        if "device_token" not in columns:
+            db.execute(text("ALTER TABLE room_players ADD COLUMN device_token VARCHAR"))
+            db.commit()
+    except Exception as exc:
+        db.rollback()
+        print(f"room_players.device_token 欄位檢查失敗: {exc}")
+    _ROOM_PLAYER_DEVICE_SCHEMA_READY = True
 
 
 def normalize_room_status(value: Optional[str]) -> str:
@@ -32,6 +60,13 @@ def normalize_room_status(value: Optional[str]) -> str:
     if raw in OPEN_STATUSES:
         return "open"
     return raw or "open"
+
+
+def normalize_device_token(value: Optional[str]) -> Optional[str]:
+    token = str(value or "").strip()
+    if not token:
+        return None
+    return token[:128]
 
 
 def ensure_room_open(room: models.GameRoom):
@@ -128,6 +163,7 @@ def serialize_room_player(entry: models.RoomPlayer):
         "display_name": entry.display_name,
         "name": entry.display_name,
         "is_temporary": bool(entry.is_temporary),
+        "device_token": getattr(entry, "device_token", None),
         "joined_at": entry.joined_at.isoformat() if entry.joined_at else None,
     }
 
@@ -154,8 +190,17 @@ def serialize_room(room: models.GameRoom):
     }
 
 
+def reload_room(db: Session, room_id: int):
+    ensure_room_player_device_schema(db)
+    return db.query(models.GameRoom).options(
+        joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player),
+        joinedload(models.GameRoom.creator),
+    ).filter(models.GameRoom.id == room_id).first()
+
+
 @router.post("")
 async def create_room(data: dict, db: Session = Depends(get_db), account: models.StorytellerAccount = Depends(require_account)):
+    ensure_room_player_device_schema(db)
     code = generate_room_code(db)
     date_value = data.get("date")
     try:
@@ -178,12 +223,13 @@ async def create_room(data: dict, db: Session = Depends(get_db), account: models
     db.add(room)
     db.commit()
     db.refresh(room)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
+    room = reload_room(db, room.id)
     return {"status": "success", "room": serialize_room(room)}
 
 
 @router.get("/{room_code}")
 async def get_room(room_code: str, db: Session = Depends(get_db)):
+    ensure_room_player_device_schema(db)
     room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
@@ -192,6 +238,7 @@ async def get_room(room_code: str, db: Session = Depends(get_db)):
 
 @router.post("/{room_code}/join")
 async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), account: Optional[models.StorytellerAccount] = Depends(get_optional_account)):
+    ensure_room_player_device_schema(db)
     room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players), joinedload(models.GameRoom.creator)).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
@@ -199,19 +246,38 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
 
     is_temporary = bool(data.get("is_temporary")) or account is None
     display_name = (data.get("display_name") or data.get("name") or (account.display_name if account else "")).strip()
+    device_token = normalize_device_token(data.get("device_token") or data.get("deviceToken"))
     if not display_name:
         raise HTTPException(status_code=400, detail="請輸入玩家名稱")
 
     if account and not is_temporary:
         existing = db.query(models.RoomPlayer).filter(models.RoomPlayer.room_id == room.id, models.RoomPlayer.account_id == account.id).first()
         if existing:
-            ensure_room_open(room)
             existing.display_name = display_name
             existing.is_temporary = False
+            if device_token:
+                existing.device_token = device_token
             db.commit()
             db.refresh(existing)
-            room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
-            return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room), "deduped": True}
+            room = reload_room(db, room.id)
+            return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room), "deduped": True, "updated_existing": True}
+
+    if device_token:
+        existing = db.query(models.RoomPlayer).filter(
+            models.RoomPlayer.room_id == room.id,
+            models.RoomPlayer.device_token == device_token,
+        ).first()
+        if existing:
+            existing.display_name = display_name
+            if account and not is_temporary:
+                existing.account_id = account.id
+                existing.is_temporary = False
+            else:
+                existing.is_temporary = True
+            db.commit()
+            db.refresh(existing)
+            room = reload_room(db, room.id)
+            return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room), "deduped": True, "updated_existing": True}
 
     if is_temporary:
         existing = db.query(models.RoomPlayer).filter(
@@ -221,12 +287,17 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
             models.RoomPlayer.display_name == display_name,
         ).first()
         if existing:
-            room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
-            return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room), "deduped": True}
+            if device_token and not getattr(existing, "device_token", None):
+                existing.device_token = device_token
+                db.commit()
+                db.refresh(existing)
+            room = reload_room(db, room.id)
+            return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room), "deduped": True, "updated_existing": False}
 
     entry = models.RoomPlayer(
         room_id=room.id,
         account_id=account.id if account and not is_temporary else None,
+        device_token=device_token,
         display_name=display_name,
         is_temporary=is_temporary,
         joined_at=datetime.now(),
@@ -234,12 +305,13 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
     db.add(entry)
     db.commit()
     db.refresh(entry)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
-    return {"status": "success", "player": serialize_room_player(entry), "room": serialize_room(room), "deduped": False}
+    room = reload_room(db, room.id)
+    return {"status": "success", "player": serialize_room_player(entry), "room": serialize_room(room), "deduped": False, "updated_existing": False}
 
 
 @router.patch("/{room_code}/players/{room_player_id}")
 async def update_room_player(room_code: str, room_player_id: int, data: dict, db: Session = Depends(get_db), account: models.StorytellerAccount = Depends(require_account)):
+    ensure_room_player_device_schema(db)
     room = db.query(models.GameRoom).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
@@ -265,12 +337,13 @@ async def update_room_player(room_code: str, room_player_id: int, data: dict, db
 
     db.commit()
     db.refresh(entry)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
+    room = reload_room(db, room.id)
     return {"status": "success", "player": serialize_room_player(entry), "room": serialize_room(room)}
 
 
 @router.delete("/{room_code}/players/{room_player_id}")
 async def delete_room_player(room_code: str, room_player_id: int, db: Session = Depends(get_db), account: models.StorytellerAccount = Depends(require_account)):
+    ensure_room_player_device_schema(db)
     room = db.query(models.GameRoom).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
@@ -285,6 +358,7 @@ async def delete_room_player(room_code: str, room_player_id: int, db: Session = 
 
 @router.patch("/{room_code}")
 async def update_room(room_code: str, data: dict, db: Session = Depends(get_db), account: models.StorytellerAccount = Depends(require_account)):
+    ensure_room_player_device_schema(db)
     room = db.query(models.GameRoom).filter(models.GameRoom.room_code == room_code.upper()).first()
     if not room:
         raise HTTPException(status_code=404, detail="找不到房間")
@@ -302,5 +376,5 @@ async def update_room(room_code: str, data: dict, db: Session = Depends(get_db),
     room.updated_at = datetime.now()
     db.commit()
     db.refresh(room)
-    room = db.query(models.GameRoom).options(joinedload(models.GameRoom.players).joinedload(models.RoomPlayer.account).joinedload(models.StorytellerAccount.player), joinedload(models.GameRoom.creator)).filter(models.GameRoom.id == room.id).first()
+    room = reload_room(db, room.id)
     return {"status": "success", "room": serialize_room(room)}
