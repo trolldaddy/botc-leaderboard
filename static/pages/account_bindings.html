@@ -1,0 +1,57 @@
+<header class="top-header">
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:1rem;flex-wrap:wrap;">
+    <h2 style="font-family:'Cinzel',serif;letter-spacing:2px;">LINE 帳號綁定</h2>
+    <button class="btn btn-outline" onclick="AccountBindings.refresh()"><i class="fa-solid fa-arrows-rotate"></i> 重新整理</button>
+  </div>
+</header>
+
+<section class="card binding-card">
+  <div class="binding-intro">
+    <h3><i class="fa-brands fa-line text-green"></i> LINE 帳號 → 玩家戰績身份</h3>
+    <p>這裡列出曾經用 LINE 登入或加入小鎮報到的帳號。你可以把 LINE 帳號手動綁定到既有玩家資料，避免玩家改暱稱後戰績分裂。</p>
+    <p class="hint-text">LINE 登入只能取得此使用者的 LINE userId、顯示名稱與頭像。不能取得好友名單，也不能自動把玩家拉進社群。若要邀請加入 LINE 社群，建議在頁面或現場顯示社群連結 / QR Code。</p>
+  </div>
+
+  <div class="binding-toolbar">
+    <input id="binding-search" class="form-control dark-input" placeholder="搜尋 LINE 名稱、UID、暱稱或玩家名稱">
+    <label class="checkline"><input id="binding-unbound-only" type="checkbox"> 只看未綁定</label>
+    <button class="btn btn-purple" onclick="AccountBindings.refresh()"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button>
+  </div>
+
+  <div id="binding-status" class="binding-status">正在讀取帳號資料...</div>
+  <div id="binding-list" class="binding-list"></div>
+</section>
+
+<style>
+  .binding-card { max-width:1200px; margin:0 auto; }
+  .binding-intro { border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.035); border-radius:16px; padding:1rem; margin-bottom:1rem; }
+  .binding-intro h3 { color:#fff; margin:0 0 .5rem; }
+  .binding-intro p { color:var(--text-muted); line-height:1.7; margin:.35rem 0; }
+  .text-green { color:#06c755; }
+  .binding-toolbar { display:flex; gap:.75rem; align-items:center; flex-wrap:wrap; margin-bottom:1rem; }
+  .dark-input { background:rgba(0,0,0,.3)!important; border:1px solid var(--border-color)!important; color:#fff!important; border-radius:8px; padding:.8rem!important; min-width:260px; }
+  .checkline { color:var(--text-muted); display:flex; align-items:center; gap:.4rem; }
+  .binding-status { color:var(--text-muted); margin:.75rem 0; }
+  .binding-list { display:grid; grid-template-columns:1fr; gap:1rem; }
+  .binding-row { border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.2); border-radius:18px; padding:1rem; display:grid; grid-template-columns:72px minmax(0,1fr) minmax(280px,.9fr); gap:1rem; align-items:start; }
+  .binding-avatar { width:64px; height:64px; border-radius:999px; overflow:hidden; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; color:var(--accent-gold); font-size:1.8rem; }
+  .binding-avatar img { width:100%; height:100%; object-fit:cover; }
+  .binding-name { color:#fff; font-weight:900; font-size:1.05rem; }
+  .binding-meta { color:var(--text-muted); font-size:.82rem; line-height:1.6; word-break:break-all; }
+  .binding-pill { display:inline-flex; align-items:center; border-radius:999px; padding:.25rem .55rem; background:rgba(255,183,3,.13); color:var(--accent-gold); font-size:.76rem; margin:.2rem .25rem .2rem 0; }
+  .bound-pill { background:rgba(34,197,94,.12); color:#86efac; }
+  .unbound-pill { background:rgba(239,68,68,.12); color:#fca5a5; }
+  .room-chip { display:inline-block; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:.35rem .5rem; color:var(--text-muted); font-size:.78rem; margin:.25rem .25rem 0 0; }
+  .binding-actions { border-left:1px solid rgba(255,255,255,.08); padding-left:1rem; }
+  .binding-actions .form-control { width:100%; margin-bottom:.6rem; }
+  .binding-action-row { display:flex; gap:.5rem; flex-wrap:wrap; margin:.5rem 0; }
+  .player-results { margin:.5rem 0; max-height:180px; overflow:auto; border:1px solid rgba(255,255,255,.08); border-radius:12px; display:none; }
+  .player-result { display:flex; justify-content:space-between; gap:.5rem; padding:.55rem .7rem; border-bottom:1px solid rgba(255,255,255,.06); color:#fff; cursor:pointer; }
+  .player-result:hover { background:rgba(255,255,255,.06); }
+  .player-result:last-child { border-bottom:0; }
+  .hint-text { color:var(--text-muted); font-size:.85rem; }
+  .empty-binding { color:var(--text-muted); text-align:center; padding:2rem; border:1px dashed rgba(255,255,255,.12); border-radius:16px; }
+  @media (max-width:900px) { .binding-row { grid-template-columns:1fr; } .binding-actions { border-left:0; padding-left:0; border-top:1px solid rgba(255,255,255,.08); padding-top:1rem; } }
+</style>
+
+<script src="/js/account_bindings.js"></script>
