@@ -181,6 +181,12 @@ def _install_town_checkin_router_patch():
     def patched_init(self, *args, **kwargs):
         original_init(self, *args, **kwargs)
         try:
+            import line_login_override_routes
+            self.include_router(line_login_override_routes.router)
+            print("LINE 登入提示官方帳號 API 已掛載: /auth/line/login")
+        except Exception as exc:
+            print(f"LINE 登入提示官方帳號 API 掛載失敗: {exc}")
+        try:
             import match_override_routes
             self.include_router(match_override_routes.router)
             print("綁定感知上傳 API 已掛載: /api/matches")
