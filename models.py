@@ -15,11 +15,14 @@ class Player(Base):
     created_at = Column(DateTime, default=datetime.now)
 
     match_history = relationship("MatchPlayer", back_populates="player")
+    linked_accounts = relationship("StorytellerAccount", back_populates="player")
 
 
 # ==========================================
-# 2. 說書人 / LINE 登入帳號 (StorytellerAccounts)
-# 由 LINE Login 建立，用來限制誰可以上傳戰績，也可作為小鎮報到的 LINE 身份來源
+# 2. LINE 登入帳號 (StorytellerAccounts)
+# 早期命名沿用 StorytellerAccount；實際上現在代表任何 LINE 登入者。
+# player_id 用來把 LINE 帳號綁定到既有玩家戰績身份。
+# can_host 先預留主持/開房認證權限，目前不強制限制。
 # ==========================================
 class StorytellerAccount(Base):
     __tablename__ = "storyteller_accounts"
@@ -28,6 +31,10 @@ class StorytellerAccount(Base):
     line_user_id = Column(String, unique=True, index=True, nullable=False)
     display_name = Column(String, nullable=True)
     picture_url = Column(Text, nullable=True)
+    player_id = Column(Integer, ForeignKey("players.id"), nullable=True, unique=True)
+    can_host = Column(Boolean, default=True)
+    host_verified_at = Column(DateTime, nullable=True)
+    host_note = Column(Text, nullable=True)
     is_allowed = Column(Boolean, default=False)
     is_banned = Column(Boolean, default=False)
     banned_at = Column(DateTime, nullable=True)
@@ -36,6 +43,7 @@ class StorytellerAccount(Base):
 
     uploaded_matches = relationship("Match", back_populates="uploader")
     checkin_entries = relationship("RoomPlayer", back_populates="account")
+    player = relationship("Player", back_populates="linked_accounts")
 
 
 # ==========================================
@@ -154,9 +162,9 @@ class MatchPlayer(Base):
 
 
 # ==========================================
-# 測試分支：小鎮報到 API 自動掛載器
-# main.py 是大型入口檔，為避免整檔覆蓋風險，這裡在 FastAPI app 建立時自動掛上 room_routes。
-# 等功能穩定合併前，可再改成 main.py 裡明確 app.include_router(room_routes.router)。
+# 測試分支：小鎮報到 / 帳號綁定 API 自動掛載器
+# main.py 是大型入口檔，為避免整檔覆蓋風險，這裡在 FastAPI app 建立時自動掛上額外 router。
+# 等功能穩定合併前，可再改成 main.py 裡明確 app.include_router(...)
 # ==========================================
 def _install_town_checkin_router_patch():
     try:
@@ -178,6 +186,12 @@ def _install_town_checkin_router_patch():
             print("小鎮報到 API 已掛載: /api/rooms")
         except Exception as exc:
             print(f"小鎮報到 API 掛載失敗: {exc}")
+        try:
+            import account_binding_routes
+            self.include_router(account_binding_routes.router)
+            print("帳號綁定 API 已掛載: /api/admin/account-bindings")
+        except Exception as exc:
+            print(f"帳號綁定 API 掛載失敗: {exc}")
 
     fastapi.FastAPI.__init__ = patched_init
     fastapi.FastAPI._botc_town_checkin_router_patch = True
