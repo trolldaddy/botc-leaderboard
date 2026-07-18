@@ -17,6 +17,18 @@ from room_routes import (
 router = APIRouter(prefix="/api/rooms", tags=["town-checkin-player-seat"])
 
 
+def build_room_permissions(
+    room: models.GameRoom,
+    account: Optional[models.StorytellerAccount],
+) -> dict:
+    is_owner = bool(account and room.created_by_id == account.id)
+    return {
+        "is_owner": is_owner,
+        "can_manage_players": is_owner,
+        "can_manage_room": is_owner,
+    }
+
+
 def can_manage_own_seat(
     room: models.GameRoom,
     entry: models.RoomPlayer,
@@ -30,6 +42,21 @@ def can_manage_own_seat(
     if device_token and getattr(entry, "device_token", None) == device_token:
         return True
     return False
+
+
+@router.get("/{room_code}/permissions")
+async def get_room_permissions(
+    room_code: str,
+    db: Session = Depends(get_db),
+    account: Optional[models.StorytellerAccount] = Depends(get_optional_account),
+):
+    room = db.query(models.GameRoom).filter(
+        models.GameRoom.room_code == room_code.upper()
+    ).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="找不到房間")
+
+    return build_room_permissions(room, account)
 
 
 @router.patch("/{room_code}/players/{room_player_id}/seat")
@@ -91,4 +118,5 @@ async def update_own_seat(
         "status": "success",
         "player": serialize_room_player(entry),
         "room": serialize_room(room),
+        "permissions": build_room_permissions(room, account),
     }
