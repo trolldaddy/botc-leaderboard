@@ -201,6 +201,12 @@ def _install_town_checkin_router_patch():
         except Exception as exc:
             print(f"小鎮報到 API 掛載失敗: {exc}")
         try:
+            import player_seat_routes
+            self.include_router(player_seat_routes.router)
+            print("玩家自選座號 API 已掛載: /api/rooms/{room_code}/players/{id}/seat")
+        except Exception as exc:
+            print(f"玩家自選座號 API 掛載失敗: {exc}")
+        try:
             import account_binding_routes
             self.include_router(account_binding_routes.router)
             print("帳號綁定 API 已掛載: /api/admin/account-bindings")
