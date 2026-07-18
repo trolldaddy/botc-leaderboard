@@ -23,22 +23,45 @@
   const fetchContext = async () => {
     const code = getRoomCode();
     if (!code) return null;
-    const [roomResp, meResp] = await Promise.all([
+
+    const [roomResp, permissionsResp, meResp] = await Promise.all([
       fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}`, { credentials: 'same-origin' }),
+      fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}/permissions`, { credentials: 'same-origin' }).catch(() => null),
       fetch(`${apiBase()}/api/me`, { credentials: 'same-origin' }).catch(() => null),
     ]);
+
     if (!roomResp.ok) return null;
     const room = await roomResp.json();
+
+    let permissions = {
+      is_owner: false,
+      can_manage_players: false,
+      can_manage_room: false,
+    };
+    try {
+      if (permissionsResp?.ok) permissions = await permissionsResp.json();
+    } catch (err) {}
+
     let me = null;
     try {
       if (meResp?.ok) me = await meResp.json();
     } catch (err) {}
-    context = { room, account: me?.user || null, deviceToken: getDeviceToken() };
+
+    room.is_owner = Boolean(permissions.is_owner);
+    room.can_manage_players = Boolean(permissions.can_manage_players);
+    room.can_manage_room = Boolean(permissions.can_manage_room);
+
+    context = {
+      room,
+      permissions,
+      account: me?.user || null,
+      deviceToken: getDeviceToken(),
+    };
     writeRoom(room);
     return context;
   };
 
-  const isRoomOwner = (ctx) => Boolean(ctx?.account?.id && Number(ctx.room?.created_by_id) === Number(ctx.account.id));
+  const isRoomOwner = (ctx) => Boolean(ctx?.permissions?.is_owner);
 
   const isOwnPlayer = (player, ctx) => {
     if (!player || !ctx) return false;
@@ -108,8 +131,13 @@
       return;
     }
 
+    if (data.permissions) {
+      data.room.is_owner = Boolean(data.permissions.is_owner);
+      data.room.can_manage_players = Boolean(data.permissions.can_manage_players);
+      data.room.can_manage_room = Boolean(data.permissions.can_manage_room);
+    }
     writeRoom(data.room);
-    context = { ...ctx, room: data.room };
+    context = { ...ctx, room: data.room, permissions: data.permissions || ctx.permissions };
     if (window.TownCheckin?.loadRoomFromInput) await window.TownCheckin.loadRoomFromInput();
     if (window.TownCheckinSeatPatch?.refresh) window.TownCheckinSeatPatch.refresh();
     scheduleDecorate();
