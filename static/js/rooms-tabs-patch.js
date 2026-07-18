@@ -103,6 +103,20 @@
     window.__botcRoomDeviceFetchPatched = true;
   };
 
+  const loadSelfSeatPatch = () => {
+    if (window.__botcSelfSeatPatchLoading || document.querySelector('script[data-botc-self-seat="1"]')) return;
+    window.__botcSelfSeatPatchLoading = true;
+    const script = document.createElement('script');
+    script.src = `/js/rooms-self-seat-patch.js?v=${Date.now()}`;
+    script.dataset.botcSelfSeat = '1';
+    script.onload = () => { window.__botcSelfSeatPatchLoading = false; };
+    script.onerror = () => {
+      window.__botcSelfSeatPatchLoading = false;
+      console.warn('玩家自選座號功能載入失敗');
+    };
+    document.head.appendChild(script);
+  };
+
   const setActiveTab = (tab) => {
     const nextTab = tab === 'storyteller' ? 'storyteller' : 'player';
     localStorage.setItem(TAB_KEY, nextTab);
@@ -127,6 +141,7 @@
 
   const install = () => {
     installDeviceTokenFetchPatch();
+    loadSelfSeatPatch();
 
     const root = $('.town-layout-v2');
     const header = $('.top-header');
