@@ -4,8 +4,7 @@
   const ROOM_KEY = 'botc_town_checkin_room';
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => Array.from(document.querySelectorAll(selector));
-  let currentUser = null;
-  let userLoaded = false;
+  let permissionFetchInFlight = null;
 
   const getSavedTab = () => localStorage.getItem(TAB_KEY) || 'player';
 
@@ -14,50 +13,54 @@
     catch (err) { return null; }
   };
 
-  const fetchCurrentUser = async () => {
-    if (userLoaded) return currentUser;
-    userLoaded = true;
-    try {
-      const resp = await fetch('/api/me', { credentials: 'same-origin' });
-      const data = await resp.json();
-      currentUser = data?.user || null;
-    } catch (err) {
-      currentUser = null;
-    }
-    return currentUser;
+  const writeRoom = (room) => {
+    if (room) localStorage.setItem(ROOM_KEY, JSON.stringify(room));
   };
 
-  const isRoomOwner = () => {
+  const fetchRoomPermissions = async () => {
+    if (permissionFetchInFlight) return permissionFetchInFlight;
     const room = readRoom();
-    const user = currentUser;
-    if (!room || !user) return false;
+    const code = String(room?.room_code || '').trim().toUpperCase();
+    if (!code) return null;
 
-    const userIds = [
-      user.id,
-      user.account_id,
-      user.storyteller_account_id,
-      user.line_user_id,
-    ].filter((value) => value !== undefined && value !== null).map(String);
+    permissionFetchInFlight = (async () => {
+      try {
+        const resp = await fetch(`/api/rooms/${encodeURIComponent(code)}/permissions`, {
+          credentials: 'same-origin',
+        });
+        if (!resp.ok) return null;
+        const permissions = await resp.json();
+        const latestRoom = readRoom() || room;
+        latestRoom.is_owner = Boolean(permissions.is_owner);
+        latestRoom.can_manage_players = Boolean(permissions.can_manage_players);
+        latestRoom.can_manage_room = Boolean(permissions.can_manage_room);
+        writeRoom(latestRoom);
+        return permissions;
+      } catch (err) {
+        console.warn('房間權限讀取失敗', err);
+        return null;
+      } finally {
+        permissionFetchInFlight = null;
+      }
+    })();
 
-    const ownerIds = [
-      room.created_by_id,
-      room.created_by_account_id,
-      room.created_by_line_user_id,
-    ].filter((value) => value !== undefined && value !== null).map(String);
-
-    return ownerIds.some((ownerId) => userIds.includes(ownerId));
+    return permissionFetchInFlight;
   };
 
-  const shouldShowManagementControls = (activeTab) => {
-    if (activeTab === 'storyteller') return true;
-    return isRoomOwner();
-  };
+  const isRoomOwner = () => Boolean(readRoom()?.is_owner);
 
-  const updateManagementVisibility = (activeTab) => {
-    const showControls = shouldShowManagementControls(activeTab);
+  const shouldShowManagementControls = () => isRoomOwner();
+
+  const updateManagementVisibility = () => {
+    const showControls = shouldShowManagementControls();
     $$('.room-members-card .card-header button, .room-members-card .footer-actions').forEach((el) => {
       el.style.display = showControls ? '' : 'none';
     });
+  };
+
+  const refreshManagementPermissions = async () => {
+    await fetchRoomPermissions();
+    updateManagementVisibility();
   };
 
   const getDeviceToken = () => {
@@ -134,9 +137,8 @@
       el.style.display = nextTab === 'storyteller' ? '' : 'none';
     });
 
-    // 玩家分頁保留玩家列表。若使用者是房主，仍顯示管理操作；一般玩家則隱藏。
-    updateManagementVisibility(nextTab);
-    fetchCurrentUser().then(() => updateManagementVisibility(nextTab));
+    updateManagementVisibility();
+    refreshManagementPermissions();
   };
 
   const install = () => {
@@ -174,8 +176,9 @@
       button.addEventListener('click', () => setActiveTab(button.dataset.townTabTarget));
     });
 
-    window.addEventListener('storage', () => updateManagementVisibility(getSavedTab()));
-    setInterval(() => updateManagementVisibility(getSavedTab()), 1500);
+    window.addEventListener('storage', () => refreshManagementPermissions());
+    window.addEventListener('focus', () => refreshManagementPermissions());
+    setInterval(() => refreshManagementPermissions(), 3000);
 
     setActiveTab(getSavedTab());
     return true;
