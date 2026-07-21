@@ -23,45 +23,23 @@
   const fetchContext = async () => {
     const code = getRoomCode();
     if (!code) return null;
-
-    const [roomResp, permissionsResp, meResp] = await Promise.all([
-      fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}`, { credentials: 'same-origin' }),
-      fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}/permissions`, { credentials: 'same-origin' }).catch(() => null),
-      fetch(`${apiBase()}/api/me`, { credentials: 'same-origin' }).catch(() => null),
+    const [roomResp, permissionResp, meResp] = await Promise.all([
+      fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}`, { credentials: 'same-origin', cache: 'no-store' }),
+      fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}/permissions`, { credentials: 'same-origin', cache: 'no-store' }).catch(() => null),
+      fetch(`${apiBase()}/api/me`, { credentials: 'same-origin', cache: 'no-store' }).catch(() => null),
     ]);
-
     if (!roomResp.ok) return null;
     const room = await roomResp.json();
-
-    let permissions = {
-      is_owner: false,
-      can_manage_players: false,
-      can_manage_room: false,
-    };
-    try {
-      if (permissionsResp?.ok) permissions = await permissionsResp.json();
-    } catch (err) {}
-
+    let permissions = { is_owner: false, can_manage_players: false, can_manage_room: false };
+    try { if (permissionResp?.ok) permissions = await permissionResp.json(); } catch (err) {}
     let me = null;
-    try {
-      if (meResp?.ok) me = await meResp.json();
-    } catch (err) {}
-
-    room.is_owner = Boolean(permissions.is_owner);
-    room.can_manage_players = Boolean(permissions.can_manage_players);
-    room.can_manage_room = Boolean(permissions.can_manage_room);
-
-    context = {
-      room,
-      permissions,
-      account: me?.user || null,
-      deviceToken: getDeviceToken(),
-    };
+    try { if (meResp?.ok) me = await meResp.json(); } catch (err) {}
+    context = { room, permissions, account: me?.user || null, deviceToken: getDeviceToken() };
     writeRoom(room);
     return context;
   };
 
-  const isRoomOwner = (ctx) => Boolean(ctx?.permissions?.is_owner);
+  const isRoomOwner = (ctx) => Boolean(ctx?.permissions?.is_owner || ctx?.permissions?.can_manage_players);
 
   const isOwnPlayer = (player, ctx) => {
     if (!player || !ctx) return false;
@@ -77,16 +55,11 @@
     const ctx = await fetchContext();
     if (!ctx) return;
     const owner = isRoomOwner(ctx);
-
     tbody.querySelectorAll('select[data-seat-selector="true"]').forEach((select) => {
       const player = findPlayer(select.dataset.playerId, ctx);
       const own = isOwnPlayer(player, ctx);
       select.disabled = !(owner || own);
-      select.title = owner
-        ? '房主可調整所有玩家座號'
-        : own
-          ? '選擇你目前坐的位置'
-          : '你只能修改自己的座號';
+      select.title = owner ? '房主可調整所有玩家座號' : own ? '選擇你目前坐的位置' : '你只能修改自己的座號';
       select.closest('td')?.classList.toggle('own-seat-cell', own);
     });
   };
@@ -100,15 +73,11 @@
     });
   };
 
-  const updateOwnSeat = async (id, value) => {
+  const updateSeatDirect = async (id, value) => {
     const ctx = await fetchContext();
     const player = findPlayer(id, ctx);
-    if (!ctx || !player) return alert('找不到你的房間玩家資料，請重新整理後再試。');
-
-    if (isRoomOwner(ctx)) {
-      return window.TownCheckin.__ownerUpdateSeat(id, value);
-    }
-    if (!isOwnPlayer(player, ctx)) {
+    if (!ctx || !player) return alert('找不到房間玩家資料，請重新整理後再試。');
+    if (!isRoomOwner(ctx) && !isOwnPlayer(player, ctx)) {
       alert('你只能修改自己的座號。');
       scheduleDecorate();
       return;
@@ -131,15 +100,11 @@
       return;
     }
 
-    if (data.permissions) {
-      data.room.is_owner = Boolean(data.permissions.is_owner);
-      data.room.can_manage_players = Boolean(data.permissions.can_manage_players);
-      data.room.can_manage_room = Boolean(data.permissions.can_manage_room);
-    }
     writeRoom(data.room);
-    context = { ...ctx, room: data.room, permissions: data.permissions || ctx.permissions };
+    context = { ...ctx, room: data.room };
     if (window.TownCheckin?.loadRoomFromInput) await window.TownCheckin.loadRoomFromInput();
     if (window.TownCheckinSeatPatch?.refresh) window.TownCheckinSeatPatch.refresh();
+    if (window.TownCheckinPermissions?.refresh) window.TownCheckinPermissions.refresh();
     scheduleDecorate();
   };
 
@@ -148,20 +113,16 @@
     if (!tbody || !window.TownCheckin) return false;
     if (installed) return true;
     installed = true;
-
-    if (!window.TownCheckin.__ownerUpdateSeat) {
-      window.TownCheckin.__ownerUpdateSeat = window.TownCheckin.updateSeat;
-      window.TownCheckin.updateSeat = (id, value) => {
-        updateOwnSeat(id, value).catch((err) => {
-          console.error(err);
-          alert('座號更新時發生錯誤，請重新整理後再試。');
-        });
-      };
-    }
-
+    window.TownCheckin.updateSeat = (id, value) => {
+      updateSeatDirect(id, value).catch((err) => {
+        console.error(err);
+        alert('座號更新時發生錯誤，請重新整理後再試。');
+      });
+    };
     observer = new MutationObserver(scheduleDecorate);
     observer.observe(tbody, { childList: true });
     window.addEventListener('focus', scheduleDecorate);
+    window.TownCheckinSelfSeat = { refresh: scheduleDecorate };
     scheduleDecorate();
     return true;
   };
