@@ -1,17 +1,40 @@
 <header class="top-header">
   <div style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:1rem;flex-wrap:wrap;">
-    <h2 style="font-family:'Cinzel',serif;letter-spacing:2px;">角色資料庫管理</h2>
+    <h2 style="font-family:'Cinzel',serif;letter-spacing:2px;">角色知識庫管理</h2>
     <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
       <button class="btn btn-outline" onclick="RoleAdmin.refresh()"><i class="fa-solid fa-arrows-rotate"></i> 重新整理</button>
+      <button id="role-sync-run" class="btn btn-outline"><i class="fa-solid fa-code-compare"></i> 比對 Pocket Grimoire</button>
       <button class="btn btn-purple" onclick="RoleAdmin.importMasterDb()"><i class="fa-solid fa-database"></i> 匯入現有角色庫</button>
     </div>
   </div>
 </header>
 
+<section id="role-sync-panel" class="card role-sync-panel" hidden>
+  <div class="role-sync-head">
+    <div>
+      <h3><i class="fa-solid fa-code-compare text-gold"></i> Pocket Grimoire 簡中轉繁比對</h3>
+      <p>從 Skateside/pocket-grimoire 讀取英文與 zh_CN 角色資料，以角色 ID 對照目前資料庫。此頁只產生差異報告，不會覆蓋現有資料。</p>
+    </div>
+    <button id="role-sync-close" class="btn btn-outline" type="button"><i class="fa-solid fa-xmark"></i> 關閉</button>
+  </div>
+  <div id="role-sync-status" class="role-admin-status">準備比對...</div>
+  <div id="role-sync-summary" class="role-sync-summary"></div>
+  <div class="role-sync-toolbar">
+    <input id="role-sync-search" class="form-control dark-input" placeholder="搜尋角色名稱或 ID">
+    <select id="role-sync-filter" class="form-control dark-input">
+      <option value="different">只看有差異</option>
+      <option value="missing_role">只看資料庫缺少</option>
+      <option value="same">只看完全一致</option>
+      <option value="all">顯示全部</option>
+    </select>
+  </div>
+  <div id="role-sync-results" class="role-sync-results"><div class="role-admin-empty">按下比對後，差異會出現在這裡。</div></div>
+</section>
+
 <section class="card role-admin-shell">
   <div class="role-admin-intro">
     <h3><i class="fa-solid fa-address-book text-gold"></i> 正式角色主資料</h3>
-    <p>這裡的修改會直接寫入資料庫。首次使用請按「匯入現有角色庫」，將目前的 MASTER_ROLE_DB 建立為可維護的正式資料。</p>
+    <p>這裡的修改會直接寫入資料庫。Pocket Grimoire 比對器只提供參考，不會自動蓋掉你手動確認過的繁中資料。</p>
   </div>
 
   <div class="role-admin-toolbar">
@@ -52,34 +75,27 @@
 </section>
 
 <style>
-  .role-admin-shell {
-    --ra-bg:#0f1118;
-    --ra-panel:#151924;
-    --ra-input:#202638;
-    --ra-input-hover:#262d42;
-    --ra-border:#39415a;
-    --ra-text:#f4f6fb;
-    --ra-muted:#aeb6c9;
-    --ra-label:#ffd166;
-    max-width:1500px;
-    margin:0 auto;
-    color:var(--ra-text);
+  .role-admin-shell, .role-sync-panel {
+    --ra-bg:#0f1118; --ra-panel:#151924; --ra-input:#202638; --ra-input-hover:#262d42;
+    --ra-border:#39415a; --ra-text:#f4f6fb; --ra-muted:#aeb6c9; --ra-label:#ffd166;
+    max-width:1500px; margin:0 auto; color:var(--ra-text);
   }
-  .role-admin-shell, .role-admin-shell * { box-sizing:border-box; }
-  .role-admin-shell input, .role-admin-shell textarea, .role-admin-shell select { color-scheme:dark; }
+  .role-sync-panel { margin-bottom:1rem; }
+  .role-admin-shell, .role-admin-shell *, .role-sync-panel, .role-sync-panel * { box-sizing:border-box; }
+  .role-admin-shell input, .role-admin-shell textarea, .role-admin-shell select, .role-sync-panel input, .role-sync-panel select { color-scheme:dark; }
   .role-admin-intro { border:1px solid var(--ra-border); background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015)); border-radius:16px; padding:1rem 1.1rem; margin-bottom:1rem; }
-  .role-admin-intro h3 { color:var(--ra-text); margin:0 0 .45rem; }
-  .role-admin-intro p, .role-admin-status { color:var(--ra-muted); line-height:1.65; }
+  .role-admin-intro h3, .role-sync-head h3 { color:var(--ra-text); margin:0 0 .45rem; }
+  .role-admin-intro p, .role-admin-status, .role-sync-head p { color:var(--ra-muted); line-height:1.65; margin:.2rem 0; }
   .role-admin-toolbar { display:grid; grid-template-columns:minmax(280px,1.6fr) minmax(170px,.7fr) minmax(170px,.7fr) auto; gap:.75rem; align-items:end; margin-bottom:1rem; padding:.85rem; border:1px solid var(--ra-border); border-radius:14px; background:rgba(255,255,255,.02); }
   .toolbar-field label, .role-editor-grid label { display:block; color:var(--ra-label); font-size:.78rem; margin-bottom:.38rem; font-weight:800; letter-spacing:.02em; }
   .toolbar-search-button { min-height:44px; padding-inline:1.05rem; }
-  .role-admin-shell .dark-input, .role-admin-shell input.form-control, .role-admin-shell textarea.form-control, .role-admin-shell select.form-control { width:100%; min-height:44px; background:var(--ra-input)!important; color:var(--ra-text)!important; border:1px solid var(--ra-border)!important; border-radius:10px!important; padding:.72rem .8rem!important; opacity:1!important; box-shadow:none!important; }
+  .role-admin-shell .dark-input, .role-admin-shell input.form-control, .role-admin-shell textarea.form-control, .role-admin-shell select.form-control, .role-sync-panel .dark-input { width:100%; min-height:44px; background:var(--ra-input)!important; color:var(--ra-text)!important; border:1px solid var(--ra-border)!important; border-radius:10px!important; padding:.72rem .8rem!important; opacity:1!important; box-shadow:none!important; }
   .role-admin-shell textarea.form-control { min-height:112px; line-height:1.58; }
-  .role-admin-shell select.form-control { cursor:pointer; appearance:auto; }
-  .role-admin-shell select.form-control option { background:#202638; color:#f4f6fb; }
-  .role-admin-shell .dark-input::placeholder { color:#8993aa!important; opacity:1; }
-  .role-admin-shell .dark-input:hover { background:var(--ra-input-hover)!important; }
-  .role-admin-shell .dark-input:focus { border-color:#8b7cf6!important; outline:2px solid rgba(139,124,246,.24)!important; outline-offset:1px; }
+  .role-admin-shell select.form-control, .role-sync-panel select.form-control { cursor:pointer; appearance:auto; }
+  .role-admin-shell select.form-control option, .role-sync-panel select.form-control option { background:#202638; color:#f4f6fb; }
+  .role-admin-shell .dark-input::placeholder, .role-sync-panel .dark-input::placeholder { color:#8993aa!important; opacity:1; }
+  .role-admin-shell .dark-input:hover, .role-sync-panel .dark-input:hover { background:var(--ra-input-hover)!important; }
+  .role-admin-shell .dark-input:focus, .role-sync-panel .dark-input:focus { border-color:#8b7cf6!important; outline:2px solid rgba(139,124,246,.24)!important; outline-offset:1px; }
   .role-admin-layout { display:grid; grid-template-columns:minmax(330px,.82fr) minmax(0,1.45fr); gap:1rem; align-items:start; }
   .role-admin-list { display:grid; gap:.55rem; max-height:72vh; overflow:auto; padding:.2rem .35rem .2rem 0; scrollbar-color:#70798f #171b27; }
   .role-admin-row { width:100%; border:1px solid #30364a; background:#131722; border-radius:14px; padding:.72rem; display:grid; grid-template-columns:48px minmax(0,1fr) auto; gap:.75rem; align-items:center; color:var(--ra-text); text-align:left; cursor:pointer; }
@@ -104,9 +120,38 @@
   .alias-row { display:flex; justify-content:space-between; gap:.6rem; align-items:center; border:1px solid #30364a; background:#151924; border-radius:10px; padding:.6rem; color:var(--ra-muted); }
   .alias-add { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:.5rem; }
   .role-editor-actions { display:flex; gap:.6rem; justify-content:flex-end; margin-top:1rem; padding-top:1rem; border-top:1px solid #2f3548; }
-  @media (max-width:1100px) { .role-admin-toolbar { grid-template-columns:1fr 1fr; } .toolbar-search { grid-column:1 / -1; } .toolbar-search-button { width:100%; } .role-admin-layout { grid-template-columns:1fr; } .role-admin-list { max-height:38vh; } }
-  @media (max-width:640px) { .role-admin-toolbar { grid-template-columns:1fr; } .toolbar-search { grid-column:auto; } .role-editor-grid { grid-template-columns:1fr; } .role-editor-grid .wide { grid-column:auto; } .alias-add { grid-template-columns:1fr; } }
+
+  .role-sync-head { display:flex; justify-content:space-between; gap:1rem; align-items:flex-start; border-bottom:1px solid var(--ra-border); padding-bottom:.8rem; margin-bottom:.8rem; }
+  .role-sync-summary { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:.6rem; margin:1rem 0; }
+  .role-sync-stat { border:1px solid var(--ra-border); background:#151924; color:var(--ra-text); border-radius:12px; padding:.8rem; cursor:pointer; text-align:left; }
+  .role-sync-stat strong { display:block; color:#ffd166; font-size:1.35rem; }
+  .role-sync-stat span { color:var(--ra-muted); font-size:.76rem; }
+  .role-sync-toolbar { display:grid; grid-template-columns:minmax(240px,1fr) 220px; gap:.7rem; margin-bottom:.8rem; }
+  .role-sync-results { display:grid; gap:.65rem; max-height:70vh; overflow:auto; }
+  .role-sync-row { border:1px solid var(--ra-border); border-radius:12px; background:#11151f; overflow:hidden; }
+  .role-sync-row summary { list-style:none; display:flex; justify-content:space-between; gap:1rem; align-items:center; cursor:pointer; padding:.85rem 1rem; }
+  .role-sync-row summary::-webkit-details-marker { display:none; }
+  .role-sync-row summary strong { color:#fff; display:block; }
+  .role-sync-row summary span:not(.role-sync-badge) { color:var(--ra-muted); font-size:.78rem; display:block; margin-top:.2rem; }
+  .role-sync-badge { border-radius:999px; padding:.28rem .58rem; font-size:.72rem; font-weight:900; white-space:nowrap; }
+  .role-sync-badge.different { background:rgba(255,183,3,.14); color:#ffd166; }
+  .role-sync-badge.missing_role { background:rgba(230,57,70,.2); color:#ffd0d4; }
+  .role-sync-badge.same { background:rgba(69,123,157,.25); color:#cfe9ff; }
+  .role-sync-row-body { border-top:1px solid var(--ra-border); padding:.8rem; display:grid; gap:.7rem; }
+  .role-sync-field { border:1px solid #30364a; border-radius:10px; overflow:hidden; }
+  .role-sync-field-title { background:#1a1f2c; color:#ffd166; font-size:.78rem; font-weight:900; padding:.5rem .7rem; }
+  .role-sync-compare-grid { display:grid; grid-template-columns:1fr 1fr; }
+  .role-sync-compare-grid > div { min-width:0; padding:.65rem; }
+  .role-sync-compare-grid > div + div { border-left:1px solid #30364a; }
+  .role-sync-compare-grid small { color:var(--ra-muted); }
+  .role-sync-compare-grid pre { color:#f4f6fb; white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; line-height:1.55; margin:.4rem 0 0; }
+  .role-sync-token-box, .role-sync-same { padding:.75rem; border-radius:10px; background:#151924; color:var(--ra-muted); line-height:1.7; }
+  .role-sync-token-box strong { color:#ffd166; }
+
+  @media (max-width:1100px) { .role-admin-toolbar { grid-template-columns:1fr 1fr; } .toolbar-search { grid-column:1 / -1; } .toolbar-search-button { width:100%; } .role-admin-layout { grid-template-columns:1fr; } .role-admin-list { max-height:38vh; } .role-sync-summary { grid-template-columns:repeat(3,1fr); } }
+  @media (max-width:640px) { .role-admin-toolbar, .role-sync-toolbar { grid-template-columns:1fr; } .toolbar-search { grid-column:auto; } .role-editor-grid { grid-template-columns:1fr; } .role-editor-grid .wide { grid-column:auto; } .alias-add { grid-template-columns:1fr; } .role-sync-head { flex-direction:column; } .role-sync-summary { grid-template-columns:repeat(2,1fr); } .role-sync-compare-grid { grid-template-columns:1fr; } .role-sync-compare-grid > div + div { border-left:0; border-top:1px solid #30364a; } }
 </style>
 
 <script src="/js/role_admin.js"></script>
 <script src="/js/role_admin_import_fix.js"></script>
+<script src="/js/role_sync.js"></script>
