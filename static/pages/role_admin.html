@@ -15,22 +15,31 @@
   </div>
 
   <div class="role-admin-toolbar">
-    <input id="role-admin-search" class="form-control dark-input" placeholder="搜尋繁中名稱、英文名稱或角色 ID">
-    <select id="role-admin-team" class="form-control dark-input">
-      <option value="">全部陣營</option>
-      <option value="townsfolk">鎮民</option>
-      <option value="outsider">外來者</option>
-      <option value="minion">爪牙</option>
-      <option value="demon">惡魔</option>
-      <option value="traveller">旅行者</option>
-      <option value="fabled">傳奇角色</option>
-    </select>
-    <select id="role-admin-review" class="form-control dark-input">
-      <option value="">全部狀態</option>
-      <option value="true">待確認</option>
-      <option value="false">已確認</option>
-    </select>
-    <button class="btn btn-purple" onclick="RoleAdmin.refresh()"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button>
+    <div class="toolbar-field toolbar-search">
+      <label for="role-admin-search">搜尋角色</label>
+      <input id="role-admin-search" class="form-control dark-input" placeholder="繁中名稱、英文名稱或角色 ID">
+    </div>
+    <div class="toolbar-field">
+      <label for="role-admin-team">陣營</label>
+      <select id="role-admin-team" class="form-control dark-input">
+        <option value="">全部陣營</option>
+        <option value="townsfolk">鎮民</option>
+        <option value="outsider">外來者</option>
+        <option value="minion">爪牙</option>
+        <option value="demon">惡魔</option>
+        <option value="traveller">旅行者</option>
+        <option value="fabled">傳奇角色</option>
+      </select>
+    </div>
+    <div class="toolbar-field">
+      <label for="role-admin-review">資料狀態</label>
+      <select id="role-admin-review" class="form-control dark-input">
+        <option value="">全部狀態</option>
+        <option value="true">待確認</option>
+        <option value="false">已確認</option>
+      </select>
+    </div>
+    <button class="btn btn-purple toolbar-search-button" onclick="RoleAdmin.refresh()"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button>
   </div>
 
   <div id="role-admin-status" class="role-admin-status">正在讀取角色資料...</div>
@@ -43,36 +52,60 @@
 </section>
 
 <style>
-  .role-admin-shell { max-width:1500px; margin:0 auto; }
-  .role-admin-intro { border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.035); border-radius:16px; padding:1rem; margin-bottom:1rem; }
-  .role-admin-intro h3 { color:#fff; margin:0 0 .45rem; }
-  .role-admin-intro p, .role-admin-status { color:var(--text-muted); line-height:1.65; }
-  .role-admin-toolbar { display:flex; gap:.65rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
-  .role-admin-toolbar .dark-input { min-width:180px; }
-  .role-admin-layout { display:grid; grid-template-columns:minmax(300px,.8fr) minmax(0,1.4fr); gap:1rem; align-items:start; }
-  .role-admin-list { display:grid; gap:.55rem; max-height:72vh; overflow:auto; padding-right:.25rem; }
-  .role-admin-row { width:100%; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.2); border-radius:14px; padding:.7rem; display:grid; grid-template-columns:48px minmax(0,1fr) auto; gap:.7rem; align-items:center; color:#fff; text-align:left; cursor:pointer; }
-  .role-admin-row:hover, .role-admin-row.active { border-color:rgba(167,139,250,.65); background:rgba(124,58,237,.12); }
-  .role-admin-thumb { width:48px; height:48px; border-radius:999px; object-fit:contain; background:rgba(255,255,255,.07); }
-  .role-admin-name { font-weight:900; }
-  .role-admin-meta { color:var(--text-muted); font-size:.78rem; margin-top:.2rem; }
-  .role-admin-score { font-size:.76rem; color:var(--accent-gold); }
-  .role-admin-editor { border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.2); border-radius:18px; padding:1rem; min-height:320px; }
-  .role-admin-empty { color:var(--text-muted); text-align:center; padding:3rem 1rem; }
-  .role-editor-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem; }
+  .role-admin-shell {
+    --ra-bg:#0f1118;
+    --ra-panel:#151924;
+    --ra-input:#202638;
+    --ra-input-hover:#262d42;
+    --ra-border:#39415a;
+    --ra-text:#f4f6fb;
+    --ra-muted:#aeb6c9;
+    --ra-label:#ffd166;
+    max-width:1500px;
+    margin:0 auto;
+    color:var(--ra-text);
+  }
+  .role-admin-shell, .role-admin-shell * { box-sizing:border-box; }
+  .role-admin-shell input, .role-admin-shell textarea, .role-admin-shell select { color-scheme:dark; }
+  .role-admin-intro { border:1px solid var(--ra-border); background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.015)); border-radius:16px; padding:1rem 1.1rem; margin-bottom:1rem; }
+  .role-admin-intro h3 { color:var(--ra-text); margin:0 0 .45rem; }
+  .role-admin-intro p, .role-admin-status { color:var(--ra-muted); line-height:1.65; }
+  .role-admin-toolbar { display:grid; grid-template-columns:minmax(280px,1.6fr) minmax(170px,.7fr) minmax(170px,.7fr) auto; gap:.75rem; align-items:end; margin-bottom:1rem; padding:.85rem; border:1px solid var(--ra-border); border-radius:14px; background:rgba(255,255,255,.02); }
+  .toolbar-field label, .role-editor-grid label { display:block; color:var(--ra-label); font-size:.78rem; margin-bottom:.38rem; font-weight:800; letter-spacing:.02em; }
+  .toolbar-search-button { min-height:44px; padding-inline:1.05rem; }
+  .role-admin-shell .dark-input, .role-admin-shell input.form-control, .role-admin-shell textarea.form-control, .role-admin-shell select.form-control { width:100%; min-height:44px; background:var(--ra-input)!important; color:var(--ra-text)!important; border:1px solid var(--ra-border)!important; border-radius:10px!important; padding:.72rem .8rem!important; opacity:1!important; box-shadow:none!important; }
+  .role-admin-shell textarea.form-control { min-height:112px; line-height:1.58; }
+  .role-admin-shell select.form-control { cursor:pointer; appearance:auto; }
+  .role-admin-shell select.form-control option { background:#202638; color:#f4f6fb; }
+  .role-admin-shell .dark-input::placeholder { color:#8993aa!important; opacity:1; }
+  .role-admin-shell .dark-input:hover { background:var(--ra-input-hover)!important; }
+  .role-admin-shell .dark-input:focus { border-color:#8b7cf6!important; outline:2px solid rgba(139,124,246,.24)!important; outline-offset:1px; }
+  .role-admin-layout { display:grid; grid-template-columns:minmax(330px,.82fr) minmax(0,1.45fr); gap:1rem; align-items:start; }
+  .role-admin-list { display:grid; gap:.55rem; max-height:72vh; overflow:auto; padding:.2rem .35rem .2rem 0; scrollbar-color:#70798f #171b27; }
+  .role-admin-row { width:100%; border:1px solid #30364a; background:#131722; border-radius:14px; padding:.72rem; display:grid; grid-template-columns:48px minmax(0,1fr) auto; gap:.75rem; align-items:center; color:var(--ra-text); text-align:left; cursor:pointer; }
+  .role-admin-row:hover { border-color:#625b89; background:#191e2b; }
+  .role-admin-row.active { border-color:#8b7cf6; background:#211b35; box-shadow:0 0 0 1px rgba(139,124,246,.22) inset; }
+  .role-admin-thumb { width:48px; height:48px; border-radius:999px; object-fit:contain; background:#252a38; }
+  .role-admin-name { font-weight:900; color:#fff; }
+  .role-admin-meta { color:var(--ra-muted); font-size:.78rem; margin-top:.2rem; }
+  .role-admin-score { font-size:.76rem; color:#ffd166; font-weight:800; }
+  .role-admin-editor { border:1px solid var(--ra-border); background:var(--ra-bg); border-radius:18px; padding:1rem; min-height:420px; }
+  .role-admin-empty { color:var(--ra-muted); text-align:center; padding:3rem 1rem; }
+  .role-editor-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.9rem; }
   .role-editor-grid .wide { grid-column:1 / -1; }
-  .role-editor-grid label { display:block; color:var(--accent-gold); font-size:.75rem; margin-bottom:.35rem; font-weight:800; }
-  .role-editor-grid textarea { min-height:100px; resize:vertical; }
-  .role-editor-head { display:flex; gap:1rem; align-items:center; margin-bottom:1rem; }
-  .role-editor-head img { width:72px; height:72px; object-fit:contain; border-radius:999px; background:rgba(255,255,255,.07); }
-  .role-editor-head h3 { margin:0; color:#fff; }
-  .role-checkboxes { display:flex; gap:1rem; flex-wrap:wrap; margin:.75rem 0; color:var(--text-muted); }
+  .role-editor-grid textarea { resize:vertical; }
+  .role-editor-head { display:flex; gap:1rem; align-items:center; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid #2f3548; }
+  .role-editor-head img { width:72px; height:72px; object-fit:contain; border-radius:999px; background:#252a38; }
+  .role-editor-head h3 { margin:0; color:#fff; font-size:1.35rem; }
+  .role-checkboxes { display:flex; gap:.75rem; flex-wrap:wrap; margin:1rem 0; color:var(--ra-text); padding:.75rem; border:1px solid #30364a; background:#151924; border-radius:12px; }
+  .role-checkboxes label { display:flex; gap:.4rem; align-items:center; }
+  .role-checkboxes input { accent-color:#8b7cf6; }
   .alias-list { display:grid; gap:.45rem; margin:.6rem 0; }
-  .alias-row { display:flex; justify-content:space-between; gap:.6rem; align-items:center; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:.55rem; color:var(--text-muted); }
+  .alias-row { display:flex; justify-content:space-between; gap:.6rem; align-items:center; border:1px solid #30364a; background:#151924; border-radius:10px; padding:.6rem; color:var(--ra-muted); }
   .alias-add { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:.5rem; }
-  .role-editor-actions { display:flex; gap:.6rem; justify-content:flex-end; margin-top:1rem; }
-  @media (max-width:1000px) { .role-admin-layout { grid-template-columns:1fr; } .role-admin-list { max-height:38vh; } }
-  @media (max-width:640px) { .role-editor-grid { grid-template-columns:1fr; } .role-editor-grid .wide { grid-column:auto; } .alias-add { grid-template-columns:1fr; } }
+  .role-editor-actions { display:flex; gap:.6rem; justify-content:flex-end; margin-top:1rem; padding-top:1rem; border-top:1px solid #2f3548; }
+  @media (max-width:1100px) { .role-admin-toolbar { grid-template-columns:1fr 1fr; } .toolbar-search { grid-column:1 / -1; } .toolbar-search-button { width:100%; } .role-admin-layout { grid-template-columns:1fr; } .role-admin-list { max-height:38vh; } }
+  @media (max-width:640px) { .role-admin-toolbar { grid-template-columns:1fr; } .toolbar-search { grid-column:auto; } .role-editor-grid { grid-template-columns:1fr; } .role-editor-grid .wide { grid-column:auto; } .alias-add { grid-template-columns:1fr; } }
 </style>
 
 <script src="/js/role_admin.js"></script>
