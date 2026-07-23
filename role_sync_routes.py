@@ -1,3 +1,4 @@
+import re
 from typing import Any, Dict, List
 
 import requests
@@ -58,8 +59,9 @@ def normalize_list(values: Any, converter: OpenCC) -> List[str]:
     return [normalize_text(value, converter) for value in values if str(value or "").strip()]
 
 
-def changed(current: Any, incoming: Any) -> bool:
-    return (current or "").strip() != (incoming or "").strip()
+def normalize_role_id(value: Any) -> str:
+    """Match IDs despite underscores, hyphens, spaces, punctuation or case differences."""
+    return re.sub(r"[^a-z0-9]", "", str(value or "").strip().lower())
 
 
 @router.post("/pocket-grimoire/compare")
@@ -75,23 +77,53 @@ def compare_pocket_grimoire(
 
     roles = db.query(Role).all()
     roles_by_key = {role.canonical_key: role for role in roles}
+    roles_by_normalized_key = {}
+    for role in roles:
+        normalized = normalize_role_id(role.canonical_key)
+        if normalized and normalized not in roles_by_normalized_key:
+            roles_by_normalized_key[normalized] = role
+
     aliases = db.query(RoleAlias).filter(RoleAlias.source.in_(["master_role_db", "pocket_grimoire"])).all()
-    alias_map = {alias.external_id: roles_by_key.get(alias.role.canonical_key) if alias.role else None for alias in aliases}
+    alias_map = {}
+    normalized_alias_map = {}
+    for alias in aliases:
+        role = alias.role if alias.role else None
+        if not role:
+            continue
+        alias_map[alias.external_id] = role
+        normalized = normalize_role_id(alias.external_id)
+        if normalized and normalized not in normalized_alias_map:
+            normalized_alias_map[normalized] = role
 
     rows = []
+    roles_with_ability = sum(1 for role in roles if str(role.ability_zh_tw or "").strip())
     summary = {
         "source_total": len(zh_by_id),
         "matched": 0,
+        "matched_by_normalized_id": 0,
         "missing_in_database": 0,
         "database_only": 0,
         "same": 0,
         "different": 0,
         "missing_fields": 0,
+        "database_roles_total": len(roles),
+        "database_roles_with_ability": roles_with_ability,
+        "database_roles_without_ability": len(roles) - roles_with_ability,
     }
+
+    matched_role_ids = set()
 
     for external_id, zh_item in zh_by_id.items():
         en_item = english_by_id.get(external_id, {})
+        normalized_external_id = normalize_role_id(external_id)
         role = roles_by_key.get(external_id) or alias_map.get(external_id)
+        match_method = "exact"
+        if not role:
+            role = roles_by_normalized_key.get(normalized_external_id) or normalized_alias_map.get(normalized_external_id)
+            if role:
+                match_method = "normalized_id"
+                summary["matched_by_normalized_id"] += 1
+
         incoming = {
             "canonical_key": external_id,
             "name_zh_tw": normalize_text(zh_item.get("name"), converter),
@@ -106,14 +138,22 @@ def compare_pocket_grimoire(
             "reminders_global": normalize_list(zh_item.get("remindersGlobal"), converter),
             "setup": bool(en_item.get("setup")),
             "special": en_item.get("special") if isinstance(en_item.get("special"), list) else [],
-            "image_url": str(en_item.get("image") or "").strip(),
         }
 
         if not role:
             summary["missing_in_database"] += 1
-            rows.append({"external_id": external_id, "status": "missing_role", "current": None, "incoming": incoming, "diff_fields": list(incoming.keys())})
+            rows.append({
+                "external_id": external_id,
+                "normalized_external_id": normalized_external_id,
+                "match_method": None,
+                "status": "missing_role",
+                "current": None,
+                "incoming": incoming,
+                "diff_fields": list(incoming.keys()),
+            })
             continue
 
+        matched_role_ids.add(role.id)
         summary["matched"] += 1
         current = {
             "id": role.id,
@@ -126,11 +166,12 @@ def compare_pocket_grimoire(
             "other_night_order": role.other_night_order or 0,
             "first_night_reminder": role.first_night_reminder or "",
             "other_night_reminder": role.other_night_reminder or "",
+            # Local database images are authoritative and intentionally not compared.
             "image_url": role.image_url or "",
         }
         comparable_fields = [
             "name_zh_tw", "name_en", "team", "ability_zh_tw", "first_night_order",
-            "other_night_order", "first_night_reminder", "other_night_reminder", "image_url",
+            "other_night_order", "first_night_reminder", "other_night_reminder",
         ]
         diff_fields = [field for field in comparable_fields if current.get(field) != incoming.get(field)]
         missing_fields = [field for field in comparable_fields if not current.get(field) and incoming.get(field)]
@@ -144,7 +185,9 @@ def compare_pocket_grimoire(
             status = "same"
         rows.append({
             "external_id": external_id,
+            "normalized_external_id": normalized_external_id,
             "role_id": role.id,
+            "match_method": match_method,
             "status": status,
             "current": current,
             "incoming": incoming,
@@ -152,10 +195,9 @@ def compare_pocket_grimoire(
             "missing_fields": missing_fields,
         })
 
-    source_ids = set(zh_by_id)
     database_only = [
         {"role_id": role.id, "canonical_key": role.canonical_key, "name_zh_tw": role.name_zh_tw}
-        for role in roles if role.canonical_key not in source_ids and role.canonical_key not in alias_map
+        for role in roles if role.id not in matched_role_ids
     ]
     summary["database_only"] = len(database_only)
 
@@ -164,6 +206,7 @@ def compare_pocket_grimoire(
         "status": "success",
         "source": "Skateside/pocket-grimoire zh_CN + characters.json",
         "conversion": "OpenCC s2twp + BOTC terminology normalization",
+        "image_policy": "local_database_only",
         "summary": summary,
         "rows": rows,
         "database_only": database_only,
