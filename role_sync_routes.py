@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException
@@ -17,20 +17,14 @@ PG_BASE = "https://raw.githubusercontent.com/Skateside/pocket-grimoire/main/asse
 PG_EN_URL = f"{PG_BASE}/characters.json"
 PG_ZH_CN_URL = f"{PG_BASE}/characters/zh_CN.json"
 
-# OpenCC handles character conversion; this dictionary handles BOTC terminology
-# and Taiwan-facing wording that cannot be solved by glyph conversion alone.
 BOTC_TERM_REPLACEMENTS = {
     "奴才": "爪牙",
     "好人": "善良陣營",
-    "邪惡玩家": "邪惡玩家",
     "說書⼈": "說書人",
-    "角色標記": "角色標記",
     "喝醉": "醉酒",
-    "中毒": "中毒",
     "每個夜晚": "每晚",
     "每個白天": "每天",
     "遊戲限一次": "每局限一次",
-    "得知": "得知",
 }
 
 
@@ -60,21 +54,41 @@ def normalize_list(values: Any, converter: OpenCC) -> List[str]:
 
 
 def normalize_role_id(value: Any) -> str:
-    """Match IDs despite underscores, hyphens, spaces, punctuation or case differences."""
     return re.sub(r"[^a-z0-9]", "", str(value or "").strip().lower())
 
 
-@router.post("/pocket-grimoire/compare")
-def compare_pocket_grimoire(
-    db: Session = Depends(get_db),
-    admin: models.StorytellerAccount = Depends(require_admin_account),
-):
+def load_source() -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Dict[str, Any]], OpenCC]:
     english_items = fetch_json(PG_EN_URL)
     zh_cn_items = fetch_json(PG_ZH_CN_URL)
     english_by_id = {str(item.get("id") or "").strip(): item for item in english_items if item.get("id")}
     zh_by_id = {str(item.get("id") or "").strip(): item for item in zh_cn_items if item.get("id")}
-    converter = OpenCC("s2twp")
+    return english_by_id, zh_by_id, OpenCC("s2twp")
 
+
+def build_incoming(external_id: str, en_item: Dict[str, Any], zh_item: Dict[str, Any], converter: OpenCC) -> Dict[str, Any]:
+    translated_name = normalize_text(zh_item.get("name"), converter)
+    english_name = str(en_item.get("name") or "").strip()
+    # Some zh_CN entries simply repeat the English name. Keep it for display, but never use it to replace our local Chinese name.
+    has_localized_name = bool(translated_name and normalize_role_id(translated_name) != normalize_role_id(english_name))
+    return {
+        "canonical_key": external_id,
+        "name_zh_tw": translated_name,
+        "has_localized_name": has_localized_name,
+        "name_en": english_name,
+        "team": str(en_item.get("team") or "").strip(),
+        "ability_zh_tw": normalize_text(zh_item.get("ability"), converter),
+        "first_night_order": int(en_item.get("firstNight") or 0),
+        "other_night_order": int(en_item.get("otherNight") or 0),
+        "first_night_reminder": normalize_text(zh_item.get("firstNightReminder"), converter),
+        "other_night_reminder": normalize_text(zh_item.get("otherNightReminder"), converter),
+        "reminders": normalize_list(zh_item.get("reminders"), converter),
+        "reminders_global": normalize_list(zh_item.get("remindersGlobal"), converter),
+        "setup": bool(en_item.get("setup")),
+        "special": en_item.get("special") if isinstance(en_item.get("special"), list) else [],
+    }
+
+
+def role_indexes(db: Session):
     roles = db.query(Role).all()
     roles_by_key = {role.canonical_key: role for role in roles}
     roles_by_normalized_key = {}
@@ -94,6 +108,25 @@ def compare_pocket_grimoire(
         normalized = normalize_role_id(alias.external_id)
         if normalized and normalized not in normalized_alias_map:
             normalized_alias_map[normalized] = role
+    return roles, roles_by_key, roles_by_normalized_key, alias_map, normalized_alias_map
+
+
+def find_role(external_id: str, roles_by_key, roles_by_normalized_key, alias_map, normalized_alias_map) -> Tuple[Optional[Role], Optional[str]]:
+    role = roles_by_key.get(external_id) or alias_map.get(external_id)
+    if role:
+        return role, "exact"
+    normalized = normalize_role_id(external_id)
+    role = roles_by_normalized_key.get(normalized) or normalized_alias_map.get(normalized)
+    return (role, "normalized_id") if role else (None, None)
+
+
+@router.post("/pocket-grimoire/compare")
+def compare_pocket_grimoire(
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    english_by_id, zh_by_id, converter = load_source()
+    roles, roles_by_key, roles_by_normalized_key, alias_map, normalized_alias_map = role_indexes(db)
 
     rows = []
     roles_with_ability = sum(1 for role in roles if str(role.ability_zh_tw or "").strip())
@@ -110,49 +143,34 @@ def compare_pocket_grimoire(
         "database_roles_with_ability": roles_with_ability,
         "database_roles_without_ability": len(roles) - roles_with_ability,
     }
-
     matched_role_ids = set()
 
-    for external_id, zh_item in zh_by_id.items():
-        en_item = english_by_id.get(external_id, {})
-        normalized_external_id = normalize_role_id(external_id)
-        role = roles_by_key.get(external_id) or alias_map.get(external_id)
-        match_method = "exact"
-        if not role:
-            role = roles_by_normalized_key.get(normalized_external_id) or normalized_alias_map.get(normalized_external_id)
-            if role:
-                match_method = "normalized_id"
-                summary["matched_by_normalized_id"] += 1
+    # Chinese name and image are local-authoritative, so neither participates in normal diff results.
+    comparable_fields = [
+        "name_en", "team", "ability_zh_tw", "first_night_order",
+        "other_night_order", "first_night_reminder", "other_night_reminder",
+    ]
 
-        incoming = {
-            "canonical_key": external_id,
-            "name_zh_tw": normalize_text(zh_item.get("name"), converter),
-            "name_en": str(en_item.get("name") or "").strip(),
-            "team": str(en_item.get("team") or "").strip(),
-            "ability_zh_tw": normalize_text(zh_item.get("ability"), converter),
-            "first_night_order": int(en_item.get("firstNight") or 0),
-            "other_night_order": int(en_item.get("otherNight") or 0),
-            "first_night_reminder": normalize_text(zh_item.get("firstNightReminder"), converter),
-            "other_night_reminder": normalize_text(zh_item.get("otherNightReminder"), converter),
-            "reminders": normalize_list(zh_item.get("reminders"), converter),
-            "reminders_global": normalize_list(zh_item.get("remindersGlobal"), converter),
-            "setup": bool(en_item.get("setup")),
-            "special": en_item.get("special") if isinstance(en_item.get("special"), list) else [],
-        }
+    for external_id, zh_item in zh_by_id.items():
+        incoming = build_incoming(external_id, english_by_id.get(external_id, {}), zh_item, converter)
+        role, match_method = find_role(external_id, roles_by_key, roles_by_normalized_key, alias_map, normalized_alias_map)
 
         if not role:
             summary["missing_in_database"] += 1
             rows.append({
                 "external_id": external_id,
-                "normalized_external_id": normalized_external_id,
+                "normalized_external_id": normalize_role_id(external_id),
                 "match_method": None,
                 "status": "missing_role",
                 "current": None,
                 "incoming": incoming,
-                "diff_fields": list(incoming.keys()),
+                "diff_fields": comparable_fields,
+                "missing_fields": comparable_fields,
             })
             continue
 
+        if match_method == "normalized_id":
+            summary["matched_by_normalized_id"] += 1
         matched_role_ids.add(role.id)
         summary["matched"] += 1
         current = {
@@ -166,26 +184,17 @@ def compare_pocket_grimoire(
             "other_night_order": role.other_night_order or 0,
             "first_night_reminder": role.first_night_reminder or "",
             "other_night_reminder": role.other_night_reminder or "",
-            # Local database images are authoritative and intentionally not compared.
             "image_url": role.image_url or "",
         }
-        comparable_fields = [
-            "name_zh_tw", "name_en", "team", "ability_zh_tw", "first_night_order",
-            "other_night_order", "first_night_reminder", "other_night_reminder",
-        ]
         diff_fields = [field for field in comparable_fields if current.get(field) != incoming.get(field)]
         missing_fields = [field for field in comparable_fields if not current.get(field) and incoming.get(field)]
         if missing_fields:
             summary["missing_fields"] += 1
-        if diff_fields:
-            summary["different"] += 1
-            status = "different"
-        else:
-            summary["same"] += 1
-            status = "same"
+        status = "different" if diff_fields else "same"
+        summary[status if status == "same" else "different"] += 1
         rows.append({
             "external_id": external_id,
-            "normalized_external_id": normalized_external_id,
+            "normalized_external_id": normalize_role_id(external_id),
             "role_id": role.id,
             "match_method": match_method,
             "status": status,
@@ -200,14 +209,85 @@ def compare_pocket_grimoire(
         for role in roles if role.id not in matched_role_ids
     ]
     summary["database_only"] = len(database_only)
-
-    rows.sort(key=lambda row: ({"different": 0, "missing_role": 1, "same": 2}.get(row["status"], 9), row["incoming"].get("name_zh_tw") or row["external_id"]))
+    rows.sort(key=lambda row: ({"different": 0, "missing_role": 1, "same": 2}.get(row["status"], 9), row.get("current", {}).get("name_zh_tw") if row.get("current") else row["external_id"]))
     return {
         "status": "success",
         "source": "Skateside/pocket-grimoire zh_CN + characters.json",
         "conversion": "OpenCC s2twp + BOTC terminology normalization",
         "image_policy": "local_database_only",
+        "name_policy": "local_database_authoritative",
         "summary": summary,
         "rows": rows,
         "database_only": database_only,
+    }
+
+
+@router.post("/pocket-grimoire/fill-empty")
+def fill_empty_from_pocket_grimoire(
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    english_by_id, zh_by_id, converter = load_source()
+    roles, roles_by_key, roles_by_normalized_key, alias_map, normalized_alias_map = role_indexes(db)
+
+    fillable_fields = [
+        "name_en", "ability_zh_tw", "first_night_order", "other_night_order",
+        "first_night_reminder", "other_night_reminder",
+    ]
+    counts = {field: 0 for field in fillable_fields}
+    matched = 0
+    skipped_existing = 0
+    missing_roles = 0
+    aliases_created = 0
+    changed_roles = 0
+
+    for external_id, zh_item in zh_by_id.items():
+        role, _ = find_role(external_id, roles_by_key, roles_by_normalized_key, alias_map, normalized_alias_map)
+        if not role:
+            missing_roles += 1
+            continue
+        matched += 1
+        incoming = build_incoming(external_id, english_by_id.get(external_id, {}), zh_item, converter)
+        role_changed = False
+
+        for field in fillable_fields:
+            current = getattr(role, field)
+            source_value = incoming.get(field)
+            current_empty = current in (None, "", 0)
+            source_has_value = source_value not in (None, "", 0)
+            if current_empty and source_has_value:
+                setattr(role, field, source_value)
+                counts[field] += 1
+                role_changed = True
+            elif not current_empty and source_has_value:
+                skipped_existing += 1
+
+        if role_changed:
+            role.needs_review = True
+            changed_roles += 1
+
+        alias = db.query(RoleAlias).filter(
+            RoleAlias.source == "pocket_grimoire",
+            RoleAlias.external_id == external_id,
+        ).first()
+        if not alias:
+            db.add(RoleAlias(
+                role_id=role.id,
+                source="pocket_grimoire",
+                external_id=external_id,
+                external_name=str(english_by_id.get(external_id, {}).get("name") or "").strip() or None,
+            ))
+            aliases_created += 1
+
+    db.commit()
+    return {
+        "status": "success",
+        "policy": "fill_empty_only",
+        "matched": matched,
+        "changed_roles": changed_roles,
+        "missing_roles": missing_roles,
+        "skipped_existing_values": skipped_existing,
+        "aliases_created": aliases_created,
+        "filled": counts,
+        "untouched": ["name_zh_tw", "image_url", "team"],
     }
