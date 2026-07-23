@@ -212,6 +212,12 @@ def _install_town_checkin_router_patch():
             print("帳號綁定 API 已掛載: /api/admin/account-bindings")
         except Exception as exc:
             print(f"帳號綁定 API 掛載失敗: {exc}")
+        try:
+            import role_admin_routes
+            self.include_router(role_admin_routes.router, prefix="/api/admin")
+            print("角色資料庫管理 API 已掛載: /api/admin/roles")
+        except Exception as exc:
+            print(f"角色資料庫管理 API 掛載失敗: {exc}")
 
     fastapi.FastAPI.__init__ = patched_init
     fastapi.FastAPI._botc_town_checkin_router_patch = True
