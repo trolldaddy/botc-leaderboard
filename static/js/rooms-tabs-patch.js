@@ -111,6 +111,7 @@
   const loadRuntimePatches = () => {
     loadPatch('/js/rooms-self-seat-patch.js', 'botc-self-seat', '玩家自選座號功能載入失敗');
     loadPatch('/js/rooms-critical-fixes-patch.js', 'botc-critical-fixes', '房間核心修正載入失敗');
+    loadPatch('/js/rooms-checkin-wizard.js', 'botc-checkin-wizard', 'QR 報到精靈載入失敗');
   };
 
   const setActiveTab = (tab) => {
