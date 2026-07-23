@@ -177,7 +177,6 @@ def _install_town_checkin_router_patch():
 
     if getattr(fastapi.FastAPI, "_botc_town_checkin_router_patch", False):
         return
-
     original_init = fastapi.FastAPI.__init__
 
     def patched_init(self, *args, **kwargs):
@@ -218,6 +217,12 @@ def _install_town_checkin_router_patch():
             print("角色資料庫管理 API 已掛載: /api/admin/roles")
         except Exception as exc:
             print(f"角色資料庫管理 API 掛載失敗: {exc}")
+        try:
+            import role_sync_routes
+            self.include_router(role_sync_routes.router, prefix="/api/admin")
+            print("角色資料同步 API 已掛載: /api/admin/role-sync")
+        except Exception as exc:
+            print(f"角色資料同步 API 掛載失敗: {exc}")
 
     fastapi.FastAPI.__init__ = patched_init
     fastapi.FastAPI._botc_town_checkin_router_patch = True
