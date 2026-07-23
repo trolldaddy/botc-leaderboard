@@ -65,6 +65,7 @@
         <li><a href="#" data-page="recorder"><i class="fa-solid fa-book-open"></i> <span>覆盤紀錄器</span></a></li>
         <li><a href="#" data-page="record"><i class="fa-solid fa-feather-pointed"></i> <span>錄入對局</span></a></li>
         <li><a href="#" data-page="history"><i class="fa-solid fa-clock-rotate-left"></i> <span>歷史紀錄＆戰績查詢</span></a></li>
+        <li id="admin-role-nav-item" style="display:none;"><a href="#" data-page="role_admin"><i class="fa-solid fa-address-book"></i> <span>角色資料庫</span></a></li>
         <li id="admin-bindings-nav-item" style="display:none;"><a href="#" data-page="account_bindings"><i class="fa-solid fa-link"></i> <span>帳號綁定</span></a></li>
         <li id="admin-nav-item" style="display:none;"><a href="#" data-page="admin"><i class="fa-solid fa-shield-halved"></i> <span>管理後台</span></a></li>
     </ul>
@@ -84,56 +85,41 @@
                 const html = await response.text();
                 area.innerHTML = html;
 
-    const scripts = Array.from(area.querySelectorAll('script'));
+                const scripts = Array.from(area.querySelectorAll('script'));
                 for (const oldScript of scripts) {
-    const type = oldScript.getAttribute('type');
-    const src = oldScript.getAttribute('src');
+                    const type = oldScript.getAttribute('type');
+                    const src = oldScript.getAttribute('src');
+                    oldScript.remove();
 
-    oldScript.remove();
+                    if (type === 'text/babel') {
+                        let sourceCode = '';
+                        if (src) {
+                            const scriptUrl = `${src}?v=${new Date().getTime()}`;
+                            const scriptResp = await fetch(scriptUrl);
+                            if (!scriptResp.ok) throw new Error(`腳本載入失敗：${src}`);
+                            sourceCode = await scriptResp.text();
+                        } else {
+                            sourceCode = oldScript.textContent || '';
+                        }
+                        const transformed = Babel.transform(sourceCode, {
+                            presets: [['react', { runtime: 'classic' }]],
+                            sourceType: 'script'
+                        }).code;
+                        const newScript = document.createElement('script');
+                        newScript.textContent = transformed;
+                        document.body.appendChild(newScript);
+                        continue;
+                    }
 
-    // 專門處理 React JSX / text-babel
-    if (type === 'text/babel') {
-        let sourceCode = '';
+                    const newScript = document.createElement('script');
+                    Array.from(oldScript.attributes).forEach(attr => {
+                        if (attr.name !== 'type') newScript.setAttribute(attr.name, attr.value);
+                    });
+                    if (src) newScript.src = `${src}?v=${new Date().getTime()}`;
+                    else newScript.textContent = oldScript.textContent || '';
+                    document.body.appendChild(newScript);
+                }
 
-        if (src) {
-            const scriptUrl = `${src}?v=${new Date().getTime()}`;
-            const scriptResp = await fetch(scriptUrl);
-            if (!scriptResp.ok) {
-                throw new Error(`腳本載入失敗：${src}`);
-            }
-            sourceCode = await scriptResp.text();
-        } else {
-            sourceCode = oldScript.textContent || '';
-        }
-
-        const transformed = Babel.transform(sourceCode, {
-            presets: [
-                ['react', { runtime: 'classic' }]
-            ],
-            sourceType: 'script'
-        }).code;
-
-        const newScript = document.createElement('script');
-        newScript.textContent = transformed;
-        document.body.appendChild(newScript);
-        continue;
-    }
-
-    // 一般 JS，例如 location-options.js
-    const newScript = document.createElement('script');
-    Array.from(oldScript.attributes).forEach(attr => {
-        if (attr.name !== 'type') newScript.setAttribute(attr.name, attr.value);
-    });
-
-    if (src) {
-        newScript.src = `${src}?v=${new Date().getTime()}`;
-    } else {
-        newScript.textContent = oldScript.textContent || '';
-    }
-
-    document.body.appendChild(newScript);
-}
-                
                 area.style.opacity = '1';
                 document.querySelectorAll('#main-nav li').forEach(li => {
                     const link = li.querySelector('a');
@@ -149,6 +135,7 @@
         async function revealAdminNav() {
             const adminItem = document.getElementById('admin-nav-item');
             const bindingItem = document.getElementById('admin-bindings-nav-item');
+            const roleItem = document.getElementById('admin-role-nav-item');
             try {
                 const resp = await fetch(`${window.API_BASE || ''}/api/me`, { credentials: 'same-origin' });
                 if (!resp.ok) return;
@@ -156,6 +143,7 @@
                 const showAdmin = !!me.is_admin;
                 if (adminItem) adminItem.style.display = showAdmin ? 'flex' : 'none';
                 if (bindingItem) bindingItem.style.display = showAdmin ? 'flex' : 'none';
+                if (roleItem) roleItem.style.display = showAdmin ? 'flex' : 'none';
             } catch (err) {}
         }
 
