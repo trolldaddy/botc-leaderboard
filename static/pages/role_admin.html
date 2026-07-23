@@ -1,0 +1,78 @@
+<header class="top-header">
+  <div style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:1rem;flex-wrap:wrap;">
+    <h2 style="font-family:'Cinzel',serif;letter-spacing:2px;">角色資料庫管理</h2>
+    <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
+      <button class="btn btn-outline" onclick="RoleAdmin.refresh()"><i class="fa-solid fa-arrows-rotate"></i> 重新整理</button>
+      <button class="btn btn-purple" onclick="RoleAdmin.importMasterDb()"><i class="fa-solid fa-database"></i> 匯入現有角色庫</button>
+    </div>
+  </div>
+</header>
+
+<section class="card role-admin-shell">
+  <div class="role-admin-intro">
+    <h3><i class="fa-solid fa-address-book text-gold"></i> 正式角色主資料</h3>
+    <p>這裡的修改會直接寫入資料庫。首次使用請按「匯入現有角色庫」，將目前的 MASTER_ROLE_DB 建立為可維護的正式資料。</p>
+  </div>
+
+  <div class="role-admin-toolbar">
+    <input id="role-admin-search" class="form-control dark-input" placeholder="搜尋繁中名稱、英文名稱或角色 ID">
+    <select id="role-admin-team" class="form-control dark-input">
+      <option value="">全部陣營</option>
+      <option value="townsfolk">鎮民</option>
+      <option value="outsider">外來者</option>
+      <option value="minion">爪牙</option>
+      <option value="demon">惡魔</option>
+      <option value="traveller">旅行者</option>
+      <option value="fabled">傳奇角色</option>
+    </select>
+    <select id="role-admin-review" class="form-control dark-input">
+      <option value="">全部狀態</option>
+      <option value="true">待確認</option>
+      <option value="false">已確認</option>
+    </select>
+    <button class="btn btn-purple" onclick="RoleAdmin.refresh()"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button>
+  </div>
+
+  <div id="role-admin-status" class="role-admin-status">正在讀取角色資料...</div>
+  <div class="role-admin-layout">
+    <div id="role-admin-list" class="role-admin-list"></div>
+    <div id="role-admin-editor" class="role-admin-editor">
+      <div class="role-admin-empty">請從左側選擇角色。</div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .role-admin-shell { max-width:1500px; margin:0 auto; }
+  .role-admin-intro { border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.035); border-radius:16px; padding:1rem; margin-bottom:1rem; }
+  .role-admin-intro h3 { color:#fff; margin:0 0 .45rem; }
+  .role-admin-intro p, .role-admin-status { color:var(--text-muted); line-height:1.65; }
+  .role-admin-toolbar { display:flex; gap:.65rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
+  .role-admin-toolbar .dark-input { min-width:180px; }
+  .role-admin-layout { display:grid; grid-template-columns:minmax(300px,.8fr) minmax(0,1.4fr); gap:1rem; align-items:start; }
+  .role-admin-list { display:grid; gap:.55rem; max-height:72vh; overflow:auto; padding-right:.25rem; }
+  .role-admin-row { width:100%; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.2); border-radius:14px; padding:.7rem; display:grid; grid-template-columns:48px minmax(0,1fr) auto; gap:.7rem; align-items:center; color:#fff; text-align:left; cursor:pointer; }
+  .role-admin-row:hover, .role-admin-row.active { border-color:rgba(167,139,250,.65); background:rgba(124,58,237,.12); }
+  .role-admin-thumb { width:48px; height:48px; border-radius:999px; object-fit:contain; background:rgba(255,255,255,.07); }
+  .role-admin-name { font-weight:900; }
+  .role-admin-meta { color:var(--text-muted); font-size:.78rem; margin-top:.2rem; }
+  .role-admin-score { font-size:.76rem; color:var(--accent-gold); }
+  .role-admin-editor { border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.2); border-radius:18px; padding:1rem; min-height:320px; }
+  .role-admin-empty { color:var(--text-muted); text-align:center; padding:3rem 1rem; }
+  .role-editor-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.8rem; }
+  .role-editor-grid .wide { grid-column:1 / -1; }
+  .role-editor-grid label { display:block; color:var(--accent-gold); font-size:.75rem; margin-bottom:.35rem; font-weight:800; }
+  .role-editor-grid textarea { min-height:100px; resize:vertical; }
+  .role-editor-head { display:flex; gap:1rem; align-items:center; margin-bottom:1rem; }
+  .role-editor-head img { width:72px; height:72px; object-fit:contain; border-radius:999px; background:rgba(255,255,255,.07); }
+  .role-editor-head h3 { margin:0; color:#fff; }
+  .role-checkboxes { display:flex; gap:1rem; flex-wrap:wrap; margin:.75rem 0; color:var(--text-muted); }
+  .alias-list { display:grid; gap:.45rem; margin:.6rem 0; }
+  .alias-row { display:flex; justify-content:space-between; gap:.6rem; align-items:center; border:1px solid rgba(255,255,255,.08); border-radius:10px; padding:.55rem; color:var(--text-muted); }
+  .alias-add { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:.5rem; }
+  .role-editor-actions { display:flex; gap:.6rem; justify-content:flex-end; margin-top:1rem; }
+  @media (max-width:1000px) { .role-admin-layout { grid-template-columns:1fr; } .role-admin-list { max-height:38vh; } }
+  @media (max-width:640px) { .role-editor-grid { grid-template-columns:1fr; } .role-editor-grid .wide { grid-column:auto; } .alias-add { grid-template-columns:1fr; } }
+</style>
+
+<script src="/js/role_admin.js"></script>
