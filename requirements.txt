@@ -6,3 +6,4 @@ psycopg2-binary
 requests
 aiofiles
 opencc-python-reimplemented
+beautifulsoup4
