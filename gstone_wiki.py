@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from urllib.parse import quote
 
 import requests
@@ -10,9 +10,11 @@ from opencc import OpenCC
 
 BASE_URL = "https://clocktower-wiki.gstonegames.com"
 HEADERS = {
-    "User-Agent": "Larplus-Knowledge-Base/1.0 (+official GStone wiki sync)",
+    "User-Agent": "Larplus-Knowledge-Base/1.1 (+official GStone wiki sync)",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.5",
 }
+_TO_TRADITIONAL = OpenCC("s2twp")
+_TO_SIMPLIFIED = OpenCC("t2s")
 
 
 def clean_text(value: Any) -> str:
@@ -20,23 +22,59 @@ def clean_text(value: Any) -> str:
 
 
 def to_traditional(value: Any) -> str:
-    return OpenCC("s2twp").convert(clean_text(value))
+    return _TO_TRADITIONAL.convert(clean_text(value))
+
+
+def to_simplified(value: Any) -> str:
+    return _TO_SIMPLIFIED.convert(clean_text(value))
 
 
 def article_url(title: str) -> str:
     return f"{BASE_URL}/index.php?title={quote(clean_text(title))}"
 
 
-def fetch_article(title: str) -> Dict[str, Any]:
-    url = article_url(title)
-    response = requests.get(url, headers=HEADERS, timeout=25)
-    response.raise_for_status()
-    return {
-        "title": clean_text(title),
-        "url": response.url,
-        "status": response.status_code,
-        "html": response.text,
-    }
+def title_candidates(title: str, aliases: Optional[List[str]] = None) -> List[Dict[str, str]]:
+    requested = clean_text(title)
+    candidates: List[Dict[str, str]] = []
+
+    def add(value: Any, method: str) -> None:
+        candidate = clean_text(value)
+        if not candidate or any(item["title"] == candidate for item in candidates):
+            return
+        candidates.append({"title": candidate, "method": method})
+
+    for alias in aliases or []:
+        add(alias, "provided_alias")
+    add(requested, "requested_title")
+    add(to_simplified(requested), "traditional_to_simplified")
+    return candidates
+
+
+def fetch_article(title: str, aliases: Optional[List[str]] = None) -> Dict[str, Any]:
+    attempts: List[Dict[str, Any]] = []
+    for candidate in title_candidates(title, aliases):
+        url = article_url(candidate["title"])
+        response = requests.get(url, headers=HEADERS, timeout=25)
+        attempts.append({
+            "title": candidate["title"],
+            "method": candidate["method"],
+            "url": response.url,
+            "status": response.status_code,
+        })
+        if response.status_code == 404:
+            continue
+        response.raise_for_status()
+        return {
+            "title": clean_text(title),
+            "resolved_title": candidate["title"],
+            "resolution_method": candidate["method"],
+            "url": response.url,
+            "status": response.status_code,
+            "html": response.text,
+            "attempts": attempts,
+        }
+    attempted_titles = "、".join(item["title"] for item in attempts)
+    raise requests.HTTPError(f"GStone 找不到角色頁，已嘗試：{attempted_titles}")
 
 
 def _section_nodes(heading: Tag) -> List[Tag]:
@@ -94,7 +132,6 @@ def parse_reminders(html: str) -> Dict[str, Any]:
         return {"found": True, "reminders": [], "raw_text": raw_text}
 
     reminders: List[Dict[str, str]] = []
-
     for table in [node for node in nodes if node.name == "table"]:
         rows = table.find_all("tr")
         headers: List[str] = []
@@ -153,11 +190,14 @@ def parse_reminders(html: str) -> Dict[str, Any]:
     return {"found": True, "reminders": unique, "raw_text": raw_text}
 
 
-def fetch_role_reminders(title: str) -> Dict[str, Any]:
-    article = fetch_article(title)
+def fetch_role_reminders(title: str, aliases: Optional[List[str]] = None) -> Dict[str, Any]:
+    article = fetch_article(title, aliases=aliases)
     parsed = parse_reminders(article["html"])
     return {
         "title": article["title"],
+        "resolved_title": article["resolved_title"],
+        "resolution_method": article["resolution_method"],
+        "attempts": article["attempts"],
         "source": "GStone 官方鐘樓百科",
         "source_url": article["url"],
         "http_status": article["status"],
