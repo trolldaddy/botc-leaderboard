@@ -112,6 +112,7 @@
     loadPatch('/js/rooms-self-seat-patch.js', 'botc-self-seat', '玩家自選座號功能載入失敗');
     loadPatch('/js/rooms-critical-fixes-patch.js', 'botc-critical-fixes', '房間核心修正載入失敗');
     loadPatch('/js/rooms-checkin-wizard.js', 'botc-checkin-wizard', 'QR 報到精靈載入失敗');
+    loadPatch('/js/rooms-mobile-layout-patch.js', 'botc-mobile-layout', '手機房間版面載入失敗');
   };
 
   const setActiveTab = (tab) => {
@@ -148,11 +149,16 @@
         <i class="fa-solid fa-user"></i><span>玩家</span>
       </button>
       <button class="town-mode-tab" type="button" role="tab" data-town-tab-target="storyteller">
-        <i class="fa-solid fa-user-gear"></i><span>房主管理</span>
+        <i class="fa-solid fa-door-open"></i><span>房間資訊</span>
       </button>`;
     header.insertAdjacentElement('afterend', tabs);
-    $$('.player-profile-card, .join-room-card, .room-members-card').forEach((el) => el.classList.add('town-tab-player'));
-    $$('.storyteller-room-card').forEach((el) => el.classList.add('town-tab-storyteller'));
+    $$('.player-profile-card, .join-room-card').forEach((el) => el.classList.add('town-tab-player'));
+    $$('.storyteller-room-card, .room-members-card').forEach((el) => el.classList.add('town-tab-storyteller'));
+    const storytellerCard = $('.storyteller-room-card');
+    const membersCard = $('.room-members-card');
+    if (storytellerCard && membersCard && storytellerCard.parentElement === membersCard.parentElement) {
+      storytellerCard.insertAdjacentElement('afterend', membersCard);
+    }
     $$('.town-mode-tab').forEach((button) => button.addEventListener('click', () => setActiveTab(button.dataset.townTabTarget)));
     window.addEventListener('storage', refreshManagementPermissions);
     window.addEventListener('focus', refreshManagementPermissions);
