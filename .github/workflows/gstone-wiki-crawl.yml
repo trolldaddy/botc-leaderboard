@@ -37,9 +37,14 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Prepare report directory
+        run: mkdir -p reports
+
       - name: Crawl wiki
+        id: crawl
         shell: bash
         run: |
+          set -o pipefail
           EXTRA_ARGS=()
           if [[ "${{ inputs.parse_reminders_all }}" == "true" ]]; then
             EXTRA_ARGS+=(--parse-reminders-all)
@@ -49,13 +54,15 @@ jobs:
             --delay "${{ inputs.delay }}" \
             --output reports/gstone-crawl.json \
             "${EXTRA_ARGS[@]}" \
-            | tee reports/gstone-crawl-summary.txt
+            2>&1 | tee reports/gstone-crawl-summary.txt
 
       - name: Upload report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gstone-wiki-crawl-report
           path: |
             reports/gstone-crawl.json
             reports/gstone-crawl-summary.txt
+          if-no-files-found: warn
           retention-days: 30
