@@ -32,6 +32,7 @@ class Role(Base):
 
     aliases = relationship("RoleAlias", back_populates="role", cascade="all, delete-orphan")
     guide = relationship("RoleGuide", back_populates="role", uselist=False, cascade="all, delete-orphan")
+    reminders = relationship("RoleReminder", back_populates="role", cascade="all, delete-orphan")
 
 
 class RoleAlias(Base):
@@ -65,10 +66,27 @@ class RoleGuide(Base):
     role = relationship("Role", back_populates="guide")
 
 
+class RoleReminder(Base):
+    __tablename__ = "role_reminders"
+    __table_args__ = (
+        UniqueConstraint("role_id", "scope", "label_zh_tw", name="uq_role_reminder_role_scope_label"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False, index=True)
+    label_zh_tw = Column(String, nullable=False)
+    scope = Column(String, nullable=False, default="role", index=True)
+    sort_order = Column(Integer, nullable=False, default=0)
+    source = Column(String, nullable=False, default="pocket_grimoire", index=True)
+    created_at = Column(DateTime, default=datetime.now)
+
+    role = relationship("Role", back_populates="reminders")
+
+
 def ensure_role_schema():
     Base.metadata.create_all(
         bind=engine,
-        tables=[Role.__table__, RoleAlias.__table__, RoleGuide.__table__],
+        tables=[Role.__table__, RoleAlias.__table__, RoleGuide.__table__, RoleReminder.__table__],
     )
 
 
