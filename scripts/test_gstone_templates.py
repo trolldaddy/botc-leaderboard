@@ -12,7 +12,14 @@ from __future__ import annotations
 import json
 import sys
 import time
+from pathlib import Path
 from typing import Any
+
+# Running a file inside scripts/ makes Python treat scripts/ as sys.path[0].
+# Add the repository root explicitly so root-level modules can be imported.
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from gstone_wiki import fetch_role_reminders
 
