@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 import models
 from account_binding_routes import require_admin_account
 from database import get_db
-from role_models import Role, RoleAlias
+from role_models import Role, RoleAlias, RoleReminder
 
 router = APIRouter(prefix="/role-sync", tags=["role-sync"])
 
@@ -237,8 +237,6 @@ def fill_empty_from_pocket_grimoire(
                 role.needs_review = True
                 changed_roles += 1
 
-        # Alias creation is deliberately excluded from this write transaction.
-        # Filling role fields must remain reliable even when legacy alias data contains conflicts.
         db.commit()
         return {
             "status": "success", "policy": "fill_empty_only", "matched": matched,
@@ -253,3 +251,76 @@ def fill_empty_from_pocket_grimoire(
         db.rollback()
         print(f"Pocket Grimoire 補齊失敗，角色={failed_role}: {exc}")
         raise HTTPException(status_code=500, detail=f"補齊失敗於角色 {failed_role or '未知'}：{type(exc).__name__}: {exc}")
+
+
+@router.post("/pocket-grimoire/import-reminders")
+def import_reminders_from_pocket_grimoire(
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    failed_role = None
+    try:
+        english_by_id, zh_by_id, converter = load_source()
+        roles, roles_by_key, roles_by_normalized_key, alias_map, normalized_alias_map = role_indexes(db)
+
+        existing = {
+            (reminder.role_id, reminder.scope, reminder.label_zh_tw.strip())
+            for reminder in db.query(RoleReminder).all()
+            if reminder.label_zh_tw
+        }
+
+        added_role = 0
+        added_global = 0
+        skipped_duplicates = 0
+        missing_roles = 0
+        matched_roles = 0
+
+        for external_id, zh_item in zh_by_id.items():
+            failed_role = external_id
+            role, _ = find_role(external_id, roles_by_key, roles_by_normalized_key, alias_map, normalized_alias_map)
+            if not role:
+                missing_roles += 1
+                continue
+            matched_roles += 1
+            incoming = build_incoming(external_id, english_by_id.get(external_id, {}), zh_item, converter)
+
+            for scope, labels in (("role", incoming.get("reminders") or []), ("global", incoming.get("reminders_global") or [])):
+                for sort_order, label in enumerate(labels):
+                    clean_label = str(label or "").strip()
+                    if not clean_label:
+                        continue
+                    key = (role.id, scope, clean_label)
+                    if key in existing:
+                        skipped_duplicates += 1
+                        continue
+                    db.add(RoleReminder(
+                        role_id=role.id,
+                        label_zh_tw=clean_label,
+                        scope=scope,
+                        sort_order=sort_order,
+                        source="pocket_grimoire",
+                    ))
+                    existing.add(key)
+                    if scope == "role":
+                        added_role += 1
+                    else:
+                        added_global += 1
+
+        db.commit()
+        return {
+            "status": "success",
+            "policy": "append_only_no_delete_no_overwrite",
+            "matched_roles": matched_roles,
+            "missing_roles": missing_roles,
+            "added_role_reminders": added_role,
+            "added_global_reminders": added_global,
+            "skipped_duplicates": skipped_duplicates,
+            "source": "pocket_grimoire",
+        }
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as exc:
+        db.rollback()
+        print(f"Pocket Grimoire 提示標記匯入失敗，角色={failed_role}: {exc}")
+        raise HTTPException(status_code=500, detail=f"提示標記匯入失敗於角色 {failed_role or '未知'}：{type(exc).__name__}: {exc}")
