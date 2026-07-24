@@ -1,6 +1,9 @@
 name: Deploy Cloud Run
 
 on:
+  push:
+    branches:
+      - feature/town-checkin
   workflow_dispatch:
     inputs:
       deploy_ref:
@@ -24,19 +27,23 @@ permissions:
   id-token: write
 
 concurrency:
-  group: deploy-cloud-run-${{ inputs.service }}
-  cancel-in-progress: false
+  group: deploy-cloud-run-botc-twitch
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: production
+    env:
+      DEPLOY_REF: ${{ github.event_name == 'workflow_dispatch' && inputs.deploy_ref || github.ref_name }}
+      CLOUD_RUN_SERVICE: ${{ github.event_name == 'workflow_dispatch' && inputs.service || 'botc-twitch' }}
+      CLOUD_RUN_REGION: ${{ github.event_name == 'workflow_dispatch' && inputs.region || 'asia-east1' }}
 
     steps:
       - name: Checkout deployment source
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.deploy_ref }}
+          ref: ${{ env.DEPLOY_REF }}
 
       - name: Validate deployment configuration
         shell: bash
@@ -47,8 +54,11 @@ jobs:
           set -euo pipefail
           test -n "$GCP_PROJECT_ID" || { echo "Missing repository secret: GCP_PROJECT_ID"; exit 1; }
           test -n "$GCP_SA_KEY" || { echo "Missing repository secret: GCP_SA_KEY"; exit 1; }
-          test -f main.py || { echo "main.py was not found in deploy ref: ${{ inputs.deploy_ref }}"; exit 1; }
-          test -f knowledge_admin_routes.py || { echo "knowledge_admin_routes.py was not found in deploy ref: ${{ inputs.deploy_ref }}"; exit 1; }
+          test -f main.py || { echo "main.py was not found in deploy ref: $DEPLOY_REF"; exit 1; }
+          test -f knowledge_admin_routes.py || { echo "knowledge_admin_routes.py was not found in deploy ref: $DEPLOY_REF"; exit 1; }
+          echo "Deploying ref: $DEPLOY_REF"
+          echo "Cloud Run service: $CLOUD_RUN_SERVICE"
+          echo "Cloud Run region: $CLOUD_RUN_REGION"
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -64,10 +74,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          gcloud run deploy "${{ inputs.service }}" \
+          gcloud run deploy "$CLOUD_RUN_SERVICE" \
             --source . \
             --project "${{ secrets.GCP_PROJECT_ID }}" \
-            --region "${{ inputs.region }}" \
+            --region "$CLOUD_RUN_REGION" \
             --platform managed \
             --allow-unauthenticated \
             --quiet
@@ -76,9 +86,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          SERVICE_URL="$(gcloud run services describe "${{ inputs.service }}" \
+          SERVICE_URL="$(gcloud run services describe "$CLOUD_RUN_SERVICE" \
             --project "${{ secrets.GCP_PROJECT_ID }}" \
-            --region "${{ inputs.region }}" \
+            --region "$CLOUD_RUN_REGION" \
             --format='value(status.url)')"
           echo "Service URL: $SERVICE_URL"
           curl --fail --silent --show-error "$SERVICE_URL/openapi.json" -o openapi.json
@@ -89,10 +99,16 @@ jobs:
           data = json.loads(Path("openapi.json").read_text(encoding="utf-8"))
           paths = data.get("paths", {})
           knowledge_paths = sorted(path for path in paths if "/knowledge" in path)
+          room_paths = sorted(path for path in paths if "/api/rooms" in path)
           if not knowledge_paths:
               raise SystemExit("Deployment succeeded, but no knowledge routes were found in openapi.json")
+          if not room_paths:
+              raise SystemExit("Deployment succeeded, but no room routes were found in openapi.json")
           print("Knowledge routes found:")
           for path in knowledge_paths:
+              print(f"- {path}")
+          print("Room routes found:")
+          for path in room_paths:
               print(f"- {path}")
           PY
 
