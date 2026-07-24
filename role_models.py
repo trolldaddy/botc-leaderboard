@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, inspect, text
 from sqlalchemy.orm import relationship
 
 from database import Base, engine
@@ -77,8 +77,15 @@ class RoleReminder(Base):
     label_zh_tw = Column(String, nullable=False)
     scope = Column(String, nullable=False, default="role", index=True)
     sort_order = Column(Integer, nullable=False, default=0)
+    placement_timing = Column(Text, nullable=True)
+    placement_condition = Column(Text, nullable=True)
+    removal_timing = Column(Text, nullable=True)
+    special_notes = Column(Text, nullable=True)
     source = Column(String, nullable=False, default="pocket_grimoire", index=True)
+    source_url = Column(Text, nullable=True)
+    needs_review = Column(Boolean, nullable=False, default=False, index=True)
     created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
     role = relationship("Role", back_populates="reminders")
 
@@ -88,6 +95,33 @@ def ensure_role_schema():
         bind=engine,
         tables=[Role.__table__, RoleAlias.__table__, RoleGuide.__table__, RoleReminder.__table__],
     )
+    try:
+        inspector = inspect(engine)
+        if "role_reminders" not in inspector.get_table_names():
+            return
+        columns = {column["name"] for column in inspector.get_columns("role_reminders")}
+        dialect = engine.dialect.name
+        boolean_default = "FALSE" if dialect == "postgresql" else "0"
+        timestamp_type = "TIMESTAMP" if dialect == "postgresql" else "DATETIME"
+        additions = {
+            "placement_timing": "TEXT",
+            "placement_condition": "TEXT",
+            "removal_timing": "TEXT",
+            "special_notes": "TEXT",
+            "source_url": "TEXT",
+            "needs_review": f"BOOLEAN DEFAULT {boolean_default}",
+            "updated_at": timestamp_type,
+        }
+        with engine.begin() as connection:
+            for name, definition in additions.items():
+                if name in columns:
+                    continue
+                if dialect == "postgresql":
+                    connection.execute(text(f"ALTER TABLE role_reminders ADD COLUMN IF NOT EXISTS {name} {definition}"))
+                else:
+                    connection.execute(text(f"ALTER TABLE role_reminders ADD COLUMN {name} {definition}"))
+    except Exception as exc:
+        print(f"角色提示標記資料表補齊失敗: {exc}")
 
 
 ensure_role_schema()
