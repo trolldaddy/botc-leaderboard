@@ -138,6 +138,7 @@ def _install_town_checkin_router_patch():
             ("role_admin_routes", "/api/admin", "角色資料庫管理 API"),
             ("role_sync_routes", "/api/admin", "角色資料同步 API"),
             ("role_reminder_routes", "/api/admin", "角色提示標記 API"),
+            ("knowledge_admin_routes", "/api/admin", "知識圖譜預覽 API"),
         ]
         for module_name, prefix, label in routers:
             try:
