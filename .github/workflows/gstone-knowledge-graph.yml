@@ -1,0 +1,102 @@
+name: GStone Knowledge Graph
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 執行模式（preview 只預覽；write 會寫入 DATABASE_URL）
+        required: true
+        type: choice
+        options:
+          - preview
+          - write
+        default: preview
+      max_pages:
+        description: 最多抓取頁數
+        required: true
+        default: "5000"
+      delay:
+        description: 每次請求間隔秒數
+        required: true
+        default: "0.7"
+      parse_reminders_all:
+        description: 是否對所有頁面執行提示標記解析
+        required: true
+        type: boolean
+        default: false
+
+jobs:
+  build-graph:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: read
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+    steps:
+      - name: Checkout Knowledge Schema branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/town-checkin
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Prepare report directory
+        run: mkdir -p reports
+
+      - name: Crawl GStone wiki
+        shell: bash
+        run: |
+          EXTRA_ARGS=()
+          if [[ "${{ inputs.parse_reminders_all }}" == "true" ]]; then
+            EXTRA_ARGS+=(--parse-reminders-all)
+          fi
+          python3 scripts/crawl_gstone_wiki.py \
+            --max-pages "${{ inputs.max_pages }}" \
+            --delay "${{ inputs.delay }}" \
+            --output reports/gstone-crawl.json \
+            "${EXTRA_ARGS[@]}" \
+            | tee reports/gstone-crawl-summary.txt
+
+      - name: Validate write mode configuration
+        if: ${{ inputs.mode == 'write' }}
+        shell: bash
+        run: |
+          if [[ -z "$DATABASE_URL" ]]; then
+            echo "::error::write 模式需要在 Repository Secrets 設定 DATABASE_URL。"
+            exit 1
+          fi
+
+      - name: Preview knowledge graph import
+        if: ${{ inputs.mode == 'preview' }}
+        run: |
+          python3 scripts/import_gstone_graph.py reports/gstone-crawl.json \
+            | tee reports/gstone-graph-preview.txt
+
+      - name: Write knowledge graph to database
+        if: ${{ inputs.mode == 'write' }}
+        run: |
+          python3 scripts/import_gstone_graph.py reports/gstone-crawl.json --write \
+            | tee reports/gstone-graph-write.txt
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gstone-knowledge-graph-${{ inputs.mode }}
+          path: |
+            reports/gstone-crawl.json
+            reports/gstone-crawl-summary.txt
+            reports/gstone-graph-preview.txt
+            reports/gstone-graph-write.txt
+          if-no-files-found: ignore
+          retention-days: 30
