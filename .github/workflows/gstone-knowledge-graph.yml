@@ -56,6 +56,7 @@ jobs:
       - name: Crawl GStone wiki
         shell: bash
         run: |
+          set -o pipefail
           EXTRA_ARGS=()
           if [[ "${{ inputs.parse_reminders_all }}" == "true" ]]; then
             EXTRA_ARGS+=(--parse-reminders-all)
@@ -65,7 +66,7 @@ jobs:
             --delay "${{ inputs.delay }}" \
             --output reports/gstone-crawl.json \
             "${EXTRA_ARGS[@]}" \
-            | tee reports/gstone-crawl-summary.txt
+            2>&1 | tee reports/gstone-crawl-summary.txt
 
       - name: Validate write mode configuration
         if: ${{ inputs.mode == 'write' }}
@@ -78,15 +79,27 @@ jobs:
 
       - name: Preview knowledge graph import
         if: ${{ inputs.mode == 'preview' }}
+        shell: bash
         run: |
+          set -o pipefail
           python3 scripts/import_gstone_graph.py reports/gstone-crawl.json \
-            | tee reports/gstone-graph-preview.txt
+            2>&1 | tee reports/gstone-graph-preview.txt
+          if [[ ! -s reports/gstone-graph-preview.txt ]]; then
+            echo "::error::Knowledge Graph preview 沒有產生任何輸出。"
+            exit 1
+          fi
 
       - name: Write knowledge graph to database
         if: ${{ inputs.mode == 'write' }}
+        shell: bash
         run: |
+          set -o pipefail
           python3 scripts/import_gstone_graph.py reports/gstone-crawl.json --write \
-            | tee reports/gstone-graph-write.txt
+            2>&1 | tee reports/gstone-graph-write.txt
+          if [[ ! -s reports/gstone-graph-write.txt ]]; then
+            echo "::error::Knowledge Graph write 沒有產生任何輸出。"
+            exit 1
+          fi
 
       - name: Upload reports
         if: always()
