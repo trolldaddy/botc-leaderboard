@@ -1,0 +1,106 @@
+name: Deploy Cloud Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_ref:
+        description: "Branch, tag, or commit to deploy"
+        required: true
+        default: "feature/town-checkin"
+        type: string
+      service:
+        description: "Cloud Run service name"
+        required: true
+        default: "botc-twitch"
+        type: string
+      region:
+        description: "Cloud Run region"
+        required: true
+        default: "asia-east1"
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-cloud-run-${{ inputs.service }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout deployment source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deploy_ref }}
+
+      - name: Validate deployment configuration
+        shell: bash
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$GCP_PROJECT_ID" || { echo "Missing repository secret: GCP_PROJECT_ID"; exit 1; }
+          test -n "$GCP_SA_KEY" || { echo "Missing repository secret: GCP_SA_KEY"; exit 1; }
+          test -f main.py || { echo "main.py was not found in deploy ref: ${{ inputs.deploy_ref }}"; exit 1; }
+          test -f knowledge_admin_routes.py || { echo "knowledge_admin_routes.py was not found in deploy ref: ${{ inputs.deploy_ref }}"; exit 1; }
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy source to Cloud Run
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run deploy "${{ inputs.service }}" \
+            --source . \
+            --project "${{ secrets.GCP_PROJECT_ID }}" \
+            --region "${{ inputs.region }}" \
+            --platform managed \
+            --allow-unauthenticated \
+            --quiet
+
+      - name: Verify deployed OpenAPI contains knowledge routes
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_URL="$(gcloud run services describe "${{ inputs.service }}" \
+            --project "${{ secrets.GCP_PROJECT_ID }}" \
+            --region "${{ inputs.region }}" \
+            --format='value(status.url)')"
+          echo "Service URL: $SERVICE_URL"
+          curl --fail --silent --show-error "$SERVICE_URL/openapi.json" -o openapi.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path("openapi.json").read_text(encoding="utf-8"))
+          paths = data.get("paths", {})
+          knowledge_paths = sorted(path for path in paths if "/knowledge" in path)
+          if not knowledge_paths:
+              raise SystemExit("Deployment succeeded, but no knowledge routes were found in openapi.json")
+          print("Knowledge routes found:")
+          for path in knowledge_paths:
+              print(f"- {path}")
+          PY
+
+      - name: Upload deployment verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-run-deployment-verification
+          path: openapi.json
+          if-no-files-found: ignore
+          retention-days: 7
