@@ -113,6 +113,10 @@ class MatchPlayer(Base):
         return self.alignment == self.match.winning_team
 
 
+# Importing registers the Knowledge Schema v1 tables on the shared SQLAlchemy metadata.
+import knowledge_models  # noqa: E402,F401
+
+
 def _install_town_checkin_router_patch():
     try:
         import fastapi
