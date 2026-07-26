@@ -1,6 +1,15 @@
 import argparse
 import os
 import re
+import sys
+from pathlib import Path
+
+# Running `python scripts/...py` puts the scripts directory on sys.path,
+# not the repository root. Add the project root explicitly so shared
+# modules such as database.py and knowledge_models.py can be imported.
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from sqlalchemy.orm import Session
 
