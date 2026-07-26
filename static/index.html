@@ -61,6 +61,7 @@
 
     <ul class="nav-links" id="main-nav">
         <li class="active"><a href="#" data-page="dashboard"><i class="fa-solid fa-chart-line"></i> <span>數據看板</span></a></li>
+        <li><a href="#" data-page="knowledge"><i class="fa-solid fa-book-atlas"></i> <span>角色與規則</span></a></li>
         <li><a href="#" data-page="rooms"><i class="fa-solid fa-door-open"></i> <span>小鎮報到</span></a></li>
         <li><a href="#" data-page="recorder"><i class="fa-solid fa-book-open"></i> <span>覆盤紀錄器</span></a></li>
         <li><a href="#" data-page="record"><i class="fa-solid fa-feather-pointed"></i> <span>錄入對局</span></a></li>
@@ -170,8 +171,9 @@
                 if (navMenu && navMenu.classList.contains('active') && !navMenu.contains(e.target)) navMenu.classList.remove('active');
             });
             revealAdminNav();
-            const hash = window.location.hash.replace('#', '');
-            loadPage(hash || 'dashboard');
+            const rawHash = window.location.hash.replace('#', '');
+            const initialPage = rawHash.startsWith('knowledge/') ? 'knowledge' : (rawHash || 'dashboard');
+            loadPage(initialPage);
         });
     </script>
 </body>
