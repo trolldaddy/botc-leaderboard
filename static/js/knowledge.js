@@ -1,6 +1,6 @@
 (() => {
   const apiBase = window.API_BASE || '';
-  const state = { items: [], activeSlug: null, types: [], expandedRelationGroups: new Set() };
+  const state = { items: [], activeSlug: null, types: [], expandedRelationGroups: new Set(), expandedBlocks: new Set() };
   const $ = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -65,7 +65,6 @@
       const key = group.type;
       const expanded = state.expandedRelationGroups.has(key);
       const visible = expanded ? group.items : group.items.slice(0, 12);
-      const hiddenCount = Math.max(0, group.items.length - visible.length);
       return `
         <div class="knowledge-relation-group">
           <div class="knowledge-relation-group-head">
@@ -77,6 +76,47 @@
     }).join('');
   }
 
+  function paragraphize(value) {
+    const text = String(value || '').trim();
+    if (!text) return [];
+    const existing = text.split(/\n{2,}/).map((part) => part.trim()).filter(Boolean);
+    if (existing.length > 1) return existing;
+    const sentences = text.split(/(?<=[。！？!?])\s*/).map((part) => part.trim()).filter(Boolean);
+    const paragraphs = [];
+    let current = '';
+    sentences.forEach((sentence) => {
+      if ((current + sentence).length > 260 && current) {
+        paragraphs.push(current.trim());
+        current = sentence;
+      } else {
+        current += sentence;
+      }
+    });
+    if (current) paragraphs.push(current.trim());
+    return paragraphs.length ? paragraphs : [text];
+  }
+
+  function renderBlock(block) {
+    const paragraphs = paragraphize(block.content || '');
+    const key = String(block.id || `${block.block_type}-${block.title || ''}`);
+    const expanded = state.expandedBlocks.has(key);
+    const previewCount = 3;
+    const visible = expanded ? paragraphs : paragraphs.slice(0, previewCount);
+    const hasMore = paragraphs.length > previewCount;
+    return `
+      <article class="knowledge-block ${expanded ? 'is-expanded' : ''}">
+        <div class="knowledge-block-head">
+          <div>
+            <strong>${escapeHtml(block.title || typeLabel(block.block_type))}</strong>
+            <span class="knowledge-block-label">來源整理 · 待審核</span>
+          </div>
+          ${hasMore ? `<button type="button" class="knowledge-block-toggle" data-block-toggle="${escapeHtml(key)}">${expanded ? '收合' : '展開全文'}</button>` : ''}
+        </div>
+        <div class="knowledge-block-body">${visible.map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`).join('')}</div>
+        ${!expanded && hasMore ? `<div class="knowledge-block-fade"></div>` : ''}
+      </article>`;
+  }
+
   function bindDetailEvents(detail, node) {
     detail.querySelectorAll('[data-related-slug]').forEach((button) => button.addEventListener('click', () => loadNode(button.dataset.relatedSlug)));
     detail.querySelectorAll('[data-relation-group]').forEach((button) => {
@@ -84,6 +124,14 @@
         const key = button.dataset.relationGroup;
         if (state.expandedRelationGroups.has(key)) state.expandedRelationGroups.delete(key);
         else state.expandedRelationGroups.add(key);
+        renderNode(node);
+      });
+    });
+    detail.querySelectorAll('[data-block-toggle]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const key = button.dataset.blockToggle;
+        if (state.expandedBlocks.has(key)) state.expandedBlocks.delete(key);
+        else state.expandedBlocks.add(key);
         renderNode(node);
       });
     });
@@ -97,6 +145,7 @@
     const source = node.source_record;
     const sourceContent = source?.content || node.summary || '';
     const relations = node.relations || [];
+    const hasSourceExcerptBlock = blocks.some((block) => block.block_type === 'source_excerpt');
     detail.className = '';
     detail.innerHTML = `
       <div class="knowledge-detail-title">
@@ -111,15 +160,15 @@
       ${blocks.length ? `
         <div class="knowledge-section">
           <h3>整理內容</h3>
-          ${blocks.map((block) => `<div class="knowledge-block"><strong>${escapeHtml(block.title || typeLabel(block.block_type))}</strong>\n${escapeHtml(block.content || '')}</div>`).join('')}
+          ${blocks.map(renderBlock).join('')}
         </div>` : `
         <div class="knowledge-section">
           <div class="knowledge-warning">目前尚未建立人工整理的 Knowledge Blocks，下方先顯示爬取來源內容。之後會逐步補上能力、規則、說書人提醒與常見誤解。</div>
         </div>`}
 
       <div class="knowledge-section">
-        <h3>來源內容</h3>
-        <div class="knowledge-source-content">${escapeHtml(sourceContent || '目前沒有可顯示的來源內容。')}</div>
+        <h3>來源</h3>
+        ${!hasSourceExcerptBlock ? `<div class="knowledge-source-content">${escapeHtml(sourceContent || '目前沒有可顯示的來源內容。')}</div>` : '<div class="knowledge-source-note">完整原始內容已整理到上方區塊，這裡保留來源連結與查核入口。</div>'}
         ${source?.url ? `<a class="knowledge-source-link" href="${escapeHtml(source.url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> 查看原始來源</a>` : ''}
       </div>
 
@@ -137,6 +186,7 @@
     if (!slug) return;
     state.activeSlug = slug;
     state.expandedRelationGroups.clear();
+    state.expandedBlocks.clear();
     renderResults();
     const detail = $('knowledge-detail');
     if (detail) detail.innerHTML = '<div class="knowledge-detail-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>正在讀取條目...</p></div>';
