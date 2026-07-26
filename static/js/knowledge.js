@@ -1,11 +1,12 @@
 (() => {
   const apiBase = window.API_BASE || '';
-  const state = { items: [], activeSlug: null, types: [] };
+  const state = { items: [], activeSlug: null, types: [], expandedRelationGroups: new Set() };
   const $ = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   const typeLabel = (type) => ({ role: '角色', script: '劇本', guide: '指南', mechanic: '規則／機制', article: '文章' }[type] || type || '其他');
+  const relationGroupOrder = ['role', 'mechanic', 'script', 'guide', 'article', 'other'];
 
   async function requireJson(resp) {
     let data = null;
@@ -42,7 +43,50 @@
 
   function relationButton(rel) {
     const node = rel.node || {};
-    return `<button type="button" class="knowledge-relation" data-related-slug="${escapeHtml(node.slug)}" title="${escapeHtml(rel.edge_type || '')}">${escapeHtml(node.name || node.slug)} · ${escapeHtml(rel.edge_type || '相關')}</button>`;
+    return `<button type="button" class="knowledge-relation" data-related-slug="${escapeHtml(node.slug)}" title="${escapeHtml(rel.edge_type || '')}">${escapeHtml(node.name || node.slug)} <small>${escapeHtml(rel.edge_type || '相關')}</small></button>`;
+  }
+
+  function groupRelations(relations) {
+    const groups = new Map();
+    relations.forEach((rel) => {
+      const type = rel?.node?.node_type || 'other';
+      if (!groups.has(type)) groups.set(type, []);
+      groups.get(type).push(rel);
+    });
+    return relationGroupOrder
+      .filter((type) => groups.has(type))
+      .map((type) => ({ type, items: groups.get(type) }))
+      .concat(Array.from(groups.entries()).filter(([type]) => !relationGroupOrder.includes(type)).map(([type, items]) => ({ type, items })));
+  }
+
+  function renderRelationGroups(relations) {
+    if (!relations.length) return '<span class="knowledge-result-meta">目前沒有可顯示的關聯。</span>';
+    return groupRelations(relations).map((group) => {
+      const key = group.type;
+      const expanded = state.expandedRelationGroups.has(key);
+      const visible = expanded ? group.items : group.items.slice(0, 12);
+      const hiddenCount = Math.max(0, group.items.length - visible.length);
+      return `
+        <div class="knowledge-relation-group">
+          <div class="knowledge-relation-group-head">
+            <h4>${escapeHtml(typeLabel(group.type))} <span>${group.items.length}</span></h4>
+            ${group.items.length > 12 ? `<button type="button" class="knowledge-relation-toggle" data-relation-group="${escapeHtml(key)}">${expanded ? '收合' : `展開其餘 ${group.items.length - 12} 筆`}</button>` : ''}
+          </div>
+          <div class="knowledge-relations">${visible.map(relationButton).join('')}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function bindDetailEvents(detail, node) {
+    detail.querySelectorAll('[data-related-slug]').forEach((button) => button.addEventListener('click', () => loadNode(button.dataset.relatedSlug)));
+    detail.querySelectorAll('[data-relation-group]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const key = button.dataset.relationGroup;
+        if (state.expandedRelationGroups.has(key)) state.expandedRelationGroups.delete(key);
+        else state.expandedRelationGroups.add(key);
+        renderNode(node);
+      });
+    });
   }
 
   function renderNode(node) {
@@ -83,15 +127,16 @@
 
       <div class="knowledge-section">
         <h3>相關條目（${relations.length}）</h3>
-        <div class="knowledge-relations">${relations.length ? relations.slice(0, 80).map(relationButton).join('') : '<span class="knowledge-result-meta">目前沒有可顯示的關聯。</span>'}</div>
+        <div class="knowledge-relation-groups">${renderRelationGroups(relations)}</div>
       </div>
     `;
-    detail.querySelectorAll('[data-related-slug]').forEach((button) => button.addEventListener('click', () => loadNode(button.dataset.relatedSlug)));
+    bindDetailEvents(detail, node);
   }
 
   async function loadNode(slug) {
     if (!slug) return;
     state.activeSlug = slug;
+    state.expandedRelationGroups.clear();
     renderResults();
     const detail = $('knowledge-detail');
     if (detail) detail.innerHTML = '<div class="knowledge-detail-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>正在讀取條目...</p></div>';
