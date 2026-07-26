@@ -1,0 +1,122 @@
+name: Deploy Cloud Run
+
+on:
+  push:
+    branches:
+      - feature/town-checkin
+  workflow_dispatch:
+    inputs:
+      deploy_ref:
+        description: "Branch, tag, or commit to deploy"
+        required: true
+        default: "feature/town-checkin"
+        type: string
+      service:
+        description: "Cloud Run service name"
+        required: true
+        default: "botc-twitch"
+        type: string
+      region:
+        description: "Cloud Run region"
+        required: true
+        default: "asia-east1"
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-cloud-run-botc-twitch
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Resolve deployment settings
+        id: settings
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "deploy_ref=${{ github.event_name == 'push' && github.ref_name || inputs.deploy_ref }}" >> "$GITHUB_OUTPUT"
+          echo "service=${{ github.event_name == 'push' && 'botc-twitch' || inputs.service }}" >> "$GITHUB_OUTPUT"
+          echo "region=${{ github.event_name == 'push' && 'asia-east1' || inputs.region }}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout deployment source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.settings.outputs.deploy_ref }}
+
+      - name: Validate deployment configuration
+        shell: bash
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$GCP_PROJECT_ID" || { echo "Missing repository secret: GCP_PROJECT_ID"; exit 1; }
+          test -n "$GCP_SA_KEY" || { echo "Missing repository secret: GCP_SA_KEY"; exit 1; }
+          test -f main.py || { echo "main.py was not found in deploy ref"; exit 1; }
+          test -f knowledge_admin_routes.py || { echo "knowledge_admin_routes.py was not found in deploy ref"; exit 1; }
+          test -f knowledge_public_routes.py || { echo "knowledge_public_routes.py was not found in deploy ref"; exit 1; }
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy source to Cloud Run
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run deploy "${{ steps.settings.outputs.service }}" \
+            --source . \
+            --project "${{ secrets.GCP_PROJECT_ID }}" \
+            --region "${{ steps.settings.outputs.region }}" \
+            --platform managed \
+            --allow-unauthenticated \
+            --quiet
+
+      - name: Verify deployed APIs
+        shell: bash
+        run: |
+          set -euo pipefail
+          SERVICE_URL="$(gcloud run services describe "${{ steps.settings.outputs.service }}" \
+            --project "${{ secrets.GCP_PROJECT_ID }}" \
+            --region "${{ steps.settings.outputs.region }}" \
+            --format='value(status.url)')"
+          echo "Service URL: $SERVICE_URL"
+          curl --fail --silent --show-error "$SERVICE_URL/openapi.json" -o openapi.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          data = json.loads(Path("openapi.json").read_text(encoding="utf-8"))
+          paths = data.get("paths", {})
+          required = [
+              "/api/admin/knowledge/summary",
+              "/api/knowledge/search",
+              "/api/rooms/{room_code}",
+          ]
+          missing = [path for path in required if path not in paths]
+          if missing:
+              raise SystemExit("Missing deployed routes: " + ", ".join(missing))
+          print("Deployment verification passed.")
+          PY
+
+      - name: Upload deployment verification
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-run-deployment-verification
+          path: openapi.json
+          if-no-files-found: ignore
+          retention-days: 7
