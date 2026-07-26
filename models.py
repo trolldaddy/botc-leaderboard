@@ -135,6 +135,7 @@ def _install_town_checkin_router_patch():
             ("room_routes", "", "小鎮報到 API"),
             ("player_seat_routes", "", "玩家自選座號 API"),
             ("account_binding_routes", "", "帳號綁定 API"),
+            ("knowledge_public_routes", "", "公開知識庫 API"),
             ("role_admin_routes", "/api/admin", "角色資料庫管理 API"),
             ("role_sync_routes", "/api/admin", "角色資料同步 API"),
             ("role_reminder_routes", "/api/admin", "角色提示標記 API"),
