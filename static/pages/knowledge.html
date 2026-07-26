@@ -1,0 +1,44 @@
+<header class="top-header knowledge-header">
+  <div>
+    <div class="knowledge-kicker">拉普拉斯推理資料庫</div>
+    <h2>角色與規則查詢</h2>
+    <p>先完成可用的搜尋與閱讀流程，美術將在內容結構穩定後統一整理。</p>
+  </div>
+</header>
+
+<section class="card knowledge-search-card">
+  <form id="knowledge-search-form" class="knowledge-search-form">
+    <div class="knowledge-search-box">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input id="knowledge-search-input" class="form-control dark-input" autocomplete="off" placeholder="搜尋角色、英文名、簡中名稱或別名，例如：酒鬼">
+    </div>
+    <select id="knowledge-type-filter" class="form-control dark-input" aria-label="內容類型">
+      <option value="">全部類型</option>
+    </select>
+    <button class="btn btn-purple" type="submit">搜尋</button>
+  </form>
+  <div id="knowledge-search-meta" class="knowledge-search-meta">正在載入知識索引...</div>
+</section>
+
+<div class="knowledge-layout">
+  <section class="card knowledge-results-card">
+    <div class="card-header"><h3><i class="fa-solid fa-list"></i> 搜尋結果</h3></div>
+    <div id="knowledge-results" class="knowledge-results">
+      <div class="knowledge-empty">正在整理條目...</div>
+    </div>
+  </section>
+
+  <section class="card knowledge-detail-card">
+    <div id="knowledge-detail" class="knowledge-detail-empty">
+      <i class="fa-solid fa-book-open"></i>
+      <h3>選擇一個條目</h3>
+      <p>先從左側搜尋結果選擇角色或規則條目。</p>
+    </div>
+  </section>
+</div>
+
+<style>
+  .knowledge-header{margin-bottom:1rem}.knowledge-kicker{font-size:.72rem;letter-spacing:.18em;color:var(--accent-gold);font-weight:900}.knowledge-header h2{font-family:'Cinzel',serif;letter-spacing:.08em;margin:.3rem 0}.knowledge-header p{color:var(--text-muted);margin:0;line-height:1.6}.knowledge-search-card{margin-bottom:1.25rem}.knowledge-search-form{display:grid;grid-template-columns:minmax(0,1fr) 180px auto;gap:.75rem;align-items:center}.knowledge-search-box{position:relative}.knowledge-search-box i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-muted)}.knowledge-search-box input{padding-left:2.8rem!important}.knowledge-search-meta{margin-top:.75rem;color:var(--text-muted);font-size:.85rem}.knowledge-layout{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:1.25rem;align-items:start}.knowledge-results{display:flex;flex-direction:column;gap:.55rem;max-height:calc(100vh - 300px);overflow:auto;padding-right:.25rem}.knowledge-result{width:100%;text-align:left;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:inherit;border-radius:10px;padding:.8rem;cursor:pointer}.knowledge-result:hover,.knowledge-result.is-active{border-color:rgba(255,183,3,.4);background:rgba(255,255,255,.065)}.knowledge-result-title{font-weight:900;color:#fff}.knowledge-result-meta{font-size:.74rem;color:var(--text-muted);margin-top:.25rem}.knowledge-type-chip{display:inline-flex;padding:.16rem .45rem;border-radius:999px;background:rgba(124,58,237,.18);color:#d9ccff;font-size:.68rem;margin-right:.4rem}.knowledge-empty,.knowledge-detail-empty{text-align:center;color:var(--text-muted);padding:2.5rem 1rem}.knowledge-detail-empty i{font-size:2rem;color:var(--accent-gold);margin-bottom:.8rem}.knowledge-detail-title{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:1rem}.knowledge-detail-title h2{margin:0;color:#fff;font-size:1.55rem}.knowledge-name-en{color:var(--text-muted);margin-top:.3rem}.knowledge-section{margin-top:1.25rem}.knowledge-section h3{font-size:.82rem;color:var(--accent-gold);letter-spacing:.08em;margin-bottom:.65rem}.knowledge-source-content{white-space:pre-wrap;line-height:1.8;color:var(--text-main);max-height:520px;overflow:auto;padding:1rem;border-radius:10px;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.06)}.knowledge-aliases,.knowledge-relations{display:flex;flex-wrap:wrap;gap:.5rem}.knowledge-alias,.knowledge-relation{padding:.4rem .65rem;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);font-size:.82rem}.knowledge-relation{cursor:pointer;color:#fff}.knowledge-relation:hover{border-color:rgba(255,183,3,.35)}.knowledge-source-link{display:inline-flex;gap:.45rem;align-items:center;color:var(--accent-gold);text-decoration:none;margin-top:.75rem}.knowledge-warning{padding:.75rem 1rem;border-radius:9px;background:rgba(255,183,3,.08);border:1px solid rgba(255,183,3,.2);color:#e7d6a0;font-size:.82rem;line-height:1.6}.knowledge-block{padding:1rem;border-radius:10px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);margin-bottom:.65rem;white-space:pre-wrap;line-height:1.75}@media(max-width:900px){.knowledge-search-form,.knowledge-layout{grid-template-columns:1fr}.knowledge-results{max-height:none}.knowledge-detail-card{min-height:320px}}@media(max-width:640px){.knowledge-search-form .btn{width:100%}.knowledge-detail-title{flex-direction:column}.knowledge-source-content{max-height:none}}
+</style>
+
+<script src="/js/knowledge.js"></script>
