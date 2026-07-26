@@ -6,8 +6,8 @@
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   const typeLabel = (type) => ({ role: '角色', script: '劇本', guide: '指南', mechanic: '規則／機制', article: '文章' }[type] || type || '其他');
-  const blockLabel = (type) => ({ background: '背景故事', ability: '角色能力', rules: '規則說明', reminders: '提示標記', jinx: '相剋規則', interactions: '角色互動', examples: '範例', strategy: '策略', source_excerpt: '原始來源節錄' }[type] || typeLabel(type));
-  const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', rules: 'fa-scale-balanced', reminders: 'fa-tag', jinx: 'fa-link', interactions: 'fa-arrows-left-right', examples: 'fa-lightbulb', strategy: 'fa-chess', source_excerpt: 'fa-box-archive' }[type] || 'fa-note-sticky');
+  const blockLabel = (type) => ({ background: '背景故事', ability: '角色能力', overview: '角色簡介', rules: '規則說明', reminders: '提示標記', jinx: '相剋規則', interactions: '角色互動', examples: '範例', strategy: '提示與技巧', storyteller_advice: '說書人建議', source_excerpt: '原始來源節錄' }[type] || typeLabel(type));
+  const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', overview: 'fa-circle-info', rules: 'fa-scale-balanced', reminders: 'fa-tag', jinx: 'fa-link', interactions: 'fa-arrows-left-right', examples: 'fa-lightbulb', strategy: 'fa-chess', storyteller_advice: 'fa-user-tie', source_excerpt: 'fa-box-archive' }[type] || 'fa-note-sticky');
   const relationGroupOrder = ['role', 'mechanic', 'script', 'guide', 'article', 'other'];
 
   async function requireJson(resp) {
@@ -66,21 +66,86 @@
     }).join('');
   }
 
-  function paragraphs(content) {
-    const clean = String(content || '').trim();
-    if (!clean) return '<p class="knowledge-result-meta">目前沒有內容。</p>';
-    const parts = clean.split(/\n{2,}|(?<=[。！？])\s+(?=[^」』])/).map((part) => part.trim()).filter(Boolean);
-    return parts.map((part) => `<p>${escapeHtml(part)}</p>`).join('');
+  function inlineMarkup(value) {
+    return escapeHtml(value).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  function renderTable(lines) {
+    const rows = lines.map((line) => line.split('|').slice(1, -1).map((cell) => cell.trim()));
+    if (rows.length < 2) return '';
+    const header = rows[0];
+    const body = rows.slice(2);
+    return `<div class="knowledge-table-wrap"><table class="knowledge-table"><thead><tr>${header.map((cell) => `<th>${inlineMarkup(cell)}</th>`).join('')}</tr></thead><tbody>${body.map((row) => `<tr>${row.map((cell) => `<td>${inlineMarkup(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+
+  function structuredText(content) {
+    const lines = String(content || '').replace(/\r/g, '').split('\n');
+    const output = [];
+    let paragraph = [];
+    let listItems = [];
+    let listType = '';
+    let tableLines = [];
+
+    const flushParagraph = () => {
+      if (!paragraph.length) return;
+      output.push(`<p>${inlineMarkup(paragraph.join(' '))}</p>`);
+      paragraph = [];
+    };
+    const flushList = () => {
+      if (!listItems.length) return;
+      const tag = listType === 'ol' ? 'ol' : 'ul';
+      output.push(`<${tag}>${listItems.map((item) => `<li>${inlineMarkup(item)}</li>`).join('')}</${tag}>`);
+      listItems = [];
+      listType = '';
+    };
+    const flushTable = () => {
+      if (!tableLines.length) return;
+      output.push(renderTable(tableLines));
+      tableLines = [];
+    };
+    const flushAll = () => { flushParagraph(); flushList(); flushTable(); };
+
+    lines.forEach((raw) => {
+      const line = raw.trim();
+      if (!line) { flushAll(); return; }
+      if (/^\|.*\|$/.test(line)) {
+        flushParagraph(); flushList(); tableLines.push(line); return;
+      }
+      flushTable();
+      if (line.startsWith('### ')) {
+        flushParagraph(); flushList(); output.push(`<h4>${inlineMarkup(line.slice(4))}</h4>`); return;
+      }
+      if (line.startsWith('> ')) {
+        flushParagraph(); flushList(); output.push(`<blockquote>${inlineMarkup(line.slice(2))}</blockquote>`); return;
+      }
+      const ordered = line.match(/^\d+\.\s+(.+)$/);
+      if (ordered) {
+        flushParagraph();
+        if (listType && listType !== 'ol') flushList();
+        listType = 'ol'; listItems.push(ordered[1]); return;
+      }
+      const bullet = line.match(/^[-•]\s+(.+)$/);
+      if (bullet) {
+        flushParagraph();
+        if (listType && listType !== 'ul') flushList();
+        listType = 'ul'; listItems.push(bullet[1]); return;
+      }
+      flushList();
+      paragraph.push(line);
+    });
+    flushAll();
+    return output.join('') || '<p class="knowledge-result-meta">目前沒有內容。</p>';
   }
 
   function renderBlock(block, index) {
-    const isSource = block.block_type === 'source_excerpt';
+    const baseType = String(block.block_type || '').replace(/_\d+$/, '');
+    const isSource = baseType === 'source_excerpt';
     if (isSource) {
       const key = String(block.id || index);
       const expanded = state.expandedSourceBlocks.has(key);
-      return `<div class="knowledge-block knowledge-block-source"><button type="button" class="knowledge-source-toggle" data-source-block="${escapeHtml(key)}"><span><i class="fa-solid ${blockIcon(block.block_type)}"></i> ${escapeHtml(block.title || blockLabel(block.block_type))}</span><span>${expanded ? '收合' : '展開備查'}</span></button>${expanded ? `<div class="knowledge-block-body">${paragraphs(block.content)}</div>` : '<div class="knowledge-source-note">保留原始來源節錄，供比對與後續人工審核。</div>'}</div>`;
+      return `<div class="knowledge-block knowledge-block-source"><button type="button" class="knowledge-source-toggle" data-source-block="${escapeHtml(key)}"><span><i class="fa-solid ${blockIcon(baseType)}"></i> ${escapeHtml(block.title || blockLabel(baseType))}</span><span>${expanded ? '收合' : '展開備查'}</span></button>${expanded ? `<div class="knowledge-block-body">${structuredText(block.content)}</div>` : '<div class="knowledge-source-note">保留原始來源節錄，供比對與後續人工審核。</div>'}</div>`;
     }
-    return `<article class="knowledge-block knowledge-block-structured"><div class="knowledge-block-heading"><i class="fa-solid ${blockIcon(block.block_type)}"></i><div><strong>${escapeHtml(block.title || blockLabel(block.block_type))}</strong><span>來源整理・待審核</span></div></div><div class="knowledge-block-body">${paragraphs(block.content)}</div></article>`;
+    return `<article class="knowledge-block knowledge-block-structured"><div class="knowledge-block-heading"><i class="fa-solid ${blockIcon(baseType)}"></i><div><strong>${escapeHtml(block.title || blockLabel(baseType))}</strong><span>依原始百科章節整理・待審核</span></div></div><div class="knowledge-block-body">${structuredText(block.content)}</div></article>`;
   }
 
   function bindDetailEvents(detail, node) {
