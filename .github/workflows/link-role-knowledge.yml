@@ -1,0 +1,45 @@
+name: Link Role Knowledge
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Preview or write role/knowledge integration"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - write
+
+permissions:
+  contents: read
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/town-checkin
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Link roles and import supplemental blocks
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.mode }}" = "write" ]; then
+            python scripts/link_roles_to_knowledge.py --write
+          else
+            python scripts/link_roles_to_knowledge.py
+          fi
