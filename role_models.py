@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint, inspect, text
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, inspect, text
 from sqlalchemy.orm import relationship
 
 from database import Base, engine
@@ -33,13 +33,13 @@ class Role(Base):
     aliases = relationship("RoleAlias", back_populates="role", cascade="all, delete-orphan")
     guide = relationship("RoleGuide", back_populates="role", uselist=False, cascade="all, delete-orphan")
     reminders = relationship("RoleReminder", back_populates="role", cascade="all, delete-orphan")
+    content_blocks = relationship("RoleContentBlock", back_populates="role", cascade="all, delete-orphan")
+    knowledge_links = relationship("RoleKnowledgeLink", back_populates="role", cascade="all, delete-orphan")
 
 
 class RoleAlias(Base):
     __tablename__ = "role_aliases"
-    __table_args__ = (
-        UniqueConstraint("source", "external_id", name="uq_role_alias_source_external_id"),
-    )
+    __table_args__ = (UniqueConstraint("source", "external_id", name="uq_role_alias_source_external_id"),)
 
     id = Column(Integer, primary_key=True, index=True)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False, index=True)
@@ -47,7 +47,6 @@ class RoleAlias(Base):
     external_id = Column(String, nullable=False, index=True)
     external_name = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.now)
-
     role = relationship("Role", back_populates="aliases")
 
 
@@ -62,15 +61,12 @@ class RoleGuide(Base):
     common_mistakes = Column(Text, nullable=True)
     advanced_tips = Column(Text, nullable=True)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
     role = relationship("Role", back_populates="guide")
 
 
 class RoleReminder(Base):
     __tablename__ = "role_reminders"
-    __table_args__ = (
-        UniqueConstraint("role_id", "scope", "label_zh_tw", name="uq_role_reminder_role_scope_label"),
-    )
+    __table_args__ = (UniqueConstraint("role_id", "scope", "label_zh_tw", name="uq_role_reminder_role_scope_label"),)
 
     id = Column(Integer, primary_key=True, index=True)
     role_id = Column(Integer, ForeignKey("roles.id"), nullable=False, index=True)
@@ -86,15 +82,51 @@ class RoleReminder(Base):
     needs_review = Column(Boolean, nullable=False, default=False, index=True)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
-
     role = relationship("Role", back_populates="reminders")
 
 
+class RoleContentBlock(Base):
+    __tablename__ = "role_content_blocks"
+    __table_args__ = (UniqueConstraint("role_id", "block_type", "source", "source_key", name="uq_role_content_source_block"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False, index=True)
+    block_type = Column(String(60), nullable=False, index=True)
+    title = Column(String(220), nullable=True)
+    content_format = Column(String(30), nullable=False, default="html")
+    content = Column(Text, nullable=True)
+    audience = Column(String(30), nullable=False, default="encyclopedia", index=True)
+    source = Column(String(60), nullable=False, default="manual", index=True)
+    source_key = Column(String(220), nullable=False, default="manual")
+    source_url = Column(Text, nullable=True)
+    sort_order = Column(Integer, nullable=False, default=0)
+    review_status = Column(String(40), nullable=False, default="needs_review", index=True)
+    is_active = Column(Boolean, nullable=False, default=True, index=True)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    role = relationship("Role", back_populates="content_blocks")
+
+
+class RoleKnowledgeLink(Base):
+    __tablename__ = "role_knowledge_links"
+    __table_args__ = (UniqueConstraint("role_id", "knowledge_node_id", name="uq_role_knowledge_link"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False, index=True)
+    knowledge_node_id = Column(Integer, nullable=False, index=True)
+    match_method = Column(String(50), nullable=False, default="name")
+    confidence = Column(Float, nullable=False, default=1.0)
+    review_status = Column(String(40), nullable=False, default="needs_review", index=True)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    role = relationship("Role", back_populates="knowledge_links")
+
+
 def ensure_role_schema():
-    Base.metadata.create_all(
-        bind=engine,
-        tables=[Role.__table__, RoleAlias.__table__, RoleGuide.__table__, RoleReminder.__table__],
-    )
+    Base.metadata.create_all(bind=engine, tables=[
+        Role.__table__, RoleAlias.__table__, RoleGuide.__table__, RoleReminder.__table__,
+        RoleContentBlock.__table__, RoleKnowledgeLink.__table__,
+    ])
     try:
         inspector = inspect(engine)
         if "role_reminders" not in inspector.get_table_names():
@@ -104,12 +136,8 @@ def ensure_role_schema():
         boolean_default = "FALSE" if dialect == "postgresql" else "0"
         timestamp_type = "TIMESTAMP" if dialect == "postgresql" else "DATETIME"
         additions = {
-            "placement_timing": "TEXT",
-            "placement_condition": "TEXT",
-            "removal_timing": "TEXT",
-            "special_notes": "TEXT",
-            "source_url": "TEXT",
-            "needs_review": f"BOOLEAN DEFAULT {boolean_default}",
+            "placement_timing": "TEXT", "placement_condition": "TEXT", "removal_timing": "TEXT",
+            "special_notes": "TEXT", "source_url": "TEXT", "needs_review": f"BOOLEAN DEFAULT {boolean_default}",
             "updated_at": timestamp_type,
         }
         with engine.begin() as connection:
