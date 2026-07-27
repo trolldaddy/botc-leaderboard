@@ -113,7 +113,6 @@ class MatchPlayer(Base):
         return self.alignment == self.match.winning_team
 
 
-# Register shared schemas before route modules are mounted.
 import knowledge_models  # noqa: E402,F401
 import role_models  # noqa: E402,F401
 
@@ -139,6 +138,7 @@ def _install_town_checkin_router_patch():
             ("knowledge_public_routes", "", "公開知識庫 API"),
             ("role_public_routes", "", "公開角色視圖 API"),
             ("role_admin_routes", "/api/admin", "角色資料庫管理 API"),
+            ("role_content_admin_routes", "/api/admin", "角色內容區塊管理 API"),
             ("role_sync_routes", "/api/admin", "角色資料同步 API"),
             ("role_reminder_routes", "/api/admin", "角色提示標記 API"),
             ("knowledge_admin_routes", "/api/admin", "知識圖譜預覽 API"),
