@@ -15,6 +15,7 @@ from gstone_wiki import fetch_role_reminders  # noqa: E402
 from role_models import Role, RoleAlias, RoleContentBlock, RoleReminder  # noqa: E402
 from role_reminder_merge import (  # noqa: E402
     GSTONE_REMINDER_SOURCE,
+    POCKET_REMINDER_SOURCE,
     PROTECTED_REMINDER_SOURCES,
     automated_canonical,
     find_matching_group,
@@ -54,6 +55,8 @@ def sync(write: bool = False, delay: float = 0.15, limit: int | None = None) -> 
         "updated": 0,
         "protected": 0,
         "duplicates_merged": 0,
+        "pocket_would_remove": 0,
+        "pocket_removed": 0,
         "duplicate_blocks_disabled": 0,
         "failures": [],
         "roles": [],
@@ -127,6 +130,17 @@ def sync(write: bool = False, delay: float = 0.15, limit: int | None = None) -> 
                     item.source = GStone_SOURCE
                     item.source_url = result.get("source_url") or None
                     item.needs_review = True
+
+                remaining_pocket = [
+                    item for item in existing
+                    if normalized_source(item.source) == POCKET_REMINDER_SOURCE
+                ]
+                summary["pocket_would_remove"] += len(remaining_pocket)
+                if write:
+                    for item in remaining_pocket:
+                        db.delete(item)
+                        existing.remove(item)
+                        summary["pocket_removed"] += 1
 
                 if write:
                     duplicate_blocks = db.query(RoleContentBlock).filter(
