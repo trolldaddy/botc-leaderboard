@@ -205,3 +205,11 @@ window.RoleSync = (() => {
   setTimeout(init, 50);
   return { compare, fillEmpty, importReminders, close };
 })();
+
+(() => {
+  if (document.querySelector('script[data-role-reminder-merge]')) return;
+  const script = document.createElement('script');
+  script.src = '/js/role_admin_reminder_merge.js';
+  script.dataset.roleReminderMerge = '1';
+  document.head.appendChild(script);
+})();
