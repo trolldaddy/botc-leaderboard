@@ -32,13 +32,13 @@ def is_protected_reminder(reminder: RoleReminder) -> bool:
 
 
 def reminder_source_priority(reminder: RoleReminder) -> tuple[int, int]:
-    """Manual data wins display conflicts; GStone wins automated conflicts."""
+    """GStone is canonical; local/manual data is fallback when GStone is absent."""
     source = normalized_source(reminder.source)
     priority = {
+        GSTONE_REMINDER_SOURCE: 500,
         "larplus": 400,
         "manual": 390,
-        GSTONE_REMINDER_SOURCE: 300,
-        POCKET_REMINDER_SOURCE: 200,
+        POCKET_REMINDER_SOURCE: -1,
     }.get(source, 100)
     return priority, int(reminder.id or 0)
 
@@ -56,9 +56,13 @@ def group_reminders(reminders: Iterable[RoleReminder]) -> dict[tuple[str, str], 
 
 def preferred_reminders(reminders: Iterable[RoleReminder]) -> list[RoleReminder]:
     """Return one visible reminder per scope/label without mutating the database."""
+    eligible = [
+        item for item in reminders
+        if normalized_source(item.source) != POCKET_REMINDER_SOURCE
+    ]
     selected = [
         max(group, key=reminder_source_priority)
-        for group in group_reminders(reminders).values()
+        for group in group_reminders(eligible).values()
         if group
     ]
     return sorted(selected, key=lambda item: (item.scope or "role", item.sort_order, item.id or 0))
