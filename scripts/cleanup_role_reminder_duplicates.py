@@ -12,6 +12,8 @@ if str(ROOT) not in sys.path:
 from database import SessionLocal  # noqa: E402
 from role_models import Role, RoleReminder  # noqa: E402
 from role_reminder_merge import (  # noqa: E402
+    GSTONE_REMINDER_SOURCE,
+    POCKET_REMINDER_SOURCE,
     automated_canonical,
     group_reminders,
     normalized_source,
@@ -41,14 +43,23 @@ def cleanup(write: bool = False) -> dict:
                 .all()
             )
             for (scope, normalized_label), group in group_reminders(reminders).items():
-                if len(group) < 2:
-                    continue
+                sources = [normalized_source(item.source) for item in group]
+                pocket_rows = [
+                    item for item in group
+                    if normalized_source(item.source) == POCKET_REMINDER_SOURCE
+                ]
                 redundant = redundant_automated_reminders(group)
+                if GSTONE_REMINDER_SOURCE not in sources:
+                    redundant = list({item.id: item for item in [*redundant, *pocket_rows]}.values())
+                if len(group) < 2 and not redundant:
+                    continue
                 protected = [
                     item for item in group
                     if normalized_source(item.source) in {"larplus", "manual"}
                 ]
                 canonical = automated_canonical(group)
+                if canonical and normalized_source(canonical.source) == POCKET_REMINDER_SOURCE:
+                    canonical = None
                 result["duplicate_groups"] += 1
                 result["protected_rows_preserved"] += len(protected)
                 result["would_delete"] += len(redundant)
@@ -79,7 +90,7 @@ def cleanup(write: bool = False) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Remove duplicate automated role reminders using GStone-over-Pocket precedence."
+        description="Remove Pocket reminders and duplicate automated rows; GStone is canonical."
     )
     parser.add_argument("--write", action="store_true", help="Commit cleanup changes.")
     args = parser.parse_args()
