@@ -3,9 +3,12 @@ from __future__ import annotations
 import re
 import unicodedata
 from collections import defaultdict
-from typing import Iterable
+from typing import TYPE_CHECKING, Any, Iterable
 
-from role_models import RoleReminder
+if TYPE_CHECKING:
+    from role_models import RoleReminder
+else:
+    RoleReminder = Any
 
 
 PROTECTED_REMINDER_SOURCES = {"larplus", "manual"}
