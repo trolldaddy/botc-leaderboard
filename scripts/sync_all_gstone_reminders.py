@@ -95,11 +95,12 @@ def sync(write: bool = False, delay: float = 0.15, limit: int | None = None) -> 
                     item = automated_canonical(group)
                     action = "update" if item else "create"
                     if protected_items:
-                        action = "protected"
-                        summary["protected"] += 1
-                    elif item:
+                        summary["protected"] += len(protected_items)
+                        if item is None:
+                            action = "protected"
+                    if action == "update":
                         summary["would_update"] += 1
-                    else:
+                    elif action == "create":
                         summary["would_create"] += 1
 
                     role_result["reminders"].append({"label": label, "action": action})
