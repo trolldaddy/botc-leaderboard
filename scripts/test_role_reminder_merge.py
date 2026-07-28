@@ -28,12 +28,20 @@ class RoleReminderMergeTests(unittest.TestCase):
         self.assertEqual(preferred_reminders([pocket, gstone]), [gstone])
         self.assertEqual(redundant_automated_reminders([pocket, gstone]), [pocket])
 
-    def test_manual_is_visible_and_never_cleanup_target(self):
+    def test_gstone_wins_over_manual_for_the_same_label(self):
         pocket = Reminder(1, "已選擇", "pocket_grimoire")
         gstone = Reminder(2, "已選擇", "gstone_official_wiki")
         manual = Reminder(3, "已選擇", "manual")
-        self.assertEqual(preferred_reminders([pocket, gstone, manual]), [manual])
+        self.assertEqual(preferred_reminders([pocket, gstone, manual]), [gstone])
         self.assertEqual(redundant_automated_reminders([pocket, gstone, manual]), [pocket])
+
+    def test_pocket_is_never_visible(self):
+        pocket = Reminder(1, "下回死亡", "pocket_grimoire")
+        self.assertEqual(preferred_reminders([pocket]), [])
+
+    def test_manual_remains_a_fallback_when_gstone_is_absent(self):
+        manual = Reminder(1, "店內裁定", "manual")
+        self.assertEqual(preferred_reminders([manual]), [manual])
 
 
 if __name__ == "__main__":
