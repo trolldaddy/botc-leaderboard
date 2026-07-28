@@ -3,6 +3,61 @@
   const esc = (value) => String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
   const apiBase = () => window.API_BASE || '';
 
+  const installStableLayout = () => {
+    if (document.getElementById('role-admin-stable-layout')) return;
+    const style = document.createElement('style');
+    style.id = 'role-admin-stable-layout';
+    style.textContent = `
+      html { scrollbar-gutter: stable; }
+      .role-admin-layout {
+        grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) !important;
+      }
+      .role-admin-list,
+      .role-admin-editor,
+      .role-admin-editor > *,
+      .ia-pane,
+      .role-content-list,
+      .role-content-card,
+      .role-content-grid,
+      .ia-display-section,
+      .ia-display-row { min-width: 0; }
+      .role-admin-editor {
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+        contain: inline-size;
+      }
+      .ia-tabs {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        width: 100%;
+        max-width: 100%;
+        gap: .45rem;
+      }
+      .ia-tabs button {
+        width: 100%;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ia-pane { width: 100%; max-width: 100%; }
+      .role-content-grid input,
+      .role-content-grid textarea,
+      .role-content-grid select { min-width: 0; max-width: 100%; }
+      .ia-display-row > div { min-width: 0; overflow-wrap: anywhere; }
+      @media (max-width: 1100px) {
+        .role-admin-layout { grid-template-columns: 1fr !important; }
+      }
+      @media (max-width: 640px) {
+        .ia-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .ia-tabs button { white-space: normal; min-height: 46px; }
+      }
+    `;
+    document.head.appendChild(style);
+  };
+  installStableLayout();
+
   const request = async (path, options = {}) => {
     const response = await fetch(`${apiBase()}${path}`, {
       credentials: 'same-origin',
