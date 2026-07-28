@@ -6,6 +6,15 @@ from account_binding_routes import require_admin_account
 from database import get_db
 from gstone_wiki import fetch_role_reminders
 from role_models import Role, RoleReminder
+from role_reminder_merge import (
+    GSTONE_REMINDER_SOURCE,
+    PROTECTED_REMINDER_SOURCES,
+    automated_canonical,
+    find_matching_group,
+    normalized_source,
+    preferred_reminders,
+    redundant_automated_reminders,
+)
 
 router = APIRouter(prefix="/role-reminders", tags=["role-reminders"])
 
@@ -33,7 +42,7 @@ def list_reminders(role_id: int, db: Session = Depends(get_db), admin: models.St
     if not role:
         raise HTTPException(status_code=404, detail="找不到角色")
     items = db.query(RoleReminder).filter(RoleReminder.role_id == role_id).order_by(RoleReminder.scope.asc(), RoleReminder.sort_order.asc(), RoleReminder.id.asc()).all()
-    return [serialize(item) for item in items]
+    return [serialize(item) for item in preferred_reminders(items)]
 
 
 @router.post("/{role_id}/gstone-preview")
@@ -57,28 +66,50 @@ def gstone_apply(role_id: int, data: dict, db: Session = Depends(get_db), admin:
         raise HTTPException(status_code=404, detail="找不到角色")
     reminders = data.get("reminders") or []
     source_url = str(data.get("source_url") or "").strip() or None
-    created = updated = 0
+    created = updated = merged = protected = 0
+    existing = db.query(RoleReminder).filter(RoleReminder.role_id == role.id).order_by(RoleReminder.id).all()
     for index, incoming in enumerate(reminders):
         label = str(incoming.get("label") or incoming.get("label_zh_tw") or "").strip()
         if not label:
             continue
-        item = db.query(RoleReminder).filter(RoleReminder.role_id == role.id, RoleReminder.scope == "role", RoleReminder.label_zh_tw == label).first()
+        group = find_matching_group(existing, label, scope="role")
+        protected_items = [
+            item for item in group
+            if normalized_source(item.source) in PROTECTED_REMINDER_SOURCES
+        ]
+        if protected_items:
+            protected += 1
+            continue
+        item = automated_canonical(group)
         if not item:
             item = RoleReminder(role_id=role.id, label_zh_tw=label, scope="role")
             db.add(item)
+            existing.append(item)
             created += 1
         else:
             updated += 1
+        for duplicate in redundant_automated_reminders(group):
+            db.delete(duplicate)
+            if duplicate in existing:
+                existing.remove(duplicate)
+            merged += 1
+        item.label_zh_tw = label
         item.sort_order = index
         item.placement_timing = incoming.get("placement_timing") or None
         item.placement_condition = incoming.get("placement_condition") or None
         item.removal_timing = incoming.get("removal_timing") or None
         item.special_notes = incoming.get("special_notes") or None
-        item.source = "gstone_official_wiki"
+        item.source = GSTONE_REMINDER_SOURCE
         item.source_url = source_url
         item.needs_review = True
     db.commit()
-    return {"status": "success", "created": created, "updated": updated}
+    return {
+        "status": "success",
+        "created": created,
+        "updated": updated,
+        "merged": merged,
+        "protected": protected,
+    }
 
 
 @router.patch("/{role_id}/{reminder_id}")
