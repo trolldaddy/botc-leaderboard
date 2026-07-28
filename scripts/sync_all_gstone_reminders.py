@@ -13,9 +13,17 @@ if str(ROOT) not in sys.path:
 from database import SessionLocal  # noqa: E402
 from gstone_wiki import fetch_role_reminders  # noqa: E402
 from role_models import Role, RoleAlias, RoleContentBlock, RoleReminder  # noqa: E402
+from role_reminder_merge import (  # noqa: E402
+    GSTONE_REMINDER_SOURCE,
+    PROTECTED_REMINDER_SOURCES,
+    automated_canonical,
+    find_matching_group,
+    normalized_source,
+    redundant_automated_reminders,
+)
 
-PROTECTED_SOURCES = {"manual", "larplus"}
-GStone_SOURCE = "gstone_official_wiki"
+PROTECTED_SOURCES = PROTECTED_REMINDER_SOURCES
+GStone_SOURCE = GSTONE_REMINDER_SOURCE
 
 
 def role_aliases(role: Role) -> list[str]:
@@ -45,6 +53,7 @@ def sync(write: bool = False, delay: float = 0.15, limit: int | None = None) -> 
         "created": 0,
         "updated": 0,
         "protected": 0,
+        "duplicates_merged": 0,
         "duplicate_blocks_disabled": 0,
         "failures": [],
         "roles": [],
@@ -70,18 +79,22 @@ def sync(write: bool = False, delay: float = 0.15, limit: int | None = None) -> 
                 role_result["resolution_method"] = result.get("resolution_method")
                 if not reminders:
                     summary["pages_without_reminders"] += 1
+                existing = db.query(RoleReminder).filter(
+                    RoleReminder.role_id == role.id
+                ).order_by(RoleReminder.id).all()
                 for index, incoming in enumerate(reminders):
                     label = str(incoming.get("label") or incoming.get("label_zh_tw") or "").strip()
                     if not label:
                         continue
                     summary["reminders_found"] += 1
-                    item = db.query(RoleReminder).filter(
-                        RoleReminder.role_id == role.id,
-                        RoleReminder.scope == "role",
-                        RoleReminder.label_zh_tw == label,
-                    ).first()
+                    group = find_matching_group(existing, label, scope="role")
+                    protected_items = [
+                        item for item in group
+                        if normalized_source(item.source) in PROTECTED_SOURCES
+                    ]
+                    item = automated_canonical(group)
                     action = "update" if item else "create"
-                    if item and (item.source or "").strip().lower() in PROTECTED_SOURCES:
+                    if protected_items:
                         action = "protected"
                         summary["protected"] += 1
                     elif item:
@@ -95,9 +108,16 @@ def sync(write: bool = False, delay: float = 0.15, limit: int | None = None) -> 
                     if not item:
                         item = RoleReminder(role_id=role.id, label_zh_tw=label, scope="role")
                         db.add(item)
+                        existing.append(item)
                         summary["created"] += 1
                     else:
                         summary["updated"] += 1
+                    for duplicate in redundant_automated_reminders(group):
+                        db.delete(duplicate)
+                        if duplicate in existing:
+                            existing.remove(duplicate)
+                        summary["duplicates_merged"] += 1
+                    item.label_zh_tw = label
                     item.sort_order = index
                     item.placement_timing = incoming.get("placement_timing") or None
                     item.placement_condition = incoming.get("placement_condition") or None
