@@ -8,9 +8,20 @@
     const style = document.createElement('style');
     style.id = 'role-admin-stable-layout';
     style.textContent = `
+      html, body { max-width: 100%; overflow-x: hidden; }
       html { scrollbar-gutter: stable; }
+      .role-admin-shell,
+      .role-sync-panel {
+        width: min(100%, 1500px) !important;
+        max-width: calc(100vw - 2rem) !important;
+        margin-inline: auto !important;
+      }
       .role-admin-layout {
-        grid-template-columns: minmax(300px, 360px) minmax(0, 1fr) !important;
+        display: grid !important;
+        grid-template-columns: clamp(220px, 20vw, 290px) minmax(0, 1fr) !important;
+        width: 100%;
+        max-width: 100%;
+        gap: 1rem;
       }
       .role-admin-list,
       .role-admin-editor,
@@ -20,38 +31,56 @@
       .role-content-card,
       .role-content-grid,
       .ia-display-section,
-      .ia-display-row { min-width: 0; }
+      .ia-display-row { min-width: 0; max-width: 100%; }
       .role-admin-editor {
         width: 100%;
-        max-width: 100%;
         overflow-x: hidden;
-        contain: inline-size;
       }
       .ia-tabs {
         display: grid !important;
         grid-template-columns: repeat(4, minmax(0, 1fr));
         width: 100%;
-        max-width: 100%;
-        gap: .45rem;
+        gap: .5rem;
+        margin: 0 0 1rem;
       }
       .ia-tabs button {
         width: 100%;
         min-width: 0;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        min-height: 46px;
+        padding: .7rem .45rem;
+        white-space: normal;
+        line-height: 1.25;
+        text-align: center;
       }
-      .ia-pane { width: 100%; max-width: 100%; }
+      .ia-pane { display: none !important; width: 100%; }
+      .ia-pane.active { display: block !important; }
+      .role-editor-grid,
+      .role-content-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
       .role-content-grid input,
       .role-content-grid textarea,
-      .role-content-grid select { min-width: 0; max-width: 100%; }
+      .role-content-grid select,
+      .role-editor-grid input,
+      .role-editor-grid textarea,
+      .role-editor-grid select { min-width: 0; max-width: 100%; }
       .ia-display-row > div { min-width: 0; overflow-wrap: anywhere; }
-      @media (max-width: 1100px) {
+      .role-admin-toolbar { width: 100%; max-width: 100%; }
+      @media (max-width: 1180px) {
+        .role-admin-layout { grid-template-columns: 230px minmax(0, 1fr) !important; }
+        .ia-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 900px) {
+        .role-admin-shell,
+        .role-sync-panel { max-width: calc(100vw - 1rem) !important; }
         .role-admin-layout { grid-template-columns: 1fr !important; }
+        .role-admin-list { max-height: 34vh !important; }
       }
       @media (max-width: 640px) {
+        .role-editor-grid,
+        .role-content-grid { grid-template-columns: 1fr !important; }
+        .role-editor-grid .wide,
+        .role-content-grid .wide { grid-column: auto !important; }
         .ia-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .ia-tabs button { white-space: normal; min-height: 46px; }
+        .ia-tabs button { min-height: 44px; font-size: .9rem; }
       }
     `;
     document.head.appendChild(style);
