@@ -51,18 +51,7 @@ window.RoleSync = (() => {
       button.addEventListener('click', fillEmpty);
       toolbar.appendChild(button);
     }
-
-    if (!$('role-sync-import-reminders')) {
-      const button = document.createElement('button');
-      button.id = 'role-sync-import-reminders';
-      button.type = 'button';
-      button.className = 'btn btn-outline';
-      button.innerHTML = '<i class="fa-solid fa-tags"></i> 匯入提示標記';
-      button.addEventListener('click', importReminders);
-      toolbar.appendChild(button);
-    }
-
-    toolbar.style.gridTemplateColumns = 'minmax(240px,1fr) 220px auto auto';
+    toolbar.style.gridTemplateColumns = 'minmax(240px,1fr) 220px auto';
   };
 
   const renderSummary = () => {
@@ -115,7 +104,6 @@ window.RoleSync = (() => {
         </summary>
         <div class="role-sync-row-body">
           ${renderDiff(row)}
-          ${(row.incoming?.reminders?.length || row.incoming?.reminders_global?.length) ? `<div class="role-sync-token-box"><strong>提示標記</strong><div>角色 Token：${escapeHtml((row.incoming.reminders || []).join('、') || '無')}</div><div>全域 Token：${escapeHtml((row.incoming.reminders_global || []).join('、') || '無')}</div></div>` : ''}
         </div>
       </details>`;
     }).join('');
@@ -166,30 +154,6 @@ window.RoleSync = (() => {
       if (window.RoleAdmin?.refresh) await window.RoleAdmin.refresh();
     } catch (err) {
       setStatus(`補齊失敗：${err.message}`, true);
-    } finally {
-      if (button) button.disabled = false;
-    }
-  }
-
-  async function importReminders() {
-    if (!result) return setStatus('請先執行一次比對。', true);
-    if (!confirm('將把 Pocket Grimoire 的角色提示標記與全域提示標記加入正式資料表。\n\n只新增不存在的項目，不刪除、不覆蓋既有標記。確定繼續嗎？')) return;
-    const button = $('role-sync-import-reminders');
-    if (button) button.disabled = true;
-    setStatus('正在匯入提示標記，既有資料不會被改動...');
-    try {
-      const data = await request('/api/admin/role-sync/pocket-grimoire/import-reminders');
-      alert([
-        '提示標記匯入完成',
-        `角色提示標記新增：${data.added_role_reminders || 0}`,
-        `全域提示標記新增：${data.added_global_reminders || 0}`,
-        `重複略過：${data.skipped_duplicates || 0}`,
-        `成功配對角色：${data.matched_roles || 0}`,
-        `無角色對應：${data.missing_roles || 0}`,
-      ].join('\n'));
-      setStatus(`提示標記匯入完成：新增 ${(data.added_role_reminders || 0) + (data.added_global_reminders || 0)} 筆。`);
-    } catch (err) {
-      setStatus(`提示標記匯入失敗：${err.message}`, true);
     } finally {
       if (button) button.disabled = false;
     }
