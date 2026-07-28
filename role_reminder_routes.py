@@ -77,10 +77,11 @@ def gstone_apply(role_id: int, data: dict, db: Session = Depends(get_db), admin:
             item for item in group
             if normalized_source(item.source) in PROTECTED_REMINDER_SOURCES
         ]
-        if protected_items:
-            protected += 1
-            continue
         item = automated_canonical(group)
+        if protected_items:
+            protected += len(protected_items)
+            if item is None:
+                continue
         if not item:
             item = RoleReminder(role_id=role.id, label_zh_tw=label, scope="role")
             db.add(item)
