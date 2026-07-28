@@ -1,0 +1,51 @@
+name: Sync All GStone Reminders
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Preview or write all GStone reminder tokens"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - write
+      delay:
+        description: "Delay between GStone requests in seconds"
+        required: false
+        default: "0.15"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/town-checkin
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Sync all GStone reminder tokens
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.mode }}" = "write" ]; then
+            python scripts/sync_all_gstone_reminders.py --write --delay "${{ inputs.delay }}"
+          else
+            python scripts/sync_all_gstone_reminders.py --delay "${{ inputs.delay }}"
+          fi
