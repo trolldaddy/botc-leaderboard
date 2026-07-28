@@ -1,0 +1,45 @@
+name: Cleanup Role Reminder Duplicates
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Preview or write reminder cleanup"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - write
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/town-checkin
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Cleanup duplicate reminder tokens
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.mode }}" = "write" ]; then
+            python scripts/cleanup_role_reminder_duplicates.py --write
+          else
+            python scripts/cleanup_role_reminder_duplicates.py
+          fi
