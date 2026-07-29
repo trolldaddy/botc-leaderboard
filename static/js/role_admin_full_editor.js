@@ -266,7 +266,7 @@
     const infoCard = document.createElement('article');
     infoCard.className = 'role-identity-card';
     infoCard.innerHTML = `
-      <div class="role-identity-main">${iconUrl ? `<img src="${esc(iconUrl)}" alt="">` : '<div class="role-identity-icon"></div>'}<div><h4>${esc(roleName)}${englishName ? `<span>${esc(englishName)}</span>` : ''}</h4><div class="role-identity-tags"><span>${esc(teamName)}</span>${scripts.map((item)=>`<span>${esc(item)}</span>`).join('') || '<span>尚未設定劇本</span>'}</div><div class="role-ability-tags">${abilityTags.map((item)=>`<a href="#knowledge/${encodeURIComponent(item)}">${esc(item)}</a>`).join('') || '<span class="empty">尚未設定能力類型</span>'}</div></div></div>
+      <div class="role-identity-main">${iconUrl ? `<img src="${esc(iconUrl)}" alt="">` : '<div class="role-identity-icon"></div>'}<div><h4>${esc(roleName)}${englishName ? `<span>${esc(englishName)}</span>` : ''}</h4><div class="role-identity-tags"><span>${esc(teamName)}</span>${scripts.map((item)=>`<span>${esc(item)}</span>`).join('') || '<span>待百科同步劇本</span>'}</div><div class="role-ability-tags">${abilityTags.map((item)=>`<a href="#knowledge/${encodeURIComponent(item)}">${esc(item)}</a>`).join('') || '<span class="empty">待百科同步能力類型</span>'}</div></div></div>
       <div class="role-reference-links">${references}${externalSource ? `<a href="${esc(externalSource)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> GStone 原始資料</a>` : ''}</div>`;
 
     const core = document.createElement('section'); core.className='ia-pane active'; core.dataset.iaPane='content';

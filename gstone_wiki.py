@@ -203,3 +203,65 @@ def fetch_role_reminders(title: str, aliases: Optional[List[str]] = None) -> Dic
         "http_status": article["status"],
         **parsed,
     }
+
+
+def parse_role_information(html: str) -> Dict[str, Any]:
+    """Extract the structured role information section from a GStone role article."""
+    soup = BeautifulSoup(html, "html.parser")
+    heading = None
+    for candidate in soup.find_all(["h2", "h3", "h4", "h5"]):
+        text = to_traditional(candidate.get_text(" ", strip=True))
+        text = re.sub(r"\[[^\]]+\]", "", text).strip()
+        if text in {"角色資訊", "角色信息"}:
+            heading = candidate
+            break
+    empty = {"found": False, "english_name": "", "script_names": [], "role_type": "", "ability_tags": []}
+    if not heading:
+        return empty
+
+    values: Dict[str, List[str]] = {}
+    for node in _section_nodes(heading):
+        for item in node.find_all("li"):
+            text = to_traditional(item.get_text(" ", strip=True))
+            match = re.match(r"^([^：:]+)[：:]\s*(.*)$", text)
+            if not match:
+                continue
+            label = clean_text(match.group(1))
+            value = clean_text(match.group(2))
+            links = [to_traditional(link.get_text(" ", strip=True)) for link in item.find_all("a") if clean_text(link.get_text(" ", strip=True))]
+            values[label] = links or [clean_text(part) for part in re.split(r"[、,，/]", value) if clean_text(part)]
+
+    def first(*labels: str) -> str:
+        for label in labels:
+            if values.get(label):
+                return values[label][0]
+        return ""
+
+    def many(*labels: str) -> List[str]:
+        for label in labels:
+            if values.get(label):
+                return list(dict.fromkeys(values[label]))
+        return []
+
+    return {
+        "found": True,
+        "english_name": first("英文名", "英文名稱"),
+        "script_names": many("所屬劇本", "所属剧本"),
+        "role_type": first("角色型別", "角色類型", "角色类型"),
+        "ability_tags": many("角色能力型別", "角色能力類型", "角色能力类型"),
+    }
+
+
+def fetch_role_information(title: str, aliases: Optional[List[str]] = None) -> Dict[str, Any]:
+    article = fetch_article(title, aliases=aliases)
+    parsed = parse_role_information(article["html"])
+    return {
+        "title": article["title"],
+        "resolved_title": article["resolved_title"],
+        "resolution_method": article["resolution_method"],
+        "attempts": article["attempts"],
+        "source": "GStone 官方鐘樓百科",
+        "source_url": article["url"],
+        "http_status": article["status"],
+        **parsed,
+    }
