@@ -1,5 +1,6 @@
 import argparse
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -14,22 +15,28 @@ from database import SessionLocal
 from knowledge_models import KnowledgeAlias, KnowledgeBlock, KnowledgeNode, KnowledgeSourceRecord
 from role_models import Role, RoleContentBlock, RoleKnowledgeLink
 
-TARGET_NAMES = ["小惡魔", "酒鬼", "洗腦師"]
-SKIP_BLOCK_TYPES = {"ability", "source_excerpt"}
+TARGET_NAMES = ["小惡魔", "洗腦師", "賭徒"]
+SKIP_BLOCK_TYPES = {"ability", "reminders", "source_excerpt"}
 AUDIENCE_BY_TYPE = {
     "background": "encyclopedia",
     "intro": "player",
-    "rules": "encyclopedia",
+    "overview": "encyclopedia",
+    "how_it_works": "encyclopedia",
     "rules_detail": "encyclopedia",
     "examples": "encyclopedia",
-    "strategy": "encyclopedia",
-    "interactions": "encyclopedia",
-    "jinx": "encyclopedia",
+    "strategy_play": "encyclopedia",
+    "strategy_bluff": "encyclopedia",
+    "strategy_counter": "encyclopedia",
+    "rules_interactions": "encyclopedia",
+    "rules_jinx": "encyclopedia",
     "common_mistakes": "storyteller",
     "storyteller_advice": "storyteller",
     "reminders": "storyteller",
 }
 
+
+def base_block_type(block_type: str) -> str:
+    return re.sub(r"_\d+$", "", block_type or "")
 
 def find_role(db: Session, name: str):
     role = db.query(Role).filter(func.lower(Role.name_zh_tw) == name.lower()).first()
@@ -70,6 +77,7 @@ def run(write: bool):
         "blocks_created": 0,
         "blocks_updated": 0,
         "blocks_skipped": 0,
+        "blocks_deactivated": 0,
         "missing_roles": [],
         "missing_nodes": [],
         "matches": [],
@@ -117,11 +125,14 @@ def run(write: bool):
                 KnowledgeBlock.visibility.in_(["public", "published"]),
             ).order_by(KnowledgeBlock.sort_order, KnowledgeBlock.id).all()
 
+            active_source_keys = set()
             for kb in blocks:
-                if kb.block_type in SKIP_BLOCK_TYPES or not (kb.content or "").strip():
+                base_type = base_block_type(kb.block_type)
+                if base_type in SKIP_BLOCK_TYPES or not (kb.content or "").strip():
                     stats["blocks_skipped"] += 1
                     continue
                 source_key = f"knowledge:{node.id}:{kb.block_type}"
+                active_source_keys.add(source_key)
                 target = db.query(RoleContentBlock).filter(
                     RoleContentBlock.role_id == role.id,
                     RoleContentBlock.source == "gstone_wiki",
@@ -137,11 +148,20 @@ def run(write: bool):
                 target.title = kb.title
                 target.content_format = kb.content_format or "html"
                 target.content = kb.content
-                target.audience = AUDIENCE_BY_TYPE.get(kb.block_type, "encyclopedia")
+                target.audience = AUDIENCE_BY_TYPE.get(base_type, "encyclopedia")
                 target.source_url = source_url
                 target.sort_order = kb.sort_order or 0
                 target.review_status = kb.review_status or "needs_review"
                 target.is_active = True
+            stale_blocks = db.query(RoleContentBlock).filter(
+                RoleContentBlock.role_id == role.id,
+                RoleContentBlock.source == "gstone_wiki",
+                RoleContentBlock.source_key.like(f"knowledge:{node.id}:%"),
+            ).all()
+            for stale in stale_blocks:
+                if stale.source_key not in active_source_keys and stale.is_active:
+                    stale.is_active = False
+                    stats["blocks_deactivated"] += 1
 
         if write:
             db.commit()

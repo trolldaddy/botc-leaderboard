@@ -6,8 +6,8 @@
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   const typeLabel = (type) => ({ role: '角色', script: '劇本', guide: '指南', mechanic: '規則／機制', article: '文章' }[type] || type || '其他');
-  const blockLabel = (type) => ({ background: '背景故事', ability: '角色能力', overview: '角色簡介', rules: '規則說明', reminders: '提示標記', jinx: '相剋規則', interactions: '角色互動', examples: '範例', strategy: '提示與技巧', storyteller_advice: '說書人建議', source_excerpt: '原始來源節錄' }[type] || typeLabel(type));
-  const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', overview: 'fa-circle-info', rules: 'fa-scale-balanced', reminders: 'fa-tag', jinx: 'fa-link', interactions: 'fa-arrows-left-right', examples: 'fa-lightbulb', strategy: 'fa-chess', storyteller_advice: 'fa-user-tie', source_excerpt: 'fa-box-archive' }[type] || 'fa-note-sticky');
+  const blockLabel = (type) => ({ background: '背景故事', ability: '角色能力', overview: '角色簡介', how_it_works: '運作方式', rules_detail: '規則細節', rules_interactions: '角色互動', rules_jinx: '相剋規則', reminders: '提示標記', examples: '範例', strategy_play: '如何遊玩', strategy_bluff: '如何偽裝', strategy_counter: '如何對抗', storyteller_advice: '說書人建議', source_excerpt: '原始來源節錄' }[type] || typeLabel(type));
+  const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', overview: 'fa-circle-info', how_it_works: 'fa-gears', rules_detail: 'fa-scale-balanced', rules_interactions: 'fa-arrows-left-right', rules_jinx: 'fa-link', reminders: 'fa-tag', examples: 'fa-lightbulb', strategy_play: 'fa-chess', strategy_bluff: 'fa-masks-theater', strategy_counter: 'fa-shield-halved', storyteller_advice: 'fa-user-tie', source_excerpt: 'fa-box-archive' }[type] || 'fa-note-sticky');
   const relationGroupOrder = ['role', 'mechanic', 'script', 'guide', 'article', 'other'];
 
   async function requireJson(resp) {

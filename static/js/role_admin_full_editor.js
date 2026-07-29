@@ -100,9 +100,11 @@
   };
 
   const labelForType = (type) => ({
-    background:'背景故事', ability:'角色能力補充', rules_detail:'規則細節', rules:'規則說明',
-    examples:'範例', common_mistakes:'常見誤解', strategy:'策略', storyteller_advice:'說書人建議',
-    jinx:'相剋規則', interactions:'角色互動', player_summary:'玩家摘要', reminders:'提示標記說明',
+    background:'背景故事', ability:'角色能力補充', overview:'角色簡介', how_it_works:'運作方式',
+    rules_detail:'規則細節', rules_interactions:'角色互動', rules_jinx:'相剋規則',
+    examples:'範例', common_mistakes:'常見誤解', strategy_play:'如何遊玩',
+    strategy_bluff:'如何偽裝', strategy_counter:'如何對抗', storyteller_advice:'說書人建議',
+    player_summary:'玩家摘要', reminders:'提示標記說明',
     custom_note:'自訂內容', source_excerpt:'來源節錄',
   }[type] || type || '未分類');
 

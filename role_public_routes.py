@@ -1,9 +1,11 @@
+import re
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, or_
 from sqlalchemy.orm import Session, joinedload
 
 from database import get_db
-from role_models import Role, RoleAlias, RoleContentBlock, RoleGuide, RoleReminder
+from knowledge_models import KnowledgeNode, KnowledgeSourceRecord
+from role_models import Role, RoleAlias, RoleContentBlock, RoleGuide, RoleKnowledgeLink, RoleReminder
 
 router = APIRouter(prefix="/api/roles", tags=["roles-public"])
 VALID_VIEWS = {"player", "encyclopedia", "storyteller"}
@@ -58,6 +60,36 @@ def serialize_reminder(reminder: RoleReminder):
         "needs_review": bool(reminder.needs_review),
     }
 
+
+def serialize_content_groups(blocks: list[RoleContentBlock]):
+    strategy_types = {"strategy_play", "strategy_bluff", "strategy_counter"}
+    rules_types = {"rules_detail", "rules_interactions", "rules_jinx"}
+    return {
+        "strategy": [serialize_block(block) for block in blocks if re.sub(r"_\d+$", "", block.block_type or "") in strategy_types],
+        "rules_detail": [serialize_block(block) for block in blocks if re.sub(r"_\d+$", "", block.block_type or "") in rules_types],
+    }
+
+
+def role_references(db: Session, role_id: int):
+    links = db.query(RoleKnowledgeLink).filter(RoleKnowledgeLink.role_id == role_id).all()
+    references = []
+    for link in links:
+        node = db.query(KnowledgeNode).filter(KnowledgeNode.id == link.knowledge_node_id).first()
+        if not node:
+            continue
+        source_record = db.query(KnowledgeSourceRecord).filter(
+            KnowledgeSourceRecord.node_id == node.id
+        ).order_by(KnowledgeSourceRecord.fetched_at.desc(), KnowledgeSourceRecord.id.desc()).first()
+        if not source_record or not source_record.source_url:
+            continue
+        references.append({
+            "type": "wiki",
+            "label": "GStone 鐘樓百科",
+            "url": source_record.source_url,
+            "knowledge_slug": node.slug,
+            "knowledge_name": node.canonical_name_zh_tw,
+        })
+    return references
 
 def find_role(db: Session, key: str):
     role = db.query(Role).filter(func.lower(Role.canonical_key) == key.lower()).first()
@@ -120,6 +152,8 @@ def get_role_view(key: str, view: str = Query(default="player"), db: Session = D
         RoleContentBlock.audience.in_(VIEW_AUDIENCES[view]),
     ).order_by(RoleContentBlock.sort_order, RoleContentBlock.id).all()
     payload["content_blocks"] = [serialize_block(block) for block in blocks]
+    payload["content_groups"] = serialize_content_groups(blocks)
+    payload["references"] = role_references(db, role.id)
 
     guide = db.query(RoleGuide).filter(RoleGuide.role_id == role.id).first()
     if guide:

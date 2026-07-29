@@ -16,28 +16,37 @@ from database import SessionLocal
 from gstone_wiki import HEADERS, to_traditional
 from knowledge_models import KnowledgeBlock, KnowledgeNode, KnowledgeSourceRecord
 
-TARGET_SLUGS = ["酒鬼", "小惡魔", "洗腦師"]
+TARGET_SLUGS = ["賭徒", "小惡魔", "洗腦師"]
 SECTION_MAP = {
     "背景故事": ("background", "背景故事", 100),
     "角色能力": ("ability", "角色能力", 200),
     "能力": ("ability", "角色能力", 200),
     "角色簡介": ("overview", "角色簡介", 250),
     "角色简介": ("overview", "角色簡介", 250),
-    "運作方式": ("rules", "運作方式", 300),
-    "规则细节": ("rules", "規則細節", 320),
-    "規則細節": ("rules", "規則細節", 320),
-    "規則": ("rules", "規則說明", 300),
+    "運作方式": ("how_it_works", "運作方式", 300),
+    "规则细节": ("rules_detail", "規則細節", 400),
+    "規則細節": ("rules_detail", "規則細節", 400),
+    "規則": ("rules_detail", "規則", 400),
     "提示標記": ("reminders", "提示標記", 400),
-    "相剋規則": ("jinx", "相剋規則", 500),
-    "角色互動": ("interactions", "角色互動", 550),
+    "相剋規則": ("rules_jinx", "相剋規則", 420),
+    "角色互動": ("rules_interactions", "角色互動", 410),
     "範例": ("examples", "範例", 600),
-    "提示與技巧": ("strategy", "提示與技巧", 700),
-    "提示与技巧": ("strategy", "提示與技巧", 700),
-    "策略": ("strategy", "策略", 700),
+    "提示與技巧": ("strategy_play", "如何遊玩", 700),
+    "提示与技巧": ("strategy_play", "如何遊玩", 700),
+    "策略": ("strategy_play", "如何遊玩", 700),
     "說書人建議": ("storyteller_advice", "說書人建議", 750),
     "说书人建议": ("storyteller_advice", "說書人建議", 750),
 }
 
+
+def map_section(title: str):
+    if title.startswith(("偽裝成", "伪装成")):
+        return "strategy_bluff", title, 710
+    if title.startswith(("對抗", "对抗")):
+        return "strategy_counter", title, 720
+    if title in {"角色資訊", "角色信息"}:
+        return None
+    return next((value for key, value in SECTION_MAP.items() if key == title or key in title), None)
 
 def clean_inline(value: str) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()
@@ -194,7 +203,7 @@ def extract_structured_sections(html: str) -> tuple[str, list[dict]]:
     headings = root.find_all(["h2", "h3"])
     for heading in headings:
         title = normalize_heading(heading.get_text(" ", strip=True))
-        mapped = next((value for key, value in SECTION_MAP.items() if key == title or key in title), None)
+        mapped = map_section(title)
         if not mapped:
             continue
         content = collect_section_content(heading)
