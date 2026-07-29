@@ -114,11 +114,20 @@
 
                     const newScript = document.createElement('script');
                     Array.from(oldScript.attributes).forEach(attr => {
-                        if (attr.name !== 'type') newScript.setAttribute(attr.name, attr.value);
+                        if (attr.name !== 'type' && attr.name !== 'src') newScript.setAttribute(attr.name, attr.value);
                     });
-                    if (src) newScript.src = `${src}?v=${new Date().getTime()}`;
-                    else newScript.textContent = oldScript.textContent || '';
-                    document.body.appendChild(newScript);
+                    if (src) {
+                        newScript.async = false;
+                        newScript.src = `${src}${src.includes('?') ? '&' : '?'}v=${new Date().getTime()}`;
+                        await new Promise((resolve, reject) => {
+                            newScript.addEventListener('load', resolve, { once: true });
+                            newScript.addEventListener('error', () => reject(new Error(`腳本載入失敗：${src}`)), { once: true });
+                            document.body.appendChild(newScript);
+                        });
+                    } else {
+                        newScript.textContent = oldScript.textContent || '';
+                        document.body.appendChild(newScript);
+                    }
                 }
 
                 area.style.opacity = '1';
