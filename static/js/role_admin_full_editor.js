@@ -75,9 +75,9 @@
       .role-identity-main h4 { margin:0 0 .55rem; color:#fff; font-size:1.3rem; }
       .role-identity-main h4 span { display:block; margin-top:.2rem; color:#aeb6c9; font-size:.82rem; font-weight:600; }
       .role-identity-tags,.role-ability-tags,.role-reference-links { display:flex; flex-wrap:wrap; gap:.4rem; }
-      .role-identity-tags span,.role-ability-tags span { padding:.28rem .58rem; border-radius:999px; border:1px solid rgba(139,124,246,.38); background:rgba(139,124,246,.12); color:#ece9ff; font-size:.76rem; font-weight:800; }
+      .role-identity-tags span,.role-ability-tags span,.role-ability-tags a { padding:.28rem .58rem; border-radius:999px; border:1px solid rgba(139,124,246,.38); background:rgba(139,124,246,.12); color:#ece9ff; font-size:.76rem; font-weight:800; }
       .role-ability-tags { margin-top:.45rem; }
-      .role-ability-tags span { border-color:rgba(255,209,102,.35); background:rgba(255,209,102,.09); color:#ffd166; }
+      .role-ability-tags span,.role-ability-tags a { text-decoration:none; border-color:rgba(255,209,102,.35); background:rgba(255,209,102,.09); color:#ffd166; }
       .role-ability-tags span.empty { color:#aeb6c9; border-color:#39415a; background:transparent; }
       .role-reference-links { justify-content:flex-end; }
       .role-reference-links a { display:inline-flex; align-items:center; gap:.4rem; color:#cfc8ff; text-decoration:none; font-size:.8rem; font-weight:800; }
@@ -196,7 +196,7 @@
     try {
       const [contentData, mechanicData] = await Promise.all([
         request(`/api/admin/roles/${roleId}/content`),
-        request('/api/admin/knowledge/nodes?node_type=mechanic&limit=500'),
+        request('/api/admin/knowledge/ability-types'),
       ]);
       data = contentData;
       abilityTypeNodes = mechanicData.items || [];
@@ -266,7 +266,7 @@
     const infoCard = document.createElement('article');
     infoCard.className = 'role-identity-card';
     infoCard.innerHTML = `
-      <div class="role-identity-main">${iconUrl ? `<img src="${esc(iconUrl)}" alt="">` : '<div class="role-identity-icon"></div>'}<div><h4>${esc(roleName)}${englishName ? `<span>${esc(englishName)}</span>` : ''}</h4><div class="role-identity-tags"><span>${esc(teamName)}</span>${scripts.map((item)=>`<span>${esc(item)}</span>`).join('') || '<span>尚未設定劇本</span>'}</div><div class="role-ability-tags">${abilityTags.map((item)=>`<span>${esc(item)}</span>`).join('') || '<span class="empty">尚未設定能力類型</span>'}</div></div></div>
+      <div class="role-identity-main">${iconUrl ? `<img src="${esc(iconUrl)}" alt="">` : '<div class="role-identity-icon"></div>'}<div><h4>${esc(roleName)}${englishName ? `<span>${esc(englishName)}</span>` : ''}</h4><div class="role-identity-tags"><span>${esc(teamName)}</span>${scripts.map((item)=>`<span>${esc(item)}</span>`).join('') || '<span>尚未設定劇本</span>'}</div><div class="role-ability-tags">${abilityTags.map((item)=>`<a href="#knowledge/${encodeURIComponent(item)}">${esc(item)}</a>`).join('') || '<span class="empty">尚未設定能力類型</span>'}</div></div></div>
       <div class="role-reference-links">${references}${externalSource ? `<a href="${esc(externalSource)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> GStone 原始資料</a>` : ''}</div>`;
 
     const core = document.createElement('section'); core.className='ia-pane active'; core.dataset.iaPane='content';

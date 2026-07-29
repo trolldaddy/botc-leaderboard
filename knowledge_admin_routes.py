@@ -1,4 +1,5 @@
 from typing import Optional
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func, or_
@@ -18,6 +19,13 @@ from knowledge_models import (
 )
 
 router = APIRouter(prefix="/knowledge", tags=["knowledge-admin"])
+ABILITY_CATEGORY_NAMES = [
+    "拜訪說書人", "保護", "暴露角色", "持續檢測型能力", "處決", "額外死亡", "瘋狂", "復活",
+    "更換選擇目標", "公開觸發能力", "獲得能力", "獲取資訊", "互動干擾", "回溯型能力",
+    "進場能力", "角色變化", "鄰近", "免死", "能力效果干擾", "認知覆蓋", "設置調整",
+    "死後能力保留", "死亡觸發能力", "特殊勝利失敗條件", "提名", "投票", "限次能力",
+    "影響", "陣營轉變", "中毒", "醉酒",
+]
 
 
 @router.get("/summary")
@@ -97,6 +105,43 @@ def list_nodes(
         } for node in nodes],
     }
 
+
+
+@router.get("/ability-types")
+def list_ability_types(
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    nodes = db.query(KnowledgeNode).filter(or_(
+        KnowledgeNode.canonical_name_zh_tw.in_(ABILITY_CATEGORY_NAMES),
+        KnowledgeNode.canonical_name_zh_cn.in_(ABILITY_CATEGORY_NAMES),
+    )).all()
+    by_name = {}
+    for node in nodes:
+        for name in (node.canonical_name_zh_tw, node.canonical_name_zh_cn):
+            if name:
+                by_name[name] = node
+    items = []
+    for name in ABILITY_CATEGORY_NAMES:
+        node = by_name.get(name)
+        slug = node.slug if node else name
+        items.append({
+            "id": node.id if node else None,
+            "name_zh_tw": node.canonical_name_zh_tw if node else name,
+            "name_zh_cn": node.canonical_name_zh_cn if node else None,
+            "slug": slug,
+            "node_type": node.node_type if node else "article",
+            "knowledge_url": f"#knowledge/{quote(slug)}",
+            "source_url": f"https://clocktower-wiki.gstonegames.com/index.php?title={quote(name)}",
+            "is_linked": bool(node),
+        })
+    return {
+        "source": "gstone_role_ability_category_overview",
+        "source_url": "https://clocktower-wiki.gstonegames.com/index.php?title=%E8%A7%92%E8%89%B2%E8%83%BD%E5%8A%9B%E7%B1%BB%E5%88%AB%E6%80%BB%E8%A7%88",
+        "total": len(items),
+        "linked": sum(1 for item in items if item["is_linked"]),
+        "items": items,
+    }
 
 @router.get("/nodes/{node_id}")
 def get_node(
