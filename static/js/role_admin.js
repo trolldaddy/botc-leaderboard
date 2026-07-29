@@ -44,17 +44,33 @@ window.RoleAdmin = (() => {
 
   const field = (label, id, value = '', type = 'text', wide = false) => `<div class="${wide ? 'wide' : ''}"><label for="${id}">${label}</label>${type === 'textarea' ? `<textarea id="${id}" class="form-control dark-input">${escapeHtml(value)}</textarea>` : `<input id="${id}" type="${type}" class="form-control dark-input" value="${escapeHtml(value)}">`}</div>`;
 
+  const reminderSourceLabel = (source) => ({
+    gstone_official_wiki: 'GStone 官方百科',
+    larplus: '拉普拉斯',
+    manual: '人工補充',
+  }[source] || source || '未標記來源');
+
   const reminderCard = (item) => `
-    <div class="role-reminder-card" data-reminder-id="${item.id}">
-      <div class="role-reminder-head"><strong>${escapeHtml(item.label_zh_tw)}</strong><span>${escapeHtml(item.source || 'manual')}${item.needs_review ? ' · 待確認' : ''}</span></div>
-      ${field('標記名稱', `rr-label-${item.id}`, item.label_zh_tw, 'text', true)}
-      ${field('放置時機', `rr-timing-${item.id}`, item.placement_timing || '', 'textarea', true)}
-      ${field('放置條件', `rr-condition-${item.id}`, item.placement_condition || '', 'textarea', true)}
-      ${field('移除時機', `rr-removal-${item.id}`, item.removal_timing || '', 'textarea', true)}
-      ${field('特殊說明', `rr-notes-${item.id}`, item.special_notes || '', 'textarea', true)}
-      ${item.source_url ? `<a href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener">開啟官方來源</a>` : ''}
-      <div class="role-editor-actions"><label><input id="rr-review-${item.id}" type="checkbox" ${item.needs_review ? 'checked' : ''}> 待確認</label><button type="button" class="btn btn-outline" data-save-reminder="${item.id}">儲存此標記</button></div>
-    </div>`;
+    <article class="role-reminder-card" data-reminder-id="${item.id}">
+      <header class="role-reminder-head">
+        <strong>${escapeHtml(item.label_zh_tw)}</strong>
+        <div class="role-reminder-meta">
+          <span class="role-reminder-source">${escapeHtml(reminderSourceLabel(item.source))}</span>
+          ${item.needs_review ? '<span class="role-reminder-review">待確認</span>' : ''}
+        </div>
+      </header>
+      <div class="role-reminder-fields">
+        ${field('標記名稱', `rr-label-${item.id}`, item.label_zh_tw, 'text', true)}
+        ${field('放置時機', `rr-timing-${item.id}`, item.placement_timing || '', 'textarea', true)}
+        ${field('放置條件', `rr-condition-${item.id}`, item.placement_condition || '', 'textarea', true)}
+        ${field('移除時機', `rr-removal-${item.id}`, item.removal_timing || '', 'textarea', true)}
+        ${field('特殊說明', `rr-notes-${item.id}`, item.special_notes || '', 'textarea', true)}
+      </div>
+      <footer class="role-reminder-footer">
+        ${item.source_url ? `<a class="role-reminder-source-link" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener">開啟官方來源</a>` : '<span></span>'}
+        <div class="role-editor-actions"><label><input id="rr-review-${item.id}" type="checkbox" ${item.needs_review ? 'checked' : ''}> 待確認</label><button type="button" class="btn btn-outline" data-save-reminder="${item.id}">儲存此標記</button></div>
+      </footer>
+    </article>`;
 
   const openRole = async (id) => {
     selectedId = id; gstonePreview = null; renderList(); status('正在讀取角色資料...');
