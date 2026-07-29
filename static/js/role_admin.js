@@ -28,6 +28,7 @@ window.RoleAdmin = (() => {
   };
 
   const teamLabel = (team) => ({ townsfolk:'鎮民', outsider:'外來者', minion:'爪牙', demon:'惡魔', traveller:'旅行者', fabled:'傳奇角色' }[team] || team || '未分類');
+  const splitTags = (value) => String(value || '').split(/[,，、\n]/).map((item) => item.trim()).filter(Boolean);
 
   const renderList = () => {
     const list = $('role-admin-list');
@@ -92,11 +93,12 @@ window.RoleAdmin = (() => {
       <div class="role-editor-grid">
         ${field('繁體中文名稱','ra-name-zh',role.name_zh_tw)}${field('英文名稱','ra-name-en',role.name_en||'')}
         <div><label for="ra-team">陣營</label><select id="ra-team" class="form-control dark-input">${['townsfolk','outsider','minion','demon','traveller','fabled'].map((team)=>`<option value="${team}" ${role.team===team?'selected':''}>${teamLabel(team)}</option>`).join('')}</select></div>
+        ${field('所屬劇本（以逗號分隔）','ra-scripts',(role.script_names||[]).join('、'))}${field('能力類型 Tag（以逗號分隔）','ra-ability-tags',(role.ability_tags||[]).join('、'))}
         <div><label for="ra-source-type">來源類型</label><select id="ra-source-type" class="form-control dark-input">${['unclassified','official','experimental','custom','variant'].map((value)=>`<option value="${value}" ${role.source_type===value?'selected':''}>${value}</option>`).join('')}</select></div>
         ${field('來源名稱','ra-source-name',role.source_name||'')}${field('作者','ra-author',role.author||'')}${field('圖片網址','ra-image',role.image_url||'','text',true)}
         ${field('玩家能力文字','ra-ability',role.ability_zh_tw||'','textarea',true)}${field('首夜順序','ra-first-order',role.first_night_order||0,'number')}${field('其他夜晚順序','ra-other-order',role.other_night_order||0,'number')}
         ${field('首夜說書人提示','ra-first-reminder',role.first_night_reminder||'','textarea',true)}${field('其他夜晚說書人提示','ra-other-reminder',role.other_night_reminder||'','textarea',true)}
-        ${field('一句話定位','ra-guide-summary',guide.beginner_summary||'','textarea',true)}${field('這個角色要做什麼','ra-guide-play',guide.how_to_play||'','textarea',true)}${field('開局建議','ra-guide-first-day',guide.first_day_advice||'','textarea',true)}${field('常見誤區','ra-guide-mistakes',guide.common_mistakes||'','textarea',true)}${field('進階技巧','ra-guide-advanced',guide.advanced_tips||'','textarea',true)}
+        ${field('一句話定位','ra-guide-summary',guide.beginner_summary||'','textarea',true)}${field('角色能力補充','ra-guide-ability',guide.ability_supplement||'','textarea',true)}${field('這個角色要做什麼','ra-guide-play',guide.how_to_play||'','textarea',true)}${field('進階技巧','ra-guide-advanced',guide.advanced_tips||'','textarea',true)}${field('說書人建議','ra-guide-storyteller',guide.storyteller_advice||'','textarea',true)}${field('常見誤解','ra-guide-mistakes',guide.common_mistakes||'','textarea',true)}
       </div>
       <div class="role-checkboxes"><label><input id="ra-official" type="checkbox" ${role.is_official?'checked':''}> 官方角色</label><label><input id="ra-custom" type="checkbox" ${role.is_custom?'checked':''}> 自創角色</label><label><input id="ra-active" type="checkbox" ${role.is_active?'checked':''}> 啟用</label><label><input id="ra-review" type="checkbox" ${role.needs_review?'checked':''}> 待確認</label></div>
       <section class="role-reminder-section"><div class="role-reminder-title"><div><h4>提示標記</h4><p>用途資料以 GStone 官方鐘樓百科為準。</p></div><button type="button" id="rr-gstone-preview" class="btn btn-outline">讀取 GStone 官方資料</button></div><div id="rr-preview"></div><div class="role-reminder-list">${currentReminders.map(reminderCard).join('') || '<div class="role-admin-meta">尚無提示標記。</div>'}</div></section>
@@ -136,7 +138,7 @@ window.RoleAdmin = (() => {
   };
 
   const saveRole = async (id) => {
-    const payload = { name_zh_tw:$('ra-name-zh').value.trim(), name_en:$('ra-name-en').value.trim()||null, team:$('ra-team').value, source_type:$('ra-source-type').value, source_name:$('ra-source-name').value.trim()||null, author:$('ra-author').value.trim()||null, image_url:$('ra-image').value.trim()||null, ability_zh_tw:$('ra-ability').value.trim()||null, first_night_order:Number($('ra-first-order').value||0), other_night_order:Number($('ra-other-order').value||0), first_night_reminder:$('ra-first-reminder').value.trim()||null, other_night_reminder:$('ra-other-reminder').value.trim()||null, is_official:$('ra-official').checked, is_custom:$('ra-custom').checked, is_active:$('ra-active').checked, needs_review:$('ra-review').checked, guide:{ beginner_summary:$('ra-guide-summary').value.trim(), how_to_play:$('ra-guide-play').value.trim(), first_day_advice:$('ra-guide-first-day').value.trim(), common_mistakes:$('ra-guide-mistakes').value.trim(), advanced_tips:$('ra-guide-advanced').value.trim() } };
+    const payload = { name_zh_tw:$('ra-name-zh').value.trim(), name_en:$('ra-name-en').value.trim()||null, team:$('ra-team').value, script_names:splitTags($('ra-scripts').value), ability_tags:splitTags($('ra-ability-tags').value), source_type:$('ra-source-type').value, source_name:$('ra-source-name').value.trim()||null, author:$('ra-author').value.trim()||null, image_url:$('ra-image').value.trim()||null, ability_zh_tw:$('ra-ability').value.trim()||null, first_night_order:Number($('ra-first-order').value||0), other_night_order:Number($('ra-other-order').value||0), first_night_reminder:$('ra-first-reminder').value.trim()||null, other_night_reminder:$('ra-other-reminder').value.trim()||null, is_official:$('ra-official').checked, is_custom:$('ra-custom').checked, is_active:$('ra-active').checked, needs_review:$('ra-review').checked, guide:{ beginner_summary:$('ra-guide-summary').value.trim(), how_to_play:$('ra-guide-play').value.trim(), common_mistakes:$('ra-guide-mistakes').value.trim(), advanced_tips:$('ra-guide-advanced').value.trim(), ability_supplement:$('ra-guide-ability').value.trim(), storyteller_advice:$('ra-guide-storyteller').value.trim() } };
     status('正在儲存...');
     try { await request(`/api/admin/roles/${id}`,{method:'PATCH',body:JSON.stringify(payload)}); status('角色資料已儲存。'); await refresh(); await openRole(id); } catch(err){status(`儲存失敗：${err.message}`,true);}
   };

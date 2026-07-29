@@ -23,6 +23,8 @@ class Role(Base):
     source_type = Column(String, default="unclassified", index=True)
     source_name = Column(String, nullable=True)
     author = Column(String, nullable=True)
+    script_names_json = Column(Text, nullable=True)
+    ability_tags_json = Column(Text, nullable=True)
     is_official = Column(Boolean, default=False)
     is_custom = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
@@ -60,6 +62,8 @@ class RoleGuide(Base):
     first_day_advice = Column(Text, nullable=True)
     common_mistakes = Column(Text, nullable=True)
     advanced_tips = Column(Text, nullable=True)
+    ability_supplement = Column(Text, nullable=True)
+    storyteller_advice = Column(Text, nullable=True)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     role = relationship("Role", back_populates="guide")
 
@@ -129,6 +133,26 @@ def ensure_role_schema():
     ])
     try:
         inspector = inspect(engine)
+        if "roles" in inspector.get_table_names():
+            role_columns = {column["name"] for column in inspector.get_columns("roles")}
+            with engine.begin() as connection:
+                for name in ("script_names_json", "ability_tags_json"):
+                    if name in role_columns:
+                        continue
+                    if engine.dialect.name == "postgresql":
+                        connection.execute(text(f"ALTER TABLE roles ADD COLUMN IF NOT EXISTS {name} TEXT"))
+                    else:
+                        connection.execute(text(f"ALTER TABLE roles ADD COLUMN {name} TEXT"))
+        if "role_guides" in inspector.get_table_names():
+            guide_columns = {column["name"] for column in inspector.get_columns("role_guides")}
+            with engine.begin() as connection:
+                for name in ("ability_supplement", "storyteller_advice"):
+                    if name in guide_columns:
+                        continue
+                    if engine.dialect.name == "postgresql":
+                        connection.execute(text(f"ALTER TABLE role_guides ADD COLUMN IF NOT EXISTS {name} TEXT"))
+                    else:
+                        connection.execute(text(f"ALTER TABLE role_guides ADD COLUMN {name} TEXT"))
         if "role_reminders" not in inspector.get_table_names():
             return
         columns = {column["name"] for column in inspector.get_columns("role_reminders")}

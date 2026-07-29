@@ -1,3 +1,4 @@
+import json
 import re
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, or_
@@ -17,6 +18,15 @@ VIEW_AUDIENCES = {
 
 
 def role_card(role: Role):
+    def string_list(value):
+        if not value:
+            return []
+        try:
+            items = json.loads(value)
+        except (TypeError, ValueError):
+            items = str(value).split(",")
+        return [str(item).strip() for item in items if str(item).strip()]
+
     return {
         "id": role.id,
         "canonical_key": role.canonical_key,
@@ -25,6 +35,8 @@ def role_card(role: Role):
         "team": role.team,
         "ability_zh_tw": role.ability_zh_tw,
         "image_url": role.image_url,
+        "script_names": string_list(role.script_names_json),
+        "ability_tags": string_list(role.ability_tags_json),
         "is_official": bool(role.is_official),
         "is_custom": bool(role.is_custom),
     }
@@ -170,6 +182,8 @@ def get_role_view(key: str, view: str = Query(default="player"), db: Session = D
                 "first_day_advice": guide.first_day_advice,
                 "common_mistakes": guide.common_mistakes,
                 "advanced_tips": guide.advanced_tips,
+                "ability_supplement": guide.ability_supplement,
+                "storyteller_advice": guide.storyteller_advice,
             }
     else:
         payload["guide"] = None

@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -28,8 +29,26 @@ def serialize_guide(guide: Optional[RoleGuide]):
         "first_day_advice": guide.first_day_advice if guide else "",
         "common_mistakes": guide.common_mistakes if guide else "",
         "advanced_tips": guide.advanced_tips if guide else "",
+        "ability_supplement": guide.ability_supplement if guide else "",
+        "storyteller_advice": guide.storyteller_advice if guide else "",
     }
 
+
+def parse_string_list(value: Optional[str]):
+    if not value:
+        return []
+    try:
+        items = json.loads(value)
+    except (TypeError, ValueError):
+        items = [part.strip() for part in str(value).split(",")]
+    return [str(item).strip() for item in items if str(item).strip()]
+
+
+def encode_string_list(value):
+    if not isinstance(value, list):
+        return None
+    items = list(dict.fromkeys(str(item).strip() for item in value if str(item).strip()))
+    return json.dumps(items, ensure_ascii=False)
 
 def completeness(role: Role):
     missing = []
@@ -55,6 +74,8 @@ def serialize_role(role: Role, include_detail: bool = True):
         "source_type": role.source_type,
         "source_name": role.source_name,
         "author": role.author,
+        "script_names": parse_string_list(role.script_names_json),
+        "ability_tags": parse_string_list(role.ability_tags_json),
         "is_official": bool(role.is_official),
         "is_custom": bool(role.is_custom),
         "is_active": bool(role.is_active),
@@ -213,12 +234,16 @@ def update_role(
         if field in data:
             setattr(role, field, data.get(field))
 
+    if "script_names" in data:
+        role.script_names_json = encode_string_list(data.get("script_names"))
+    if "ability_tags" in data:
+        role.ability_tags_json = encode_string_list(data.get("ability_tags"))
     guide_data = data.get("guide")
     if isinstance(guide_data, dict):
         guide = role.guide or RoleGuide(role_id=role.id)
         if not role.guide:
             db.add(guide)
-        for field in ["beginner_summary", "how_to_play", "first_day_advice", "common_mistakes", "advanced_tips"]:
+        for field in ["beginner_summary", "how_to_play", "first_day_advice", "common_mistakes", "advanced_tips", "ability_supplement", "storyteller_advice"]:
             if field in guide_data:
                 setattr(guide, field, guide_data.get(field))
 
