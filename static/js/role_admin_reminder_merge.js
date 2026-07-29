@@ -1,8 +1,11 @@
 (() => {
   const installStyles = () => {
-    if (document.getElementById('role-admin-reminder-merge-style')) return;
-    const style = document.createElement('style');
-    style.id = 'role-admin-reminder-merge-style';
+    let style = document.getElementById('role-admin-reminder-merge-style');
+    if (!style) {
+      style = document.createElement('style');
+      style.id = 'role-admin-reminder-merge-style';
+      document.head.appendChild(style);
+    }
     style.textContent = `
       .role-reminder-section.reminder-merged {
         width: 100% !important;
@@ -39,7 +42,7 @@
 
       .role-reminder-section.reminder-merged .role-reminder-list {
         display: grid !important;
-        grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)) !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
         gap: .9rem !important;
         align-items: start !important;
       }
@@ -114,7 +117,7 @@
       .role-reminder-section.reminder-merged .role-reminder-fields label {
         display: block;
         margin: 0 0 .35rem;
-        color: #d9deea;
+        color: #ffd166;
         font-size: .78rem;
         font-weight: 800;
       }
@@ -167,6 +170,12 @@
         white-space: nowrap;
       }
 
+      @media (max-width: 1100px) {
+        .role-reminder-section.reminder-merged .role-reminder-list {
+          grid-template-columns: 1fr !important;
+        }
+      }
+
       @media (max-width: 760px) {
         .role-reminder-section.reminder-merged {
           padding: .8rem !important;
@@ -189,7 +198,6 @@
         }
       }
     `;
-    document.head.appendChild(style);
   };
 
   const mergeReminderUi = () => {
