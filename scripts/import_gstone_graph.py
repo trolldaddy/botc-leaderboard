@@ -53,14 +53,24 @@ def slugify(title: str) -> str:
     return value.strip("-") or "untitled"
 
 
-def unique_slug(db, base: str, title: str) -> str:
+def unique_slug(db, base: str) -> str:
     existing = db.query(KnowledgeNode).filter(KnowledgeNode.slug == base).first()
-    if not existing or existing.canonical_name_zh_tw == title:
+    if not existing:
         return base
     suffix = 2
     while db.query(KnowledgeNode).filter(KnowledgeNode.slug == f"{base}-{suffix}").first():
         suffix += 1
     return f"{base}-{suffix}"
+
+
+def find_existing_node(db, title: str, title_tw: str):
+    """Find an imported node before creating a new page or edge placeholder."""
+    base_slug = slugify(title_tw)
+    return db.query(KnowledgeNode).filter(
+        (KnowledgeNode.canonical_name_zh_tw == title_tw)
+        | (KnowledgeNode.canonical_name_zh_cn == title)
+        | (KnowledgeNode.slug == base_slug)
+    ).first()
 
 
 def parse_dt(value):
@@ -131,11 +141,11 @@ def import_report(report: dict, write: bool):
                 continue
             title_tw = to_traditional(title)
             node_type = TYPE_MAP.get(page.get("page_type"), "article")
-            node = db.query(KnowledgeNode).filter(KnowledgeNode.canonical_name_zh_tw == title_tw).first()
+            node = find_existing_node(db, title, title_tw)
             if not node:
                 node = KnowledgeNode(
                     node_type=node_type,
-                    slug=unique_slug(db, slugify(title_tw), title_tw),
+                    slug=unique_slug(db, slugify(title_tw)),
                     canonical_name_zh_tw=title_tw,
                     canonical_name_zh_cn=title,
                     status="discovered",
@@ -217,9 +227,15 @@ def import_report(report: dict, write: bool):
             target_tw = to_traditional(target_title)
             to_node = nodes_by_title.get(target_title) or nodes_by_title.get(target_tw)
             if not to_node:
+                to_node = find_existing_node(db, target_title, target_tw)
+                if to_node:
+                    nodes_by_title[target_title] = to_node
+                    nodes_by_title[target_tw] = to_node
+                    stats["placeholder_nodes_reused"] += 1
+            if not to_node:
                 to_node = KnowledgeNode(
                     node_type="article",
-                    slug=unique_slug(db, slugify(target_tw), target_tw),
+                    slug=unique_slug(db, slugify(target_tw)),
                     canonical_name_zh_tw=target_tw,
                     canonical_name_zh_cn=target_title,
                     status="discovered",
