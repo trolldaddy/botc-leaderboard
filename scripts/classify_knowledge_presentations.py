@@ -15,6 +15,10 @@ from database import SessionLocal, engine
 from knowledge_models import KnowledgeEdge, KnowledgeNode, KnowledgeSourceRecord
 from knowledge_presentation import classify_knowledge_node, excluded_classification
 
+CONTEST_ENTRY_TITLES = {
+    "凶宅魅影", "十三行", "司民", "寄夢他鄉", "愚者歡宴",
+    "沸反盈天", "無何有之鄉", "移花接木", "金戈鐵馬V2.0", "隻手遮天",
+}
 
 def ensure_columns():
     inspector = inspect(engine)
@@ -46,6 +50,8 @@ def irrelevant_contest_node_ids(db: Session) -> set[int]:
         ])
     ).all()
     excluded_ids = {node.id for node in roots}
+    known_entries = db.query(KnowledgeNode).filter(KnowledgeNode.canonical_name_zh_tw.in_(CONTEST_ENTRY_TITLES)).all()
+    excluded_ids.update(node.id for node in known_entries)
     for root in roots:
         target_ids = [row[0] for row in db.query(KnowledgeEdge.to_node_id).filter(
             KnowledgeEdge.from_node_id == root.id
