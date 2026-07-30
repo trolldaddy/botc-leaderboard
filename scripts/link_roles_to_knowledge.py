@@ -48,16 +48,32 @@ def find_role(db: Session, name: str):
     return None, "none", 0.0
 
 
-def find_node(db: Session, name: str):
-    node = db.query(KnowledgeNode).filter(func.lower(KnowledgeNode.canonical_name_zh_tw) == name.lower()).first()
-    if node:
-        return node, "canonical_name_zh_tw", 1.0
-    alias = db.query(KnowledgeAlias).filter(func.lower(KnowledgeAlias.alias) == name.lower()).first()
-    if alias:
-        node = db.query(KnowledgeNode).filter(KnowledgeNode.id == alias.node_id).first()
+def find_node(db: Session, name: str, aliases: list[str] | None = None):
+    candidates = [name] + [value for value in (aliases or []) if value and value.lower() != name.lower()]
+    for index, candidate in enumerate(candidates):
+        node = db.query(KnowledgeNode).filter(
+            func.lower(KnowledgeNode.canonical_name_zh_tw) == candidate.lower()
+        ).first()
         if node:
-            return node, "knowledge_alias", 0.9
+            return node, "canonical_name_zh_tw" if index == 0 else "role_alias_to_canonical_zh_tw", 1.0 if index == 0 else 0.95
+        node = db.query(KnowledgeNode).filter(
+            func.lower(KnowledgeNode.canonical_name_en) == candidate.lower()
+        ).first()
+        if node:
+            return node, "canonical_name_en", 0.95
+        alias = db.query(KnowledgeAlias).filter(func.lower(KnowledgeAlias.alias) == candidate.lower()).first()
+        if alias:
+            node = db.query(KnowledgeNode).filter(KnowledgeNode.id == alias.node_id).first()
+            if node:
+                return node, "knowledge_alias", 0.9
     return None, "none", 0.0
+
+
+def role_node_aliases(role: Role) -> list[str]:
+    values = [role.name_en, role.canonical_key]
+    for alias in role.aliases or []:
+        values.extend([alias.external_name, alias.external_id])
+    return list(dict.fromkeys(str(value).strip() for value in values if str(value or "").strip()))
 
 
 def latest_source_url(db: Session, node_id: int):
@@ -67,11 +83,11 @@ def latest_source_url(db: Session, node_id: int):
     return row.source_url if row else None
 
 
-def run(write: bool):
+def run(write: bool, all_roles: bool = True):
     db: Session = SessionLocal()
     stats = {
         "mode": "write" if write else "preview",
-        "targets": TARGET_NAMES,
+        "targets": "all_active_roles" if all_roles else TARGET_NAMES,
         "links_created": 0,
         "links_updated": 0,
         "blocks_created": 0,
@@ -83,9 +99,14 @@ def run(write: bool):
         "matches": [],
     }
     try:
-        for name in TARGET_NAMES:
+        target_names = (
+            [role.name_zh_tw for role in db.query(Role).filter(Role.is_active == True).order_by(Role.id).all()]  # noqa: E712
+            if all_roles else TARGET_NAMES
+        )
+        stats["roles_scanned"] = len(target_names)
+        for name in target_names:
             role, role_method, role_confidence = find_role(db, name)
-            node, node_method, node_confidence = find_node(db, name)
+            node, node_method, node_confidence = find_node(db, name, aliases=role_node_aliases(role) if role else [])
             if not role:
                 stats["missing_roles"].append(name)
                 continue
@@ -178,10 +199,11 @@ def run(write: bool):
 def main():
     parser = argparse.ArgumentParser(description="Link Role master data to Knowledge nodes and import supplemental content.")
     parser.add_argument("--write", action="store_true")
+    parser.add_argument("--trial", action="store_true", help="Only process the original three trial roles.")
     args = parser.parse_args()
     if not os.getenv("DATABASE_URL"):
         raise SystemExit("DATABASE_URL is required")
-    print(run(args.write))
+    print(run(args.write, all_roles=not args.trial))
 
 
 if __name__ == "__main__":

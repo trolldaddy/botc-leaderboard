@@ -2,6 +2,7 @@ import argparse
 import os
 import re
 import sys
+import time
 from pathlib import Path
 
 import requests
@@ -269,7 +270,7 @@ def upsert_block(db: Session, node_id: int, source_id: int | None, spec: dict) -
     return action
 
 
-def seed(write: bool) -> dict:
+def seed(write: bool, all_roles: bool = True, delay: float = 0.15) -> dict:
     db: Session = SessionLocal()
     stats = {
         "created": 0,
@@ -282,12 +283,22 @@ def seed(write: bool) -> dict:
         "missing": [],
     }
     try:
-        for slug in TARGET_SLUGS:
-            node = db.query(KnowledgeNode).filter(KnowledgeNode.slug == slug).first()
-            if not node:
-                stats["missing"].append(slug)
-                continue
+        if all_roles:
+            nodes = db.query(KnowledgeNode).filter(
+                KnowledgeNode.node_type == "role"
+            ).order_by(KnowledgeNode.id).all()
+        else:
+            nodes = []
+            for slug in TARGET_SLUGS:
+                node = db.query(KnowledgeNode).filter(KnowledgeNode.slug == slug).first()
+                if node:
+                    nodes.append(node)
+                else:
+                    stats["missing"].append(slug)
 
+        stats["nodes_scanned"] = len(nodes)
+        for node in nodes:
+            slug = node.slug
             source = db.query(KnowledgeSourceRecord).filter(
                 KnowledgeSourceRecord.node_id == node.id
             ).order_by(KnowledgeSourceRecord.fetched_at.desc(), KnowledgeSourceRecord.id.desc()).first()
@@ -302,6 +313,9 @@ def seed(write: bool) -> dict:
                         stats["fetched"] += 1
                 except Exception as exc:
                     stats["fetch_failed"].append({"slug": slug, "error": str(exc)})
+
+            if delay:
+                time.sleep(delay)
 
             if not sections:
                 stats["skipped"] += 1
@@ -344,11 +358,13 @@ def seed(write: bool) -> dict:
 def main():
     parser = argparse.ArgumentParser(description="Seed DOM-structured public blocks for initial role pages.")
     parser.add_argument("--write", action="store_true", help="Commit changes. Default is dry-run.")
+    parser.add_argument("--trial", action="store_true", help="Only process the original three trial roles.")
+    parser.add_argument("--delay", type=float, default=0.15, help="Delay between wiki requests.")
     args = parser.parse_args()
     if not os.getenv("DATABASE_URL"):
         raise SystemExit("DATABASE_URL is required")
-    stats = seed(args.write)
-    print({"mode": "write" if args.write else "dry-run", "targets": TARGET_SLUGS, "stats": stats})
+    stats = seed(args.write, all_roles=not args.trial, delay=max(0, args.delay))
+    print({"mode": "write" if args.write else "dry-run", "targets": TARGET_SLUGS if args.trial else "all_role_nodes", "stats": stats})
 
 
 if __name__ == "__main__":
