@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from database import SessionLocal
+from gstone_wiki import to_simplified
 from knowledge_models import KnowledgeAlias, KnowledgeBlock, KnowledgeEdge, KnowledgeNode, KnowledgeSourceRecord
 from role_models import Role, RoleContentBlock, RoleKnowledgeLink
 
@@ -66,6 +67,11 @@ def find_node(db: Session, name: str, aliases: list[str] | None = None):
             node = db.query(KnowledgeNode).filter(KnowledgeNode.id == alias.node_id).first()
             if node:
                 return node, "knowledge_alias", 0.9
+    normalized_candidates = {to_simplified(value).lower() for value in candidates if value}
+    for node in db.query(KnowledgeNode).filter(KnowledgeNode.node_type == "role").all():
+        node_names = [node.canonical_name_zh_tw, node.canonical_name_zh_cn, node.canonical_name_en]
+        if any(to_simplified(value).lower() in normalized_candidates for value in node_names if value):
+            return node, "normalized_simplified_name", 0.9
     return None, "none", 0.0
 
 
