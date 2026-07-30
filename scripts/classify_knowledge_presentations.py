@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from database import SessionLocal, engine
-from knowledge_models import KnowledgeEdge, KnowledgeNode
+from knowledge_models import KnowledgeEdge, KnowledgeNode, KnowledgeSourceRecord
 from knowledge_presentation import classify_knowledge_node, excluded_classification
 
 
@@ -57,6 +57,18 @@ def irrelevant_contest_node_ids(db: Session) -> set[int]:
         for node in candidates:
             if classify_knowledge_node(node).presentation_type == "standard_article":
                 excluded_ids.add(node.id)
+
+    contest_markers = ("第一屆華燈初上劇本創作大賽", "第一届华灯初上剧本创作大赛")
+    records = db.query(KnowledgeSourceRecord).filter(KnowledgeSourceRecord.node_id.isnot(None)).all()
+    content_node_ids = {
+        record.node_id
+        for record in records
+        if any(marker in f"{record.normalized_content or ''}\n{record.raw_content or ''}" for marker in contest_markers)
+    }
+    content_nodes = db.query(KnowledgeNode).filter(KnowledgeNode.id.in_(content_node_ids)).all() if content_node_ids else []
+    for node in content_nodes:
+        if classify_knowledge_node(node).presentation_type == "standard_article":
+            excluded_ids.add(node.id)
     return excluded_ids
 
 
