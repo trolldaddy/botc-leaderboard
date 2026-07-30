@@ -10,7 +10,10 @@
   const request = async (path, options = {}) => {
     const response = await fetch(`${apiBase()}${path}`, { credentials:'same-origin', headers:{'Content-Type':'application/json'}, ...options });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.detail || `HTTP ${response.status}`);
+    if (!response.ok) {
+      const detail = Array.isArray(data.detail) ? data.detail.map((item) => item.msg || JSON.stringify(item)).join("；") : (typeof data.detail === "object" ? JSON.stringify(data.detail) : data.detail);
+      throw new Error(detail || `HTTP ${response.status}`);
+    }
     return data;
   };
   const targetCell = (item, view, label) => `<label class="rds-target"><span><input type="checkbox" data-rds-show="${view}" ${item[`show_${view}`] ? 'checked' : ''}> ${label}</span>${item.item_type === 'block' ? `<input type="number" data-rds-sort="${view}" value="${Number(item[`sort_${view}`] || 0)}" title="${label}排序">` : `<input type="hidden" data-rds-sort="${view}" value="${Number(item[`sort_${view}`] || 0)}">`}</label>`;
