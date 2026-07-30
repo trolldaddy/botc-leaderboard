@@ -26,16 +26,11 @@
     body.innerHTML = renderSection('固定資料模組', modules) + renderSection('內容 Block 類型', blocks);
   };
   const open = async () => {
-    modal.hidden = false; document.body.style.overflow = 'hidden'; status.textContent = '讀取中…';
+    modal.hidden = false; modal.scrollTop = 0; document.body.style.overflow = 'hidden'; status.textContent = '讀取中…';
     try { const data = await request('/api/admin/roles/display-settings'); items = data.items || []; render(); status.textContent = '套用至所有角色'; }
     catch (err) { body.innerHTML = `<div class="role-admin-empty">讀取失敗：${esc(err.message)}</div>`; status.textContent = ''; }
   };
   const close = () => { modal.hidden = true; document.body.style.overflow = ''; };
-  body?.addEventListener('wheel', (event) => {
-    if (body.scrollHeight <= body.clientHeight) return;
-    body.scrollTop += event.deltaY;
-    event.preventDefault();
-  }, { passive:false });
   const save = async () => {
     const button = $('role-display-settings-save'); button.disabled = true; status.textContent = '儲存中…';
     try {
