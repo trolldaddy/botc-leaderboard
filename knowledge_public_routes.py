@@ -41,6 +41,8 @@ def _node_card(node: KnowledgeNode):
         "name_zh_cn": node.canonical_name_zh_cn,
         "name_en": node.canonical_name_en,
         "summary": node.summary,
+        "presentation_type": node.presentation_type,
+        "classification_status": node.classification_status,
         "status": node.status,
         "is_official": bool(node.is_official),
     }

@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 import models
 from account_binding_routes import require_admin_account
 from database import get_db
+from knowledge_presentation import PRESENTATION_TYPES
 from knowledge_models import (
     CrawlRun,
     KnowledgeAlias,
@@ -99,6 +100,10 @@ def list_nodes(
             "name_zh_tw": node.canonical_name_zh_tw,
             "name_zh_cn": node.canonical_name_zh_cn,
             "name_en": node.canonical_name_en,
+            "presentation_type": node.presentation_type,
+            "classification_method": node.classification_method,
+            "classification_confidence": node.classification_confidence,
+            "classification_status": node.classification_status,
             "status": node.status,
             "visibility": node.visibility,
             "is_official": bool(node.is_official),
@@ -143,6 +148,33 @@ def list_ability_types(
         "items": items,
     }
 
+@router.patch("/nodes/{node_id}/presentation")
+def update_node_presentation(
+    node_id: int,
+    data: dict,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    node = db.query(KnowledgeNode).filter(KnowledgeNode.id == node_id).first()
+    if not node:
+        raise HTTPException(status_code=404, detail="找不到知識節點")
+    presentation_type = str(data.get("presentation_type") or "").strip()
+    if presentation_type not in PRESENTATION_TYPES:
+        raise HTTPException(status_code=400, detail="不支援的文章呈現模板")
+    node.presentation_type = presentation_type
+    node.classification_method = "manual"
+    node.classification_confidence = 1.0
+    node.classification_status = "confirmed"
+    db.commit()
+    return {
+        "id": node.id,
+        "presentation_type": node.presentation_type,
+        "classification_method": node.classification_method,
+        "classification_confidence": node.classification_confidence,
+        "classification_status": node.classification_status,
+    }
+
+
 @router.get("/nodes/{node_id}")
 def get_node(
     node_id: int,
@@ -182,6 +214,10 @@ def get_node(
         "name_zh_cn": node.canonical_name_zh_cn,
         "name_en": node.canonical_name_en,
         "summary": node.summary,
+        "presentation_type": node.presentation_type,
+        "classification_method": node.classification_method,
+        "classification_confidence": node.classification_confidence,
+        "classification_status": node.classification_status,
         "status": node.status,
         "visibility": node.visibility,
         "aliases": [{

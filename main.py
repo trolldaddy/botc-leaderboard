@@ -94,6 +94,17 @@ def ensure_runtime_schema():
                 }.items():
                     if column not in columns:
                         conn.execute(text(add_column_sql("locations", column, definition)))
+        if "knowledge_nodes" in table_names:
+            columns = {col["name"] for col in inspector.get_columns("knowledge_nodes")}
+            with engine.begin() as conn:
+                for column, definition in {
+                    "presentation_type": "VARCHAR(50)",
+                    "classification_method": "VARCHAR(80)",
+                    "classification_confidence": "FLOAT",
+                    "classification_status": "VARCHAR(40) DEFAULT 'unclassified'",
+                }.items():
+                    if column not in columns:
+                        conn.execute(text(add_column_sql("knowledge_nodes", column, definition)))
     except Exception as e:
         print(f"資料庫結構補齊失敗: {e}")
 

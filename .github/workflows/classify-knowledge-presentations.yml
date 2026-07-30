@@ -1,0 +1,45 @@
+name: Classify Knowledge Presentations
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Preview or write Knowledge presentation classifications"
+        required: true
+        default: "preview"
+        type: choice
+        options:
+          - preview
+          - write
+
+permissions:
+  contents: read
+
+jobs:
+  classify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/town-checkin
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Classify page presentations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.mode }}" = "write" ]; then
+            python scripts/classify_knowledge_presentations.py --write
+          else
+            python scripts/classify_knowledge_presentations.py
+          fi
