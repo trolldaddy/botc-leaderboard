@@ -163,16 +163,16 @@
   .rds-modal[hidden] { display:none; }
   .rds-modal { position:fixed; inset:0; z-index:2147483000; display:grid; place-items:center; width:100vw; height:100dvh; padding:1rem; isolation:isolate; }
   .rds-backdrop { position:absolute; inset:0; background:rgba(3,5,10,.82); backdrop-filter:blur(5px); }
-  .rds-dialog { position:relative; width:min(1120px,calc(100vw - 2rem)); max-height:calc(100dvh - 2rem); display:flex; flex-direction:column; overflow:hidden; border:1px solid #4a526d; border-radius:18px; background:#0f1118; color:#f4f6fb; box-shadow:0 28px 90px rgba(0,0,0,.55); }
+  .rds-dialog { position:relative; width:min(1120px,calc(100vw - 2rem)); height:calc(100dvh - 2rem); max-height:calc(100dvh - 2rem); display:flex; flex-direction:column; overflow:hidden; border:1px solid #4a526d; border-radius:18px; background:#0f1118; color:#f4f6fb; box-shadow:0 28px 90px rgba(0,0,0,.55); }
   .rds-head,.rds-actions { flex:0 0 auto; display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem 1.1rem; border-bottom:1px solid #30364a; background:#0f1118; position:relative; z-index:2; }
   .rds-head h3 { margin:0 0 .3rem; }.rds-head p,.rds-actions span { margin:0; color:#aeb6c9; }
   .rds-actions { border-top:1px solid #30364a; border-bottom:0; justify-content:flex-end; }.rds-actions span { margin-right:auto; }
-  .rds-body { flex:1 1 auto; min-height:0; padding:1rem; overflow:auto; overscroll-behavior:contain; display:grid; gap:1rem; scrollbar-gutter:stable; }.rds-section { border:1px solid #39415a; border-radius:14px; overflow:hidden; }
+  .rds-body { flex:1 1 0; min-height:0; height:0; padding:1rem; overflow-x:hidden!important; overflow-y:scroll!important; overscroll-behavior:contain; touch-action:pan-y; display:grid; gap:1rem; scrollbar-gutter:stable; }.rds-section { border:1px solid #39415a; border-radius:14px; overflow:hidden; }
   .rds-section h4 { margin:0; padding:.8rem 1rem; color:#ffd166; background:#151924; border-bottom:1px solid #30364a; }
   .rds-row { display:grid; grid-template-columns:minmax(210px,1fr) repeat(3,minmax(135px,.45fr)); gap:.7rem; align-items:center; padding:.7rem 1rem; border-bottom:1px solid #282e40; }.rds-row:last-child{border-bottom:0}.rds-row strong{overflow-wrap:anywhere}
   .rds-target { display:grid; grid-template-columns:auto 1fr; gap:.45rem; align-items:center; color:#dfe3ee; }.rds-target input[type=checkbox]{accent-color:#8b7cf6}.rds-target input[type=number]{min-width:0;width:100%;background:#202638;color:#fff;border:1px solid #39415a;border-radius:8px;padding:.45rem}
   .rds-legend { display:none; }
-  @media(max-width:720px){.rds-row{grid-template-columns:1fr}.rds-row strong{margin-bottom:.2rem}.rds-target{grid-template-columns:80px 1fr}.rds-dialog{width:calc(100vw - 1rem);max-height:calc(100dvh - 1rem)}.rds-head{align-items:flex-start}.rds-head p{font-size:.82rem}}
+  @media(max-width:720px){.rds-row{grid-template-columns:1fr}.rds-row strong{margin-bottom:.2rem}.rds-target{grid-template-columns:80px 1fr}.rds-dialog{width:calc(100vw - 1rem);height:calc(100dvh - 1rem);max-height:calc(100dvh - 1rem)}.rds-head{align-items:flex-start}.rds-head p{font-size:.82rem}}
 </style>
 
 <script src="/js/role_admin.js"></script>

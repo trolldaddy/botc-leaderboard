@@ -31,6 +31,11 @@
     catch (err) { body.innerHTML = `<div class="role-admin-empty">讀取失敗：${esc(err.message)}</div>`; status.textContent = ''; }
   };
   const close = () => { modal.hidden = true; document.body.style.overflow = ''; };
+  body?.addEventListener('wheel', (event) => {
+    if (body.scrollHeight <= body.clientHeight) return;
+    body.scrollTop += event.deltaY;
+    event.preventDefault();
+  }, { passive:false });
   const save = async () => {
     const button = $('role-display-settings-save'); button.disabled = true; status.textContent = '儲存中…';
     try {
