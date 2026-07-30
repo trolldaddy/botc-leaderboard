@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from database import get_db
 from knowledge_models import KnowledgeNode, KnowledgeSourceRecord
+from role_display_settings import base_block_type, ensure_display_settings, setting_order, setting_visible
 from role_models import Role, RoleAlias, RoleContentBlock, RoleGuide, RoleKnowledgeLink, RoleReminder
 
 router = APIRouter(prefix="/api/roles", tags=["roles-public"])
@@ -150,52 +151,74 @@ def get_role_view(key: str, view: str = Query(default="player"), db: Session = D
     if not role or not role.is_active:
         raise HTTPException(status_code=404, detail="找不到角色")
 
+    settings = ensure_display_settings(db)
+    settings_by_key = {item.item_key: item for item in settings}
     payload = role_card(role)
     payload["view"] = view
+    payload["display_modules"] = {
+        item.item_key.removeprefix("module."): setting_visible(item, view)
+        for item in settings if item.item_type == "module"
+    }
+    payload["display_order"] = {
+        item.item_key: setting_order(item, view) for item in settings
+    }
     payload["aliases"] = [{
         "source": alias.source,
         "external_id": alias.external_id,
         "external_name": alias.external_name,
     } for alias in db.query(RoleAlias).filter(RoleAlias.role_id == role.id).all()]
 
-    blocks = db.query(RoleContentBlock).filter(
+    candidate_blocks = db.query(RoleContentBlock).filter(
         RoleContentBlock.role_id == role.id,
         RoleContentBlock.is_active == True,  # noqa: E712
-        RoleContentBlock.audience.in_(VIEW_AUDIENCES[view]),
-    ).order_by(RoleContentBlock.sort_order, RoleContentBlock.id).all()
+    ).all()
+    blocks = []
+    for block in candidate_blocks:
+        setting = settings_by_key.get(f"block.{base_block_type(block.block_type)}")
+        if setting:
+            if setting_visible(setting, view):
+                blocks.append(block)
+        elif block.audience in VIEW_AUDIENCES[view]:
+            blocks.append(block)
+    blocks.sort(key=lambda block: (
+        setting_order(settings_by_key[f"block.{base_block_type(block.block_type)}"], view)
+        if f"block.{base_block_type(block.block_type)}" in settings_by_key else block.sort_order,
+        block.sort_order,
+        block.id,
+    ))
     payload["content_blocks"] = [serialize_block(block) for block in blocks]
     payload["content_groups"] = serialize_content_groups(blocks)
     payload["references"] = role_references(db, role.id)
 
     guide = db.query(RoleGuide).filter(RoleGuide.role_id == role.id).first()
-    if guide:
-        if view == "player":
-            payload["guide"] = {
-                "beginner_summary": guide.beginner_summary,
-                "how_to_play": guide.how_to_play,
-                "first_day_advice": guide.first_day_advice,
-            }
-        else:
-            payload["guide"] = {
-                "beginner_summary": guide.beginner_summary,
-                "how_to_play": guide.how_to_play,
-                "first_day_advice": guide.first_day_advice,
-                "common_mistakes": guide.common_mistakes,
-                "advanced_tips": guide.advanced_tips,
-                "ability_supplement": guide.ability_supplement,
-                "storyteller_advice": guide.storyteller_advice,
-            }
+    guide_fields = {
+        "beginner_summary": "player_summary",
+        "how_to_play": "how_to_play",
+        "first_day_advice": "how_to_play",
+        "common_mistakes": "common_mistakes",
+        "advanced_tips": "advanced_tips",
+        "ability_supplement": "ability_supplement",
+        "storyteller_advice": "storyteller_advice",
+    }
+    if guide and payload["display_modules"].get("guide", True):
+        payload["guide"] = {
+            field: getattr(guide, field)
+            for field, setting_key in guide_fields.items()
+            if not settings_by_key.get(f"block.{setting_key}")
+            or setting_visible(settings_by_key[f"block.{setting_key}"], view)
+        }
     else:
         payload["guide"] = None
 
-    if view == "storyteller":
+    if payload["display_modules"].get("night_operation", False):
         payload.update({
             "first_night_order": role.first_night_order,
             "other_night_order": role.other_night_order,
             "first_night_reminder": role.first_night_reminder,
             "other_night_reminder": role.other_night_reminder,
-            "reminders": [serialize_reminder(item) for item in db.query(RoleReminder).filter(
-                RoleReminder.role_id == role.id
-            ).order_by(RoleReminder.sort_order, RoleReminder.id).all()],
         })
+    if payload["display_modules"].get("reminders", False):
+        payload["reminders"] = [serialize_reminder(item) for item in db.query(RoleReminder).filter(
+            RoleReminder.role_id == role.id
+        ).order_by(RoleReminder.sort_order, RoleReminder.id).all()]
     return payload

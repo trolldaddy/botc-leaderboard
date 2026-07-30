@@ -125,11 +125,26 @@ class RoleKnowledgeLink(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
     role = relationship("Role", back_populates="knowledge_links")
 
+class RoleDisplaySetting(Base):
+    __tablename__ = "role_display_settings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    item_key = Column(String(100), unique=True, nullable=False, index=True)
+    item_type = Column(String(30), nullable=False, default="block", index=True)
+    label = Column(String(120), nullable=False)
+    show_player = Column(Boolean, nullable=False, default=False)
+    show_encyclopedia = Column(Boolean, nullable=False, default=True)
+    show_storyteller = Column(Boolean, nullable=False, default=True)
+    sort_player = Column(Integer, nullable=False, default=0)
+    sort_encyclopedia = Column(Integer, nullable=False, default=0)
+    sort_storyteller = Column(Integer, nullable=False, default=0)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
 
 def ensure_role_schema():
     Base.metadata.create_all(bind=engine, tables=[
         Role.__table__, RoleAlias.__table__, RoleGuide.__table__, RoleReminder.__table__,
-        RoleContentBlock.__table__, RoleKnowledgeLink.__table__,
+        RoleContentBlock.__table__, RoleKnowledgeLink.__table__, RoleDisplaySetting.__table__,
     ])
     try:
         inspector = inspect(engine)

@@ -5,9 +5,48 @@ import models
 from account_binding_routes import require_admin_account
 from database import get_db
 from knowledge_models import KnowledgeNode
-from role_models import Role, RoleContentBlock, RoleKnowledgeLink
+from role_display_settings import ensure_display_settings
+from role_models import Role, RoleContentBlock, RoleDisplaySetting, RoleKnowledgeLink
 
 router = APIRouter(prefix="/roles", tags=["role-content-admin"])
+
+def serialize_display_setting(item: RoleDisplaySetting):
+    return {
+        "id": item.id, "item_key": item.item_key, "item_type": item.item_type, "label": item.label,
+        "show_player": bool(item.show_player), "show_encyclopedia": bool(item.show_encyclopedia),
+        "show_storyteller": bool(item.show_storyteller), "sort_player": item.sort_player,
+        "sort_encyclopedia": item.sort_encyclopedia, "sort_storyteller": item.sort_storyteller,
+    }
+
+
+@router.get("/display-settings")
+def list_display_settings(
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    return {"items": [serialize_display_setting(item) for item in ensure_display_settings(db)]}
+
+
+@router.put("/display-settings")
+def update_display_settings(
+    data: dict,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    items = ensure_display_settings(db)
+    by_key = {item.item_key: item for item in items}
+    allowed = {"show_player", "show_encyclopedia", "show_storyteller", "sort_player", "sort_encyclopedia", "sort_storyteller"}
+    for incoming in data.get("items") or []:
+        item = by_key.get(str(incoming.get("item_key") or ""))
+        if not item:
+            continue
+        for field in allowed:
+            if field not in incoming:
+                continue
+            value = bool(incoming[field]) if field.startswith("show_") else int(incoming[field] or 0)
+            setattr(item, field, value)
+    db.commit()
+    return {"status": "success", "items": [serialize_display_setting(item) for item in ensure_display_settings(db)]}
 
 
 def serialize_block(block: RoleContentBlock):

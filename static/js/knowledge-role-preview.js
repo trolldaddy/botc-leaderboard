@@ -34,12 +34,12 @@
     if (['how_it_works', 'rules_detail', 'rules_interactions', 'rules_jinx'].includes(baseType(block))) return 'extended';
     return 'core';
   }
-  function blockCard(block) {
-    return `<article class="knowledge-block knowledge-block-structured"><div class="knowledge-block-heading"><i class="fa-solid ${blockIcon(baseType(block))}"></i><div><strong>${esc(block.title || baseType(block))}</strong><span>${esc(block.source || '資料庫')} · ${esc(block.review_status || '待確認')}</span></div></div><div class="knowledge-block-body">${richText(block.content)}</div></article>`;
+  function blockCard(block, showSourceStatus) {
+    return `<article class="knowledge-block knowledge-block-structured"><div class="knowledge-block-heading"><i class="fa-solid ${blockIcon(baseType(block))}"></i><div><strong>${esc(block.title || baseType(block))}</strong>${showSourceStatus ? `<span>${esc(block.source || '資料庫')} · ${esc(block.review_status || '待確認')}</span>` : ''}</div></div><div class="knowledge-block-body">${richText(block.content)}</div></article>`;
   }
-  function blockGroup(blocks, group) {
+  function blockGroup(blocks, group, showSourceStatus) {
     const items = (blocks || []).filter((block) => groupFor(block) === group && !['reminders', 'source_excerpt'].includes(baseType(block)));
-    return items.length ? `<div class="knowledge-block-list">${items.map(blockCard).join('')}</div>` : '<div class="role-preview-empty">這個視角目前沒有對應內容。</div>';
+    return items.length ? `<div class="knowledge-block-list">${items.map((block) => blockCard(block, showSourceStatus)).join('')}</div>` : '<div class="role-preview-empty">這個視角目前沒有對應內容。</div>';
   }
   function guideCards(guide) {
     if (!guide) return '';
@@ -59,10 +59,16 @@
     try {
       const role = await fetch(`${apiBase}/api/roles/${encodeURIComponent(node.name || node.slug)}?view=${encodeURIComponent(view)}`, { cache: 'no-store' }).then(requireJson);
       const blocks = role.content_blocks || [];
-      const storyteller = role.view === 'storyteller' ? `${section('夜間操作', '只在說書人視角顯示', `<div class="role-night-grid"><article><b>首夜順序</b><strong>${esc(role.first_night_order ?? '未設定')}</strong><p>${esc(role.first_night_reminder || '無首夜提醒')}</p></article><article><b>其他夜順序</b><strong>${esc(role.other_night_order ?? '未設定')}</strong><p>${esc(role.other_night_reminder || '無其他夜提醒')}</p></article></div>`)}${section('提示標記', '以 GStone 百科資料為準', reminderCards(role.reminders))}` : '';
+      const modules = role.display_modules || {};
+      const visible = (key) => modules[key] !== false;
+      const showSourceStatus = visible('source_status');
+      const nightSection = visible('night_operation') ? section('夜間操作', '只在說書人視角顯示', `<div class="role-night-grid"><article><b>首夜順序</b><strong>${esc(role.first_night_order ?? '未設定')}</strong><p>${esc(role.first_night_reminder || '無首夜提醒')}</p></article><article><b>其他夜順序</b><strong>${esc(role.other_night_order ?? '未設定')}</strong><p>${esc(role.other_night_reminder || '無其他夜提醒')}</p></article></div>`) : '';
+      const reminderSection = visible('reminders') ? section('提示標記', '以 GStone 百科資料為準', reminderCards(role.reminders)) : '';
+      const hero = visible('identity') ? `<article class="role-hero role-team-${esc(role.team || 'unknown')}"><div class="role-hero-icon">${role.image_url ? `<img src="${esc(role.image_url)}" alt="${esc(role.name_zh_tw)}角色圖示">` : '<i class="fa-solid fa-masks-theater"></i>'}</div><div class="role-hero-copy"><div class="role-eyebrow">${esc(teamLabel(role.team))}${role.is_official ? ' · 官方角色' : ''}</div><h2>${esc(role.name_zh_tw)}</h2>${visible('role_metadata') ? `<div class="knowledge-name-en">${esc(role.name_en || role.canonical_key || '')}</div><div class="role-meta-row">${(role.script_names || []).map((item) => `<span><i class="fa-solid fa-book"></i>${esc(item)}</span>`).join('')}${(role.ability_tags || []).map((item) => `<span><i class="fa-solid fa-diagram-project"></i>${esc(item)}</span>`).join('')}</div>` : ''}</div>${visible('references') ? `<div class="role-hero-links">${(role.references || []).map((ref) => `<a href="${esc(ref.url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>${esc(ref.label)}</a>`).join('')}</div>` : ''}</article>` : '';
+      const ability = visible('official_ability') ? `<section class="role-ability-panel"><div><i class="fa-solid fa-wand-sparkles"></i><span>官方能力</span></div><p>${esc(role.ability_zh_tw || '尚未填入官方能力文字。')}</p></section>` : '';
+      const contentSections = `${section('角色內容', '角色背景、簡介、範例與策略', blockGroup(blocks, 'core', showSourceStatus))}${section('延伸資料', '運作方式、規則細節、互動與相剋', blockGroup(blocks, 'extended', showSourceStatus))}${section('拉普拉斯資料', '店內教學、補充與裁定', blockGroup(blocks, 'larplus', showSourceStatus))}`;
       detail.className = 'role-preview';
-      detail.innerHTML = `<article class="role-hero role-team-${esc(role.team || 'unknown')}"><div class="role-hero-icon">${role.image_url ? `<img src="${esc(role.image_url)}" alt="${esc(role.name_zh_tw)}角色圖示">` : '<i class="fa-solid fa-masks-theater"></i>'}</div><div class="role-hero-copy"><div class="role-eyebrow">${esc(teamLabel(role.team))}${role.is_official ? ' · 官方角色' : ''}</div><h2>${esc(role.name_zh_tw)}</h2><div class="knowledge-name-en">${esc(role.name_en || role.canonical_key || '')}</div><div class="role-meta-row">${(role.script_names || []).map((item) => `<span><i class="fa-solid fa-book"></i>${esc(item)}</span>`).join('')}${(role.ability_tags || []).map((item) => `<span><i class="fa-solid fa-diagram-project"></i>${esc(item)}</span>`).join('')}</div></div><div class="role-hero-links">${(role.references || []).map((ref) => `<a href="${esc(ref.url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>${esc(ref.label)}</a>`).join('')}</div></article><nav class="role-view-tabs" aria-label="角色預覽視角">${['player', 'encyclopedia', 'storyteller'].map((item) => `<button type="button" data-role-view="${item}" class="${role.view === item ? 'is-active' : ''}">${viewLabel(item)}</button>`).join('')}</nav><section class="role-ability-panel"><div><i class="fa-solid fa-wand-sparkles"></i><span>官方能力</span></div><p>${esc(role.ability_zh_tw || '尚未填入官方能力文字。')}</p></section>${guideCards(role.guide)}${role.view !== 'player' ? `${section('角色內容', '角色背景、簡介、範例與策略', blockGroup(blocks, 'core'))}${section('延伸資料', '運作方式、規則細節、互動與相剋', blockGroup(blocks, 'extended'))}${section('拉普拉斯資料', '店內教學、補充與裁定', blockGroup(blocks, 'larplus'))}` : ''}${storyteller}`;
-      detail.querySelectorAll('[data-role-view]').forEach((button) => button.addEventListener('click', () => render({ ...options, view: button.dataset.roleView })));
+      detail.innerHTML = `${hero}<nav class="role-view-tabs" aria-label="角色預覽視角">${['player', 'encyclopedia', 'storyteller'].map((item) => `<button type="button" data-role-view="${item}" class="${role.view === item ? 'is-active' : ''}">${viewLabel(item)}</button>`).join('')}</nav>${ability}${visible('guide') ? guideCards(role.guide) : ''}${blocks.length ? contentSections : ''}${nightSection}${reminderSection}`;      detail.querySelectorAll('[data-role-view]').forEach((button) => button.addEventListener('click', () => render({ ...options, view: button.dataset.roleView })));
     } catch (err) {
       onFallback(err);
     }
