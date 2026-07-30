@@ -27,7 +27,7 @@ MECHANIC_TITLES = {
     "互動干擾", "互动干扰", "回溯型能力", "進場能力", "进场能力", "角色變化", "角色变化",
     "鄰近", "邻近", "免死", "能力效果干擾", "能力效果干扰", "認知覆蓋", "认知覆盖",
     "死後能力保留", "死后能力保留", "死亡觸發能力", "死亡触发能力", "提名", "投票",
-    "限次能力", "影響", "影响", "陣營轉變", "阵营转变", "中毒", "醉酒",
+    "限次能力", "影響", "影响", "陣營轉變", "阵营转变", "能力效果乾擾", "中毒", "醉酒",
 }
 IRRELEVANT_ROOT_TITLES = {"第一屆華燈初上劇本創作大賽", "第一届华灯初上剧本创作大赛"}
 
@@ -52,6 +52,10 @@ def _result(presentation_type: str, method: str, confidence: float, reason: str)
         status="auto_confirmed" if confidence >= 0.95 else "needs_review",
         reason=reason,
     )
+
+
+def excluded_classification(reason: str = "節點屬明確排除內容") -> PresentationClassification:
+    return _result("excluded", "graph_exclusion_rule", 1.0, reason)
 
 
 def classify_knowledge_node(node) -> PresentationClassification:

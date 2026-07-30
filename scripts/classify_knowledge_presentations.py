@@ -12,8 +12,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from database import SessionLocal, engine
-from knowledge_models import KnowledgeNode
-from knowledge_presentation import classify_knowledge_node
+from knowledge_models import KnowledgeEdge, KnowledgeNode
+from knowledge_presentation import classify_knowledge_node, excluded_classification
+from role_models import RoleKnowledgeLink
 
 
 def ensure_columns():
@@ -38,6 +39,35 @@ def ensure_columns():
                 connection.execute(text(f"ALTER TABLE knowledge_nodes ADD COLUMN {name} {definition}"))
 
 
+def irrelevant_contest_node_ids(db: Session) -> set[int]:
+    roots = db.query(KnowledgeNode).filter(
+        KnowledgeNode.canonical_name_zh_tw.in_([
+            "第一屆華燈初上劇本創作大賽",
+            "第一届华灯初上剧本创作大赛",
+        ])
+    ).all()
+    excluded_ids = {node.id for node in roots}
+    for root in roots:
+        target_ids = [row[0] for row in db.query(KnowledgeEdge.to_node_id).filter(
+            KnowledgeEdge.from_node_id == root.id
+        ).all()]
+        candidates = db.query(KnowledgeNode).filter(
+            KnowledgeNode.id.in_(target_ids),
+            KnowledgeNode.node_type == "article",
+        ).all() if target_ids else []
+        for node in candidates:
+            has_role_link = db.query(RoleKnowledgeLink.id).filter(
+                RoleKnowledgeLink.knowledge_node_id == node.id
+            ).first() is not None
+            has_other_incoming = db.query(KnowledgeEdge.id).filter(
+                KnowledgeEdge.to_node_id == node.id,
+                KnowledgeEdge.from_node_id != root.id,
+            ).first() is not None
+            if not has_role_link and not has_other_incoming:
+                excluded_ids.add(node.id)
+    return excluded_ids
+
+
 def run(write: bool):
     ensure_columns()
     db: Session = SessionLocal()
@@ -48,13 +78,18 @@ def run(write: bool):
     skipped_manual = 0
     try:
         nodes = db.query(KnowledgeNode).order_by(KnowledgeNode.node_type, KnowledgeNode.canonical_name_zh_tw).all()
+        contest_excluded_ids = irrelevant_contest_node_ids(db)
         for node in nodes:
             if node.classification_method == "manual" and node.presentation_type:
                 type_counts[node.presentation_type] += 1
                 status_counts[node.classification_status or "manual_confirmed"] += 1
                 skipped_manual += 1
                 continue
-            result = classify_knowledge_node(node)
+            result = (
+                excluded_classification("第一屆華燈初上劇本創作大賽的無關子頁")
+                if node.id in contest_excluded_ids
+                else classify_knowledge_node(node)
+            )
             type_counts[result.presentation_type] += 1
             status_counts[result.status] += 1
             is_changed = any([
@@ -89,6 +124,7 @@ def run(write: bool):
             "presentation_types": dict(sorted(type_counts.items())),
             "classification_statuses": dict(sorted(status_counts.items())),
             "manual_overrides_preserved": skipped_manual,
+            "contest_nodes_excluded": len(contest_excluded_ids),
             "review_or_excluded": rows,
         }
         print(json.dumps(report, ensure_ascii=False, indent=2))
