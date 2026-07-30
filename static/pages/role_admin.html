@@ -168,12 +168,13 @@
   .rds-head { top:0; }
   .rds-head h3 { margin:0 0 .3rem; }.rds-head p,.rds-actions span { margin:0; color:#aeb6c9; }
   .rds-actions { border-top:1px solid #30364a; border-bottom:0; justify-content:flex-end; }.rds-actions span { margin-right:auto; }
-  .rds-body { flex:1 1 0; min-height:0; height:0; padding:1rem; overflow:hidden; display:grid; grid-template-rows:auto minmax(0,1fr); gap:1rem; }.rds-section { min-height:0; border:1px solid #39415a; border-radius:14px; overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#7568c9 #151924; }
+  .rds-body { flex:1 1 0; min-width:0; min-height:0; height:0; padding:1rem; overflow:hidden; display:grid; grid-template-rows:minmax(0,.72fr) minmax(0,1.28fr); gap:1rem; }
+  .rds-section { min-width:0; min-height:0; max-height:100%; border:1px solid #39415a; border-radius:14px; overflow:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#7568c9 #151924; }
   .rds-section::-webkit-scrollbar { width:10px; height:10px; }
   .rds-section::-webkit-scrollbar-track { background:#151924; border-radius:999px; }
   .rds-section::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#8b7cf6,#5f55a7); border:2px solid #151924; border-radius:999px; }
   .rds-section::-webkit-scrollbar-thumb:hover { background:linear-gradient(180deg,#a99dff,#7468c8); }
-  .rds-section h4 { margin:0; padding:.8rem 1rem; color:#ffd166; background:#151924; border-bottom:1px solid #30364a; }
+  .rds-section h4 { position:sticky; top:0; z-index:1; margin:0; padding:.8rem 1rem; color:#ffd166; background:#151924; border-bottom:1px solid #30364a; }
   .rds-row { display:grid; grid-template-columns:minmax(210px,1fr) repeat(3,minmax(135px,.45fr)); gap:.7rem; align-items:center; padding:.7rem 1rem; border-bottom:1px solid #282e40; }.rds-row:last-child{border-bottom:0}.rds-row strong{overflow-wrap:anywhere}
   .rds-target { display:grid; grid-template-columns:auto 1fr; gap:.45rem; align-items:center; color:#dfe3ee; }.rds-target input[type=checkbox]{accent-color:#8b7cf6}.rds-target input[type=number]{min-width:0;width:100%;background:#202638;color:#fff;border:1px solid #39415a;border-radius:8px;padding:.45rem}
   .rds-legend { display:none; }
