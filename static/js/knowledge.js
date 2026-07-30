@@ -188,7 +188,20 @@
     if (detail) detail.innerHTML = '<div class="knowledge-detail-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>正在讀取條目...</p></div>';
     try {
       const node = await fetch(`${apiBase}/api/knowledge/nodes/${encodeURIComponent(slug)}`, { cache: 'no-store' }).then(requireJson);
-      renderNode(node);
+      if (node.node_type === 'role' && window.RoleKnowledgePreview) {
+        await window.RoleKnowledgePreview.render({
+          apiBase, node, detail, requireJson,
+          onFallback: (err) => {
+            renderNode(node);
+            const warning = document.createElement('div');
+            warning.className = 'knowledge-warning';
+            warning.textContent = `角色主資料尚未完成連結：${err.message}`;
+            detail.prepend(warning);
+          }
+        });
+      } else {
+        renderNode(node);
+      }
       const hash = `knowledge/${encodeURIComponent(slug)}`;
       if (window.location.hash !== `#${hash}`) history.replaceState(null, '', `#${hash}`);
     } catch (err) {
