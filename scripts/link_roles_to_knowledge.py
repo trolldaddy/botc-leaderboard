@@ -15,6 +15,7 @@ from database import SessionLocal
 from gstone_wiki import to_simplified
 from knowledge_models import KnowledgeAlias, KnowledgeBlock, KnowledgeEdge, KnowledgeNode, KnowledgeSourceRecord
 from role_models import Role, RoleContentBlock, RoleKnowledgeLink
+from scripts.seed_archived_deleted_roles import ARCHIVED_ROLES, run as seed_archived_deleted_roles
 
 TARGET_NAMES = ["小惡魔", "洗腦師", "賭徒"]
 SKIP_BLOCK_TYPES = {"ability", "reminders", "source_excerpt"}
@@ -248,7 +249,17 @@ def main():
     args = parser.parse_args()
     if not os.getenv("DATABASE_URL"):
         raise SystemExit("DATABASE_URL is required")
-    print(run(args.write, all_roles=not args.trial))
+    archived_stats = seed_archived_deleted_roles(args.write)
+    link_stats = run(args.write, all_roles=not args.trial)
+    if not args.write:
+        archived_names = {item["name_tw"] for item in ARCHIVED_ROLES}
+        covered = [name for name in link_stats["missing_nodes"] if name in archived_names]
+        link_stats["missing_nodes"] = [name for name in link_stats["missing_nodes"] if name not in archived_names]
+        link_stats["resolved_by_archived_seed_preview"] = covered
+    print({
+        "archived_deleted_roles": archived_stats,
+        "role_knowledge": link_stats,
+    })
 
 
 if __name__ == "__main__":
