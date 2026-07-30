@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from database import SessionLocal
-from knowledge_models import KnowledgeAlias, KnowledgeBlock, KnowledgeNode, KnowledgeSourceRecord
+from knowledge_models import KnowledgeAlias, KnowledgeBlock, KnowledgeEdge, KnowledgeNode, KnowledgeSourceRecord
 from role_models import Role, RoleContentBlock, RoleKnowledgeLink
 
 TARGET_NAMES = ["小惡魔", "洗腦師", "賭徒"]
@@ -83,6 +83,34 @@ def latest_source_url(db: Session, node_id: int):
     return row.source_url if row else None
 
 
+def irrelevant_contest_nodes(db: Session) -> list[KnowledgeNode]:
+    root = db.query(KnowledgeNode).filter(
+        KnowledgeNode.canonical_name_zh_tw == "第一屆華燈初上劇本創作大賽"
+    ).first()
+    if not root:
+        return []
+
+    target_ids = [row[0] for row in db.query(KnowledgeEdge.to_node_id).filter(
+        KnowledgeEdge.from_node_id == root.id
+    ).all()]
+    candidates = db.query(KnowledgeNode).filter(
+        KnowledgeNode.id.in_(target_ids),
+        KnowledgeNode.node_type == "article",
+    ).all() if target_ids else []
+    disabled = [root]
+    for node in candidates:
+        has_role_link = db.query(RoleKnowledgeLink.id).filter(
+            RoleKnowledgeLink.knowledge_node_id == node.id
+        ).first() is not None
+        has_other_incoming = db.query(KnowledgeEdge.id).filter(
+            KnowledgeEdge.to_node_id == node.id,
+            KnowledgeEdge.from_node_id != root.id,
+        ).first() is not None
+        if not has_role_link and not has_other_incoming:
+            disabled.append(node)
+    return disabled
+
+
 def run(write: bool, all_roles: bool = True):
     db: Session = SessionLocal()
     stats = {
@@ -97,6 +125,9 @@ def run(write: bool, all_roles: bool = True):
         "missing_roles": [],
         "missing_nodes": [],
         "matches": [],
+        "contest_nodes_would_disable": 0,
+        "contest_nodes_disabled": 0,
+        "contest_nodes": [],
     }
     try:
         target_names = (
@@ -183,6 +214,14 @@ def run(write: bool, all_roles: bool = True):
                 if stale.source_key not in active_source_keys and stale.is_active:
                     stale.is_active = False
                     stats["blocks_deactivated"] += 1
+
+        for node in irrelevant_contest_nodes(db):
+            stats["contest_nodes"].append({"id": node.id, "name": node.canonical_name_zh_tw, "status": node.status})
+            if node.status != "disabled":
+                stats["contest_nodes_would_disable"] += 1
+                if write:
+                    node.status = "disabled"
+                    stats["contest_nodes_disabled"] += 1
 
         if write:
             db.commit()

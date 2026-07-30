@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup, Tag
 from opencc import OpenCC
 
 BASE_URL = "https://clocktower-wiki.gstonegames.com"
+EXCLUDED_KNOWLEDGE_TITLES = {"第一屆華燈初上劇本創作大賽"}
 HEADERS = {
     "User-Agent": "Larplus-Knowledge-Base/1.1 (+official GStone wiki sync)",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.5",
@@ -27,6 +28,10 @@ def to_traditional(value: Any) -> str:
 
 def to_simplified(value: Any) -> str:
     return _TO_SIMPLIFIED.convert(clean_text(value))
+
+
+def is_excluded_knowledge_title(title: str) -> bool:
+    return to_traditional(title) in EXCLUDED_KNOWLEDGE_TITLES
 
 
 def article_url(title: str) -> str:

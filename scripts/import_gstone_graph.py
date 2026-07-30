@@ -20,7 +20,7 @@ if str(REPO_ROOT) not in sys.path:
 
 import models  # noqa: F401  registers all SQLAlchemy models
 from database import Base, SessionLocal, engine
-from gstone_wiki import BASE_URL, to_traditional
+from gstone_wiki import BASE_URL, is_excluded_knowledge_title, to_traditional
 from knowledge_models import (
     CrawlLink,
     CrawlPage,
@@ -126,6 +126,9 @@ def import_report(report: dict, write: bool):
             if not title:
                 stats["pages_skipped"] += 1
                 continue
+            if is_excluded_knowledge_title(title):
+                stats["pages_excluded"] += 1
+                continue
             title_tw = to_traditional(title)
             node_type = TYPE_MAP.get(page.get("page_type"), "article")
             node = db.query(KnowledgeNode).filter(KnowledgeNode.canonical_name_zh_tw == title_tw).first()
@@ -203,6 +206,9 @@ def import_report(report: dict, write: bool):
             target_title = (edge.get("target") or "").strip()
             if not source_title or not target_title:
                 stats["edges_skipped"] += 1
+                continue
+            if is_excluded_knowledge_title(source_title):
+                stats["edges_excluded"] += 1
                 continue
             from_node = nodes_by_title.get(source_title) or nodes_by_title.get(to_traditional(source_title))
             if not from_node:

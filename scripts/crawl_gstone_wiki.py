@@ -26,7 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from gstone_wiki import BASE_URL, HEADERS, article_url, parse_reminders, to_traditional
+from gstone_wiki import BASE_URL, HEADERS, article_url, is_excluded_knowledge_title, parse_reminders, to_traditional
 
 DEFAULT_SEEDS = ["首頁", "角色", "剧本", "規則", "规则", "相克規則", "相克规则"]
 ARTICLE_PATH = "/index.php"
@@ -238,6 +238,12 @@ def crawl(args: argparse.Namespace) -> dict[str, Any]:
         visited.add(requested_title)
         requested_url = canonical_article_url(requested_title)
         page = CrawlPage(requested_url=requested_url, title=requested_title)
+        if is_excluded_knowledge_title(requested_title):
+            page.resolved_title = requested_title
+            page.page_type = "excluded"
+            page.classification_reasons = ["excluded_irrelevant_competition"]
+            pages.append(page)
+            continue
         try:
             response, page.elapsed_ms = fetch_page(session, requested_url, args.timeout)
             page.status = response.status_code
