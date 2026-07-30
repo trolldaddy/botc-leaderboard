@@ -30,6 +30,7 @@ MECHANIC_TITLES = {
     "死後能力保留", "死后能力保留", "死亡觸發能力", "死亡触发能力", "提名", "投票",
     "限次能力", "影響", "影响", "陣營轉變", "阵营转变", "能力效果乾擾", "中毒", "醉酒",
 }
+GUIDE_TITLES = {"瘋狂規則如何運作？——瘋狂的小精靈", "疯狂规则如何运作？——疯狂的小精灵"}
 IRRELEVANT_ROOT_TITLES = {"第一屆華燈初上劇本創作大賽", "第一届华灯初上剧本创作大赛"}
 
 
@@ -86,6 +87,8 @@ def classify_knowledge_node(node) -> PresentationClassification:
         return _result("script_guide", "title_or_node_type", 0.96, "官方劇本或劇本指南")
     if name in MECHANIC_TITLES or node_type == "mechanic":
         return _result("mechanic", "title_or_node_type", 0.96, "單一規則或能力機制")
+    if name in GUIDE_TITLES:
+        return _result("guide", "exact_title", 0.98, "官方延伸閱讀指南")
     if node_type == "guide":
         return _result("guide", "node_type", 0.90, "指南型節點，需覆核文章結構")
     if any(keyword in name for keyword in ("一覽", "一览", "總覽", "总览", "彙總", "汇总")):

@@ -37,6 +37,8 @@ SECTION_MAP = {
     "策略": ("strategy_play", "如何遊玩", 700),
     "說書人建議": ("storyteller_advice", "說書人建議", 750),
     "说书人建议": ("storyteller_advice", "說書人建議", 750),
+    "對說書人的建議": ("storyteller_advice", "說書人建議", 750),
+    "对说书人的建议": ("storyteller_advice", "說書人建議", 750),
 }
 
 
