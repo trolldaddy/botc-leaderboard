@@ -24,6 +24,10 @@ def _node_query(db: Session):
     return db.query(KnowledgeNode).filter(
         KnowledgeNode.node_type.in_(PUBLIC_NODE_TYPES),
         ~KnowledgeNode.status.in_(HIDDEN_STATUSES),
+        or_(
+            KnowledgeNode.presentation_type.is_(None),
+            KnowledgeNode.presentation_type != "excluded",
+        ),
     )
 
 
