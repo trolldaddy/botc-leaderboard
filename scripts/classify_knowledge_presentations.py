@@ -14,7 +14,6 @@ if str(ROOT) not in sys.path:
 from database import SessionLocal, engine
 from knowledge_models import KnowledgeEdge, KnowledgeNode
 from knowledge_presentation import classify_knowledge_node, excluded_classification
-from role_models import RoleKnowledgeLink
 
 
 def ensure_columns():
@@ -56,15 +55,7 @@ def irrelevant_contest_node_ids(db: Session) -> set[int]:
             KnowledgeNode.node_type == "article",
         ).all() if target_ids else []
         for node in candidates:
-            has_role_link = db.query(RoleKnowledgeLink.id).filter(
-                RoleKnowledgeLink.knowledge_node_id == node.id
-            ).first() is not None
-            has_other_incoming = db.query(KnowledgeEdge.id).filter(
-                KnowledgeEdge.to_node_id == node.id,
-                KnowledgeEdge.from_node_id != root.id,
-            ).first() is not None
-            if not has_role_link and not has_other_incoming:
-                excluded_ids.add(node.id)
+            excluded_ids.add(node.id)
     return excluded_ids
 
 
