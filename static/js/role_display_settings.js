@@ -7,6 +7,8 @@
   const status = $('role-display-settings-status');
   let items = [];
 
+  if (modal && modal.parentElement !== document.body) document.body.appendChild(modal);
+
   const request = async (path, options = {}) => {
     const response = await fetch(`${apiBase()}${path}`, { credentials:'same-origin', headers:{'Content-Type':'application/json'}, ...options });
     const data = await response.json().catch(() => ({}));
