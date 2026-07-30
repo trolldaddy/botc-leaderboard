@@ -46,7 +46,13 @@ def map_section(title: str):
         return "strategy_counter", title, 720
     if title in {"角色資訊", "角色信息"}:
         return None
-    return next((value for key, value in SECTION_MAP.items() if key == title or key in title), None)
+    exact = SECTION_MAP.get(title)
+    if exact:
+        return exact
+    return next(
+        (SECTION_MAP[key] for key in sorted(SECTION_MAP, key=len, reverse=True) if key in title),
+        None,
+    )
 
 def clean_inline(value: str) -> str:
     return re.sub(r"\s+", " ", str(value or "")).strip()
@@ -199,8 +205,7 @@ def extract_structured_sections(html: str) -> tuple[str, list[dict]]:
         node.decompose()
 
     sections: list[dict] = []
-    used_types: dict[str, int] = {}
-    headings = root.find_all(["h2", "h3"])
+    headings = root.find_all(["h2"])
     for heading in headings:
         title = normalize_heading(heading.get_text(" ", strip=True))
         mapped = map_section(title)
@@ -210,13 +215,17 @@ def extract_structured_sections(html: str) -> tuple[str, list[dict]]:
         if not content:
             continue
         base_type, display_title, sort_order = mapped
-        occurrence = used_types.get(base_type, 0)
-        used_types[base_type] = occurrence + 1
-        block_type = base_type if occurrence == 0 else f"{base_type}_{occurrence + 1}"
+        existing = next((section for section in sections if section["block_type"] == base_type), None)
+        if existing:
+            existing["content"] = excerpt(
+                f"{existing['content']}\n\n### {title}\n\n{content}",
+                9000,
+            )
+            continue
         sections.append({
-            "block_type": block_type,
-            "title": display_title if occurrence == 0 else f"{display_title}（續）",
-            "sort_order": sort_order + occurrence,
+            "block_type": base_type,
+            "title": display_title,
+            "sort_order": sort_order,
             "content": excerpt(content, 9000),
             "content_format": "structured_text",
         })

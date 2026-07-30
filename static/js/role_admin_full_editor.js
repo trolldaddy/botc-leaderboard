@@ -247,7 +247,10 @@
     const larplusGrid = takeFields(['ra-guide-summary','ra-guide-ability','ra-guide-play','ra-guide-advanced','ra-guide-storyteller','ra-guide-mistakes']);
     originalGrid.remove();
 
-    const blocks = data.content_blocks || [];
+    const blocks = (data.content_blocks || []).filter((block) => {
+      const source = String(block.source || '').toLowerCase();
+      return block.is_active || ['larplus', 'manual'].includes(source);
+    });
     const shared = blocks.filter((b) => !['larplus','manual'].includes(String(b.source || '').toLowerCase()) && !String(b.block_type || '').startsWith('reminders'));
     const larplus = blocks.filter((b) => ['larplus','manual'].includes(String(b.source || '').toLowerCase()));
     const baseType = (block) => String(block.block_type || '').replace(/_\d+$/, '');
