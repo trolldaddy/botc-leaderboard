@@ -18,6 +18,7 @@ ROLE_GROUP_TITLES = {
 }
 INDEX_TITLES = {"首頁", "首页", "角色", "劇本", "剧本"}
 SCRIPT_GUIDE_TITLES = {
+    "山雨欲來", "山雨欲来",
     "暗流湧動", "暗流涌动", "黯月初升", "夢殞春宵", "梦殒春宵", "華燈初上", "华灯初上",
 }
 MECHANIC_TITLES = {

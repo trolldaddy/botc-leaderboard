@@ -55,7 +55,8 @@ def irrelevant_contest_node_ids(db: Session) -> set[int]:
             KnowledgeNode.node_type == "article",
         ).all() if target_ids else []
         for node in candidates:
-            excluded_ids.add(node.id)
+            if node.canonical_name_zh_tw not in {"山雨欲來", "山雨欲来"}:
+                excluded_ids.add(node.id)
     return excluded_ids
 
 
