@@ -17,6 +17,7 @@ from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup, NavigableString, Tag
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 ROOT = Path(__file__).resolve().parents[1]

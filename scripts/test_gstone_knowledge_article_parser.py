@@ -1,4 +1,4 @@
-﻿from seed_gstone_knowledge_articles import extract_article_sections, is_gstone_url
+﻿from seed_gstone_knowledge_articles import extract_article_sections, is_gstone_url, or_
 
 
 HTML = """
@@ -16,6 +16,7 @@ HTML = """
 
 
 def main():
+    assert callable(or_)
     normalized, blocks = extract_article_sections(HTML)
     assert [block["title"] for block in blocks] == ["導言", "第一節", "資料表"]
     assert "### 子標題" in blocks[1]["content"]
