@@ -2,3 +2,5 @@
 .role-preview .role-meta-row .role-meta-tag{appearance:none;display:inline-flex;align-items:center;gap:.38rem;padding:.3rem .62rem;border-radius:999px;border:1px solid rgba(167,139,250,.34);background:rgba(124,58,237,.18);color:#e8e1ff;font:inherit;font-size:.72rem;font-weight:800;line-height:1;cursor:pointer;transition:border-color .16s ease,background .16s ease,transform .16s ease}.role-preview .role-meta-row .role-meta-tag:hover{border-color:rgba(255,209,102,.62);background:rgba(255,209,102,.12);color:#ffd166;transform:translateY(-1px)}
 
 .knowledge-block-body .rich-size-sm{font-size:.82em}.knowledge-block-body .rich-size-md{font-size:1em}.knowledge-block-body .rich-size-lg{font-size:1.18em;line-height:1.55}.knowledge-block-body .rich-size-xl{display:inline-block;font-size:1.38em;line-height:1.4;font-weight:800;color:#fff;margin:.2em 0}
+
+.role-mention-inline{display:inline-flex;align-items:center;margin:0 .12rem;padding:.16rem .48rem;vertical-align:.08em;white-space:nowrap}

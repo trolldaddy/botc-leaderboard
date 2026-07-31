@@ -47,40 +47,71 @@
     if (team === 'fabled') return 'fabled';
     return 'article';
   };
-  function appendRoleMentionChips(root, targets, currentRole, onNavigate) {
+  const relationMentionTargets = (node) => (node.relations || [])
+    .map((relation) => relation?.node)
+    .filter((item) => item && item.node_type !== 'role' && String(item.name || '').trim().length >= 2)
+    .map((item) => ({ label: String(item.name).trim(), target: String(item.slug || item.name).trim(), team: 'article' }));
+  const uniqueMentionTargets = (targets) => {
+    const seen = new Set();
+    return targets.filter((item) => {
+      const key = `${item.label}::${item.target}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).sort((a, b) => b.label.length - a.label.length);
+  };
+  function replaceInlineMentions(root, targets, currentRole, currentNode, onNavigate) {
     if (!root || !targets.length || typeof onNavigate !== 'function') return;
-    const currentNames = new Set([currentRole.name_zh_tw, currentRole.name_en, currentRole.canonical_key].filter(Boolean));
-    const candidates = targets.filter((item) => !currentNames.has(item.label));
-    root.querySelectorAll('.knowledge-block-structured, .role-guide-card').forEach((block) => {
-      const body = block.querySelector('.knowledge-block-body');
-      const bodyText = body?.textContent || '';
-      const mentioned = [];
-      const seen = new Set();
-      candidates.forEach((item) => {
-        if (!bodyText.includes(item.label) || seen.has(item.target)) return;
-        seen.add(item.target);
-        mentioned.push(item);
+    const currentNames = new Set([
+      currentRole.name_zh_tw, currentRole.name_en, currentRole.canonical_key, currentNode.name, currentNode.slug,
+    ].filter(Boolean).map((value) => String(value).trim()));
+    const candidates = uniqueMentionTargets(targets)
+      .filter((item) => !currentNames.has(item.label) && !currentNames.has(item.target));
+    if (!candidates.length) return;
+
+    const nodeFilter = root.ownerDocument.defaultView.NodeFilter;
+    root.querySelectorAll('.role-ability-panel p, .knowledge-block-body, .role-reminder-field p, .role-night-grid p').forEach((body) => {
+      const walker = root.ownerDocument.createTreeWalker(body, nodeFilter.SHOW_TEXT, {
+        acceptNode(textNode) {
+          if (!String(textNode.nodeValue || '').trim()) return nodeFilter.FILTER_REJECT;
+          const parent = textNode.parentElement;
+          if (!parent || parent.closest('a, button, .role-mention-chip')) return nodeFilter.FILTER_REJECT;
+          return candidates.some((item) => textNode.nodeValue.includes(item.label))
+            ? nodeFilter.FILTER_ACCEPT : nodeFilter.FILTER_REJECT;
+        },
       });
-      if (!mentioned.length) return;
-      const footer = root.ownerDocument.createElement('div');
-      footer.className = 'role-mention-footer';
-      const label = root.ownerDocument.createElement('span');
-      label.className = 'role-mention-label';
-      label.textContent = '本文提及';
-      footer.append(label);
-      mentioned.forEach((item) => {
-        const button = root.ownerDocument.createElement('button');
-        button.type = 'button';
-        button.className = `role-mention-chip role-mention-${mentionTone(item.team)}`;
-        button.textContent = item.label;
-        button.title = `查看「${item.label}」角色資料`;
-        button.addEventListener('click', () => onNavigate(item.target));
-        footer.append(button);
+      const textNodes = [];
+      while (walker.nextNode()) textNodes.push(walker.currentNode);
+      textNodes.forEach((textNode) => {
+        const textValue = textNode.nodeValue;
+        const fragment = root.ownerDocument.createDocumentFragment();
+        let cursor = 0;
+        let changed = false;
+        while (cursor < textValue.length) {
+          let match = null;
+          candidates.forEach((item) => {
+            const index = textValue.indexOf(item.label, cursor);
+            if (index < 0) return;
+            if (!match || index < match.index || (index === match.index && item.label.length > match.item.label.length)) match = { index, item };
+          });
+          if (!match) break;
+          if (match.index > cursor) fragment.append(textValue.slice(cursor, match.index));
+          const button = root.ownerDocument.createElement('button');
+          button.type = 'button';
+          button.className = `role-mention-chip role-mention-inline role-mention-${mentionTone(match.item.team)}`;
+          button.textContent = match.item.label;
+          button.title = `查看「${match.item.label}」資料`;
+          button.addEventListener('click', () => onNavigate(match.item.target));
+          fragment.append(button);
+          cursor = match.index + match.item.label.length;
+          changed = true;
+        }
+        if (!changed) return;
+        if (cursor < textValue.length) fragment.append(textValue.slice(cursor));
+        textNode.replaceWith(fragment);
       });
-      block.append(footer);
     });
   }
-
   function richText(content) {
     const lines = String(content || '').replace(/\r/g, '').split('\n');
     const output = [];
@@ -169,7 +200,7 @@
       const contentSections = `${coreBlocks ? section('角色內容', '角色背景、簡介、範例與策略', coreBlocks) : ''}${extendedBlocks ? section('延伸資料', '運作方式、規則細節、互動與相剋', extendedBlocks) : ''}${larplusBlocks ? section('拉普拉斯資料', '店內教學、補充與裁定', larplusBlocks) : ''}`;
       const viewContent = `${ability}${visible('guide') ? guideCards(role.guide) : ''}${blocks.length ? contentSections : ''}${nightSection}${reminderSection}`;      const applyRoleMentionLinks = (root) => {
         loadRoleMentionTargets(apiBase, requireJson)
-          .then((targets) => appendRoleMentionChips(root, targets, role, options.onNavigate))
+          .then((targets) => replaceInlineMentions(root, [...targets, ...relationMentionTargets(node)], role, node, options.onNavigate))
           .catch((error) => console.warn('角色提及連結載入失敗', error));
       };
       if (preserveShell) {
