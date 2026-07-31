@@ -223,5 +223,13 @@
       else console.error(err);
     }
   }
-  window.RoleKnowledgePreview = { render };
+  async function linkRoleMentions(options = {}) {
+    const { root, apiBase = '', requireJson, currentRole = {}, currentNode = {}, onNavigate, isCurrent } = options;
+    if (!root || typeof requireJson !== 'function') return;
+    const targets = await loadRoleMentionTargets(apiBase, requireJson);
+    if (typeof isCurrent === 'function' && !isCurrent()) return;
+    replaceInlineMentions(root, targets, currentRole, currentNode, onNavigate);
+  }
+
+  window.RoleKnowledgePreview = { render, linkRoleMentions };
 })();

@@ -62,6 +62,17 @@
       .map((type) => ({ type, items: groups.get(type) }));
   }
 
+  function renderTitleRelations(relations) {
+    const items = groupRelations(relations).flatMap((group) => group.items);
+    if (!items.length) return '';
+    return `<aside class="knowledge-title-relations" aria-label="相關條目"><span class="knowledge-title-relations-label">相關條目</span><div class="knowledge-title-relation-list">${items.map(relationButton).join('')}</div></aside>`;
+  }
+
+  function isNavigationOnlyIntro(block) {
+    if (String(block?.title || '').trim() !== '導言') return false;
+    const text = String(block?.content || '').replace(/\s+/g, ' ').trim();
+    return /^(?:<<|←|返回|回到).*?(?:總覽|分類|上一層)/.test(text);
+  }
   function renderRelationGroups(relations) {
     const groups = groupRelations(relations);
     if (!groups.length) return '<span class="knowledge-result-meta">目前沒有可顯示的規則或文章關聯。</span>';
@@ -192,17 +203,24 @@
     const detail = $('knowledge-detail');
     if (!detail) return;
     const aliases = (node.aliases || []).filter((alias) => alias.alias && alias.alias !== node.name);
-    const blocks = node.blocks || [];
+    const blocks = (node.blocks || []).filter((block) => !isNavigationOnlyIntro(block));
     const relations = node.relations || [];
-    const visibleRelationCount = groupRelations(relations).reduce((total, group) => total + group.items.length, 0);
+    detail.dataset.knowledgeSlug = node.slug;
     detail.className = '';
     detail.innerHTML = `
-      <div class="knowledge-detail-title"><div><div class="knowledge-type-chip">${escapeHtml(typeLabel(node.node_type))}</div><h2>${escapeHtml(node.name)}</h2>${node.name_en ? `<div class="knowledge-name-en">${escapeHtml(node.name_en)}</div>` : ''}</div><div class="knowledge-result-meta">${escapeHtml(node.slug)}</div></div>
+      <div class="knowledge-detail-title"><div class="knowledge-title-identity"><div class="knowledge-type-chip">${escapeHtml(typeLabel(node.node_type))}</div><h2>${escapeHtml(node.name)}</h2>${node.name_en ? `<div class="knowledge-name-en">${escapeHtml(node.name_en)}</div>` : ''}</div>${renderTitleRelations(relations)}</div>
       ${blocks.length ? `<div class="knowledge-section"><h3>整理內容</h3><div class="knowledge-block-list">${blocks.map(renderBlock).join('')}</div></div>` : `<div class="knowledge-section"><div class="knowledge-warning">目前尚未建立結構化內容。後續會逐步補上能力、規則、說書人提醒與常見誤解。</div></div>`}
       ${node.source_record?.url ? `<div class="knowledge-section knowledge-source-reference"><h3>來源</h3><a class="knowledge-source-link" href="${escapeHtml(node.source_record.url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> 查看原始來源</a></div>` : ''}
-      ${aliases.length ? `<div class="knowledge-section"><h3>別名與其他語言</h3><div class="knowledge-aliases">${aliases.map((alias) => `<span class="knowledge-alias">${escapeHtml(alias.alias)} <small>${escapeHtml(alias.language || '')}</small></span>`).join('')}</div></div>` : ''}
-      <div class="knowledge-section"><h3>相關條目（${visibleRelationCount}）</h3><div class="knowledge-relation-groups">${renderRelationGroups(relations)}</div></div>`;
+      ${aliases.length ? `<div class="knowledge-section"><h3>別名與其他語言</h3><div class="knowledge-aliases">${aliases.map((alias) => `<span class="knowledge-alias">${escapeHtml(alias.alias)} <small>${escapeHtml(alias.language || '')}</small></span>`).join('')}</div></div>` : ''}`;
     bindDetailEvents(detail, node);
+    window.RoleKnowledgePreview?.linkRoleMentions?.({
+      root: detail,
+      apiBase,
+      requireJson,
+      currentNode: node,
+      onNavigate: loadNode,
+      isCurrent: () => detail.dataset.knowledgeSlug === node.slug
+    }).catch((error) => console.warn('文章角色提及連結載入失敗', error));
   }
 
   const slugFromLocation = () => {
