@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 from database import get_db
 from knowledge_models import KnowledgeNode, KnowledgeSourceRecord
 from role_display_settings import base_block_type, ensure_display_settings, setting_order, setting_visible
-from role_models import Role, RoleAlias, RoleContentBlock, RoleGuide, RoleKnowledgeLink, RoleReminder
+from role_models import Role, RoleAlias, RoleContentBlock, RoleDisplayOverride, RoleGuide, RoleKnowledgeLink, RoleReminder
 
 router = APIRouter(prefix="/api/roles", tags=["roles-public"])
 VALID_VIEWS = {"player", "encyclopedia", "storyteller"}
@@ -153,14 +153,25 @@ def get_role_view(key: str, view: str = Query(default="player"), db: Session = D
 
     settings = ensure_display_settings(db)
     settings_by_key = {item.item_key: item for item in settings}
+    overrides_by_key = {item.item_key: item for item in db.query(RoleDisplayOverride).filter(RoleDisplayOverride.role_id == role.id).all()}
+
+    def visible(setting, selected_view):
+        override = overrides_by_key.get(setting.item_key)
+        value = getattr(override, f"show_{selected_view}", None) if override else None
+        return bool(value) if value is not None else setting_visible(setting, selected_view)
+
+    def order(setting, selected_view):
+        override = overrides_by_key.get(setting.item_key)
+        value = getattr(override, f"sort_{selected_view}", None) if override else None
+        return int(value) if value is not None else setting_order(setting, selected_view)
     payload = role_card(role)
     payload["view"] = view
     payload["display_modules"] = {
-        item.item_key.removeprefix("module."): setting_visible(item, view)
+        item.item_key.removeprefix("module."): visible(item, view)
         for item in settings if item.item_type == "module"
     }
     payload["display_order"] = {
-        item.item_key: setting_order(item, view) for item in settings
+        item.item_key: order(item, view) for item in settings
     }
     payload["aliases"] = [{
         "source": alias.source,
@@ -176,12 +187,12 @@ def get_role_view(key: str, view: str = Query(default="player"), db: Session = D
     for block in candidate_blocks:
         setting = settings_by_key.get(f"block.{base_block_type(block.block_type)}")
         if setting:
-            if setting_visible(setting, view):
+            if visible(setting, view):
                 blocks.append(block)
         elif block.audience in VIEW_AUDIENCES[view]:
             blocks.append(block)
     blocks.sort(key=lambda block: (
-        setting_order(settings_by_key[f"block.{base_block_type(block.block_type)}"], view)
+        order(settings_by_key[f"block.{base_block_type(block.block_type)}"], view)
         if f"block.{base_block_type(block.block_type)}" in settings_by_key else block.sort_order,
         block.sort_order,
         block.id,
@@ -205,7 +216,7 @@ def get_role_view(key: str, view: str = Query(default="player"), db: Session = D
             field: getattr(guide, field)
             for field, setting_key in guide_fields.items()
             if not settings_by_key.get(f"block.{setting_key}")
-            or setting_visible(settings_by_key[f"block.{setting_key}"], view)
+            or visible(settings_by_key[f"block.{setting_key}"], view)
         }
     else:
         payload["guide"] = None

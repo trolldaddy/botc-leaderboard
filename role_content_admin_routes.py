@@ -6,7 +6,7 @@ from account_binding_routes import require_admin_account
 from database import get_db
 from knowledge_models import KnowledgeNode
 from role_display_settings import ensure_display_settings
-from role_models import Role, RoleContentBlock, RoleKnowledgeLink
+from role_models import Role, RoleContentBlock, RoleDisplayOverride, RoleKnowledgeLink
 
 router = APIRouter(prefix="/roles", tags=["role-content-admin"])
 
@@ -54,6 +54,23 @@ def require_role(db: Session, role_id: int) -> Role:
     return role
 
 
+def serialize_role_display_settings(db: Session, role_id: int):
+    settings = ensure_display_settings(db)
+    overrides = {item.item_key: item for item in db.query(RoleDisplayOverride).filter(RoleDisplayOverride.role_id == role_id).all()}
+    result = []
+    for setting in settings:
+        override = overrides.get(setting.item_key)
+        item = {"item_key": setting.item_key, "item_type": setting.item_type, "label": setting.label, "is_overridden": bool(override)}
+        for view in ("player", "encyclopedia", "storyteller"):
+            show_field, sort_field = f"show_{view}", f"sort_{view}"
+            show_value = getattr(override, show_field, None) if override else None
+            sort_value = getattr(override, sort_field, None) if override else None
+            item[show_field] = bool(show_value) if show_value is not None else bool(getattr(setting, show_field))
+            item[sort_field] = int(sort_value) if sort_value is not None else int(getattr(setting, sort_field) or 0)
+        result.append(item)
+    return result
+
+
 @router.get("/{role_id}/content")
 def list_role_content(
     role_id: int,
@@ -74,7 +91,36 @@ def list_role_content(
         "role": {"id": role.id, "canonical_key": role.canonical_key, "name_zh_tw": role.name_zh_tw},
         "content_blocks": [serialize_block(item) for item in blocks],
         "knowledge_links": [serialize_link(item, nodes.get(item.knowledge_node_id)) for item in links],
+        "display_settings": serialize_role_display_settings(db, role_id),
     }
+
+
+@router.put("/{role_id}/display-settings")
+def update_role_display_settings(
+    role_id: int,
+    data: dict,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    require_role(db, role_id)
+    global_settings = {item.item_key: item for item in ensure_display_settings(db)}
+    existing = {item.item_key: item for item in db.query(RoleDisplayOverride).filter(RoleDisplayOverride.role_id == role_id).all()}
+    allowed = {"show_player", "show_encyclopedia", "show_storyteller", "sort_player", "sort_encyclopedia", "sort_storyteller"}
+    for incoming in data.get("items") or []:
+        item_key = str(incoming.get("item_key") or "")
+        if item_key not in global_settings:
+            continue
+        override = existing.get(item_key)
+        if override is None:
+            override = RoleDisplayOverride(role_id=role_id, item_key=item_key)
+            db.add(override)
+            existing[item_key] = override
+        for field in allowed:
+            if field in incoming:
+                value = bool(incoming[field]) if field.startswith("show_") else int(incoming[field] or 0)
+                setattr(override, field, value)
+    db.commit()
+    return {"status": "success", "items": serialize_role_display_settings(db, role_id)}
 
 
 @router.post("/{role_id}/content")

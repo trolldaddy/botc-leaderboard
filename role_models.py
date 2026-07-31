@@ -141,10 +141,27 @@ class RoleDisplaySetting(Base):
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 
+class RoleDisplayOverride(Base):
+    __tablename__ = "role_display_overrides"
+    __table_args__ = (UniqueConstraint("role_id", "item_key", name="uq_role_display_override"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    role_id = Column(Integer, ForeignKey("roles.id"), nullable=False, index=True)
+    item_key = Column(String(100), nullable=False, index=True)
+    show_player = Column(Boolean, nullable=True)
+    show_encyclopedia = Column(Boolean, nullable=True)
+    show_storyteller = Column(Boolean, nullable=True)
+    sort_player = Column(Integer, nullable=True)
+    sort_encyclopedia = Column(Integer, nullable=True)
+    sort_storyteller = Column(Integer, nullable=True)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+
 def ensure_role_schema():
     Base.metadata.create_all(bind=engine, tables=[
         Role.__table__, RoleAlias.__table__, RoleGuide.__table__, RoleReminder.__table__,
         RoleContentBlock.__table__, RoleKnowledgeLink.__table__, RoleDisplaySetting.__table__,
+        RoleDisplayOverride.__table__,
     ])
     try:
         inspector = inspect(engine)

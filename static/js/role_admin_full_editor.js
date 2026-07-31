@@ -91,7 +91,18 @@
       .role-display-details .ia-display-row { display:grid; grid-template-columns:minmax(180px,1fr) minmax(150px,.45fr) auto; gap:.7rem; align-items:center; padding:.7rem 1rem; border-bottom:1px solid #282e40; }
       .role-display-details .ia-display-row:last-child { border-bottom:0; }
       .role-display-details .ia-display-row span { display:block; margin-top:.2rem; color:#8993aa; font-size:.72rem; }
-      @media (max-width:720px) { .role-identity-card { align-items:flex-start; flex-direction:column; } .role-reference-links { justify-content:flex-start; } .role-display-details .ia-display-row { grid-template-columns:1fr; } }      @media (max-width: 1180px) {
+      .role-setting-groups { display:grid; gap:1rem; margin-top:1rem; }
+      .role-setting-groups > section { overflow:hidden; border:1px solid #30364a; border-radius:12px; background:#131722; }
+      .role-setting-groups h4 { margin:0; padding:.8rem 1rem; color:#ffd166; border-bottom:1px solid #30364a; }
+      .role-setting-row { display:grid; grid-template-columns:minmax(210px,1.2fr) repeat(3,minmax(140px,.7fr)); gap:.7rem; align-items:center; padding:.65rem 1rem; border-bottom:1px solid #282e40; }
+      .role-setting-row:last-child { border-bottom:0; }
+      .role-setting-row.is-dirty { background:rgba(255,209,102,.06); box-shadow:inset 3px 0 #ffd166; }
+      .role-setting-name span { display:block; margin-top:.2rem; color:#8993aa; font-size:.72rem; }
+      .role-setting-view { display:grid; grid-template-columns:auto 1fr; gap:.35rem .5rem; align-items:center; color:#dfe3ee; font-size:.78rem; font-weight:800; }
+      .role-setting-view > span { grid-column:1 / -1; color:#8993aa; }
+      .role-setting-view input[type="number"] { min-width:0; height:34px; padding:.35rem .5rem; }
+      .role-setting-actions { display:flex; justify-content:flex-end; margin-top:1rem; }
+      @media (max-width:720px) { .role-setting-row { grid-template-columns:1fr; } .role-identity-card { align-items:flex-start; flex-direction:column; } .role-reference-links { justify-content:flex-start; } .role-display-details .ia-display-row { grid-template-columns:1fr; } }      @media (max-width: 1180px) {
         .role-admin-layout { grid-template-columns: 230px minmax(0, 1fr) !important; }
         .ia-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       }
@@ -170,15 +181,9 @@
       <div class="role-content-actions"><button type="button" class="btn btn-outline" data-delete-content="${block.id}">刪除</button><button type="button" class="btn btn-purple" data-save-content="${block.id}">儲存區塊</button></div>
     </article>`;
 
-  const displayRow = (block) => `<div class="ia-display-row" data-display-block="${block.id}">
-    <div><strong>${esc(block.title || labelForType(block.block_type))}</strong><span>${esc(labelForType(block.block_type))} · ${esc(block.source || 'manual')}</span></div>
-    <select class="form-control dark-input" data-role-audience aria-label="顯示對象">
-      <option value="player" ${block.audience === 'player' ? 'selected' : ''}>只給玩家</option>
-      <option value="encyclopedia" ${!['player','storyteller','all'].includes(block.audience) ? 'selected' : ''}>只給百科</option>
-      <option value="storyteller" ${block.audience === 'storyteller' ? 'selected' : ''}>只給說書人</option>
-      <option value="all" ${block.audience === 'all' ? 'selected' : ''}>三種視角皆顯示</option>
-    </select>
-    <button type="button" class="btn btn-outline ia-save-display">儲存</button>
+  const roleDisplayRow = (item) => `<div class="role-setting-row" data-role-setting="${esc(item.item_key)}">
+    <div class="role-setting-name"><strong>${esc(item.label)}</strong><span>${esc(item.item_key)}${item.is_overridden ? ' \u00b7 \u6b64\u89d2\u8272\u5df2\u81ea\u8a02' : ' \u00b7 \u6cbf\u7528\u5168\u57df\u503c'}</span></div>
+    ${['player','encyclopedia','storyteller'].map((view) => `<label class="role-setting-view"><span>${({player:'\u73a9\u5bb6',encyclopedia:'\u767e\u79d1',storyteller:'\u8aaa\u66f8\u4eba'})[view]}</span><input type="checkbox" data-show="${view}" ${item[`show_${view}`] ? 'checked' : ''}><input class="form-control dark-input" type="number" data-sort="${view}" value="${Number(item[`sort_${view}`] || 0)}" aria-label="${view} \u6392\u5e8f"></label>`).join('')}
   </div>`;
 
   const saveBlock = async (roleId, blockId) => {
@@ -299,7 +304,10 @@
     const lapList = document.createElement('div'); lapList.className='role-content-list'; lapList.innerHTML=larplus.map(blockCard).join('') || '<div class="role-admin-empty">目前沒有額外的拉普拉斯 Block。</div>'; lap.appendChild(lapList);
 
     const displayPane = document.createElement('section'); displayPane.className='ia-pane role-display-pane'; displayPane.dataset.iaPane='display';
-    displayPane.innerHTML='<div class="ia-pane-intro"><h4>顯示設定</h4><p>這裡只調整目前角色各內容 Block 在玩家、百科與說書人視角的顯示方式。上方工具列的「顯示設定」仍是所有角色共用規則。</p></div><div class="role-display-details"><div class="ia-display-section">'+(blocks.map(displayRow).join('') || '<div class="role-admin-empty">目前沒有可設定的內容 Block。</div>')+'</div></div>';
+    const roleSettings = data.display_settings || [];
+    const moduleSettings = roleSettings.filter((item) => item.item_type === 'module');
+    const blockSettings = roleSettings.filter((item) => item.item_type === 'block');
+    displayPane.innerHTML=`<div class="ia-pane-intro"><h4>\u986f\u793a\u8a2d\u5b9a</h4><p>\u9019\u88e1\u53ef\u70ba\u76ee\u524d\u89d2\u8272\u8986\u5beb\u5b8c\u6574\u7684\u73a9\u5bb6\u3001\u767e\u79d1\u8207\u8aaa\u66f8\u4eba\u986f\u793a\u898f\u5247\u3002\u672a\u4fee\u6539\u6642\u6cbf\u7528\u4e0a\u65b9\u5de5\u5177\u5217\u7684\u5168\u57df\u8a2d\u5b9a\u3002</p><p><strong>\u53ea\u60f3\u589e\u52a0\u300c\u4e00\u53e5\u8a71\u5b9a\u4f4d\u300d\uff1a</strong>\u5148\u5728\u300c\u62c9\u666e\u62c9\u65af\u8cc7\u6599\u300d\u586b\u5beb\u4e00\u53e5\u8a71\uff0c\u518d\u56de\u6b64\u9801\u52fe\u9078\u300c\u4e00\u53e5\u8a71\u5b9a\u4f4d\u300d\u8981\u51fa\u73fe\u7684\u8996\u89d2\u3002</p></div><div class="role-setting-groups"><section><h4>\u56fa\u5b9a\u8cc7\u6599\u6a21\u7d44</h4>${moduleSettings.map(roleDisplayRow).join('')}</section><section><h4>\u5167\u5bb9 Block \u985e\u578b</h4>${blockSettings.map(roleDisplayRow).join('')}</section></div><div class="role-setting-actions"><button type="button" class="btn btn-purple" data-save-role-settings><i class="fa-solid fa-floppy-disk"></i> \u5132\u5b58\u6b64\u89d2\u8272\u986f\u793a\u8a2d\u5b9a</button></div>`;
 
     const tabs=document.createElement('nav'); tabs.className='ia-tabs'; tabs.innerHTML='<button class="active" data-ia-tab="content">角色內容</button><button data-ia-tab="extension">延伸資料</button><button data-ia-tab="larplus">拉普拉斯資料</button><button data-ia-tab="display">顯示設定</button>';
     header.insertAdjacentElement('afterend',tabs); tabs.insertAdjacentElement('afterend',core); core.insertAdjacentElement('afterend',extension); extension.insertAdjacentElement('afterend',lap); lap.insertAdjacentElement('afterend',displayPane); if(actions) editor.appendChild(actions);
@@ -309,16 +317,36 @@
       editor.querySelectorAll('.ia-pane').forEach((pane)=>pane.classList.toggle('active',pane.dataset.iaPane===button.dataset.iaTab));
     }));
 
-    displayPane.querySelectorAll('.ia-save-display').forEach((button) => button.addEventListener('click', async () => {
-      const row = button.closest('[data-display-block]');
-      const audience = row.querySelector('[data-role-audience]').value;
-      button.disabled = true; button.textContent = '儲存中…';
+    displayPane.querySelectorAll('[data-role-setting] input').forEach((input) => input.addEventListener('change', () => input.closest('[data-role-setting]').classList.add('is-dirty')));
+
+    displayPane.querySelector('[data-save-role-settings]')?.addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      const dirtyRows = Array.from(displayPane.querySelectorAll('[data-role-setting].is-dirty'));
+      if (!dirtyRows.length) {
+        button.innerHTML = '<i class="fa-solid fa-check"></i> \u6c92\u6709\u5f85\u5132\u5b58\u7684\u8b8a\u66f4';
+        setTimeout(() => { button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> \u5132\u5b58\u6b64\u89d2\u8272\u986f\u793a\u8a2d\u5b9a'; }, 900);
+        return;
+      }
+      const items = dirtyRows.map((row) => {
+        const item = { item_key: row.dataset.roleSetting };
+        ['player','encyclopedia','storyteller'].forEach((view) => {
+          item[`show_${view}`] = row.querySelector(`[data-show="${view}"]`).checked;
+          item[`sort_${view}`] = Number(row.querySelector(`[data-sort="${view}"]`).value || 0);
+        });
+        return item;
+      });
+      button.disabled = true;
       try {
-        await request(`/api/admin/roles/${roleId}/content/${row.dataset.displayBlock}`, { method:'PATCH', body:JSON.stringify({ audience }) });
-        button.textContent = '已儲存';
-      } catch (err) { alert(`儲存失敗：${err.message}`); button.textContent = '儲存'; }
-      finally { setTimeout(() => { button.disabled = false; if (button.textContent === '已儲存') button.textContent = '儲存'; }, 900); }
-    }));
+        await request(`/api/admin/roles/${roleId}/display-settings`, { method:'PUT', body:JSON.stringify({ items }) });
+        button.innerHTML = '<i class="fa-solid fa-check"></i> \u5df2\u5132\u5b58';
+        dirtyRows.forEach((row) => {
+          row.classList.remove('is-dirty');
+          const span = row.querySelector('.role-setting-name span');
+          span.textContent = span.textContent.replace('\u6cbf\u7528\u5168\u57df\u503c', '\u6b64\u89d2\u8272\u5df2\u81ea\u8a02');
+        });
+      } catch (err) { alert(`\u5132\u5b58\u5931\u6557\uff1a${err.message}`); }
+      finally { setTimeout(() => { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> \u5132\u5b58\u6b64\u89d2\u8272\u986f\u793a\u8a2d\u5b9a'; }, 900); }
+    });
     editor.querySelectorAll('[data-save-content]').forEach((button)=>button.addEventListener('click',async()=>{button.disabled=true;try{await saveBlock(roleId,Number(button.dataset.saveContent));button.textContent='已儲存';}catch(err){alert(`儲存失敗：${err.message}`);}finally{setTimeout(()=>{button.disabled=false;button.textContent='儲存區塊';},800);}}));
     editor.querySelectorAll('[data-delete-content]').forEach((button)=>button.addEventListener('click',async()=>{if(!confirm('確定刪除此內容區塊？'))return;try{await request(`/api/admin/roles/${roleId}/content/${button.dataset.deleteContent}`,{method:'DELETE'});editor.dataset.iaV2Role='';window.RoleAdmin?.refresh?.();}catch(err){alert(`刪除失敗：${err.message}`);}}));
   };

@@ -4,6 +4,18 @@
   const viewLabel = (view) => ({ player: '玩家', encyclopedia: '百科', storyteller: '說書人' }[view] || view);
   const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', overview: 'fa-circle-info', how_it_works: 'fa-gears', rules_detail: 'fa-scale-balanced', rules_interactions: 'fa-arrows-left-right', rules_jinx: 'fa-link', examples: 'fa-lightbulb', strategy_play: 'fa-chess', strategy_bluff: 'fa-masks-theater', strategy_counter: 'fa-shield-halved', storyteller_advice: 'fa-user-tie' }[type] || 'fa-note-sticky');
   const inline = (value) => esc(value).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  const roleViewCache = new Map();
+  const roleCacheKey = (node, view) => `${node.slug || node.name}::${view}`;
+  const loadRoleView = (apiBase, node, view, requireJson) => {
+    const key = roleCacheKey(node, view);
+    if (!roleViewCache.has(key)) {
+      const promise = fetch(`${apiBase}/api/roles/${encodeURIComponent(node.name || node.slug)}?view=${encodeURIComponent(view)}`, { cache: 'no-store' })
+        .then(requireJson)
+        .catch((error) => { roleViewCache.delete(key); throw error; });
+      roleViewCache.set(key, promise);
+    }
+    return roleViewCache.get(key);
+  };
 
   function richText(content) {
     const lines = String(content || '').replace(/\r/g, '').split('\n');
@@ -62,7 +74,10 @@
       detail.querySelector('.role-view-content')?.setAttribute('aria-busy', 'true');
     }
     try {
-      const role = await fetch(`${apiBase}/api/roles/${encodeURIComponent(node.name || node.slug)}?view=${encodeURIComponent(view)}`, { cache: 'no-store' }).then(requireJson);
+      const requestToken = `${roleCacheKey(node, view)}::${Date.now()}`;
+      detail.dataset.roleViewRequest = requestToken;
+      const role = await loadRoleView(apiBase, node, view, requireJson);
+      if (detail.dataset.roleViewRequest !== requestToken) return;
       const blocks = role.content_blocks || [];
       const modules = role.display_modules || {};
       const visible = (key) => modules[key] !== false;
@@ -89,6 +104,9 @@
         render({ ...options, view: button.dataset.roleView, preserveShell: true });
       }));
       detail.querySelectorAll('[data-knowledge-tag]').forEach((button) => button.addEventListener('click', () => options.onNavigate?.(button.dataset.knowledgeTag)));
+      ['player', 'encyclopedia', 'storyteller'].filter((item) => item !== role.view).forEach((item) => {
+        loadRoleView(apiBase, node, item, requireJson).catch(() => {});
+      });
     } catch (err) {
       detail.querySelector('.role-view-content')?.removeAttribute('aria-busy');
       if (!preserveShell) onFallback(err);
