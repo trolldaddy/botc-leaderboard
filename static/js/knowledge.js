@@ -1,6 +1,6 @@
 (() => {
   const apiBase = window.API_BASE || '';
-  const state = { items: [], activeSlug: null, types: [], expandedRelationGroups: new Set(), expandedSourceBlocks: new Set() };
+  const state = { items: [], activeSlug: null, types: [], expandedRelationGroups: new Set(), expandedSourceBlocks: new Set(), nodeRequestId: 0 };
   const $ = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -197,8 +197,15 @@
     bindDetailEvents(detail, node);
   }
 
-  async function loadNode(slug) {
+  const slugFromLocation = () => {
+    const match = window.location.hash.match(/^#knowledge\/(.*)$/);
+    if (!match) return '';
+    try { return decodeURIComponent(match[1]); } catch (_) { return match[1]; }
+  };
+
+  async function loadNode(slug, { historyMode = 'push' } = {}) {
     if (!slug) return;
+    const requestId = ++state.nodeRequestId;
     state.activeSlug = slug;
     state.expandedRelationGroups.clear();
     state.expandedSourceBlocks.clear();
@@ -207,6 +214,7 @@
     if (detail) detail.innerHTML = '<div class="knowledge-detail-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>正在讀取條目...</p></div>';
     try {
       const node = await fetch(`${apiBase}/api/knowledge/nodes/${encodeURIComponent(slug)}`, { cache: 'no-store' }).then(requireJson);
+      if (requestId !== state.nodeRequestId) return;
       if (node.node_type === 'role' && window.RoleKnowledgePreview) {
         await window.RoleKnowledgePreview.render({
           apiBase, node, detail, requireJson,
@@ -222,9 +230,14 @@
       } else {
         renderNode(node);
       }
+      if (requestId !== state.nodeRequestId) return;
       const hash = `knowledge/${encodeURIComponent(slug)}`;
-      if (window.location.hash !== `#${hash}`) history.replaceState(null, '', `#${hash}`);
+      if (window.location.hash !== `#${hash}`) {
+        if (historyMode === 'replace') history.replaceState({ knowledgeSlug: slug }, '', `#${hash}`);
+        else if (historyMode === 'push') history.pushState({ knowledgeSlug: slug }, '', `#${hash}`);
+      }
     } catch (err) {
+      if (requestId !== state.nodeRequestId) return;
       if (detail) detail.innerHTML = `<div class="knowledge-detail-empty"><h3>無法讀取條目</h3><p>${escapeHtml(err.message)}</p></div>`;
     }
   }
@@ -241,7 +254,7 @@
       state.items = data.items || [];
       if (meta) meta.textContent = q ? `找到 ${data.total} 筆與「${q}」相關的條目` : `目前共有 ${data.total} 筆可查詢條目`;
       renderResults();
-      if (state.items.length && !state.activeSlug) loadNode(state.items[0].slug);
+      if (state.items.length && !state.activeSlug) loadNode(state.items[0].slug, { historyMode: 'replace' });
     } catch (err) {
       state.items = [];
       renderResults();
@@ -257,9 +270,13 @@
       state.types = data.items || [];
       renderTypes();
     } catch (err) { console.warn('知識類型載入失敗', err); }
-    const hash = decodeURIComponent(window.location.hash.replace(/^#knowledge\/?/, ''));
+    const hash = slugFromLocation();
     await searchKnowledge();
-    if (hash && hash !== window.location.hash.replace('#', '')) loadNode(hash);
+    if (hash) await loadNode(hash, { historyMode: 'replace' });
+    window.addEventListener('popstate', () => {
+      const slug = slugFromLocation();
+      if (slug) loadNode(slug, { historyMode: 'none' });
+    });
   }
 
   init();
