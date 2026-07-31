@@ -1,4 +1,5 @@
-<header class="top-header">
+<nav class="knowledge-admin-modes" aria-label="知識庫管理模式"><button type="button" class="is-active" data-admin-mode="roles"><i class="fa-solid fa-address-book"></i> 角色管理</button><button type="button" data-admin-mode="articles"><i class="fa-solid fa-newspaper"></i> 文章管理</button></nav>
+<header class="top-header" data-role-mode>
   <div style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:1rem;flex-wrap:wrap;">
     <h2 style="font-family:'Cinzel',serif;letter-spacing:2px;">角色知識庫管理</h2>
     <div style="display:flex;gap:.6rem;flex-wrap:wrap;">
@@ -10,7 +11,7 @@
   </div>
 </header>
 
-<section id="role-sync-panel" class="card role-sync-panel" hidden>
+<section data-role-mode id="role-sync-panel" class="card role-sync-panel" hidden>
   <div class="role-sync-head">
     <div>
       <h3><i class="fa-solid fa-code-compare text-gold"></i> Pocket Grimoire 簡中轉繁比對</h3>
@@ -32,7 +33,7 @@
   <div id="role-sync-results" class="role-sync-results"><div class="role-admin-empty">按下比對後，差異會出現在這裡。</div></div>
 </section>
 
-<section class="card role-admin-shell">
+<section data-role-mode class="card role-admin-shell">
   <div class="role-admin-intro">
     <h3><i class="fa-solid fa-address-book text-gold"></i> 正式角色主資料</h3>
     <p>這裡的修改會直接寫入資料庫。Pocket Grimoire 比對器只提供參考，不會自動蓋掉你手動確認過的繁中資料。</p>
@@ -53,6 +54,7 @@
         <option value="demon">惡魔</option>
         <option value="traveller">旅行者</option>
         <option value="fabled">傳奇角色</option>
+        <option value="loric">奇遇角色</option>
       </select>
     </div>
     <div class="toolbar-field">
@@ -75,7 +77,12 @@
   </div>
 </section>
 
-
+<section id="knowledge-article-admin" class="card knowledge-article-admin" hidden>
+  <div class="role-admin-intro"><h3><i class="fa-solid fa-newspaper text-gold"></i> 文章管理</h3><p>管理非角色型知識條目。可搜尋文章、檢查區塊與關聯，並調整公開頁採用的呈現模板。</p></div>
+  <div class="article-admin-toolbar"><input id="article-admin-search" class="form-control dark-input" placeholder="搜尋文章名稱"><select id="article-admin-type" class="form-control dark-input"><option value="">全部文章類型</option><option value="article">文章</option><option value="mechanic">規則／機制</option><option value="script">劇本</option><option value="guide">指南</option></select><button id="article-admin-refresh" class="btn btn-purple" type="button"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button></div>
+  <div id="article-admin-status" class="role-admin-status">切換到文章管理後載入。</div>
+  <div class="article-admin-layout"><div id="article-admin-list" class="article-admin-list"></div><div id="article-admin-detail" class="article-admin-detail"><div class="role-admin-empty">請從左側選擇文章。</div></div></div>
+</section>
 <div id="role-display-settings-modal" class="rds-modal" hidden>
   <div class="rds-backdrop" data-rds-close></div>
   <section class="rds-dialog" role="dialog" aria-modal="true" aria-labelledby="rds-title">
@@ -86,6 +93,8 @@
   </section>
 </div>
 <style>
+  .knowledge-admin-modes{max-width:1500px;margin:0 auto 1rem;display:flex;gap:.55rem;padding:.35rem;border:1px solid #39415a;border-radius:14px;background:#121620}.knowledge-admin-modes button{flex:1;border:0;border-radius:10px;padding:.75rem 1rem;background:transparent;color:#aeb6c9;font-weight:900;cursor:pointer}.knowledge-admin-modes button.is-active{background:linear-gradient(135deg,#33235b,#4a2878);color:#fff;box-shadow:inset 0 0 0 1px #8b7cf6}
+  .knowledge-article-admin{--ra-panel:#151924;--ra-border:#39415a;--ra-text:#f4f6fb;--ra-muted:#aeb6c9;max-width:1500px;margin:0 auto;color:var(--ra-text)}.article-admin-toolbar{display:grid;grid-template-columns:minmax(240px,1fr) 220px auto;gap:.7rem;margin-bottom:1rem}.knowledge-article-admin .dark-input{min-height:44px;background:#202638!important;color:#fff!important;border:1px solid var(--ra-border)!important;border-radius:10px!important;padding:.7rem .8rem!important}.article-admin-layout{display:grid;grid-template-columns:minmax(280px,.7fr) minmax(0,1.5fr);gap:1rem}.article-admin-list{display:grid;gap:.5rem;max-height:72vh;overflow:auto}.article-admin-item{border:1px solid #30364a;border-radius:12px;background:#131722;color:#fff;padding:.75rem;text-align:left;cursor:pointer}.article-admin-item.is-active,.article-admin-item:hover{border-color:#8b7cf6;background:#211b35}.article-admin-item small{display:block;color:var(--ra-muted);margin-top:.25rem}.article-admin-detail{border:1px solid var(--ra-border);border-radius:16px;background:#0f1118;padding:1rem;min-height:420px}.article-admin-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;padding-bottom:1rem;border-bottom:1px solid #30364a}.article-admin-head h3{margin:0}.article-admin-actions{display:flex;gap:.5rem;flex-wrap:wrap}.article-admin-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin:1rem 0}.article-admin-meta>div,.article-admin-block{border:1px solid #30364a;border-radius:10px;background:#151924;padding:.75rem}.article-admin-blocks{display:grid;gap:.6rem}.article-admin-block strong{color:#ffd166}.article-admin-block p{color:var(--ra-muted);margin:.35rem 0 0;white-space:pre-wrap;max-height:8rem;overflow:auto}@media(max-width:900px){.article-admin-layout{grid-template-columns:1fr}.article-admin-list{max-height:35vh}}@media(max-width:640px){.article-admin-toolbar,.article-admin-meta{grid-template-columns:1fr}}
   .role-admin-shell, .role-sync-panel {
     --ra-bg:#0f1118; --ra-panel:#151924; --ra-input:#202638; --ra-input-hover:#262d42;
     --ra-border:#39415a; --ra-text:#f4f6fb; --ra-muted:#aeb6c9; --ra-label:#ffd166;
@@ -181,6 +190,7 @@
   @media(max-width:720px){.rds-body{grid-template-rows:minmax(160px,.8fr) minmax(220px,1.2fr)}.rds-columns{display:none}.rds-row{grid-template-columns:1fr}.rds-target-label{display:block}.rds-row strong{margin-bottom:.2rem}.rds-target{grid-template-columns:80px 1fr}.rds-dialog{width:calc(100vw - 1rem);height:calc(100dvh - 1rem);max-height:calc(100dvh - 1rem)}.rds-head{align-items:flex-start}.rds-head p{font-size:.82rem}}
 </style>
 
+<script src="/js/knowledge_article_admin.js?v=20260731a"></script>
 <script src="/js/role_admin.js?v=20260731a"></script>
 <script src="/js/role_admin_full_editor.js?v=20260731h"></script>
 <script src="/js/role_admin_import_fix.js"></script>

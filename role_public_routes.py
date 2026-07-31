@@ -18,7 +18,7 @@ VIEW_AUDIENCES = {
 }
 
 
-def role_card(role: Role):
+def role_card(role: Role, mention_aliases=None, knowledge_slug=None):
     def string_list(value):
         if not value:
             return []
@@ -38,6 +38,8 @@ def role_card(role: Role):
         "image_url": role.image_url,
         "script_names": string_list(role.script_names_json),
         "ability_tags": string_list(role.ability_tags_json),
+        "mention_aliases": sorted({str(value).strip() for value in (mention_aliases or []) if value and str(value).strip() and str(value).strip() != role.name_zh_tw}),
+        "knowledge_slug": knowledge_slug,
         "is_official": bool(role.is_official),
         "is_custom": bool(role.is_custom),
     }
@@ -140,7 +142,17 @@ def search_roles(q: str = Query(default="", max_length=120), team: str = "", lim
         query = query.filter(Role.team == team)
     total = query.count()
     roles = query.order_by(Role.team, Role.name_zh_tw).limit(limit).all()
-    return {"query": keyword, "total": total, "items": [role_card(role) for role in roles]}
+    role_ids = [role.id for role in roles]
+    aliases_by_role = {role_id: [] for role_id in role_ids}
+    knowledge_slug_by_role = {}
+    if role_ids:
+        for alias in db.query(RoleAlias).filter(RoleAlias.role_id.in_(role_ids)).all():
+            aliases_by_role.setdefault(alias.role_id, []).append(alias.external_name)
+        for role_id, slug in db.query(RoleKnowledgeLink.role_id, KnowledgeNode.slug).join(
+            KnowledgeNode, KnowledgeNode.id == RoleKnowledgeLink.knowledge_node_id
+        ).filter(RoleKnowledgeLink.role_id.in_(role_ids)).order_by(RoleKnowledgeLink.id).all():
+            knowledge_slug_by_role.setdefault(role_id, slug)
+    return {"query": keyword, "total": total, "items": [role_card(role, aliases_by_role.get(role.id, []), knowledge_slug_by_role.get(role.id)) for role in roles]}
 
 
 @router.get("/{key}")
@@ -164,7 +176,8 @@ def get_role_view(key: str, view: str = Query(default="player"), db: Session = D
         override = overrides_by_key.get(setting.item_key)
         value = getattr(override, f"sort_{selected_view}", None) if override else None
         return int(value) if value is not None else setting_order(setting, selected_view)
-    payload = role_card(role)
+    role_aliases = db.query(RoleAlias).filter(RoleAlias.role_id == role.id).all()
+    payload = role_card(role, [value for alias in role_aliases for value in (alias.external_name, alias.external_id)])
     payload["view"] = view
     payload["display_modules"] = {
         item.item_key.removeprefix("module."): visible(item, view)
@@ -177,7 +190,7 @@ def get_role_view(key: str, view: str = Query(default="player"), db: Session = D
         "source": alias.source,
         "external_id": alias.external_id,
         "external_name": alias.external_name,
-    } for alias in db.query(RoleAlias).filter(RoleAlias.role_id == role.id).all()]
+    } for alias in role_aliases]
 
     candidate_blocks = db.query(RoleContentBlock).filter(
         RoleContentBlock.role_id == role.id,

@@ -35,7 +35,7 @@ window.RoleAdmin = (() => {
     return data;
   };
 
-  const teamLabel = (team) => ({ townsfolk:'鎮民', outsider:'外來者', minion:'爪牙', demon:'惡魔', traveller:'旅行者', fabled:'傳奇角色' }[team] || team || '未分類');
+  const teamLabel = (team) => ({ townsfolk:'鎮民', outsider:'外來者', minion:'爪牙', demon:'惡魔', traveller:'旅行者', fabled:'傳奇角色', loric:'奇遇角色' }[team] || team || '未分類');
   const splitTags = (value) => String(value || '').split(/[,，、\n]/).map((item) => item.trim()).filter(Boolean);
 
   const renderList = () => {
@@ -100,7 +100,7 @@ window.RoleAdmin = (() => {
       <div class="role-editor-head">${role.image_url ? `<img src="${escapeHtml(role.image_url)}" alt="">` : '<div class="role-admin-thumb"></div>'}<div><h3>${escapeHtml(role.name_zh_tw)}</h3><div class="role-admin-meta">${escapeHtml(role.canonical_key)}</div></div></div>
       <div class="role-editor-grid">
         ${field('繁體中文名稱','ra-name-zh',role.name_zh_tw)}${field('英文名稱','ra-name-en',role.name_en||'')}
-        <div><label for="ra-team">陣營</label><select id="ra-team" class="form-control dark-input">${['townsfolk','outsider','minion','demon','traveller','fabled'].map((team)=>`<option value="${team}" ${role.team===team?'selected':''}>${teamLabel(team)}</option>`).join('')}</select></div>
+        <div><label for="ra-team">陣營</label><select id="ra-team" class="form-control dark-input">${['townsfolk','outsider','minion','demon','traveller','fabled','loric'].map((team)=>`<option value="${team}" ${role.team===team?'selected':''}>${teamLabel(team)}</option>`).join('')}</select></div>
         ${field('所屬劇本（以逗號分隔）','ra-scripts',(role.script_names||[]).join('、'))}${field('能力類型 Tag（以逗號分隔）','ra-ability-tags',(role.ability_tags||[]).join('、'))}
         <div><label for="ra-source-type">來源類型</label><select id="ra-source-type" class="form-control dark-input">${['unclassified','official','experimental','custom','variant'].map((value)=>`<option value="${value}" ${role.source_type===value?'selected':''}>${value}</option>`).join('')}</select></div>
         ${field('來源名稱','ra-source-name',role.source_name||'')}${field('作者','ra-author',role.author||'')}${field('圖片網址','ra-image',role.image_url||'','text',true)}

@@ -28,7 +28,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from gstone_wiki import BASE_URL, HEADERS, article_url, is_excluded_knowledge_title, parse_reminders, to_traditional
 
-ROLE_COVERAGE_SEEDS = ["钟表匠", "镜像双子", "理发师", "卡扎力", "炼金术士", "狸猫"]
+ROLE_COVERAGE_SEEDS = ["钟表匠", "镜像双子", "理发师", "卡扎力", "炼金术士", "狸猫", "传奇角色", "奇遇角色", "末日预言者"]
 DEFAULT_SEEDS = ["首頁", "角色", "剧本", "規則", "规则", "相克規則", "相克规则", *ROLE_COVERAGE_SEEDS]
 ARTICLE_PATH = "/index.php"
 SKIP_NAMESPACES = {
@@ -40,7 +40,7 @@ ROLE_HEADINGS = {
     "角色能力", "能力", "角色簡介", "角色介绍", "角色介紹", "背景故事",
     "運作方式", "运作方式", "提示標記", "提示标记", "範例", "示例",
 }
-ROLE_FACTIONS = {"鎮民", "镇民", "外來者", "外来者", "爪牙", "惡魔", "恶魔", "旅行者"}
+ROLE_FACTIONS = {"鎮民", "镇民", "外來者", "外来者", "爪牙", "惡魔", "恶魔", "旅行者", "傳奇角色", "传奇角色", "奇遇角色"}
 SCRIPT_HEADINGS = {"角色列表", "角色清單", "剧本信息", "劇本資訊", "配置", "角色配置"}
 
 
@@ -176,7 +176,7 @@ def classify_page(
     if faction_hits:
         role_score += 2
         reasons.append(f"faction:{','.join(faction_hits[:3])}")
-    if re.search(r"(?:角色類型|角色类型|陣營|阵营)\s*[：:]?\s*(?:鎮民|镇民|外來者|外来者|爪牙|惡魔|恶魔|旅行者)", body_text):
+    if re.search(r"(?:角色類型|角色类型|陣營|阵营)\s*[：:]?\s*(?:鎮民|镇民|外來者|外来者|爪牙|惡魔|恶魔|旅行者|傳奇角色|传奇角色|奇遇角色)", body_text):
         role_score += 3
         reasons.append("role_metadata")
     if role_score >= 4:

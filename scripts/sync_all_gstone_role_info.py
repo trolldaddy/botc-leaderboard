@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import json
@@ -14,7 +14,7 @@ from database import SessionLocal  # noqa: E402
 from gstone_wiki import fetch_role_information  # noqa: E402
 from role_models import Role  # noqa: E402
 
-TEAM_MAP = {"鎮民": "townsfolk", "外來者": "outsider", "爪牙": "minion", "惡魔": "demon", "旅行者": "traveller", "傳奇角色": "fabled"}
+TEAM_MAP = {"鎮民": "townsfolk", "外來者": "outsider", "爪牙": "minion", "惡魔": "demon", "旅行者": "traveller", "傳奇角色": "fabled", "传奇角色": "fabled", "奇遇角色": "loric"}
 
 
 def encode_list(values: list[str]) -> str:

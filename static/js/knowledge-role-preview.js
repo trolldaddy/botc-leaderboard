@@ -1,6 +1,6 @@
 (() => {
   const esc = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
-  const teamLabel = (team) => ({ townsfolk: '鎮民', outsider: '外來者', minion: '爪牙', demon: '惡魔', traveller: '旅行者', fabled: '傳奇角色' }[team] || team || '未分類');
+  const teamLabel = (team) => ({ townsfolk: '鎮民', outsider: '外來者', minion: '爪牙', demon: '惡魔', traveller: '旅行者', fabled: '傳奇角色', loric: '奇遇角色' }[team] || team || '未分類');
   const viewLabel = (view) => ({ player: '玩家', encyclopedia: '百科', storyteller: '說書人' }[view] || view);
   const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', overview: 'fa-circle-info', how_it_works: 'fa-gears', rules_detail: 'fa-scale-balanced', rules_interactions: 'fa-arrows-left-right', rules_jinx: 'fa-link', examples: 'fa-lightbulb', strategy_play: 'fa-chess', strategy_bluff: 'fa-masks-theater', strategy_counter: 'fa-shield-halved', storyteller_advice: 'fa-user-tie' }[type] || 'fa-note-sticky');
   const inline = (value) => esc(value)
@@ -27,14 +27,15 @@
     if (!roleMentionTargetsPromise) {
       roleMentionTargetsPromise = fetch(`${apiBase}/api/roles?limit=500`, { cache: 'no-store' })
         .then(requireJson)
-        .then((payload) => (payload.items || [])
-          .filter((item) => String(item.name_zh_tw || '').trim().length >= 2)
-          .map((item) => ({
-            label: String(item.name_zh_tw).trim(),
-            target: String(item.name_zh_tw).trim(),
-            team: String(item.team || 'unknown').toLowerCase(),
-          }))
-          .sort((a, b) => b.label.length - a.label.length))
+        .then((payload) => (payload.items || []).flatMap((item) => {
+          const target = String(item.name_zh_tw || '').trim();
+          if (target.length < 2) return [];
+          const fallbackAliases = ({ '檮杌': ['梼杌'], '鴆': ['鸩'] })[target] || [];
+          return [target, ...(item.mention_aliases || []), ...fallbackAliases]
+            .map((label) => String(label || '').trim())
+            .filter((label) => label.length >= 2)
+            .map((label) => ({ label, target: item.knowledge_slug || target, team: String(item.team || 'unknown').toLowerCase() }));
+        }).sort((a, b) => b.label.length - a.label.length))
         .catch((error) => { roleMentionTargetsPromise = null; throw error; });
     }
     return roleMentionTargetsPromise;
