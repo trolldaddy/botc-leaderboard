@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Preview or write structured role information"
+        description: "Preview or write structured role information and official abilities"
         required: true
         default: "preview"
         type: choice
@@ -33,7 +33,7 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Sync all GStone role information
+      - name: Sync all GStone role information and official abilities
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         shell: bash

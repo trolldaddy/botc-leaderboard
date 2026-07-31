@@ -45,7 +45,14 @@ def role_aliases(role: Role) -> list[str]:
 
 def sync(write: bool = False, delay: float = 0.15, limit: int | None = None) -> dict:
     db = SessionLocal()
-    summary = {"mode": "write" if write else "preview", "roles_scanned": 0, "pages_found": 0, "role_info_found": 0, "would_update": 0, "updated": 0, "unchanged": 0, "missing_role_info": [], "failures": [], "roles": []}
+    summary = {
+        "mode": "write" if write else "preview",
+        "ability_policy": "GStone 角色能力為正式來源；百科缺漏時保留現值",
+        "roles_scanned": 0, "pages_found": 0, "role_info_found": 0,
+        "abilities_found": 0, "abilities_would_update": 0, "abilities_updated": 0,
+        "would_update": 0, "updated": 0, "unchanged": 0,
+        "missing_role_info": [], "missing_official_ability": [], "failures": [], "roles": [],
+    }
     try:
         query = db.query(Role).filter(Role.is_active == True).order_by(Role.id)  # noqa: E712
         roles = query.limit(limit).all() if limit else query.all()
@@ -61,10 +68,37 @@ def sync(write: bool = False, delay: float = 0.15, limit: int | None = None) -> 
                     summary["missing_role_info"].append(role.name_zh_tw)
                 else:
                     summary["role_info_found"] += 1
-                    proposed = {"name_en": info.get("english_name") or role.name_en or "", "script_names": info.get("script_names") or [], "role_type": info.get("role_type") or "", "team": TEAM_MAP.get(info.get("role_type") or "", role.team), "ability_tags": info.get("ability_tags") or []}
-                    current = {"name_en": role.name_en or "", "script_names": decode_list(role.script_names_json), "role_type": "", "team": role.team, "ability_tags": decode_list(role.ability_tags_json)}
-                    changed = any(current[key] != proposed[key] for key in ("name_en", "script_names", "team", "ability_tags"))
-                    row.update({"current": current, "proposed": proposed, "action": "update" if changed else "unchanged"})
+                    official_ability = str(info.get("official_ability") or "").strip()
+                    if official_ability:
+                        summary["abilities_found"] += 1
+                    else:
+                        summary["missing_official_ability"].append(role.name_zh_tw)
+                    proposed = {
+                        "name_en": info.get("english_name") or role.name_en or "",
+                        "script_names": info.get("script_names") or [],
+                        "role_type": info.get("role_type") or "",
+                        "team": TEAM_MAP.get(info.get("role_type") or "", role.team),
+                        "ability_tags": info.get("ability_tags") or [],
+                        "ability_zh_tw": official_ability or role.ability_zh_tw or "",
+                    }
+                    current = {
+                        "name_en": role.name_en or "",
+                        "script_names": decode_list(role.script_names_json),
+                        "role_type": "",
+                        "team": role.team,
+                        "ability_tags": decode_list(role.ability_tags_json),
+                        "ability_zh_tw": role.ability_zh_tw or "",
+                    }
+                    changed = any(current[key] != proposed[key] for key in ("name_en", "script_names", "team", "ability_tags", "ability_zh_tw"))
+                    ability_changed = bool(official_ability and official_ability != current["ability_zh_tw"])
+                    if ability_changed:
+                        summary["abilities_would_update"] += 1
+                    row.update({
+                        "current": current,
+                        "proposed": proposed,
+                        "action": "update" if changed else "unchanged",
+                        "ability_action": "update" if ability_changed else ("unchanged" if official_ability else "preserve_missing"),
+                    })
                     if changed:
                         summary["would_update"] += 1
                         if write:
@@ -72,6 +106,10 @@ def sync(write: bool = False, delay: float = 0.15, limit: int | None = None) -> 
                             role.script_names_json = encode_list(proposed["script_names"])
                             role.ability_tags_json = encode_list(proposed["ability_tags"])
                             role.team = proposed["team"]
+                            if official_ability:
+                                role.ability_zh_tw = official_ability
+                                if ability_changed:
+                                    summary["abilities_updated"] += 1
                             summary["updated"] += 1
                     else:
                         summary["unchanged"] += 1

@@ -221,7 +221,7 @@ def import_master_roles(
         role.first_night_reminder = item.get("firstNightReminder") or None
         role.other_night_reminder = item.get("otherNightReminder") or None
         role.image_url = item.get("image") or None
-        if item.get("ability"):
+        if item.get("ability") and not (role.ability_zh_tw or "").strip():
             role.ability_zh_tw = item.get("ability")
 
         alias = db.query(RoleAlias).filter(

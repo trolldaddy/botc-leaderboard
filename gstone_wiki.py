@@ -213,6 +213,20 @@ def fetch_role_reminders(title: str, aliases: Optional[List[str]] = None) -> Dic
 def parse_role_information(html: str) -> Dict[str, Any]:
     """Extract the structured role information section from a GStone role article."""
     soup = BeautifulSoup(html, "html.parser")
+    official_ability = ""
+    for candidate in soup.find_all(["h2", "h3", "h4", "h5"]):
+        heading_text = to_traditional(candidate.get_text(" ", strip=True))
+        heading_text = re.sub(r"\[[^\]]+\]", "", heading_text).strip()
+        if heading_text not in {"角色能力", "能力"}:
+            continue
+        ability_parts = []
+        for node in _section_nodes(candidate):
+            text_value = to_traditional(node.get_text(" ", strip=True)).strip()
+            if text_value:
+                ability_parts.append(text_value)
+        official_ability = re.sub(r"\s+", " ", " ".join(ability_parts)).strip()
+        break
+
     heading = None
     for candidate in soup.find_all(["h2", "h3", "h4", "h5"]):
         text = to_traditional(candidate.get_text(" ", strip=True))
@@ -220,7 +234,7 @@ def parse_role_information(html: str) -> Dict[str, Any]:
         if text in {"角色資訊", "角色信息"}:
             heading = candidate
             break
-    empty = {"found": False, "english_name": "", "script_names": [], "role_type": "", "ability_tags": []}
+    empty = {"found": False, "english_name": "", "script_names": [], "role_type": "", "ability_tags": [], "official_ability": official_ability}
     if not heading:
         return empty
 
@@ -254,6 +268,7 @@ def parse_role_information(html: str) -> Dict[str, Any]:
         "script_names": many("所屬劇本", "所属剧本"),
         "role_type": first("角色型別", "角色類型", "角色类型"),
         "ability_tags": many("角色能力型別", "角色能力類型", "角色能力类型"),
+        "official_ability": official_ability,
     }
 
 
