@@ -18,8 +18,8 @@
     }
     return data;
   };
-  const targetCell = (item, view, label) => `<label class="rds-target"><span><input type="checkbox" data-rds-show="${view}" ${item[`show_${view}`] ? 'checked' : ''}> ${label}</span>${item.item_type === 'block' ? `<input type="number" data-rds-sort="${view}" value="${Number(item[`sort_${view}`] || 0)}" title="${label}排序">` : `<input type="hidden" data-rds-sort="${view}" value="${Number(item[`sort_${view}`] || 0)}">`}</label>`;
-  const renderSection = (title, rows) => `<section class="rds-section"><h4>${esc(title)}</h4>${rows.map((item) => `<div class="rds-row" data-rds-key="${esc(item.item_key)}"><strong>${esc(item.label)}</strong>${targetCell(item,'player','玩家')}${targetCell(item,'encyclopedia','百科')}${targetCell(item,'storyteller','說書人')}</div>`).join('')}</section>`;
+  const targetCell = (item, view, label) => `<label class="rds-target"><span class="rds-target-label">${label}</span><input type="checkbox" data-rds-show="${view}" ${item[`show_${view}`] ? 'checked' : ''}>${item.item_type === 'block' ? `<input type="number" data-rds-sort="${view}" value="${Number(item[`sort_${view}`] || 0)}" title="${label}排序">` : `<input type="hidden" data-rds-sort="${view}" value="${Number(item[`sort_${view}`] || 0)}">`}</label>`;
+  const renderSection = (title, rows) => `<section class="rds-section"><h4>${esc(title)}</h4><div class="rds-columns"><span>資料項目</span><span>玩家</span><span>百科</span><span>說書人</span></div>${rows.map((item) => `<div class="rds-row" data-rds-key="${esc(item.item_key)}"><strong>${esc(item.label)}</strong>${targetCell(item,'player','玩家')}${targetCell(item,'encyclopedia','百科')}${targetCell(item,'storyteller','說書人')}</div>`).join('')}</section>`;
   const render = () => {
     const modules = items.filter((item) => item.item_type === 'module');
     const blocks = items.filter((item) => item.item_type === 'block');

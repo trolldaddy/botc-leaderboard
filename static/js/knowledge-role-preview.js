@@ -3,7 +3,11 @@
   const teamLabel = (team) => ({ townsfolk: '鎮民', outsider: '外來者', minion: '爪牙', demon: '惡魔', traveller: '旅行者', fabled: '傳奇角色' }[team] || team || '未分類');
   const viewLabel = (view) => ({ player: '玩家', encyclopedia: '百科', storyteller: '說書人' }[view] || view);
   const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', overview: 'fa-circle-info', how_it_works: 'fa-gears', rules_detail: 'fa-scale-balanced', rules_interactions: 'fa-arrows-left-right', rules_jinx: 'fa-link', examples: 'fa-lightbulb', strategy_play: 'fa-chess', strategy_bluff: 'fa-masks-theater', strategy_counter: 'fa-shield-halved', storyteller_advice: 'fa-user-tie' }[type] || 'fa-note-sticky');
-  const inline = (value) => esc(value).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  const inline = (value) => esc(value)
+    .replace(/\[color=(#[0-9a-fA-F]{6})\]([\s\S]*?)\[\/color\]/g, '<span style="color:$1">$2</span>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
   const roleViewCache = new Map();
   const roleCacheKey = (node, view) => `${node.slug || node.name}::${view}`;
   const loadRoleView = (apiBase, node, view, requireJson) => {
@@ -28,7 +32,8 @@
     lines.forEach((raw) => {
       const line = raw.trim();
       if (!line) { flushParagraph(); flushList(); return; }
-      if (line.startsWith('### ')) { flushParagraph(); flushList(); output.push(`<h4>${inline(line.slice(4))}</h4>`); return; }
+      const heading = line.match(/^(#{2,4})\s+(.+)$/);
+      if (heading) { flushParagraph(); flushList(); const tag = ({ 2:'h3', 3:'h4', 4:'h5' })[heading[1].length]; output.push(`<${tag}>${inline(heading[2])}</${tag}>`); return; }
       if (line.startsWith('> ')) { flushParagraph(); flushList(); output.push(`<blockquote>${inline(line.slice(2))}</blockquote>`); return; }
       const number = line.match(/^\d+\.\s+(.+)$/);
       const bullet = line.match(/^[-•]\s+(.+)$/);
@@ -85,7 +90,7 @@
       const nightSection = visible('night_operation') ? section('夜間操作', '只在說書人視角顯示', `<div class="role-night-grid"><article><b>首夜順序</b><strong>${esc(role.first_night_order ?? '未設定')}</strong><p>${esc(role.first_night_reminder || '無首夜提醒')}</p></article><article><b>其他夜順序</b><strong>${esc(role.other_night_order ?? '未設定')}</strong><p>${esc(role.other_night_reminder || '無其他夜提醒')}</p></article></div>`) : '';
       const reminderSection = visible('reminders') ? section('提示標記', '以 GStone 百科資料為準', reminderCards(role.reminders)) : '';
       const hero = visible('identity') ? `<article class="role-hero role-team-${esc(role.team || 'unknown')}"><div class="role-hero-icon">${role.image_url ? `<img src="${esc(role.image_url)}" alt="${esc(role.name_zh_tw)}角色圖示">` : '<i class="fa-solid fa-masks-theater"></i>'}</div><div class="role-hero-copy"><div class="role-eyebrow">${esc(teamLabel(role.team))}${role.is_official ? ' · 官方角色' : ''}</div><h2>${esc(role.name_zh_tw)}</h2>${visible('role_metadata') ? `<div class="knowledge-name-en">${esc(role.name_en || role.canonical_key || '')}</div><div class="role-meta-row">${(role.script_names || []).map((item) => knowledgeTag(item, 'fa-book')).join('')}${(role.ability_tags || []).map((item) => knowledgeTag(item, 'fa-diagram-project')).join('')}</div>` : ''}</div>${visible('references') ? `<div class="role-hero-links">${(role.references || []).map((ref) => `<a href="${esc(ref.url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>${esc(ref.label)}</a>`).join('')}</div>` : ''}</article>` : '';
-      const ability = visible('official_ability') ? `<section class="role-ability-panel"><div><i class="fa-solid fa-wand-sparkles"></i><span>官方能力</span></div><p>${esc(role.ability_zh_tw || '尚未填入官方能力文字。')}</p></section>` : '';
+      const ability = visible('official_ability') ? `<section class="role-ability-panel"><div><i class="fa-solid fa-wand-sparkles"></i><span>官方能力</span></div><div class="knowledge-block-body">${richText(role.ability_zh_tw || '尚未填入官方能力文字。')}</div></section>` : '';
       const coreBlocks = blockGroup(blocks, 'core', showSourceStatus);
       const extendedBlocks = blockGroup(blocks, 'extended', showSourceStatus);
       const larplusBlocks = blockGroup(blocks, 'larplus', showSourceStatus);

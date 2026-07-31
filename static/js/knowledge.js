@@ -67,7 +67,11 @@
   }
 
   function inlineMarkup(value) {
-    return escapeHtml(value).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    return escapeHtml(value)
+      .replace(/\[color=(#[0-9a-fA-F]{6})\]([\s\S]*?)\[\/color\]/g, '<span style="color:$1">$2</span>')
+      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
   }
 
   function renderTable(lines) {
