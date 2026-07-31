@@ -19,6 +19,18 @@ VIEW_AUDIENCES = {
 
 
 def role_card(role: Role, mention_aliases=None, knowledge_slug=None):
+    canonical_name = {
+        "卡紮力": "卡札力",
+        "卡扎力": "卡札力",
+        "映像雙子": "鏡像雙子",
+        "映像双子": "鏡像雙子",
+        "镜像双子": "鏡像雙子",
+    }.get(role.name_zh_tw, role.name_zh_tw)
+    known_aliases = {
+        "卡札力": {"卡紮力", "卡扎力"},
+        "鏡像雙子": {"映像雙子", "映像双子", "镜像双子"},
+    }.get(canonical_name, set())
+
     def string_list(value):
         if not value:
             return []
@@ -31,14 +43,14 @@ def role_card(role: Role, mention_aliases=None, knowledge_slug=None):
     return {
         "id": role.id,
         "canonical_key": role.canonical_key,
-        "name_zh_tw": role.name_zh_tw,
+        "name_zh_tw": canonical_name,
         "name_en": role.name_en,
         "team": role.team,
         "ability_zh_tw": role.ability_zh_tw,
         "image_url": role.image_url,
         "script_names": string_list(role.script_names_json),
         "ability_tags": string_list(role.ability_tags_json),
-        "mention_aliases": sorted({str(value).strip() for value in (mention_aliases or []) if value and str(value).strip() and str(value).strip() != role.name_zh_tw}),
+        "mention_aliases": sorted(({str(value).strip() for value in (mention_aliases or []) if value and str(value).strip()} | known_aliases) - {canonical_name}),
         "knowledge_slug": knowledge_slug,
         "is_official": bool(role.is_official),
         "is_custom": bool(role.is_custom),
@@ -147,7 +159,7 @@ def search_roles(q: str = Query(default="", max_length=120), team: str = "", lim
     knowledge_slug_by_role = {}
     if role_ids:
         for alias in db.query(RoleAlias).filter(RoleAlias.role_id.in_(role_ids)).all():
-            aliases_by_role.setdefault(alias.role_id, []).append(alias.external_name)
+            aliases_by_role.setdefault(alias.role_id, []).extend([alias.external_name, alias.external_id])
         for role_id, slug in db.query(RoleKnowledgeLink.role_id, KnowledgeNode.slug).join(
             KnowledgeNode, KnowledgeNode.id == RoleKnowledgeLink.knowledge_node_id
         ).filter(RoleKnowledgeLink.role_id.in_(role_ids)).order_by(RoleKnowledgeLink.id).all():

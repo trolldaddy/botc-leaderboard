@@ -3,4 +3,4 @@
 
 .knowledge-block-body .rich-size-sm{font-size:.82em}.knowledge-block-body .rich-size-md{font-size:1em}.knowledge-block-body .rich-size-lg{font-size:1.18em;line-height:1.55}.knowledge-block-body .rich-size-xl{display:inline-block;font-size:1.38em;line-height:1.4;font-weight:800;color:#fff;margin:.2em 0}
 
-.role-mention-inline{display:inline-flex;align-items:center;margin:0 .12rem;padding:.16rem .48rem;vertical-align:.08em;white-space:nowrap}
+.role-mention-inline{display:inline-flex;align-items:center;gap:.28rem;margin:0 .12rem;padding:.14rem .46rem .14rem .22rem;vertical-align:.08em;white-space:nowrap}.role-mention-icon{width:1.28rem;height:1.28rem;flex:0 0 1.28rem;border-radius:50%;object-fit:contain;background:rgba(255,255,255,.08)}

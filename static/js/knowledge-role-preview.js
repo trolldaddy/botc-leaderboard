@@ -29,12 +29,24 @@
         .then(requireJson)
         .then((payload) => (payload.items || []).flatMap((item) => {
           const target = String(item.name_zh_tw || '').trim();
-          if (target.length < 2) return [];
-          const fallbackAliases = ({ '檮杌': ['梼杌'], '鴆': ['鸩'] })[target] || [];
-          return [target, ...(item.mention_aliases || []), ...fallbackAliases]
+          const canonicalLabel = ({ '卡紮力': '卡札力', '卡扎力': '卡札力', '映像雙子': '鏡像雙子', '映像双子': '鏡像雙子', '镜像双子': '鏡像雙子' })[target] || target;
+          if (canonicalLabel.length < 2 && canonicalLabel !== '限') return [];
+          const fallbackAliases = ({
+            '檮杌': ['梼杌'],
+            '鴆': ['鸩'],
+            '卡札力': ['卡紮力', '卡扎力'],
+            '鏡像雙子': ['映像雙子', '映像双子', '镜像双子'],
+          })[canonicalLabel] || [];
+          return [canonicalLabel, ...(item.mention_aliases || []), ...fallbackAliases]
             .map((label) => String(label || '').trim())
-            .filter((label) => label.length >= 2)
-            .map((label) => ({ label, target: item.knowledge_slug || target, team: String(item.team || 'unknown').toLowerCase() }));
+            .filter((label) => label.length >= 2 || label === '限')
+            .map((label) => ({
+              label,
+              displayLabel: canonicalLabel,
+              target: item.knowledge_slug || canonicalLabel,
+              team: String(item.team || 'unknown').toLowerCase(),
+              imageUrl: String(item.image_url || '').trim(),
+            }));
         }).sort((a, b) => b.label.length - a.label.length))
         .catch((error) => { roleMentionTargetsPromise = null; throw error; });
     }
@@ -57,6 +69,19 @@
       seen.add(key);
       return true;
     }).sort((a, b) => b.label.length - a.label.length);
+  };
+  const singleCharacterBoundaries = /[\s，。、「」『』（）()【】：；！？、]/;
+  const isValidMentionAt = (text, index, label) => {
+    if (label.length > 1) return true;
+    const before = index > 0 ? text[index - 1] : '';
+    const after = index + label.length < text.length ? text[index + label.length] : '';
+    return (!before || singleCharacterBoundaries.test(before))
+      && (!after || singleCharacterBoundaries.test(after));
+  };
+  const nextValidMentionIndex = (text, label, start) => {
+    let index = text.indexOf(label, start);
+    while (index >= 0 && !isValidMentionAt(text, index, label)) index = text.indexOf(label, index + label.length);
+    return index;
   };
   function replaceInlineMentions(root, targets, currentRole, currentNode, onNavigate) {
     if (!root || !targets.length || typeof onNavigate !== 'function') return;
@@ -88,7 +113,7 @@
         while (cursor < textValue.length) {
           let match = null;
           candidates.forEach((item) => {
-            const index = textValue.indexOf(item.label, cursor);
+            const index = nextValidMentionIndex(textValue, item.label, cursor);
             if (index < 0) return;
             if (!match || index < match.index || (index === match.index && item.label.length > match.item.label.length)) match = { index, item };
           });
@@ -97,7 +122,15 @@
           const button = root.ownerDocument.createElement('button');
           button.type = 'button';
           button.className = `role-mention-chip role-mention-inline role-mention-${mentionTone(match.item.team)}`;
-          button.textContent = match.item.label;
+          if (match.item.imageUrl) {
+            const icon = root.ownerDocument.createElement('img');
+            icon.className = 'role-mention-icon';
+            icon.src = match.item.imageUrl;
+            icon.alt = '';
+            icon.loading = 'lazy';
+            button.append(icon);
+          }
+          button.append(match.item.displayLabel || match.item.label);
           button.title = `查看「${match.item.label}」資料`;
           button.addEventListener('click', () => onNavigate(match.item.target));
           fragment.append(button);
