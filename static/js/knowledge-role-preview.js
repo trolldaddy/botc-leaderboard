@@ -29,17 +29,23 @@
         .then(requireJson)
         .then((payload) => (payload.items || []).flatMap((item) => {
           const target = String(item.name_zh_tw || '').trim();
-          const canonicalLabel = ({ '卡紮力': '卡札力', '卡扎力': '卡札力', '映像雙子': '鏡像雙子', '映像双子': '鏡像雙子', '镜像双子': '鏡像雙子' })[target] || target;
-          if (canonicalLabel.length < 2 && canonicalLabel !== '限') return [];
+          const canonicalLabel = ({ '卡紮力': '卡札力', '卡扎力': '卡札力', '旅店老板': '旅店老闆', '煉金術士': '鍊金術士', '炼金术士': '鍊金術士', '鐘表匠': '鐘錶匠', '钟表匠': '鐘錶匠', '理发师': '理髮師', '理發師': '理髮師', '映像雙子': '鏡像雙子', '映像双子': '鏡像雙子', '镜像双子': '鏡像雙子', '梼杌': '檮杌', '貍貓': '狸貓', '狸猫': '狸貓', '鸩': '鴆' })[target] || target;
+          const allowedSingleCharacterRoles = new Set(['限', '珀', '鴆']);
+          if (canonicalLabel.length < 2 && !allowedSingleCharacterRoles.has(canonicalLabel)) return [];
           const fallbackAliases = ({
             '檮杌': ['梼杌'],
+            '狸貓': ['貍貓', '狸猫'],
             '鴆': ['鸩'],
             '卡札力': ['卡紮力', '卡扎力'],
+            '旅店老闆': ['旅店老板'],
+            '鍊金術士': ['煉金術士', '炼金术士'],
+            '鐘錶匠': ['鐘表匠', '钟表匠'],
+            '理髮師': ['理发师', '理發師'],
             '鏡像雙子': ['映像雙子', '映像双子', '镜像双子'],
           })[canonicalLabel] || [];
           return [canonicalLabel, ...(item.mention_aliases || []), ...fallbackAliases]
             .map((label) => String(label || '').trim())
-            .filter((label) => label.length >= 2 || label === '限')
+            .filter((label) => label.length >= 2 || allowedSingleCharacterRoles.has(label))
             .map((label) => ({
               label,
               displayLabel: canonicalLabel,
@@ -47,7 +53,7 @@
               team: String(item.team || 'unknown').toLowerCase(),
               imageUrl: String(item.image_url || '').trim(),
             }));
-        }).sort((a, b) => b.label.length - a.label.length))
+        }).concat([{ label: '笑匠', displayLabel: '笑匠', target: '笑匠', team: 'traveller', imageUrl: '' }]).sort((a, b) => b.label.length - a.label.length))
         .catch((error) => { roleMentionTargetsPromise = null; throw error; });
     }
     return roleMentionTargetsPromise;
@@ -122,6 +128,10 @@
           const button = root.ownerDocument.createElement('button');
           button.type = 'button';
           button.className = `role-mention-chip role-mention-inline role-mention-${mentionTone(match.item.team)}`;
+          button.dataset.roleTarget = match.item.target;
+          button.dataset.roleLabel = match.item.displayLabel || match.item.label;
+          button.dataset.roleTeam = match.item.team || '';
+          button.dataset.roleImage = match.item.imageUrl || '';
 
 
           button.append(match.item.displayLabel || match.item.label);
@@ -136,7 +146,49 @@
         textNode.replaceWith(fragment);
       });
     });
+    enhanceRoleListBlocks(root);
   }
+  const roleListHeadings = new Set(['鎮民', '镇民', '外來者', '外来者', '爪牙', '惡魔', '恶魔', '旅行者', '傳奇角色', '传奇角色', '傳奇', '奇遇角色', '奇遇']);
+  function enhanceRoleListBlocks(root) {
+    root.querySelectorAll('.knowledge-block').forEach((block) => {
+      const heading = block.querySelector('.knowledge-block-heading strong');
+      const body = block.querySelector('.knowledge-block-body');
+      if (!heading || !body || !roleListHeadings.has(String(heading.textContent || '').trim())) return;
+      const buttons = [...body.querySelectorAll('.role-mention-chip[data-role-target]')];
+      if (!buttons.length) return;
+      body.classList.add('role-mention-card-grid');
+      buttons.forEach((button) => {
+        button.classList.remove('role-mention-inline');
+        button.classList.add('role-mention-list-card');
+        const label = button.dataset.roleLabel || button.textContent.trim();
+        const team = button.dataset.roleTeam || '';
+        const imageUrl = button.dataset.roleImage || '';
+        button.replaceChildren();
+        const icon = imageUrl
+          ? root.ownerDocument.createElement('img')
+          : root.ownerDocument.createElement('span');
+        icon.className = imageUrl
+          ? 'role-mention-list-icon'
+          : 'role-mention-list-icon role-mention-list-icon-fallback';
+        if (imageUrl) {
+          icon.src = imageUrl;
+          icon.alt = '';
+          icon.loading = 'lazy';
+        } else {
+          icon.innerHTML = '<i class="fa-solid fa-user"></i>';
+        }
+        const copy = root.ownerDocument.createElement('span');
+        copy.className = 'role-mention-list-copy';
+        const name = root.ownerDocument.createElement('strong');
+        name.textContent = label;
+        const meta = root.ownerDocument.createElement('small');
+        meta.textContent = teamLabel(team);
+        copy.append(name, meta);
+        button.append(icon, copy);
+      });
+    });
+  }
+
   function richText(content) {
     const lines = String(content || '').replace(/\r/g, '').split('\n');
     const output = [];

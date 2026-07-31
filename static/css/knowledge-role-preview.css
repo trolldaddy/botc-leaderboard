@@ -4,3 +4,50 @@
 .knowledge-block-body .rich-size-sm{font-size:.82em}.knowledge-block-body .rich-size-md{font-size:1em}.knowledge-block-body .rich-size-lg{font-size:1.18em;line-height:1.55}.knowledge-block-body .rich-size-xl{display:inline-block;font-size:1.38em;line-height:1.4;font-weight:800;color:#fff;margin:.2em 0}
 
 .role-mention-inline{display:inline-flex;align-items:center;gap:.28rem;margin:0 .12rem;padding:.14rem .46rem .14rem .22rem;vertical-align:.08em;white-space:nowrap}.role-mention-icon{width:1.28rem;height:1.28rem;flex:0 0 1.28rem;border-radius:50%;object-fit:contain;background:rgba(255,255,255,.08)}
+/* Wiki role-list cards */
+.knowledge-block-body.role-mention-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: .55rem;
+}
+.knowledge-block-body.role-mention-card-grid > p { display: contents; }
+.role-mention-card-grid .role-mention-list-card {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: .55rem;
+  width: 100%;
+  min-height: 58px;
+  margin: 0;
+  padding: .55rem .65rem;
+  border-radius: 12px;
+  text-align: left;
+  line-height: 1.2;
+  white-space: normal;
+}
+.role-mention-card-grid .role-mention-list-icon {
+  width: 34px !important;
+  height: 34px !important;
+  max-width: 34px !important;
+  object-fit: contain;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .08);
+}
+.role-mention-list-icon-fallback {
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+}
+.role-mention-list-copy {
+  display: grid;
+  gap: .12rem;
+  min-width: 0;
+}
+.role-mention-list-copy strong {
+  overflow-wrap: anywhere;
+  color: #fff;
+}
+.role-mention-list-copy small {
+  color: var(--text-muted);
+  font-size: .68rem;
+}
