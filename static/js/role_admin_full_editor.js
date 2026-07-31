@@ -84,7 +84,14 @@
       .role-source-details { margin:1rem 0; padding:.8rem; border:1px solid #30364a; border-radius:12px; background:#131722; }
       .role-source-details summary { cursor:pointer; color:#ffd166; font-weight:900; }
       .role-source-details .role-editor-grid { margin-top:.8rem; }
-      @media (max-width:720px) { .role-identity-card { align-items:flex-start; flex-direction:column; } .role-reference-links { justify-content:flex-start; } }      @media (max-width: 1180px) {
+      .role-display-details { margin:1rem 0; border:1px solid #30364a; border-radius:12px; background:#131722; overflow:hidden; }
+      .role-display-details > summary { cursor:pointer; padding:.85rem 1rem; color:#ffd166; font-weight:900; }
+      .role-display-help { margin:0; padding:0 1rem .8rem; color:#aeb6c9; font-size:.8rem; line-height:1.6; }
+      .role-display-details .ia-display-section { border-top:1px solid #30364a; }
+      .role-display-details .ia-display-row { display:grid; grid-template-columns:minmax(180px,1fr) minmax(150px,.45fr) auto; gap:.7rem; align-items:center; padding:.7rem 1rem; border-bottom:1px solid #282e40; }
+      .role-display-details .ia-display-row:last-child { border-bottom:0; }
+      .role-display-details .ia-display-row span { display:block; margin-top:.2rem; color:#8993aa; font-size:.72rem; }
+      @media (max-width:720px) { .role-identity-card { align-items:flex-start; flex-direction:column; } .role-reference-links { justify-content:flex-start; } .role-display-details .ia-display-row { grid-template-columns:1fr; } }      @media (max-width: 1180px) {
         .role-admin-layout { grid-template-columns: 230px minmax(0, 1fr) !important; }
         .ia-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       }
@@ -163,17 +170,16 @@
       <div class="role-content-actions"><button type="button" class="btn btn-outline" data-delete-content="${block.id}">刪除</button><button type="button" class="btn btn-purple" data-save-content="${block.id}">儲存區塊</button></div>
     </article>`;
 
-  const displayRow = (block) => {
-    const selected = targetsFromAudience(block.audience);
-    return `<div class="ia-display-row" data-display-block="${block.id}">
-      <div><strong>${esc(block.title || labelForType(block.block_type))}</strong><span>${esc(labelForType(block.block_type))} · ${esc(block.source || 'manual')}</span></div>
-      <label><input type="checkbox" value="player" ${selected.includes('player')?'checked':''}> 玩家</label>
-      <label><input type="checkbox" value="encyclopedia" ${selected.includes('encyclopedia')?'checked':''}> 百科</label>
-      <label><input type="checkbox" value="storyteller" ${selected.includes('storyteller')?'checked':''}> 說書人</label>
-      <label class="ia-admin-lock"><input type="checkbox" checked disabled> 後台</label>
-      <button type="button" class="btn btn-outline ia-save-display">儲存</button>
-    </div>`;
-  };
+  const displayRow = (block) => `<div class="ia-display-row" data-display-block="${block.id}">
+    <div><strong>${esc(block.title || labelForType(block.block_type))}</strong><span>${esc(labelForType(block.block_type))} · ${esc(block.source || 'manual')}</span></div>
+    <select class="form-control dark-input" data-role-audience aria-label="顯示對象">
+      <option value="player" ${block.audience === 'player' ? 'selected' : ''}>只給玩家</option>
+      <option value="encyclopedia" ${!['player','storyteller','all'].includes(block.audience) ? 'selected' : ''}>只給百科</option>
+      <option value="storyteller" ${block.audience === 'storyteller' ? 'selected' : ''}>只給說書人</option>
+      <option value="all" ${block.audience === 'all' ? 'selected' : ''}>三種視角皆顯示</option>
+    </select>
+    <button type="button" class="btn btn-outline ia-save-display">儲存</button>
+  </div>`;
 
   const saveBlock = async (roleId, blockId) => {
     const payload = {
@@ -275,6 +281,10 @@
     const core = document.createElement('section'); core.className='ia-pane active'; core.dataset.iaPane='content';
     core.innerHTML='<div class="ia-pane-intro"><h4>角色內容</h4><p>角色識別、官方能力、百科閱讀內容與策略集中在這裡。</p></div>';
     core.appendChild(infoCard);
+    const roleDisplayDetails = document.createElement('details');
+    roleDisplayDetails.className = 'role-display-details';
+    roleDisplayDetails.innerHTML = `<summary><i class="fa-solid fa-eye"></i> 此角色的內容顯示設定</summary><p class="role-display-help">只覆寫這個角色各內容 Block 的顯示對象；上方工具列的「顯示設定」仍是所有角色共用規則。</p><div class="ia-display-section">${blocks.map(displayRow).join('') || '<div class="role-admin-empty">目前沒有可設定的內容 Block。</div>'}</div>`;
+    core.appendChild(roleDisplayDetails);
     core.appendChild(identityGrid);
     const sourceDetails = document.createElement('details'); sourceDetails.className='role-source-details'; sourceDetails.innerHTML='<summary>來源與同步資料</summary>'; sourceDetails.appendChild(sourceGrid); core.appendChild(sourceDetails);
     if (checks) core.appendChild(checks);
@@ -300,6 +310,16 @@
       editor.querySelectorAll('.ia-pane').forEach((pane)=>pane.classList.toggle('active',pane.dataset.iaPane===button.dataset.iaTab));
     }));
 
+    roleDisplayDetails.querySelectorAll('.ia-save-display').forEach((button) => button.addEventListener('click', async () => {
+      const row = button.closest('[data-display-block]');
+      const audience = row.querySelector('[data-role-audience]').value;
+      button.disabled = true; button.textContent = '儲存中…';
+      try {
+        await request(`/api/admin/roles/${roleId}/content/${row.dataset.displayBlock}`, { method:'PATCH', body:JSON.stringify({ audience }) });
+        button.textContent = '已儲存';
+      } catch (err) { alert(`儲存失敗：${err.message}`); button.textContent = '儲存'; }
+      finally { setTimeout(() => { button.disabled = false; if (button.textContent === '已儲存') button.textContent = '儲存'; }, 900); }
+    }));
     editor.querySelectorAll('[data-save-content]').forEach((button)=>button.addEventListener('click',async()=>{button.disabled=true;try{await saveBlock(roleId,Number(button.dataset.saveContent));button.textContent='已儲存';}catch(err){alert(`儲存失敗：${err.message}`);}finally{setTimeout(()=>{button.disabled=false;button.textContent='儲存區塊';},800);}}));
     editor.querySelectorAll('[data-delete-content]').forEach((button)=>button.addEventListener('click',async()=>{if(!confirm('確定刪除此內容區塊？'))return;try{await request(`/api/admin/roles/${roleId}/content/${button.dataset.deleteContent}`,{method:'DELETE'});editor.dataset.iaV2Role='';window.RoleAdmin?.refresh?.();}catch(err){alert(`刪除失敗：${err.message}`);}}));
   };

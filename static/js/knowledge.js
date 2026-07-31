@@ -191,6 +191,7 @@
       if (node.node_type === 'role' && window.RoleKnowledgePreview) {
         await window.RoleKnowledgePreview.render({
           apiBase, node, detail, requireJson,
+          onNavigate: loadNode,
           onFallback: (err) => {
             renderNode(node);
             const warning = document.createElement('div');
