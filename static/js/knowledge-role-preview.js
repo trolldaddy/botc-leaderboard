@@ -167,21 +167,20 @@
       const extendedBlocks = blockGroup(blocks, 'extended', showSourceStatus);
       const larplusBlocks = blockGroup(blocks, 'larplus', showSourceStatus);
       const contentSections = `${coreBlocks ? section('角色內容', '角色背景、簡介、範例與策略', coreBlocks) : ''}${extendedBlocks ? section('延伸資料', '運作方式、規則細節、互動與相剋', extendedBlocks) : ''}${larplusBlocks ? section('拉普拉斯資料', '店內教學、補充與裁定', larplusBlocks) : ''}`;
-      const viewContent = `${ability}${visible('guide') ? guideCards(role.guide) : ''}${blocks.length ? contentSections : ''}${nightSection}${reminderSection}`;      const applyFangGuRoleLinks = (root) => {
-        if (role.canonical_key !== 'fang_gu') return;
+      const viewContent = `${ability}${visible('guide') ? guideCards(role.guide) : ''}${blocks.length ? contentSections : ''}${nightSection}${reminderSection}`;      const applyRoleMentionLinks = (root) => {
         loadRoleMentionTargets(apiBase, requireJson)
           .then((targets) => appendRoleMentionChips(root, targets, role, options.onNavigate))
-          .catch((error) => console.warn('方古角色連結載入失敗', error));
+          .catch((error) => console.warn('角色提及連結載入失敗', error));
       };
       if (preserveShell) {
         const content = detail.querySelector('.role-view-content');
-        if (content) { content.innerHTML = viewContent; content.removeAttribute('aria-busy'); applyFangGuRoleLinks(content); }
+        if (content) { content.innerHTML = viewContent; content.removeAttribute('aria-busy'); applyRoleMentionLinks(content); }
         detail.querySelectorAll('[data-role-view]').forEach((button) => button.classList.toggle('is-active', button.dataset.roleView === role.view));
         return;
       }
       detail.className = 'role-preview';
       detail.innerHTML = `${hero}<nav class="role-view-tabs" aria-label="${'\u89d2\u8272\u9810\u89bd\u8996\u89d2'}">${['player', 'encyclopedia', 'storyteller'].map((item) => `<button type="button" data-role-view="${item}" class="${role.view === item ? 'is-active' : ''}">${viewLabel(item)}</button>`).join('')}</nav><div class="role-view-content">${viewContent}</div>`;
-      applyFangGuRoleLinks(detail.querySelector('.role-view-content'));
+      applyRoleMentionLinks(detail.querySelector('.role-view-content'));
       detail.querySelectorAll('[data-role-view]').forEach((button) => button.addEventListener('click', () => {
         if (button.classList.contains('is-active')) return;
         render({ ...options, view: button.dataset.roleView, preserveShell: true });
