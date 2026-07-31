@@ -202,6 +202,33 @@
     return Object.entries(officialScriptAliases).find(([, aliases]) => aliases.includes(name))?.[0] || '';
   }
 
+  const roleGroupTeams = {
+    '鎮民': 'townsfolk',
+    '镇民': 'townsfolk',
+    '外來者': 'outsider',
+    '外来者': 'outsider',
+    '爪牙': 'minion',
+    '惡魔': 'demon',
+    '恶魔': 'demon',
+    '旅行者': 'traveller'
+  };
+
+  function roleRosterConfig(node) {
+    const scriptName = officialScriptName(node);
+    if (scriptName) {
+      const aliases = new Set(officialScriptAliases[scriptName]);
+      return {
+        title: '劇本角色',
+        matches: (role) => (role.script_names || []).some((name) => aliases.has(String(name).trim()))
+      };
+    }
+    const team = roleGroupTeams[String(node?.name || '').trim()];
+    if (!team) return null;
+    return {
+      title: `${String(node.name).trim()}角色`,
+      matches: (role) => role.team === team
+    };
+  }
   function loadRoleCatalog() {
     if (!state.roleCatalogPromise) {
       state.roleCatalogPromise = fetch(`${apiBase}/api/roles?limit=500`).then(requireJson).then((payload) => payload.items || []);
@@ -209,15 +236,16 @@
     return state.roleCatalogPromise;
   }
 
-  async function hydrateOfficialScriptRoster(node, detail) {
-    const scriptName = officialScriptName(node);
-    const host = detail.querySelector('[data-script-roster]');
-    if (!scriptName || !host) return;
-    const aliases = new Set(officialScriptAliases[scriptName]);
-    const roles = (await loadRoleCatalog()).filter((role) => (role.script_names || []).some((name) => aliases.has(String(name).trim())));
+  async function hydrateRoleRoster(node, detail) {
+    const config = roleRosterConfig(node);
+    const host = detail.querySelector('[data-role-roster]');
+    if (!config || !host) return;
+    const roles = (await loadRoleCatalog())
+      .filter(config.matches)
+      .sort((left, right) => String(left.name_zh_tw || '').localeCompare(String(right.name_zh_tw || ''), 'zh-Hant'));
     if (detail.dataset.knowledgeSlug !== node.slug) return;
     if (!roles.length) { host.remove(); return; }
-    host.innerHTML = `<div class="knowledge-script-roster-head"><h3>劇本角色</h3><span>${roles.length} 位</span></div><div class="knowledge-script-roster-grid">${roles.map((role) => `<button type="button" class="knowledge-script-role" data-related-slug="${escapeHtml(role.knowledge_slug || ({ '檮杌': '梼杌', '鴆': '鸩' }[role.name_zh_tw]) || role.name_zh_tw)}"><img src="${escapeHtml(role.image_url || '/static/img/default-avatar.png')}" alt="" loading="lazy"><span>${escapeHtml(role.name_zh_tw)}</span><small>${escapeHtml(roleTeamLabel(role.team))}</small></button>`).join('')}</div>`;
+    host.innerHTML = `<div class="knowledge-script-roster-head"><h3>${escapeHtml(config.title)}</h3><span>${roles.length} 位</span></div><div class="knowledge-script-roster-grid">${roles.map((role) => `<button type="button" class="knowledge-script-role" data-related-slug="${escapeHtml(role.knowledge_slug || ({ '檮杌': '梼杌', '鴆': '鸩' }[role.name_zh_tw]) || role.name_zh_tw)}"><img src="${escapeHtml(role.image_url || '/static/img/default-avatar.png')}" alt="" loading="lazy"><span>${escapeHtml(role.name_zh_tw)}</span><small>${escapeHtml(roleTeamLabel(role.team))}</small></button>`).join('')}</div>`;
     host.querySelectorAll('[data-related-slug]').forEach((button) => button.addEventListener('click', () => loadNode(button.dataset.relatedSlug)));
   }
   function bindDetailEvents(detail, node) {
@@ -244,12 +272,12 @@
     detail.className = '';
     detail.innerHTML = `
       <div class="knowledge-detail-title"><div class="knowledge-title-identity"><div class="knowledge-type-chip">${escapeHtml(typeLabel(node.node_type))}</div><h2>${escapeHtml(node.name)}</h2>${node.name_en ? `<div class="knowledge-name-en">${escapeHtml(node.name_en)}</div>` : ''}</div>${renderTitleRelations(relations)}</div>
-      ${officialScriptName(node) ? `<section class="knowledge-script-roster" data-script-roster><div class="knowledge-detail-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>正在整理劇本角色…</p></div></section>` : ''}
+      ${roleRosterConfig(node) ? `<section class="knowledge-script-roster" data-role-roster><div class="knowledge-detail-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>正在整理劇本角色…</p></div></section>` : ''}
       ${blocks.length ? `<div class="knowledge-section"><h3>整理內容</h3><div class="knowledge-block-list">${blocks.map(renderBlock).join('')}</div></div>` : `<div class="knowledge-section"><div class="knowledge-warning">目前尚未建立結構化內容。後續會逐步補上能力、規則、說書人提醒與常見誤解。</div></div>`}
       ${node.source_record?.url ? `<div class="knowledge-section knowledge-source-reference"><h3>來源</h3><a class="knowledge-source-link" href="${escapeHtml(node.source_record.url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> 查看原始來源</a></div>` : ''}
       ${aliases.length ? `<div class="knowledge-section"><h3>別名與其他語言</h3><div class="knowledge-aliases">${aliases.map((alias) => `<span class="knowledge-alias">${escapeHtml(alias.alias)} <small>${escapeHtml(alias.language || '')}</small></span>`).join('')}</div></div>` : ''}`;
     bindDetailEvents(detail, node);
-    hydrateOfficialScriptRoster(node, detail).catch((error) => console.warn('劇本角色載入失敗', error));
+    hydrateRoleRoster(node, detail).catch((error) => console.warn('劇本角色載入失敗', error));
     window.RoleKnowledgePreview?.linkRoleMentions?.({
       root: detail,
       apiBase,

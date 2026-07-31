@@ -122,14 +122,8 @@
           const button = root.ownerDocument.createElement('button');
           button.type = 'button';
           button.className = `role-mention-chip role-mention-inline role-mention-${mentionTone(match.item.team)}`;
-          if (match.item.imageUrl) {
-            const icon = root.ownerDocument.createElement('img');
-            icon.className = 'role-mention-icon';
-            icon.src = match.item.imageUrl;
-            icon.alt = '';
-            icon.loading = 'lazy';
-            button.append(icon);
-          }
+
+
           button.append(match.item.displayLabel || match.item.label);
           button.title = `查看「${match.item.label}」資料`;
           button.addEventListener('click', () => onNavigate(match.item.target));
