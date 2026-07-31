@@ -3,7 +3,7 @@
 
 HTML = """
 <div id="mw-content-text"><div class="mw-parser-output">
-  <p>這是導言。</p>
+  <p>這是導言，參見<a href="/index.php?title=規則">規則</a>。</p>
   <h2><span>第一節</span><span class="mw-editsection">[编辑]</span></h2>
   <p>第一段內容。</p>
   <h3>子標題</h3>
@@ -18,7 +18,8 @@ HTML = """
 def main():
     assert callable(or_)
     normalized, blocks = extract_article_sections(HTML)
-    assert [block["title"] for block in blocks] == ["導言", "第一節", "資料表"]
+    assert [block["title"] for block in blocks] == ["上層分類", "第一節", "資料表"]
+    assert blocks[0]["content"] == "[knowledge=規則]規則[/knowledge]"
     assert "### 子標題" in blocks[1]["content"]
     assert "- 專案甲" in blocks[1]["content"]
     assert "| 名稱 | 效果 |" in blocks[2]["content"]

@@ -1,4 +1,4 @@
-﻿"""Fetch and structure non-role articles from the GStone Clocktower Wiki.
+"""Fetch and structure non-role articles from the GStone Clocktower Wiki.
 
 Dry-run is the default. Pass --write to persist changes.
 Only source records belonging to the configured GStone source and host are
@@ -13,7 +13,7 @@ import sys
 import time
 from collections import Counter
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup, NavigableString, Tag
@@ -166,22 +166,27 @@ def extract_article_sections(html: str) -> tuple[str, list[dict]]:
 
     blocks: list[dict] = []
     first_h2 = root.find("h2")
-    intro_lines: list[str] = []
+    intro_link = None
+    intro_nodes = []
     for child in root.children:
         if child is first_h2:
             break
         if isinstance(child, Tag):
-            rendered = render_node(child)
-            if rendered:
-                if intro_lines:
-                    intro_lines.append("")
-                intro_lines.extend(rendered)
-    intro = clean_text("\n".join(intro_lines))
-    if intro:
+            intro_nodes.append(child)
+    for child in intro_nodes:
+        for anchor in child.select("a[href]"):
+            href = urljoin(f"https://{GSTONE_HOST}/", anchor.get("href", ""))
+            label = clean_text(anchor.get_text(" ", strip=True))
+            if label and is_gstone_url(href):
+                intro_link = (label, href)
+                break
+        if intro_link:
+            break
+    if intro_link:
         blocks.append({
             "block_type": "article_intro",
-            "title": "導言",
-            "content": intro,
+            "title": "上層分類",
+            "content": f"[knowledge={intro_link[0]}]{intro_link[0]}[/knowledge]",
             "content_format": "structured_text",
             "sort_order": 100,
         })

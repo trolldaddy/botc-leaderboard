@@ -8,7 +8,7 @@
   const typeLabel = (type) => ({ role: '角色', script: '劇本', guide: '指南', mechanic: '規則／機制', article: '文章' }[type] || type || '其他');
   const blockLabel = (type) => ({ background: '背景故事', ability: '角色能力', overview: '角色簡介', how_it_works: '運作方式', rules_detail: '規則細節', rules_interactions: '角色互動', rules_jinx: '相剋規則', reminders: '提示標記', examples: '範例', strategy_play: '如何遊玩', strategy_bluff: '如何偽裝', strategy_counter: '如何對抗', storyteller_advice: '說書人建議', source_excerpt: '原始來源節錄' }[type] || typeLabel(type));
   const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', overview: 'fa-circle-info', how_it_works: 'fa-gears', rules_detail: 'fa-scale-balanced', rules_interactions: 'fa-arrows-left-right', rules_jinx: 'fa-link', reminders: 'fa-tag', examples: 'fa-lightbulb', strategy_play: 'fa-chess', strategy_bluff: 'fa-masks-theater', strategy_counter: 'fa-shield-halved', storyteller_advice: 'fa-user-tie', source_excerpt: 'fa-box-archive' }[type] || 'fa-note-sticky');
-  const relationGroupOrder = ['role', 'mechanic', 'script', 'guide', 'article', 'other'];
+  const relationGroupOrder = ['mechanic', 'article'];
 
   async function requireJson(resp) {
     let data = null;
@@ -48,18 +48,24 @@
 
   function groupRelations(relations) {
     const groups = new Map();
+    const seen = new Set();
     relations.forEach((rel) => {
       const type = rel?.node?.node_type || 'other';
+      const slug = rel?.node?.slug || '';
+      if (!relationGroupOrder.includes(type) || !slug || seen.has(slug)) return;
+      seen.add(slug);
       if (!groups.has(type)) groups.set(type, []);
       groups.get(type).push(rel);
     });
-    return relationGroupOrder.filter((type) => groups.has(type)).map((type) => ({ type, items: groups.get(type) }))
-      .concat(Array.from(groups.entries()).filter(([type]) => !relationGroupOrder.includes(type)).map(([type, items]) => ({ type, items })));
+    return relationGroupOrder
+      .filter((type) => groups.has(type))
+      .map((type) => ({ type, items: groups.get(type) }));
   }
 
   function renderRelationGroups(relations) {
-    if (!relations.length) return '<span class="knowledge-result-meta">目前沒有可顯示的關聯。</span>';
-    return groupRelations(relations).map((group) => {
+    const groups = groupRelations(relations);
+    if (!groups.length) return '<span class="knowledge-result-meta">目前沒有可顯示的規則或文章關聯。</span>';
+    return groups.map((group) => {
       const expanded = state.expandedRelationGroups.has(group.type);
       const visible = expanded ? group.items : group.items.slice(0, 12);
       return `<div class="knowledge-relation-group"><div class="knowledge-relation-group-head"><h4>${escapeHtml(typeLabel(group.type))} <span>${group.items.length}</span></h4>${group.items.length > 12 ? `<button type="button" class="knowledge-relation-toggle" data-relation-group="${escapeHtml(group.type)}">${expanded ? '收合' : `展開其餘 ${group.items.length - 12} 筆`}</button>` : ''}</div><div class="knowledge-relations">${visible.map(relationButton).join('')}</div></div>`;
@@ -69,6 +75,7 @@
   function inlineMarkup(value) {
     return escapeHtml(value)
       .replace(/\[size=(sm|md|lg|xl)\]([\s\S]*?)\[\/size\]/g, '<span class="rich-size-$1">$2</span>')
+      .replace(/\[knowledge=([^\]]+)\]([\s\S]*?)\[\/knowledge\]/g, (_, slug, label) => `<a href="#knowledge/${encodeURIComponent(slug)}" data-knowledge-slug="${slug}">${label}</a>`)
       .replace(/\[b\]([\s\S]*?)\[\/b\]/g, '<strong>$1</strong>')
       .replace(/\[i\]([\s\S]*?)\[\/i\]/g, '<em>$1</em>')
       .replace(/\[url=(https?:\/\/[^\]\s]+)\]([\s\S]*?)\[\/url\]/g, '<a href="$1" target="_blank" rel="noopener">$2</a>')
@@ -187,13 +194,14 @@
     const aliases = (node.aliases || []).filter((alias) => alias.alias && alias.alias !== node.name);
     const blocks = node.blocks || [];
     const relations = node.relations || [];
+    const visibleRelationCount = groupRelations(relations).reduce((total, group) => total + group.items.length, 0);
     detail.className = '';
     detail.innerHTML = `
       <div class="knowledge-detail-title"><div><div class="knowledge-type-chip">${escapeHtml(typeLabel(node.node_type))}</div><h2>${escapeHtml(node.name)}</h2>${node.name_en ? `<div class="knowledge-name-en">${escapeHtml(node.name_en)}</div>` : ''}</div><div class="knowledge-result-meta">${escapeHtml(node.slug)}</div></div>
       ${blocks.length ? `<div class="knowledge-section"><h3>整理內容</h3><div class="knowledge-block-list">${blocks.map(renderBlock).join('')}</div></div>` : `<div class="knowledge-section"><div class="knowledge-warning">目前尚未建立結構化內容。後續會逐步補上能力、規則、說書人提醒與常見誤解。</div></div>`}
       ${node.source_record?.url ? `<div class="knowledge-section knowledge-source-reference"><h3>來源</h3><a class="knowledge-source-link" href="${escapeHtml(node.source_record.url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> 查看原始來源</a></div>` : ''}
       ${aliases.length ? `<div class="knowledge-section"><h3>別名與其他語言</h3><div class="knowledge-aliases">${aliases.map((alias) => `<span class="knowledge-alias">${escapeHtml(alias.alias)} <small>${escapeHtml(alias.language || '')}</small></span>`).join('')}</div></div>` : ''}
-      <div class="knowledge-section"><h3>相關條目（${relations.length}）</h3><div class="knowledge-relation-groups">${renderRelationGroups(relations)}</div></div>`;
+      <div class="knowledge-section"><h3>相關條目（${visibleRelationCount}）</h3><div class="knowledge-relation-groups">${renderRelationGroups(relations)}</div></div>`;
     bindDetailEvents(detail, node);
   }
 
