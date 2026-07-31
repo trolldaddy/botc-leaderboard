@@ -54,9 +54,13 @@
   function knowledgeTag(item, icon) { return `<button type="button" class="role-meta-tag" data-knowledge-tag="${esc(item)}"><i class="fa-solid ${icon}"></i>${esc(item)}</button>`; }
 
   async function render(options) {
-    const { apiBase, node, detail, view = 'encyclopedia', requireJson, onFallback } = options;
-    detail.className = '';
-    detail.innerHTML = '<div class="role-preview-loading"><div class="role-skeleton role-skeleton-icon"></div><div><div class="role-skeleton role-skeleton-title"></div><div class="role-skeleton role-skeleton-line"></div></div></div>';
+    const { apiBase, node, detail, view = 'encyclopedia', requireJson, onFallback, preserveShell = false } = options;
+    if (!preserveShell) {
+      detail.className = '';
+      detail.innerHTML = '<div class="role-preview-loading"><div class="role-skeleton role-skeleton-icon"></div><div><div class="role-skeleton role-skeleton-title"></div><div class="role-skeleton role-skeleton-line"></div></div></div>';
+    } else {
+      detail.querySelector('.role-view-content')?.setAttribute('aria-busy', 'true');
+    }
     try {
       const role = await fetch(`${apiBase}/api/roles/${encodeURIComponent(node.name || node.slug)}?view=${encodeURIComponent(view)}`, { cache: 'no-store' }).then(requireJson);
       const blocks = role.content_blocks || [];
@@ -71,12 +75,24 @@
       const extendedBlocks = blockGroup(blocks, 'extended', showSourceStatus);
       const larplusBlocks = blockGroup(blocks, 'larplus', showSourceStatus);
       const contentSections = `${coreBlocks ? section('角色內容', '角色背景、簡介、範例與策略', coreBlocks) : ''}${extendedBlocks ? section('延伸資料', '運作方式、規則細節、互動與相剋', extendedBlocks) : ''}${larplusBlocks ? section('拉普拉斯資料', '店內教學、補充與裁定', larplusBlocks) : ''}`;
+      const viewContent = `${ability}${visible('guide') ? guideCards(role.guide) : ''}${blocks.length ? contentSections : ''}${nightSection}${reminderSection}`;
+      if (preserveShell) {
+        const content = detail.querySelector('.role-view-content');
+        if (content) { content.innerHTML = viewContent; content.removeAttribute('aria-busy'); }
+        detail.querySelectorAll('[data-role-view]').forEach((button) => button.classList.toggle('is-active', button.dataset.roleView === role.view));
+        return;
+      }
       detail.className = 'role-preview';
-      detail.innerHTML = `${hero}<nav class="role-view-tabs" aria-label="角色預覽視角">${['player', 'encyclopedia', 'storyteller'].map((item) => `<button type="button" data-role-view="${item}" class="${role.view === item ? 'is-active' : ''}">${viewLabel(item)}</button>`).join('')}</nav>${ability}${visible('guide') ? guideCards(role.guide) : ''}${blocks.length ? contentSections : ''}${nightSection}${reminderSection}`;
-      detail.querySelectorAll('[data-role-view]').forEach((button) => button.addEventListener('click', () => render({ ...options, view: button.dataset.roleView })));
+      detail.innerHTML = `${hero}<nav class="role-view-tabs" aria-label="${'\u89d2\u8272\u9810\u89bd\u8996\u89d2'}">${['player', 'encyclopedia', 'storyteller'].map((item) => `<button type="button" data-role-view="${item}" class="${role.view === item ? 'is-active' : ''}">${viewLabel(item)}</button>`).join('')}</nav><div class="role-view-content">${viewContent}</div>`;
+      detail.querySelectorAll('[data-role-view]').forEach((button) => button.addEventListener('click', () => {
+        if (button.classList.contains('is-active')) return;
+        render({ ...options, view: button.dataset.roleView, preserveShell: true });
+      }));
       detail.querySelectorAll('[data-knowledge-tag]').forEach((button) => button.addEventListener('click', () => options.onNavigate?.(button.dataset.knowledgeTag)));
     } catch (err) {
-      onFallback(err);
+      detail.querySelector('.role-view-content')?.removeAttribute('aria-busy');
+      if (!preserveShell) onFallback(err);
+      else console.error(err);
     }
   }
   window.RoleKnowledgePreview = { render };
