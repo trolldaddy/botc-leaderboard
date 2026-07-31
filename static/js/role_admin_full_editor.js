@@ -36,6 +36,26 @@
         width: 100%;
         overflow-x: hidden;
       }
+      .role-admin-editor.ia-enhancing {
+        position: relative;
+        min-height: 420px;
+      }
+      .role-admin-editor.ia-enhancing > * {
+        visibility: hidden !important;
+      }
+      .role-admin-editor.ia-enhancing::after {
+        content: '正在整理角色資料…';
+        position: absolute;
+        inset: 0;
+        min-height: 220px;
+        display: grid;
+        place-items: center;
+        visibility: visible;
+        color: #aeb6c9;
+        border: 1px solid #30364a;
+        border-radius: 14px;
+        background: linear-gradient(145deg, rgba(22,26,40,.98), rgba(15,18,29,.98));
+      }
       .ia-tabs {
         display: grid !important;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -211,6 +231,7 @@
     const roleId = getRoleId();
     if (!editor || !roleId || !editor.querySelector('.role-editor-grid')) return;
     if (editor.dataset.iaV2Role === String(roleId) && editor.querySelector('.ia-tabs')) return;
+    editor.classList.add('ia-enhancing');
     editor.dataset.iaV2Role = String(roleId);
 
     let data;
@@ -359,7 +380,8 @@
     editor.querySelectorAll('[data-save-content]').forEach((button)=>button.addEventListener('click',async()=>{button.disabled=true;try{await saveBlock(roleId,Number(button.dataset.saveContent));button.textContent='已儲存';}catch(err){alert(`儲存失敗：${err.message}`);}finally{setTimeout(()=>{button.disabled=false;button.textContent='儲存區塊';},800);}}));
     editor.querySelectorAll('[data-delete-content]').forEach((button)=>button.addEventListener('click',async()=>{if(!confirm('確定刪除此內容區塊？'))return;try{await request(`/api/admin/roles/${roleId}/content/${button.dataset.deleteContent}`,{method:'DELETE'});editor.dataset.iaV2Role='';window.RoleAdmin?.refresh?.();}catch(err){alert(`刪除失敗：${err.message}`);}}));
   };
-  const observer=new MutationObserver(()=>{clearTimeout(observer.timer);observer.timer=setTimeout(enhance,100);});
-  const start=()=>{const editor=$('role-admin-editor');if(!editor)return setTimeout(start,200);observer.observe(editor,{childList:true,subtree:false});enhance();};
+  const runEnhance=async()=>{const editor=$('role-admin-editor');try{await enhance();}finally{editor?.classList.remove('ia-enhancing');}};
+  const observer=new MutationObserver(()=>{const editor=$('role-admin-editor');if(editor?.querySelector('.role-editor-grid')&&!editor.querySelector('.ia-tabs'))editor.classList.add('ia-enhancing');clearTimeout(observer.timer);observer.timer=setTimeout(runEnhance,20);});
+  const start=()=>{const editor=$('role-admin-editor');if(!editor)return setTimeout(start,200);observer.observe(editor,{childList:true,subtree:false});runEnhance();};
   start();
 })();
