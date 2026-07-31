@@ -80,6 +80,11 @@
       .role-ability-tags span,.role-ability-tags a { text-decoration:none; border-color:rgba(255,209,102,.35); background:rgba(255,209,102,.09); color:#ffd166; }
       .role-ability-tags span.empty { color:#aeb6c9; border-color:#39415a; background:transparent; }
       .role-reference-links { justify-content:flex-end; }
+      .role-editor-head { justify-content:space-between; }
+      .role-editor-head-main { display:flex; align-items:center; gap:1rem; min-width:0; }
+      .role-editor-head-links { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:.5rem; margin-left:auto; }
+      .role-editor-head-links a { display:inline-flex; align-items:center; gap:.38rem; padding:.42rem .68rem; border:1px solid #39415a; border-radius:999px; color:#cfc8ff; text-decoration:none; font-size:.76rem; font-weight:800; background:#171b27; }
+      .role-editor-head-links a:hover { border-color:#8b7cf6; color:#fff; }
       .role-reference-links a { display:inline-flex; align-items:center; gap:.4rem; color:#cfc8ff; text-decoration:none; font-size:.8rem; font-weight:800; }
       .role-source-details { margin:1rem 0; padding:.8rem; border:1px solid #30364a; border-radius:12px; background:#131722; }
       .role-source-details summary { cursor:pointer; color:#ffd166; font-weight:900; }
@@ -94,15 +99,15 @@
       .role-setting-groups { display:grid; gap:1rem; margin-top:1rem; }
       .role-setting-groups > section { overflow:hidden; border:1px solid #30364a; border-radius:12px; background:#131722; }
       .role-setting-groups h4 { margin:0; padding:.8rem 1rem; color:#ffd166; border-bottom:1px solid #30364a; }
-      .role-setting-row { display:grid; grid-template-columns:minmax(210px,1.2fr) repeat(3,minmax(140px,.7fr)); gap:.7rem; align-items:center; padding:.65rem 1rem; border-bottom:1px solid #282e40; }
+      .role-setting-row { display:grid; grid-template-columns:minmax(210px,1fr) repeat(3,104px); gap:.7rem; align-items:center; padding:.65rem 1rem; border-bottom:1px solid #282e40; }
       .role-setting-row:last-child { border-bottom:0; }
       .role-setting-row.is-dirty { background:rgba(255,209,102,.06); box-shadow:inset 3px 0 #ffd166; }
       .role-setting-name span { display:block; margin-top:.2rem; color:#8993aa; font-size:.72rem; }
       .role-setting-view { display:grid; grid-template-columns:auto 1fr; gap:.35rem .5rem; align-items:center; color:#dfe3ee; font-size:.78rem; font-weight:800; }
       .role-setting-view > span { grid-column:1 / -1; color:#8993aa; }
-      .role-setting-view input[type="number"] { min-width:0; height:34px; padding:.35rem .5rem; }
+      .role-setting-view input[type="number"] { width:64px; min-width:64px; max-width:64px; height:34px; padding:.35rem .45rem; text-align:center; }
       .role-setting-actions { display:flex; justify-content:flex-end; margin-top:1rem; }
-      @media (max-width:720px) { .role-setting-row { grid-template-columns:1fr; } .role-identity-card { align-items:flex-start; flex-direction:column; } .role-reference-links { justify-content:flex-start; } .role-display-details .ia-display-row { grid-template-columns:1fr; } }      @media (max-width: 1180px) {
+      @media (max-width:720px) { .role-setting-row { grid-template-columns:1fr; } .role-editor-head { align-items:flex-start; flex-direction:column; } .role-editor-head-links { justify-content:flex-start; margin-left:0; } .role-identity-card { align-items:flex-start; flex-direction:column; } .role-reference-links { justify-content:flex-start; } .role-display-details .ia-display-row { grid-template-columns:1fr; } }      @media (max-width: 1180px) {
         .role-admin-layout { grid-template-columns: 230px minmax(0, 1fr) !important; }
         .ia-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       }
@@ -269,23 +274,19 @@
     const extendedBlocks = shared.filter((block) => extendedTypes.has(baseType(block)));
     const coreBlocks = shared.filter((block) => !extendedTypes.has(baseType(block)));
 
-    const roleName = $('ra-name-zh')?.value || '';
-    const englishName = $('ra-name-en')?.value || '';
-    const teamName = $('ra-team')?.selectedOptions?.[0]?.textContent || '';
-    const scripts = String($('ra-scripts')?.value || '').split(/[,，、\n]/).map((item) => item.trim()).filter(Boolean);
-    const abilityTags = String($('ra-ability-tags')?.value || '').split(/[,，、\n]/).map((item) => item.trim()).filter(Boolean);
-    const iconUrl = $('ra-image')?.value || '';
     const externalSource = shared.find((block) => block.source_url)?.source_url || '';
-    const references = (data.knowledge_links || []).map((link) => `<a href="#knowledge/${encodeURIComponent(link.knowledge_slug || '')}"><i class="fa-solid fa-book-open"></i> ${esc(link.knowledge_name || '百科條目')}</a>`).join('');
-    const infoCard = document.createElement('article');
-    infoCard.className = 'role-identity-card';
-    infoCard.innerHTML = `
-      <div class="role-identity-main">${iconUrl ? `<img src="${esc(iconUrl)}" alt="">` : '<div class="role-identity-icon"></div>'}<div><h4>${esc(roleName)}${englishName ? `<span>${esc(englishName)}</span>` : ''}</h4><div class="role-identity-tags"><span>${esc(teamName)}</span>${scripts.map((item)=>`<span>${esc(item)}</span>`).join('') || '<span>待百科同步劇本</span>'}</div><div class="role-ability-tags">${abilityTags.map((item)=>`<a href="#knowledge/${encodeURIComponent(item)}">${esc(item)}</a>`).join('') || '<span class="empty">待百科同步能力類型</span>'}</div></div></div>
-      <div class="role-reference-links">${references}${externalSource ? `<a href="${esc(externalSource)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> GStone 原始資料</a>` : ''}</div>`;
+    const primaryKnowledge = (data.knowledge_links || [])[0];
+    const headerMain = document.createElement('div');
+    headerMain.className = 'role-editor-head-main';
+    while (header.firstChild) headerMain.appendChild(header.firstChild);
+    header.appendChild(headerMain);
+    const headerLinks = document.createElement('div');
+    headerLinks.className = 'role-editor-head-links';
+    headerLinks.innerHTML = `${primaryKnowledge ? `<a href="#knowledge/${encodeURIComponent(primaryKnowledge.knowledge_slug || '')}"><i class="fa-solid fa-book-open"></i> \u89d2\u8272\u8cc7\u6599\u9801</a>` : ''}${externalSource ? `<a href="${esc(externalSource)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> GStone \u5b98\u65b9\u8cc7\u6599</a>` : ''}`;
+    if (headerLinks.childElementCount) header.appendChild(headerLinks);
 
     const core = document.createElement('section'); core.className='ia-pane active'; core.dataset.iaPane='content';
     core.innerHTML='<div class="ia-pane-intro"><h4>角色內容</h4><p>角色識別、官方能力、百科閱讀內容與策略集中在這裡。</p></div>';
-    core.appendChild(infoCard);
     core.appendChild(identityGrid);
     const sourceDetails = document.createElement('details'); sourceDetails.className='role-source-details'; sourceDetails.innerHTML='<summary>來源與同步資料</summary>'; sourceDetails.appendChild(sourceGrid); core.appendChild(sourceDetails);
     if (checks) core.appendChild(checks);
