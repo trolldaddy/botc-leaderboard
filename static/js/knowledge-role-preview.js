@@ -47,10 +47,7 @@
     if (team === 'fabled') return 'fabled';
     return 'article';
   };
-  const relationMentionTargets = (node) => (node.relations || [])
-    .map((relation) => relation?.node)
-    .filter((item) => item && item.node_type !== 'role' && String(item.name || '').trim().length >= 2)
-    .map((item) => ({ label: String(item.name).trim(), target: String(item.slug || item.name).trim(), team: 'article' }));
+
   const uniqueMentionTargets = (targets) => {
     const seen = new Set();
     return targets.filter((item) => {
@@ -200,7 +197,7 @@
       const contentSections = `${coreBlocks ? section('角色內容', '角色背景、簡介、範例與策略', coreBlocks) : ''}${extendedBlocks ? section('延伸資料', '運作方式、規則細節、互動與相剋', extendedBlocks) : ''}${larplusBlocks ? section('拉普拉斯資料', '店內教學、補充與裁定', larplusBlocks) : ''}`;
       const viewContent = `${ability}${visible('guide') ? guideCards(role.guide) : ''}${blocks.length ? contentSections : ''}${nightSection}${reminderSection}`;      const applyRoleMentionLinks = (root) => {
         loadRoleMentionTargets(apiBase, requireJson)
-          .then((targets) => replaceInlineMentions(root, [...targets, ...relationMentionTargets(node)], role, node, options.onNavigate))
+          .then((targets) => replaceInlineMentions(root, targets, role, node, options.onNavigate))
           .catch((error) => console.warn('角色提及連結載入失敗', error));
       };
       if (preserveShell) {
