@@ -38,7 +38,7 @@
       }
       .ia-tabs {
         display: grid !important;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         width: 100%;
         gap: .5rem;
         margin: 0 0 1rem;
@@ -281,10 +281,6 @@
     const core = document.createElement('section'); core.className='ia-pane active'; core.dataset.iaPane='content';
     core.innerHTML='<div class="ia-pane-intro"><h4>角色內容</h4><p>角色識別、官方能力、百科閱讀內容與策略集中在這裡。</p></div>';
     core.appendChild(infoCard);
-    const roleDisplayDetails = document.createElement('details');
-    roleDisplayDetails.className = 'role-display-details';
-    roleDisplayDetails.innerHTML = `<summary><i class="fa-solid fa-eye"></i> 此角色的內容顯示設定</summary><p class="role-display-help">只覆寫這個角色各內容 Block 的顯示對象；上方工具列的「顯示設定」仍是所有角色共用規則。</p><div class="ia-display-section">${blocks.map(displayRow).join('') || '<div class="role-admin-empty">目前沒有可設定的內容 Block。</div>'}</div>`;
-    core.appendChild(roleDisplayDetails);
     core.appendChild(identityGrid);
     const sourceDetails = document.createElement('details'); sourceDetails.className='role-source-details'; sourceDetails.innerHTML='<summary>來源與同步資料</summary>'; sourceDetails.appendChild(sourceGrid); core.appendChild(sourceDetails);
     if (checks) core.appendChild(checks);
@@ -302,15 +298,18 @@
     lap.appendChild(larplusGrid);
     const lapList = document.createElement('div'); lapList.className='role-content-list'; lapList.innerHTML=larplus.map(blockCard).join('') || '<div class="role-admin-empty">目前沒有額外的拉普拉斯 Block。</div>'; lap.appendChild(lapList);
 
-    const tabs=document.createElement('nav'); tabs.className='ia-tabs'; tabs.innerHTML='<button class="active" data-ia-tab="content">角色內容</button><button data-ia-tab="extension">延伸資料</button><button data-ia-tab="larplus">拉普拉斯資料</button>';
-    header.insertAdjacentElement('afterend',tabs); tabs.insertAdjacentElement('afterend',core); core.insertAdjacentElement('afterend',extension); extension.insertAdjacentElement('afterend',lap); if(actions) editor.appendChild(actions);
+    const displayPane = document.createElement('section'); displayPane.className='ia-pane role-display-pane'; displayPane.dataset.iaPane='display';
+    displayPane.innerHTML='<div class="ia-pane-intro"><h4>顯示設定</h4><p>這裡只調整目前角色各內容 Block 在玩家、百科與說書人視角的顯示方式。上方工具列的「顯示設定」仍是所有角色共用規則。</p></div><div class="role-display-details"><div class="ia-display-section">'+(blocks.map(displayRow).join('') || '<div class="role-admin-empty">目前沒有可設定的內容 Block。</div>')+'</div></div>';
+
+    const tabs=document.createElement('nav'); tabs.className='ia-tabs'; tabs.innerHTML='<button class="active" data-ia-tab="content">角色內容</button><button data-ia-tab="extension">延伸資料</button><button data-ia-tab="larplus">拉普拉斯資料</button><button data-ia-tab="display">顯示設定</button>';
+    header.insertAdjacentElement('afterend',tabs); tabs.insertAdjacentElement('afterend',core); core.insertAdjacentElement('afterend',extension); extension.insertAdjacentElement('afterend',lap); lap.insertAdjacentElement('afterend',displayPane); if(actions) editor.appendChild(actions);
 
     tabs.querySelectorAll('[data-ia-tab]').forEach((button)=>button.addEventListener('click',()=>{
       tabs.querySelectorAll('button').forEach((item)=>item.classList.toggle('active',item===button));
       editor.querySelectorAll('.ia-pane').forEach((pane)=>pane.classList.toggle('active',pane.dataset.iaPane===button.dataset.iaTab));
     }));
 
-    roleDisplayDetails.querySelectorAll('.ia-save-display').forEach((button) => button.addEventListener('click', async () => {
+    displayPane.querySelectorAll('.ia-save-display').forEach((button) => button.addEventListener('click', async () => {
       const row = button.closest('[data-display-block]');
       const audience = row.querySelector('[data-role-audience]').value;
       button.disabled = true; button.textContent = '儲存中…';
