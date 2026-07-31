@@ -27,6 +27,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from gstone_wiki import BASE_URL, HEADERS, article_url, is_excluded_knowledge_title, parse_reminders, to_traditional
+from gstone_wiki import parse_role_information
 
 ROLE_COVERAGE_SEEDS = ["钟表匠", "镜像双子", "理发师", "卡扎力", "炼金术士", "狸猫", "传奇角色", "奇遇角色", "末日预言者"]
 DEFAULT_SEEDS = ["首頁", "角色", "剧本", "規則", "规则", "相克規則", "相克规则", *ROLE_COVERAGE_SEEDS]
@@ -55,6 +56,7 @@ class CrawlPage:
     resolved_title: str = ""
     status: int = 0
     page_type: str = "unknown"
+    role_type: str = ""
     classification_reasons: list[str] = field(default_factory=list)
     categories: list[str] = field(default_factory=list)
     headings: list[str] = field(default_factory=list)
@@ -151,6 +153,7 @@ def classify_page(
     categories: Iterable[str],
     headings: Iterable[str],
     soup: BeautifulSoup,
+    role_information: dict[str, Any] | None = None,
 ) -> tuple[str, list[str]]:
     title_t = to_traditional(title)
     category_values = [to_traditional(item) for item in categories]
@@ -168,31 +171,10 @@ def classify_page(
     if title_t in {to_traditional(value) for value in ROLE_GROUP_TITLES}:
         return "article", ["role_group_overview"]
 
-    role_category_hits = sorted({item for item in category_values if item in ROLE_CATEGORY_TITLES})
-    if role_category_hits:
-        return "role", [f"wiki_role_category:{','.join(role_category_hits)}"]
-
-
-    role_heading_hits = sorted({item for item in heading_values if item in {to_traditional(x) for x in ROLE_HEADINGS}})
-    faction_hits = sorted({word for word in ROLE_FACTIONS if to_traditional(word) in haystack})
-    role_score = 0
-    if "角色能力" in heading_text or "提示標記" in heading_text:
-        role_score += 4
-        reasons.append("strong_role_heading")
-    if len(role_heading_hits) >= 2:
-        role_score += 3
-        reasons.append(f"role_headings:{','.join(role_heading_hits[:5])}")
-    elif role_heading_hits:
-        role_score += 1
-        reasons.append(f"role_heading:{role_heading_hits[0]}")
-    if faction_hits:
-        role_score += 2
-        reasons.append(f"faction:{','.join(faction_hits[:3])}")
-    if re.search(r"(?:角色類型|角色类型|陣營|阵营)\s*[：:]?\s*(?:鎮民|镇民|外來者|外来者|爪牙|惡魔|恶魔|旅行者|傳奇角色|传奇角色|奇遇角色)", body_text):
-        role_score += 3
-        reasons.append("role_metadata")
-    if role_score >= 4:
-        return "role", reasons
+    role_type = to_traditional((role_information or {}).get("role_type") or "")
+    valid_role_types = {to_traditional(value) for value in ROLE_FACTIONS}
+    if (role_information or {}).get("found") and role_type in valid_role_types:
+        return "role", [f"wiki_role_type:{role_type}"]
 
     script_heading_hits = sorted({item for item in heading_values if item in {to_traditional(x) for x in SCRIPT_HEADINGS}})
     if script_heading_hits and any(word in haystack for word in ("劇本", "剧本", "暗流湧動", "黯月初升", "紫羅蘭教派")):
@@ -270,8 +252,11 @@ def crawl(args: argparse.Namespace) -> dict[str, Any]:
                 page.categories = extract_categories(soup)
                 page.headings = extract_headings(soup)
                 page.outgoing_titles = extract_outgoing_titles(soup, page.resolved_title)
+                role_information = parse_role_information(response.text)
+                page.role_type = to_traditional(role_information.get("role_type") or "")
                 page.page_type, page.classification_reasons = classify_page(
-                    page.resolved_title, page.categories, page.headings, soup
+                    page.resolved_title, page.categories, page.headings, soup,
+                    role_information,
                 )
                 page.content_hash = hashlib.sha256(response.content).hexdigest()
                 if page.page_type == "role" or args.parse_reminders_all:
@@ -298,6 +283,7 @@ def crawl(args: argparse.Namespace) -> dict[str, Any]:
     status_counts = Counter(str(page.status) for page in pages)
     reminder_counts = Counter(page.reminder_classification for page in pages if page.reminder_classification != "not_checked")
     category_counts = Counter(category for page in pages for category in page.categories)
+    role_type_counts = Counter(page.role_type for page in pages if page.role_type)
     reason_counts = Counter(reason for page in pages for reason in page.classification_reasons)
     inbound = Counter(edge["target"] for edge in edges)
     outbound = Counter(edge["source"] for edge in edges)
@@ -315,7 +301,7 @@ def crawl(args: argparse.Namespace) -> dict[str, Any]:
             "timeout_seconds": args.timeout,
             "stopped_because": "max_pages" if queue and len(pages) >= args.max_pages else "queue_exhausted",
             "remaining_queue": len(queue),
-            "classifier_version": 2,
+            "classifier_version": 3,
         },
         "summary": {
             "pages_fetched": len(pages),
@@ -326,6 +312,7 @@ def crawl(args: argparse.Namespace) -> dict[str, Any]:
             "http_statuses": dict(status_counts.most_common()),
             "reminder_coverage": dict(reminder_counts.most_common()),
             "top_categories": dict(category_counts.most_common(50)),
+            "role_types": dict(role_type_counts.most_common()),
             "classification_reasons": dict(reason_counts.most_common(50)),
             "isolated_pages": len(isolated),
         },
