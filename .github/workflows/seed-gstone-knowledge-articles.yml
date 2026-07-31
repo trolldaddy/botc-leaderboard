@@ -1,0 +1,46 @@
+name: Seed GStone Knowledge Articles
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Preview changes or write them to the database
+        required: true
+        default: preview
+        type: choice
+        options:
+          - preview
+          - write
+      delay:
+        description: Delay between GStone requests in seconds
+        required: true
+        default: "0.15"
+        type: string
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/town-checkin
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Import structured GStone articles
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.mode }}" = "write" ]; then
+            python scripts/seed_gstone_knowledge_articles.py --write --delay "${{ inputs.delay }}"
+          else
+            python scripts/seed_gstone_knowledge_articles.py --delay "${{ inputs.delay }}"
+          fi
