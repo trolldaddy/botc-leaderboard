@@ -156,17 +156,26 @@
   installStableLayout();
 
   const request = async (path, options = {}) => {
-    const response = await fetch(`${apiBase()}${path}`, {
+    const requestOptions = {
       credentials: 'same-origin',
       headers: { 'Content-Type':'application/json', ...(options.headers || {}) },
       ...options,
-    });
+    };
+    const method = String(requestOptions.method || 'GET').toUpperCase();
+    const retryableStatuses = new Set([500, 502, 503, 504]);
+    let response;
+
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      response = await fetch(`${apiBase()}${path}`, requestOptions);
+      if (method !== 'GET' || !retryableStatuses.has(response.status) || attempt === 1) break;
+      await new Promise((resolve) => setTimeout(resolve, 350));
+    }
+
     let data = null;
     try { data = await response.json(); } catch (_) {}
     if (!response.ok) throw new Error(data?.detail || `HTTP ${response.status}`);
     return data;
   };
-
   const labelForType = (type) => ({
     background:'背景故事', ability:'角色能力補充', overview:'角色簡介', how_it_works:'運作方式',
     rules_detail:'規則細節', rules_interactions:'角色互動', rules_jinx:'相剋規則',

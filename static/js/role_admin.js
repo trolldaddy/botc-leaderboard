@@ -18,9 +18,17 @@ window.RoleAdmin = (() => {
   };
 
   const request = async (path, options = {}) => {
-    const resp = await fetch(`${apiBase()}${path}`, {
+    const requestOptions = {
       credentials: 'same-origin', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options,
-    });
+    };
+    const method = String(requestOptions.method || 'GET').toUpperCase();
+    const retryableStatuses = new Set([500, 502, 503, 504]);
+    let resp;
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      resp = await fetch(`${apiBase()}${path}`, requestOptions);
+      if (method !== 'GET' || !retryableStatuses.has(resp.status) || attempt === 1) break;
+      await new Promise((resolve) => setTimeout(resolve, 350));
+    }
     let data = null;
     try { data = await resp.json(); } catch (err) {}
     if (!resp.ok) throw new Error(data?.detail || `HTTP ${resp.status}`);
