@@ -41,6 +41,9 @@ ROLE_HEADINGS = {
     "運作方式", "运作方式", "提示標記", "提示标记", "範例", "示例",
 }
 ROLE_FACTIONS = {"鎮民", "镇民", "外來者", "外来者", "爪牙", "惡魔", "恶魔", "旅行者", "傳奇角色", "传奇角色", "奇遇角色"}
+ROLE_GROUP_TITLES = ROLE_FACTIONS | {"\u5be6\u9a57\u6027\u89d2\u8272", "\u5b9e\u9a8c\u6027\u89d2\u8272"}
+ROLE_CATEGORY_TITLES = {to_traditional(value) for value in ROLE_FACTIONS}
+
 SCRIPT_HEADINGS = {"角色列表", "角色清單", "剧本信息", "劇本資訊", "配置", "角色配置"}
 
 
@@ -160,6 +163,15 @@ def classify_page(
 
     if title_t.startswith(("分類:", "分类:", "Category:")):
         return "category", ["title_namespace"]
+    # Faction overview pages list many roles and repeat role metadata. They are
+    # navigation/group pages, never profiles for one role.
+    if title_t in {to_traditional(value) for value in ROLE_GROUP_TITLES}:
+        return "article", ["role_group_overview"]
+
+    role_category_hits = sorted({item for item in category_values if item in ROLE_CATEGORY_TITLES})
+    if role_category_hits:
+        return "role", [f"wiki_role_category:{','.join(role_category_hits)}"]
+
 
     role_heading_hits = sorted({item for item in heading_values if item in {to_traditional(x) for x in ROLE_HEADINGS}})
     faction_hits = sorted({word for word in ROLE_FACTIONS if to_traditional(word) in haystack})

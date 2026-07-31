@@ -12,7 +12,7 @@ import sys
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
@@ -44,6 +44,31 @@ TYPE_MAP = {
     "stub_or_navigation": "article",
     "unknown": "article",
 }
+ROLE_GROUP_TITLES = {
+    "\u93ae\u6c11", "\u9547\u6c11", "\u5916\u4f86\u8005", "\u5916\u6765\u8005", "\u722a\u7259",
+    "\u60e1\u9b54", "\u6076\u9b54", "\u65c5\u884c\u8005", "\u50b3\u5947\u89d2\u8272", "\u4f20\u5947\u89d2\u8272",
+    "\u5947\u9047\u89d2\u8272", "\u5be6\u9a57\u6027\u89d2\u8272", "\u5b9e\u9a8c\u6027\u89d2\u8272",
+}
+GSTONE_HOST = urlparse(BASE_URL).netloc.lower()
+
+
+def is_gstone_url(value: str) -> bool:
+    parsed = urlparse((value or "").strip())
+    return parsed.scheme in {"http", "https"} and parsed.netloc.lower() == GSTONE_HOST
+
+
+def validate_report_source(report: dict) -> None:
+    """Reject crawl input that could silently import a fallback wiki."""
+    meta_url = str((report.get("meta") or {}).get("base_url") or "").strip()
+    if meta_url and not is_gstone_url(meta_url):
+        raise ValueError("Only GStone Clocktower Wiki crawl reports can be imported")
+    for page in report.get("pages") or []:
+        for key in ("requested_url", "final_url"):
+            value = str(page.get(key) or "").strip()
+            if value and not is_gstone_url(value):
+                raise ValueError(f"Non-GStone source URL is not allowed: {value}")
+
+
 
 
 def slugify(title: str) -> str:
@@ -105,6 +130,7 @@ def load_report(path: Path):
         report = json.load(handle)
     if not isinstance(report.get("pages"), list) or not isinstance(report.get("edges"), list):
         raise ValueError("Report must contain pages[] and edges[]")
+    validate_report_source(report)
     return report
 
 
@@ -141,6 +167,8 @@ def import_report(report: dict, write: bool):
                 continue
             title_tw = to_traditional(title)
             node_type = TYPE_MAP.get(page.get("page_type"), "article")
+            if title_tw in {to_traditional(value) for value in ROLE_GROUP_TITLES}:
+                node_type = "article"
             node = find_existing_node(db, title, title_tw)
             if not node:
                 node = KnowledgeNode(
