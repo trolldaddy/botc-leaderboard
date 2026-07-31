@@ -52,6 +52,7 @@
         line-height: 1.25;
         text-align: center;
       }
+      .role-admin-editor > .role-editor-actions { position:sticky; top:.5rem; z-index:20; margin-top:1rem; padding:.7rem; border:1px solid #39415a; border-radius:12px; background:rgba(17,21,34,.96); box-shadow:0 -8px 24px rgba(0,0,0,.34); backdrop-filter:blur(10px); }
       .ia-pane { display: none !important; width: 100%; }
       .ia-pane.active { display: block !important; }
       .role-editor-grid,
@@ -208,7 +209,8 @@
   const enhance = async () => {
     const editor = $('role-admin-editor');
     const roleId = getRoleId();
-    if (!editor || !roleId || editor.dataset.iaV2Role === String(roleId) || !editor.querySelector('.role-editor-grid')) return;
+    if (!editor || !roleId || !editor.querySelector('.role-editor-grid')) return;
+    if (editor.dataset.iaV2Role === String(roleId) && editor.querySelector('.ia-tabs')) return;
     editor.dataset.iaV2Role = String(roleId);
 
     let data;
@@ -315,7 +317,9 @@
     displayPane.innerHTML=`<div class="ia-pane-intro"><h4>\u986f\u793a\u8a2d\u5b9a</h4><p>\u9019\u88e1\u53ef\u70ba\u76ee\u524d\u89d2\u8272\u8986\u5beb\u5b8c\u6574\u7684\u73a9\u5bb6\u3001\u767e\u79d1\u8207\u8aaa\u66f8\u4eba\u986f\u793a\u898f\u5247\u3002\u672a\u4fee\u6539\u6642\u6cbf\u7528\u4e0a\u65b9\u5de5\u5177\u5217\u7684\u5168\u57df\u8a2d\u5b9a\u3002</p><p><strong>\u53ea\u60f3\u589e\u52a0\u300c\u4e00\u53e5\u8a71\u5b9a\u4f4d\u300d\uff1a</strong>\u5148\u5728\u300c\u62c9\u666e\u62c9\u65af\u8cc7\u6599\u300d\u586b\u5beb\u4e00\u53e5\u8a71\uff0c\u518d\u56de\u6b64\u9801\u52fe\u9078\u300c\u4e00\u53e5\u8a71\u5b9a\u4f4d\u300d\u8981\u51fa\u73fe\u7684\u8996\u89d2\u3002</p></div><div class="role-setting-groups"><section><h4>\u56fa\u5b9a\u8cc7\u6599\u6a21\u7d44</h4><div class="role-setting-columns"><span>資料項目</span><span>玩家</span><span>百科</span><span>說書人</span></div>${moduleSettings.map(roleDisplayRow).join('')}</section><section><h4>\u5167\u5bb9 Block \u985e\u578b</h4><div class="role-setting-columns"><span>資料項目</span><span>玩家</span><span>百科</span><span>說書人</span></div>${blockSettings.map(roleDisplayRow).join('')}</section></div><div class="role-setting-actions"><button type="button" class="btn btn-purple" data-save-role-settings><i class="fa-solid fa-floppy-disk"></i> \u5132\u5b58\u6b64\u89d2\u8272\u986f\u793a\u8a2d\u5b9a</button></div>`;
 
     const tabs=document.createElement('nav'); tabs.className='ia-tabs'; tabs.innerHTML='<button class="active" data-ia-tab="content">角色內容</button><button data-ia-tab="extension">延伸資料</button><button data-ia-tab="larplus">拉普拉斯資料</button><button data-ia-tab="display">顯示設定</button>';
-    header.insertAdjacentElement('afterend',tabs); tabs.insertAdjacentElement('afterend',core); core.insertAdjacentElement('afterend',extension); extension.insertAdjacentElement('afterend',lap); lap.insertAdjacentElement('afterend',displayPane); if(actions) editor.appendChild(actions);
+    header.insertAdjacentElement('afterend',tabs);
+    if(actions){tabs.insertAdjacentElement('afterend',actions);actions.insertAdjacentElement('afterend',core);}else{tabs.insertAdjacentElement('afterend',core);}
+    core.insertAdjacentElement('afterend',extension); extension.insertAdjacentElement('afterend',lap); lap.insertAdjacentElement('afterend',displayPane);
 
     tabs.querySelectorAll('[data-ia-tab]').forEach((button)=>button.addEventListener('click',()=>{
       tabs.querySelectorAll('button').forEach((item)=>item.classList.toggle('active',item===button));

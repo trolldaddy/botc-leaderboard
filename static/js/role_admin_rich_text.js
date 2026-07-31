@@ -1,4 +1,4 @@
-﻿(() => {
+(() => {
   const editor = document.getElementById('role-admin-editor');
   if (!editor) return;
 
@@ -20,7 +20,10 @@
     .role-rich-editor:focus{border-color:#9a78ff;box-shadow:0 0 0 2px rgba(139,124,246,.16)}
     .role-rich-editor:empty:before{content:'輸入內容…';color:#8993aa;pointer-events:none}
     .role-rich-editor .rich-size-sm{font-size:.82em}.role-rich-editor .rich-size-md{font-size:1em}.role-rich-editor .rich-size-lg{font-size:1.18em;line-height:1.55}.role-rich-editor .rich-size-xl{font-size:1.38em;line-height:1.4;font-weight:800;color:#fff}
-    .role-rich-editor blockquote{margin:.45rem 0;padding:.45rem .75rem;border-left:3px solid #8b7cf6;background:rgba(139,124,246,.08)}.role-rich-editor ul,.role-rich-editor ol{margin:.35rem 0;padding-left:1.5rem}.role-rich-editor a{color:#b9a7ff;text-decoration:underline}
+    .role-rich-editor blockquote{margin:.45rem 0;padding:.45rem .75rem;border-left:3px solid #8b7cf6;background:rgba(139,124,246,.08)}
+    .role-rich-editor ul,.role-rich-editor ol{display:block!important;margin:.35rem 0!important;padding-left:1.75rem!important}
+    .role-rich-editor ul{list-style:disc outside!important}.role-rich-editor ol{list-style:decimal outside!important}
+    .role-rich-editor li{display:list-item!important;margin:.16rem 0}.role-rich-editor a{color:#b9a7ff;text-decoration:underline}
     .role-rich-toolbar{position:fixed;z-index:10050;display:none;align-items:center;gap:.3rem;max-width:min(700px,calc(100vw - 1rem));padding:.42rem;border:1px solid #49516b;border-radius:10px;background:#111522;box-shadow:0 10px 30px rgba(0,0,0,.42);overflow-x:auto;scrollbar-width:thin;scrollbar-color:#7657c8 #171b29}.role-rich-toolbar.is-visible{display:flex}.role-rich-toolbar button,.role-rich-toolbar select{height:32px;min-width:32px;border:1px solid #39415a;border-radius:7px;background:#22283b;color:#f5f7ff;cursor:pointer}.role-rich-toolbar button:hover,.role-rich-toolbar select:hover{border-color:#9a78ff;background:#302650}.role-rich-toolbar select{padding:0 .45rem}.role-rich-toolbar button{padding:0 .5rem;font-size:.86rem}.role-rich-separator{width:1px;height:22px;background:#39415a;flex:0 0 1px}.role-rich-toolbar::-webkit-scrollbar{height:7px}.role-rich-toolbar::-webkit-scrollbar-track{background:#171b29;border-radius:8px}.role-rich-toolbar::-webkit-scrollbar-thumb{background:#7657c8;border-radius:8px}`;
   document.head.appendChild(style);
 
@@ -59,10 +62,10 @@
   const states = new WeakMap();
   let active = null;
   let savedRange = null;
-  const currentState = () => active ? serialize(active) : '';
+  const snapshot = (visual) => ({ html: visual.innerHTML, value: serialize(visual) });
   const record = (visual) => {
     const state = states.get(visual); if (!state || state.applying) return;
-    const value = serialize(visual); if (state.undo[state.undo.length - 1] === value) return;
+    const value = snapshot(visual); if (state.undo[state.undo.length - 1]?.value === value.value) return;
     state.undo.push(value); if (state.undo.length > 100) state.undo.shift(); state.redo.length = 0;
   };
   const sync = (visual, shouldRecord = true) => {
@@ -70,7 +73,13 @@
     textarea.value = serialize(visual); textarea.dispatchEvent(new Event('input',{bubbles:true}));
     if (shouldRecord) record(visual);
   };
-  const applyState = (value) => { const state=states.get(active);state.applying=true;active.innerHTML=toHtml(value);sync(active,false);state.applying=false;active.focus(); };
+  const applyState = (saved) => {
+    const state=states.get(active); if(!state || !saved) return;
+    state.applying=true; active.innerHTML=saved.html;
+    const textarea=active.previousElementSibling;
+    if(textarea?.matches('textarea')){textarea.value=saved.value;textarea.dispatchEvent(new Event('input',{bubbles:true}));}
+    state.applying=false; active.focus();
+  };
   const undo = () => {const state=states.get(active);if(!state||state.undo.length<2)return;state.redo.push(state.undo.pop());applyState(state.undo[state.undo.length-1]);};
   const redo = () => {const state=states.get(active);if(!state||!state.redo.length)return;const value=state.redo.pop();state.undo.push(value);applyState(value);};
 
@@ -78,7 +87,7 @@
     if (textarea.dataset.richEnhanced) return;
     textarea.dataset.richEnhanced='true'; textarea.classList.add('role-rich-source');
     const visual=document.createElement('div');visual.className='role-rich-editor';visual.contentEditable='true';visual.setAttribute('role','textbox');visual.setAttribute('aria-multiline','true');visual.innerHTML=toHtml(textarea.value);textarea.after(visual);
-    states.set(visual,{undo:[textarea.value],redo:[],applying:false});
+    states.set(visual,{undo:[snapshot(visual)],redo:[],applying:false});
     visual.addEventListener('focus',()=>{active=visual;saveRange();toolbar.classList.add('is-visible');requestAnimationFrame(position);});
     visual.addEventListener('input',()=>sync(visual,true));
     visual.addEventListener('keyup',saveRange);visual.addEventListener('mouseup',saveRange);
