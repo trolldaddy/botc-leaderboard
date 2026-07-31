@@ -11,6 +11,7 @@
     .replace(/\[color=#[0-9a-fA-F]{6}\]|\[\/color\]/g, '');
 
   const roleViewCache = new Map();
+  let roleMentionTargetsPromise = null;
   const roleCacheKey = (node, view) => `${node.slug || node.name}::${view}`;
   const loadRoleView = (apiBase, node, view, requireJson) => {
     const key = roleCacheKey(node, view);
@@ -22,7 +23,64 @@
     }
     return roleViewCache.get(key);
   };
-
+  const escapePattern = (value) => String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const loadRoleMentionTargets = (apiBase, requireJson) => {
+    if (!roleMentionTargetsPromise) {
+      roleMentionTargetsPromise = fetch(`${apiBase}/api/roles?limit=500`, { cache: 'no-store' })
+        .then(requireJson)
+        .then((payload) => (payload.items || [])
+          .filter((item) => String(item.name_zh_tw || '').trim().length >= 2)
+          .map((item) => ({ label: String(item.name_zh_tw).trim(), target: String(item.name_zh_tw).trim() }))
+          .sort((a, b) => b.label.length - a.label.length))
+        .catch((error) => { roleMentionTargetsPromise = null; throw error; });
+    }
+    return roleMentionTargetsPromise;
+  };
+  function linkRoleMentions(root, targets, currentRole, onNavigate) {
+    if (!root || !targets.length || typeof onNavigate !== 'function') return;
+    const currentNames = new Set([currentRole.name_zh_tw, currentRole.name_en, currentRole.canonical_key].filter(Boolean));
+    const candidates = targets.filter((item) => !currentNames.has(item.label));
+    if (!candidates.length) return;
+    const byLabel = new Map(candidates.map((item) => [item.label, item]));
+    const pattern = new RegExp(candidates.map((item) => escapePattern(item.label)).join('|'), 'g');
+    const linked = new Set();
+    const textNodes = [];
+    const nodeFilter = root.ownerDocument.defaultView.NodeFilter;
+    const walker = root.ownerDocument.createTreeWalker(root, nodeFilter.SHOW_TEXT, {
+      acceptNode(textNode) {
+        const parent = textNode.parentElement;
+        if (!parent || parent.closest('a, button, input, textarea, select, code, pre')) return nodeFilter.FILTER_REJECT;
+        pattern.lastIndex = 0;
+        return pattern.test(textNode.nodeValue || '') ? nodeFilter.FILTER_ACCEPT : nodeFilter.FILTER_REJECT;
+      },
+    });
+    while (walker.nextNode()) textNodes.push(walker.currentNode);
+    textNodes.forEach((textNode) => {
+      const value = textNode.nodeValue || '';
+      const fragment = root.ownerDocument.createDocumentFragment();
+      let cursor = 0;
+      let changed = false;
+      pattern.lastIndex = 0;
+      for (const match of value.matchAll(pattern)) {
+        const item = byLabel.get(match[0]);
+        if (!item || linked.has(item.target)) continue;
+        fragment.append(value.slice(cursor, match.index));
+        const button = root.ownerDocument.createElement('button');
+        button.type = 'button';
+        button.className = 'role-inline-link';
+        button.textContent = match[0];
+        button.title = `查看「${match[0]}」角色資料`;
+        button.addEventListener('click', () => onNavigate(item.target));
+        fragment.append(button);
+        linked.add(item.target);
+        cursor = match.index + match[0].length;
+        changed = true;
+      }
+      if (!changed) return;
+      fragment.append(value.slice(cursor));
+      textNode.replaceWith(fragment);
+    });
+  }
   function richText(content) {
     const lines = String(content || '').replace(/\r/g, '').split('\n');
     const output = [];
@@ -109,15 +167,21 @@
       const extendedBlocks = blockGroup(blocks, 'extended', showSourceStatus);
       const larplusBlocks = blockGroup(blocks, 'larplus', showSourceStatus);
       const contentSections = `${coreBlocks ? section('角色內容', '角色背景、簡介、範例與策略', coreBlocks) : ''}${extendedBlocks ? section('延伸資料', '運作方式、規則細節、互動與相剋', extendedBlocks) : ''}${larplusBlocks ? section('拉普拉斯資料', '店內教學、補充與裁定', larplusBlocks) : ''}`;
-      const viewContent = `${ability}${visible('guide') ? guideCards(role.guide) : ''}${blocks.length ? contentSections : ''}${nightSection}${reminderSection}`;
+      const viewContent = `${ability}${visible('guide') ? guideCards(role.guide) : ''}${blocks.length ? contentSections : ''}${nightSection}${reminderSection}`;      const applyFangGuRoleLinks = (root) => {
+        if (role.canonical_key !== 'fang_gu') return;
+        loadRoleMentionTargets(apiBase, requireJson)
+          .then((targets) => linkRoleMentions(root, targets, role, options.onNavigate))
+          .catch((error) => console.warn('方古角色連結載入失敗', error));
+      };
       if (preserveShell) {
         const content = detail.querySelector('.role-view-content');
-        if (content) { content.innerHTML = viewContent; content.removeAttribute('aria-busy'); }
+        if (content) { content.innerHTML = viewContent; content.removeAttribute('aria-busy'); applyFangGuRoleLinks(content); }
         detail.querySelectorAll('[data-role-view]').forEach((button) => button.classList.toggle('is-active', button.dataset.roleView === role.view));
         return;
       }
       detail.className = 'role-preview';
       detail.innerHTML = `${hero}<nav class="role-view-tabs" aria-label="${'\u89d2\u8272\u9810\u89bd\u8996\u89d2'}">${['player', 'encyclopedia', 'storyteller'].map((item) => `<button type="button" data-role-view="${item}" class="${role.view === item ? 'is-active' : ''}">${viewLabel(item)}</button>`).join('')}</nav><div class="role-view-content">${viewContent}</div>`;
+      applyFangGuRoleLinks(detail.querySelector('.role-view-content'));
       detail.querySelectorAll('[data-role-view]').forEach((button) => button.addEventListener('click', () => {
         if (button.classList.contains('is-active')) return;
         render({ ...options, view: button.dataset.roleView, preserveShell: true });
