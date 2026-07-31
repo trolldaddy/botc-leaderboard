@@ -100,7 +100,7 @@
       .role-setting-groups > section { overflow:hidden; border:1px solid #30364a; border-radius:12px; background:#131722; }
       .role-setting-groups h4 { margin:0; padding:.8rem 1rem; color:#ffd166; border-bottom:1px solid #30364a; }
       .role-setting-columns,.role-setting-row { display:grid; grid-template-columns:minmax(210px,1fr) repeat(3,104px); gap:.7rem; align-items:center; }
-      .role-setting-columns { padding:.55rem 1rem; color:#aab1c5; font-size:.78rem; text-align:center; border-bottom:1px solid #343b50; }
+      .role-setting-columns { position:sticky; top:0; z-index:2; padding:.55rem 1rem; color:#aab1c5; font-size:.78rem; text-align:center; border-bottom:1px solid #343b50; background:#131722; box-shadow:0 5px 10px rgba(0,0,0,.16); }
       .role-setting-columns span:first-child { text-align:left; }
       .role-setting-row { padding:.65rem 1rem; border-bottom:1px solid #282e40; }
       .role-setting-row:last-child { border-bottom:0; }
@@ -109,6 +109,7 @@
       .role-setting-view { display:grid; grid-template-columns:auto 1fr; gap:.35rem .5rem; align-items:center; color:#dfe3ee; font-size:.78rem; font-weight:800; }
       .role-setting-view > span { display:none; grid-column:1 / -1; color:#8993aa; }
       .role-setting-view input[type="number"] { width:64px; min-width:64px; max-width:64px; height:34px; padding:.35rem .45rem; text-align:center; }
+      .role-setting-view input[type="checkbox"] { width:19px; height:19px; accent-color:#8b7cf6; cursor:pointer; }
       .role-setting-actions { display:flex; justify-content:flex-end; margin-top:1rem; }
       @media (max-width:720px) { .role-setting-columns { display:none; } .role-setting-row { grid-template-columns:1fr; } .role-setting-view > span { display:block; } .role-editor-head { align-items:flex-start; flex-direction:column; } .role-editor-head-links { justify-content:flex-start; margin-left:0; } .role-identity-card { align-items:flex-start; flex-direction:column; } .role-reference-links { justify-content:flex-start; } .role-display-details .ia-display-row { grid-template-columns:1fr; } }      @media (max-width: 1180px) {
         .role-admin-layout { grid-template-columns: 230px minmax(0, 1fr) !important; }

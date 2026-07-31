@@ -4,10 +4,12 @@
   const viewLabel = (view) => ({ player: '玩家', encyclopedia: '百科', storyteller: '說書人' }[view] || view);
   const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', overview: 'fa-circle-info', how_it_works: 'fa-gears', rules_detail: 'fa-scale-balanced', rules_interactions: 'fa-arrows-left-right', rules_jinx: 'fa-link', examples: 'fa-lightbulb', strategy_play: 'fa-chess', strategy_bluff: 'fa-masks-theater', strategy_counter: 'fa-shield-halved', storyteller_advice: 'fa-user-tie' }[type] || 'fa-note-sticky');
   const inline = (value) => esc(value)
-    .replace(/\[color=(#[0-9a-fA-F]{6})\]([\s\S]*?)\[\/color\]/g, '<span style="color:$1">$2</span>')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+    .replace(/\[size=(sm|md|lg|xl)\]([\s\S]*?)\[\/size\]/g, '<span class="rich-size-$1">$2</span>')
+    .replace(/\[b\]([\s\S]*?)\[\/b\]/g, '<strong>$1</strong>')
+    .replace(/\[i\]([\s\S]*?)\[\/i\]/g, '<em>$1</em>')
+    .replace(/\[url=(https?:\/\/[^\]\s]+)\]([\s\S]*?)\[\/url\]/g, '<a href="$1" target="_blank" rel="noopener">$2</a>')
+    .replace(/\[color=#[0-9a-fA-F]{6}\]|\[\/color\]/g, '');
+
   const roleViewCache = new Map();
   const roleCacheKey = (node, view) => `${node.slug || node.name}::${view}`;
   const loadRoleView = (apiBase, node, view, requireJson) => {
@@ -32,6 +34,18 @@
     lines.forEach((raw) => {
       const line = raw.trim();
       if (!line) { flushParagraph(); flushList(); return; }
+      const taggedQuote = line.match(/^\[quote\]([\s\S]*)\[\/quote\]$/);
+      if (taggedQuote) { flushParagraph(); flushList(); output.push(`<blockquote>${inline(taggedQuote[1])}</blockquote>`); return; }
+      const taggedNumber = line.match(/^\[number\]([\s\S]*)\[\/number\]$/);
+      const taggedBullet = line.match(/^\[bullet\]([\s\S]*)\[\/bullet\]$/);
+      if (taggedNumber || taggedBullet) {
+        flushParagraph();
+        const nextOrdered = Boolean(taggedNumber);
+        if (list.length && ordered !== nextOrdered) flushList();
+        ordered = nextOrdered;
+        list.push((taggedNumber || taggedBullet)[1]);
+        return;
+      }
       const heading = line.match(/^(#{2,4})\s+(.+)$/);
       if (heading) { flushParagraph(); flushList(); const tag = ({ 2:'h3', 3:'h4', 4:'h5' })[heading[1].length]; output.push(`<${tag}>${inline(heading[2])}</${tag}>`); return; }
       if (line.startsWith('> ')) { flushParagraph(); flushList(); output.push(`<blockquote>${inline(line.slice(2))}</blockquote>`); return; }

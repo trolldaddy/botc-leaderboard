@@ -174,17 +174,17 @@
   .rds-section::-webkit-scrollbar-track { background:#151924; border-radius:999px; }
   .rds-section::-webkit-scrollbar-thumb { background:linear-gradient(180deg,#8b7cf6,#5f55a7); border:2px solid #151924; border-radius:999px; }
   .rds-section::-webkit-scrollbar-thumb:hover { background:linear-gradient(180deg,#a99dff,#7468c8); }
-  .rds-section h4 { position:sticky; top:0; z-index:1; margin:0; padding:.8rem 1rem; color:#ffd166; background:#151924; border-bottom:1px solid #30364a; }
-  .rds-columns,.rds-row { display:grid; grid-template-columns:minmax(210px,1fr) repeat(3,minmax(135px,.45fr)); gap:.7rem; align-items:center; }.rds-columns{padding:.55rem 1rem;color:#aab1c5;font-size:.78rem;text-align:center;border-bottom:1px solid #343b50}.rds-columns span:first-child{text-align:left}.rds-row { padding:.7rem 1rem; border-bottom:1px solid #282e40; }.rds-row:last-child{border-bottom:0}.rds-row strong{overflow-wrap:anywhere}
-  .rds-target { display:grid; grid-template-columns:auto 64px; gap:.45rem; align-items:center; justify-content:center; color:#dfe3ee; }.rds-target-label{display:none}.rds-target input[type=checkbox]{accent-color:#8b7cf6}.rds-target input[type=number]{min-width:64px;width:64px;background:#202638;color:#fff;border:1px solid #39415a;border-radius:8px;padding:.45rem}
+  .rds-section h4 { position:sticky; top:0; z-index:3; margin:0; padding:.8rem 1rem; color:#ffd166; background:#151924; border-bottom:1px solid #30364a; }
+  .rds-columns,.rds-row { display:grid; grid-template-columns:minmax(210px,1fr) repeat(3,minmax(135px,.45fr)); gap:.7rem; align-items:center; }.rds-columns{position:sticky;top:42px;z-index:2;padding:.55rem 1rem;color:#aab1c5;font-size:.78rem;text-align:center;border-bottom:1px solid #343b50;background:#151924;box-shadow:0 5px 10px rgba(0,0,0,.18)}.rds-columns span:first-child{text-align:left}.rds-row { padding:.7rem 1rem; border-bottom:1px solid #282e40; }.rds-row:last-child{border-bottom:0}.rds-row strong{overflow-wrap:anywhere}
+  .rds-target { display:grid; grid-template-columns:auto 64px; gap:.45rem; align-items:center; justify-content:center; color:#dfe3ee; }.rds-target-label{display:none}.rds-target input[type=checkbox]{width:19px;height:19px;accent-color:#8b7cf6;cursor:pointer}.rds-target input[type=number]{min-width:64px;width:64px;background:#202638;color:#fff;border:1px solid #39415a;border-radius:8px;padding:.45rem}
   .rds-legend { display:none; }
   @media(max-width:720px){.rds-body{grid-template-rows:minmax(160px,.8fr) minmax(220px,1.2fr)}.rds-columns{display:none}.rds-row{grid-template-columns:1fr}.rds-target-label{display:block}.rds-row strong{margin-bottom:.2rem}.rds-target{grid-template-columns:80px 1fr}.rds-dialog{width:calc(100vw - 1rem);height:calc(100dvh - 1rem);max-height:calc(100dvh - 1rem)}.rds-head{align-items:flex-start}.rds-head p{font-size:.82rem}}
 </style>
 
 <script src="/js/role_admin.js"></script>
-<script src="/js/role_admin_full_editor.js?v=20260731d"></script>
+<script src="/js/role_admin_full_editor.js?v=20260731e"></script>
 <script src="/js/role_admin_import_fix.js"></script>
 <script src="/js/role_sync.js"></script>
 <script src="/js/role_admin_reminder_merge.js"></script>
 <script src="/js/role_display_settings.js"></script>
-<script src="/js/role_admin_rich_text.js?v=20260731a"></script>
+<script src="/js/role_admin_rich_text.js?v=20260731b"></script>

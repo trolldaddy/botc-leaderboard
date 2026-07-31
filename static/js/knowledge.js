@@ -68,10 +68,11 @@
 
   function inlineMarkup(value) {
     return escapeHtml(value)
-      .replace(/\[color=(#[0-9a-fA-F]{6})\]([\s\S]*?)\[\/color\]/g, '<span style="color:$1">$2</span>')
-      .replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+      .replace(/\[size=(sm|md|lg|xl)\]([\s\S]*?)\[\/size\]/g, '<span class="rich-size-$1">$2</span>')
+      .replace(/\[b\]([\s\S]*?)\[\/b\]/g, '<strong>$1</strong>')
+      .replace(/\[i\]([\s\S]*?)\[\/i\]/g, '<em>$1</em>')
+      .replace(/\[url=(https?:\/\/[^\]\s]+)\]([\s\S]*?)\[\/url\]/g, '<a href="$1" target="_blank" rel="noopener">$2</a>')
+      .replace(/\[color=#[0-9a-fA-F]{6}\]|\[\/color\]/g, '');
   }
 
   function renderTable(lines) {
@@ -116,6 +117,20 @@
         flushParagraph(); flushList(); tableLines.push(line); return;
       }
       flushTable();
+      const taggedQuote = line.match(/^\[quote\]([\s\S]*)\[\/quote\]$/);
+      if (taggedQuote) {
+        flushParagraph(); flushList(); output.push(`<blockquote>${inlineMarkup(taggedQuote[1])}</blockquote>`); return;
+      }
+      const taggedNumber = line.match(/^\[number\]([\s\S]*)\[\/number\]$/);
+      const taggedBullet = line.match(/^\[bullet\]([\s\S]*)\[\/bullet\]$/);
+      if (taggedNumber || taggedBullet) {
+        flushParagraph();
+        const nextType = taggedNumber ? 'ol' : 'ul';
+        if (listType && listType !== nextType) flushList();
+        listType = nextType;
+        listItems.push((taggedNumber || taggedBullet)[1]);
+        return;
+      }
       if (line.startsWith('### ')) {
         flushParagraph(); flushList(); output.push(`<h4>${inlineMarkup(line.slice(4))}</h4>`); return;
       }
