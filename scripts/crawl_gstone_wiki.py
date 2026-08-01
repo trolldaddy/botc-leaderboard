@@ -30,7 +30,7 @@ from gstone_wiki import BASE_URL, HEADERS, article_url, is_excluded_knowledge_ti
 from gstone_wiki import parse_role_information
 
 ROLE_COVERAGE_SEEDS = ["钟表匠", "镜像双子", "理发师", "卡扎力", "炼金术士", "狸猫", "传奇角色", "奇遇角色", "末日预言者"]
-DEFAULT_SEEDS = ["首頁", "角色", "剧本", "規則", "规则", "相克規則", "相克规则", *ROLE_COVERAGE_SEEDS]
+DEFAULT_SEEDS = ["首頁", "首页", "角色", "剧本", "規則", "规则", "相克規則", "相克规则", *ROLE_COVERAGE_SEEDS]
 ARTICLE_PATH = "/index.php"
 SKIP_NAMESPACES = {
     "特殊", "Special", "討論", "Talk", "使用者", "User", "使用者討論", "User_talk",
