@@ -73,6 +73,8 @@ def main():
     assert not is_excluded_knowledge_title("末日預言者")
     assert not is_excluded_knowledge_title("園丁")
     assert not is_excluded_knowledge_title("中毒")
+    assert not is_excluded_knowledge_page("旅行者", "script")
+    assert not is_excluded_knowledge_page("傳奇角色", "script")
 
 
     assert page_fetch_failed({"status": 404, "error": "HTTP 404"})

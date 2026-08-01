@@ -22,6 +22,11 @@ EXCLUDED_KNOWLEDGE_TITLE_PATTERNS = (
     r"劇本比賽", r"剧本比赛", r"劇本創作大賽", r"剧本创作大赛", r"世界(?:杯|盃).*劇本集錦",
     r"世界杯.*剧本集锦", r"拜年祭", r"節目合集", r"节目合集", r"宣傳.*徵稿", r"宣传.*征稿",
 )
+PRESERVED_ROLE_GROUP_TITLES = {
+    "鎮民", "外來者", "爪牙", "惡魔", "旅行者", "傳奇角色", "奇遇角色", "實驗性角色",
+}
+
+
 HEADERS = {
     "User-Agent": "Larplus-Knowledge-Base/1.1 (+official GStone wiki sync)",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.5",
@@ -51,6 +56,9 @@ def is_excluded_knowledge_title(title: str) -> bool:
 
 
 def is_excluded_knowledge_page(title: str, page_type: str = "") -> bool:
+    normalized = to_traditional(title)
+    if normalized in PRESERVED_ROLE_GROUP_TITLES:
+        return False
     return clean_text(page_type).lower() == "script" or is_excluded_knowledge_title(title)
 
 
