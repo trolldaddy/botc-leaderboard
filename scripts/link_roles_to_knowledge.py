@@ -16,6 +16,7 @@ from gstone_wiki import to_simplified
 from knowledge_models import KnowledgeAlias, KnowledgeBlock, KnowledgeEdge, KnowledgeNode, KnowledgeSourceRecord
 from role_models import Role, RoleContentBlock, RoleKnowledgeLink
 
+from scripts.seed_gstone_special_roles import run as seed_gstone_special_roles
 ROLE_NAME_VARIANTS = {
     "狸貓": ["貍貓", "狸猫"],
     "貍貓": ["狸貓", "狸猫"],
@@ -260,9 +261,11 @@ def main():
     args = parser.parse_args()
     if not os.getenv("DATABASE_URL"):
         raise SystemExit("DATABASE_URL is required")
+    special_role_stats = seed_gstone_special_roles(write=args.write)
     link_stats = run(args.write, all_roles=not args.trial)
     print({
         "source_policy": "gstone_only",
+        "gstone_special_roles": special_role_stats,
         "role_knowledge": link_stats,
     })
 

@@ -27,6 +27,8 @@ def test_default_link_flow_does_not_import_archived_community_seed():
     assert "seed_archived_deleted_roles" not in imported_names
     assert "seed_archived_deleted_roles" not in called_functions
     assert '"source_policy": "gstone_only"' in source
+    assert "seed_gstone_special_roles" in called_functions
+    assert source.index("special_role_stats =") < source.index("link_stats =")
 
 
 def test_default_workflow_only_invokes_gstone_link_script():
