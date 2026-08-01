@@ -1,5 +1,7 @@
 from dataclasses import asdict, dataclass
 
+from gstone_wiki import is_excluded_knowledge_title
+
 
 HIDDEN_STATUSES = {"deleted", "archived", "disabled"}
 PRESENTATION_TYPES = {
@@ -65,7 +67,7 @@ def classify_knowledge_node(node) -> PresentationClassification:
     node_type = (node.node_type or "").strip().lower()
     status = (node.status or "").strip().lower()
 
-    if status in HIDDEN_STATUSES or name in IRRELEVANT_ROOT_TITLES:
+    if status in HIDDEN_STATUSES or node_type == "script" or is_excluded_knowledge_title(name):
         return _result("excluded", "status_or_exclusion_rule", 1.0, "節點已停用或屬明確排除內容")
     if node_type == "role":
         return _result("role_profile", "node_type", 1.0, "角色節點使用角色資料頁")

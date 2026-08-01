@@ -10,6 +10,18 @@ from opencc import OpenCC
 
 BASE_URL = "https://clocktower-wiki.gstonegames.com"
 EXCLUDED_KNOWLEDGE_TITLES = {"第一屆華燈初上劇本創作大賽"}
+EXCLUDED_KNOWLEDGE_TITLES.update({
+    "劇本", "剧本", "山雨欲來", "山雨欲来", "暗流湧動", "暗流涌动",
+    "黯月初昇", "黯月初升", "夢殞春宵", "梦殒春宵", "華燈初上", "华灯初上",
+})
+EXCLUDED_KNOWLEDGE_TITLE_PATTERNS = (
+    r"認證公示", r"认证公示", r"認證說書人", r"培训认证说书人", r"培訓認證說書人", r"專家說書人名單", r"专家说书人名单",
+    r"說書人認證撤銷公告", r"说书人认证撤销公告", r"認證(?:城市聯賽|高校聯賽|城市賽|店鋪)",
+    r"认证(?:城市联赛|高校联赛|城市赛|店铺)", r"全國比賽", r"全国比赛", r"城市聯賽", r"城市联赛",
+    r"城市賽", r"城市赛", r"大師賽", r"大师赛", r"派對賽", r"派对赛", r"高校聯賽", r"高校联赛",
+    r"劇本比賽", r"剧本比赛", r"劇本創作大賽", r"剧本创作大赛", r"世界(?:杯|盃).*劇本集錦",
+    r"世界杯.*剧本集锦", r"拜年祭", r"節目合集", r"节目合集", r"宣傳.*徵稿", r"宣传.*征稿",
+)
 HEADERS = {
     "User-Agent": "Larplus-Knowledge-Base/1.1 (+official GStone wiki sync)",
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.5",
@@ -31,7 +43,15 @@ def to_simplified(value: Any) -> str:
 
 
 def is_excluded_knowledge_title(title: str) -> bool:
-    return to_traditional(title) in EXCLUDED_KNOWLEDGE_TITLES
+    normalized = to_traditional(title)
+    excluded_titles = {to_traditional(value) for value in EXCLUDED_KNOWLEDGE_TITLES}
+    return normalized in excluded_titles or any(
+        re.search(pattern, normalized) for pattern in EXCLUDED_KNOWLEDGE_TITLE_PATTERNS
+    )
+
+
+def is_excluded_knowledge_page(title: str, page_type: str = "") -> bool:
+    return clean_text(page_type).lower() == "script" or is_excluded_knowledge_title(title)
 
 
 def article_url(title: str) -> str:

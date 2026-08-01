@@ -12,7 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from database import SessionLocal
-from gstone_wiki import to_simplified
+from gstone_wiki import is_excluded_knowledge_page, to_simplified
 from knowledge_models import KnowledgeAlias, KnowledgeBlock, KnowledgeEdge, KnowledgeNode, KnowledgeSourceRecord
 from role_models import Role, RoleContentBlock, RoleKnowledgeLink
 
@@ -128,7 +128,16 @@ def irrelevant_contest_nodes(db: Session) -> list[KnowledgeNode]:
     return disabled
 
 
+def excluded_content_nodes(db: Session) -> list[KnowledgeNode]:
+    return [
+        node for node in db.query(KnowledgeNode).all()
+        if is_excluded_knowledge_page(
+            node.canonical_name_zh_tw or node.canonical_name_zh_cn or "", node.node_type or ""
+        )
+    ]
+
 def run(write: bool, all_roles: bool = True):
+
     db: Session = SessionLocal()
     stats = {
         "mode": "write" if write else "preview",
@@ -142,9 +151,9 @@ def run(write: bool, all_roles: bool = True):
         "missing_roles": [],
         "missing_nodes": [],
         "matches": [],
-        "contest_nodes_would_disable": 0,
-        "contest_nodes_disabled": 0,
-        "contest_nodes": [],
+        "excluded_nodes_would_disable": 0,
+        "excluded_nodes_disabled": 0,
+        "excluded_nodes": [],
     }
     try:
         target_names = (
@@ -232,13 +241,14 @@ def run(write: bool, all_roles: bool = True):
                     stale.is_active = False
                     stats["blocks_deactivated"] += 1
 
-        for node in irrelevant_contest_nodes(db):
-            stats["contest_nodes"].append({"id": node.id, "name": node.canonical_name_zh_tw, "status": node.status})
+        for node in excluded_content_nodes(db):
+            stats["excluded_nodes"].append({"id": node.id, "name": node.canonical_name_zh_tw, "status": node.status})
             if node.status != "disabled":
-                stats["contest_nodes_would_disable"] += 1
+                stats["excluded_nodes_would_disable"] += 1
                 if write:
                     node.status = "disabled"
-                    stats["contest_nodes_disabled"] += 1
+                    node.visibility = "internal"
+                    stats["excluded_nodes_disabled"] += 1
 
         if write:
             db.commit()

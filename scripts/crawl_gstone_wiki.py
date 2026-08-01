@@ -26,7 +26,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from gstone_wiki import BASE_URL, HEADERS, article_url, is_excluded_knowledge_title, parse_reminders, to_traditional
+from gstone_wiki import BASE_URL, HEADERS, article_url, is_excluded_knowledge_page, is_excluded_knowledge_title, parse_reminders, to_traditional
 from gstone_wiki import parse_role_information
 
 ROLE_COVERAGE_SEEDS = ["钟表匠", "镜像双子", "理发师", "卡扎力", "炼金术士", "狸猫", "传奇角色", "奇遇角色", "末日预言者"]
@@ -236,7 +236,7 @@ def crawl(args: argparse.Namespace) -> dict[str, Any]:
         if is_excluded_knowledge_title(requested_title):
             page.resolved_title = requested_title
             page.page_type = "excluded"
-            page.classification_reasons = ["excluded_irrelevant_competition"]
+            page.classification_reasons = ["excluded_non_knowledge_content"]
             pages.append(page)
             continue
         try:
@@ -264,6 +264,10 @@ def crawl(args: argparse.Namespace) -> dict[str, Any]:
                     page.reminder_found = bool(reminder_data.get("found"))
                     page.reminder_count = len(reminder_data.get("reminders") or [])
                     page.reminder_classification = classify_reminders(reminder_data)
+                if is_excluded_knowledge_page(page.resolved_title, page.page_type):
+                    page.page_type = "excluded"
+                    page.classification_reasons = ["excluded_non_knowledge_content"]
+                    page.outgoing_titles = []
                 for target in page.outgoing_titles:
                     edges.append({"source": page.resolved_title, "target": target})
                     if target not in visited and target not in queued:
@@ -301,7 +305,7 @@ def crawl(args: argparse.Namespace) -> dict[str, Any]:
             "timeout_seconds": args.timeout,
             "stopped_because": "max_pages" if queue and len(pages) >= args.max_pages else "queue_exhausted",
             "remaining_queue": len(queue),
-            "classifier_version": 3,
+            "classifier_version": 4,
         },
         "summary": {
             "pages_fetched": len(pages),

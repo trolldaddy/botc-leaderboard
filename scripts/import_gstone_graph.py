@@ -20,7 +20,7 @@ if str(REPO_ROOT) not in sys.path:
 
 import models  # noqa: F401  registers all SQLAlchemy models
 from database import Base, SessionLocal, engine
-from gstone_wiki import BASE_URL, is_excluded_knowledge_title, to_traditional
+from gstone_wiki import BASE_URL, is_excluded_knowledge_page, is_excluded_knowledge_title, to_traditional
 from knowledge_models import (
     CrawlLink,
     CrawlPage,
@@ -165,12 +165,29 @@ def import_report(report: dict, write: bool):
 
         nodes_by_title = {}
         crawl_pages_by_title = {}
+        excluded_titles = {
+            (page.get("resolved_title") or page.get("title") or "").strip()
+            for page in report["pages"]
+            if is_excluded_knowledge_page(
+                (page.get("resolved_title") or page.get("title") or "").strip(),
+                page.get("page_type") or "",
+            )
+        }
+        for node in db.query(KnowledgeNode).all():
+            node_name = node.canonical_name_zh_tw or node.canonical_name_zh_cn or ""
+            if is_excluded_knowledge_page(node_name, node.node_type or "") and node.status != "disabled":
+                stats["existing_nodes_would_disable"] += 1
+                if write:
+                    node.status = "disabled"
+                    node.visibility = "internal"
+                    stats["existing_nodes_disabled"] += 1
+
         for page in report["pages"]:
             title = (page.get("resolved_title") or page.get("title") or "").strip()
             if not title:
                 stats["pages_skipped"] += 1
                 continue
-            if is_excluded_knowledge_title(title):
+            if is_excluded_knowledge_page(title, page.get("page_type") or ""):
                 stats["pages_excluded"] += 1
                 continue
             if page_fetch_failed(page):
@@ -276,7 +293,7 @@ def import_report(report: dict, write: bool):
             if not source_title or not target_title:
                 stats["edges_skipped"] += 1
                 continue
-            if is_excluded_knowledge_title(source_title):
+            if source_title in excluded_titles or target_title in excluded_titles or is_excluded_knowledge_title(source_title) or is_excluded_knowledge_title(target_title):
                 stats["edges_excluded"] += 1
                 continue
             from_node = nodes_by_title.get(source_title) or nodes_by_title.get(to_traditional(source_title))

@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 
+from gstone_wiki import is_excluded_knowledge_page, is_excluded_knowledge_title
 from crawl_gstone_wiki import classify_page
 from import_gstone_graph import page_fetch_failed, validate_report_source
 
@@ -62,6 +63,17 @@ def main():
         assert "Non-GStone" in str(exc)
     else:
         raise AssertionError("Moegirl source URL must be rejected")
+    assert is_excluded_knowledge_title("認證公示")
+    assert is_excluded_knowledge_title("認證說書人")
+    assert is_excluded_knowledge_title("卡卡十八期培訓認證說書人名單")
+    assert is_excluded_knowledge_title("第十四屆：2026年1月北京《北京城市賽》")
+    assert is_excluded_knowledge_title("BOTC世界杯2025參賽劇本集錦")
+    assert is_excluded_knowledge_title("2025拜年祭")
+    assert is_excluded_knowledge_page("遲見分曉", "script")
+    assert not is_excluded_knowledge_title("末日預言者")
+    assert not is_excluded_knowledge_title("園丁")
+    assert not is_excluded_knowledge_title("中毒")
+
 
     assert page_fetch_failed({"status": 404, "error": "HTTP 404"})
     assert page_fetch_failed({"status": 0})
