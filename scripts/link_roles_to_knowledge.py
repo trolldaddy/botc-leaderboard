@@ -16,6 +16,11 @@ from gstone_wiki import to_simplified
 from knowledge_models import KnowledgeAlias, KnowledgeBlock, KnowledgeEdge, KnowledgeNode, KnowledgeSourceRecord
 from role_models import Role, RoleContentBlock, RoleKnowledgeLink
 
+ROLE_NAME_VARIANTS = {
+    "狸貓": ["貍貓", "狸猫"],
+    "貍貓": ["狸貓", "狸猫"],
+    "狸猫": ["狸貓", "貍貓"],
+}
 TARGET_NAMES = ["小惡魔", "洗腦師", "賭徒"]
 SKIP_BLOCK_TYPES = {"ability", "reminders", "source_excerpt"}
 AUDIENCE_BY_TYPE = {
@@ -49,8 +54,13 @@ def find_role(db: Session, name: str):
     return None, "none", 0.0
 
 
+def role_name_candidates(name: str, aliases: list[str] | None = None) -> list[str]:
+    values = [name, *ROLE_NAME_VARIANTS.get(name, []), *(aliases or [])]
+    return list(dict.fromkeys(value for value in values if value))
+
+
 def find_node(db: Session, name: str, aliases: list[str] | None = None):
-    candidates = [name] + [value for value in (aliases or []) if value and value.lower() != name.lower()]
+    candidates = role_name_candidates(name, aliases)
     for index, candidate in enumerate(candidates):
         node = db.query(KnowledgeNode).filter(
             func.lower(KnowledgeNode.canonical_name_zh_tw) == candidate.lower()

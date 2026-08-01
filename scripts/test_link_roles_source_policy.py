@@ -4,6 +4,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "scripts" / "link_roles_to_knowledge.py"
+from scripts.link_roles_to_knowledge import role_name_candidates
 WORKFLOW = ROOT / ".github" / "workflows" / "link-role-knowledge.yml"
 
 
@@ -34,3 +35,11 @@ def test_default_workflow_only_invokes_gstone_link_script():
     assert "scripts/link_roles_to_knowledge.py" in workflow
     assert "seed_archived_deleted_roles.py" not in workflow
     assert "GStone-only" in workflow
+
+
+def test_traditional_tanuki_name_matches_gstone_variant():
+    assert role_name_candidates("狸貓")[:3] == ["狸貓", "貍貓", "狸猫"]
+
+
+def test_role_name_candidates_keep_explicit_aliases():
+    assert role_name_candidates("狸貓", ["Tanuki", "貍貓"]) == ["狸貓", "貍貓", "狸猫", "Tanuki"]
