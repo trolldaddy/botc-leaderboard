@@ -1,0 +1,46 @@
+name: Seed GStone Special Roles
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Preview or write individual GStone Fabled and Loric roles"
+        required: true
+        default: "preview"
+        type: choice
+        options: [preview, write]
+      delay:
+        description: "Delay between GStone requests in seconds"
+        required: false
+        default: "0.15"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/town-checkin
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Seed individual GStone Fabled and Loric roles
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.mode }}" = "write" ]; then
+            python scripts/seed_gstone_special_roles.py --write --delay "${{ inputs.delay }}"
+          else
+            python scripts/seed_gstone_special_roles.py --delay "${{ inputs.delay }}"
+          fi
