@@ -68,6 +68,14 @@ def validate_report_source(report: dict) -> None:
             if value and not is_gstone_url(value):
                 raise ValueError(f"Non-GStone source URL is not allowed: {value}")
 
+def page_fetch_failed(page: dict) -> bool:
+    status = int(page.get("status") or 0)
+    return bool(page.get("error")) or status < 200 or status >= 400
+
+
+
+
+
 
 
 
@@ -165,6 +173,29 @@ def import_report(report: dict, write: bool):
             if is_excluded_knowledge_title(title):
                 stats["pages_excluded"] += 1
                 continue
+            if page_fetch_failed(page):
+                crawl_page = CrawlPage(
+                    crawl_run_id=run.id,
+                    url=page.get("final_url") or page.get("requested_url") or "",
+                    requested_title=page.get("title"),
+                    resolved_title=title,
+                    http_status=int(page.get("status") or 0),
+                    page_type_detected=page.get("page_type") or "unknown",
+                    classification_reasons=json.dumps(
+                        page.get("classification_reasons") or [], ensure_ascii=False
+                    ),
+                    content_hash=page.get("content_hash") or None,
+                    parse_status="failed",
+                    error_message=page.get("error") or None,
+                    elapsed_ms=int(page.get("elapsed_ms") or 0),
+                )
+                db.add(crawl_page)
+                db.flush()
+                crawl_pages_by_title[title] = crawl_page
+                stats["crawl_pages_created"] += 1
+                stats["failed_pages_skipped"] += 1
+                continue
+
             title_tw = to_traditional(title)
             node_type = TYPE_MAP.get(page.get("page_type"), "article")
             if title_tw in {to_traditional(value) for value in ROLE_GROUP_TITLES}:
@@ -214,8 +245,8 @@ def import_report(report: dict, write: bool):
                 page_type_detected=page.get("page_type") or "unknown",
                 classification_reasons=json.dumps(page.get("classification_reasons") or [], ensure_ascii=False),
                 content_hash=page.get("content_hash") or None,
-                parse_status="failed" if page.get("error") else "parsed",
-                error_message=page.get("error") or None,
+                parse_status="parsed",
+                error_message=None,
                 elapsed_ms=int(page.get("elapsed_ms") or 0),
             )
             db.add(crawl_page)

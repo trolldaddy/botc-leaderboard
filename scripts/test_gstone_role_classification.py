@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 
 from crawl_gstone_wiki import classify_page
-from import_gstone_graph import validate_report_source
+from import_gstone_graph import page_fetch_failed, validate_report_source
 
 
 def classify(title, categories, html, role_type="", found=False):
@@ -62,6 +62,11 @@ def main():
         assert "Non-GStone" in str(exc)
     else:
         raise AssertionError("Moegirl source URL must be rejected")
+
+    assert page_fetch_failed({"status": 404, "error": "HTTP 404"})
+    assert page_fetch_failed({"status": 0})
+    assert not page_fetch_failed({"status": 200})
+    assert not page_fetch_failed({"status": 302})
 
     print({"status": "ok", "role_groups": "not_roles", "source": "gstone_only"})
 

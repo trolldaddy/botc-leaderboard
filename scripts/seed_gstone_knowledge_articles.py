@@ -223,6 +223,7 @@ def latest_gstone_record(db: Session, node_id: int, source_id: int):
         .filter(
             KnowledgeSourceRecord.node_id == node_id,
             KnowledgeSourceRecord.source_id == source_id,
+            KnowledgeSourceRecord.parse_status == "parsed",
         )
         .order_by(KnowledgeSourceRecord.fetched_at.desc(), KnowledgeSourceRecord.id.desc())
         .first()
