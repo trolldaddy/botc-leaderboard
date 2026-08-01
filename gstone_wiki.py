@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 from typing import Any, Dict, List, Optional
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -213,6 +213,14 @@ def fetch_role_reminders(title: str, aliases: Optional[List[str]] = None) -> Dic
 def parse_role_information(html: str) -> Dict[str, Any]:
     """Extract the structured role information section from a GStone role article."""
     soup = BeautifulSoup(html, "html.parser")
+    image_url = ""
+    for image in soup.find_all("img"):
+        source = clean_text(image.get("src"))
+        alt = clean_text(image.get("alt")).lower()
+        if source.startswith("/images/") and alt.endswith((".png", ".jpg", ".jpeg", ".webp")):
+            image_url = urljoin(BASE_URL, source)
+            break
+
     official_ability = ""
     for candidate in soup.find_all(["h2", "h3", "h4", "h5"]):
         heading_text = to_traditional(candidate.get_text(" ", strip=True))
@@ -234,7 +242,8 @@ def parse_role_information(html: str) -> Dict[str, Any]:
         if text in {"角色資訊", "角色信息"}:
             heading = candidate
             break
-    empty = {"found": False, "english_name": "", "script_names": [], "role_type": "", "ability_tags": [], "official_ability": official_ability}
+    empty = {"found": False, "english_name": "", "script_names": [], "role_type": "", "ability_tags": [],
+             "official_ability": official_ability, "image_url": image_url}
     if not heading:
         return empty
 
@@ -269,6 +278,7 @@ def parse_role_information(html: str) -> Dict[str, Any]:
         "role_type": first("角色型別", "角色類型", "角色类型"),
         "ability_tags": many("角色能力型別", "角色能力類型", "角色能力类型"),
         "official_ability": official_ability,
+        "image_url": image_url,
     }
 
 

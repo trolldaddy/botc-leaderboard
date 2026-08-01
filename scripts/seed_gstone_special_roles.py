@@ -78,6 +78,7 @@ def run(write: bool = False, delay: float = 0.15) -> dict:
         "expected": {team: len(titles) for team, titles in SPECIAL_ROLE_TITLES.items()},
         "pages_checked": 0, "roles_would_create": 0, "roles_created": 0,
         "roles_reused": 0, "aliases_would_create": 0, "aliases_created": 0,
+        "images_would_update": 0, "images_updated": 0,
         "type_mismatches": [], "failures": [], "roles": [],
     }
     try:
@@ -93,6 +94,7 @@ def run(write: bool = False, delay: float = 0.15) -> dict:
                 row.update({
                     "resolved_title": info.get("resolved_title"), "source_url": info.get("source_url"),
                     "role_type": role_type, "english_name": info.get("english_name") or "",
+                    "image_url": info.get("image_url") or "",
                 })
                 if actual_team != expected_team:
                     row["status"] = "type_mismatch"
@@ -107,6 +109,11 @@ def run(write: bool = False, delay: float = 0.15) -> dict:
                 if role:
                     stats["roles_reused"] += 1
                     row["status"] = "reused"
+                    if info.get("image_url") and not role.image_url:
+                        stats["images_would_update"] += 1
+                        if write:
+                            role.image_url = info["image_url"]
+                            stats["images_updated"] += 1
                 else:
                     stats["roles_would_create"] += 1
                     row["status"] = "would_create"
@@ -115,6 +122,7 @@ def run(write: bool = False, delay: float = 0.15) -> dict:
                             canonical_key=key, name_zh_tw=name_tw, name_en=english_name or None,
                             team=actual_team, ability_zh_tw=info.get("official_ability") or None,
                             source_type="official_wiki", source_name="GStone 鐘樓百科",
+                            image_url=info.get("image_url") or None,
                             script_names_json=json.dumps(info.get("script_names") or [], ensure_ascii=False),
                             ability_tags_json=json.dumps(info.get("ability_tags") or [], ensure_ascii=False),
                             is_official=True, is_custom=False, is_active=True, needs_review=False,
