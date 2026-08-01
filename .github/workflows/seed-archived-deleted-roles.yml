@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Preview or write recovered role data"
+        description: "Explicitly preview or write archived community role data (non-GStone)"
         required: true
         default: "preview"
         type: choice
@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Seed recovered role data
+      - name: Seed archived community role data (explicit opt-in)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         shell: bash

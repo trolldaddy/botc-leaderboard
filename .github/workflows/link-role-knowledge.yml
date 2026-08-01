@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "Preview or write role/knowledge integration"
+        description: "Preview or write GStone-only role/knowledge integration"
         required: true
         default: "preview"
         type: choice
@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Link roles and import supplemental blocks
+      - name: Link roles and import GStone supplemental blocks
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         shell: bash
