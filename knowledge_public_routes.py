@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, or_
+from sqlalchemy import case, func, or_
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -18,11 +18,16 @@ router = APIRouter(prefix="/api/knowledge", tags=["knowledge-public"])
 
 PUBLIC_NODE_TYPES = {"role", "script", "guide", "mechanic", "article"}
 HIDDEN_STATUSES = {"deleted", "archived", "disabled"}
+ROLE_GROUP_PRESENTATION = "role_group"
 
 
 def _node_query(db: Session):
     return db.query(KnowledgeNode).filter(
         KnowledgeNode.node_type.in_(PUBLIC_NODE_TYPES),
+        or_(
+            KnowledgeNode.node_type != "script",
+            KnowledgeNode.presentation_type == ROLE_GROUP_PRESENTATION,
+        ),
         ~KnowledgeNode.status.in_(HIDDEN_STATUSES),
         or_(
             KnowledgeNode.presentation_type.is_(None),
@@ -35,11 +40,17 @@ def _display_name(node: KnowledgeNode) -> str:
     return node.canonical_name_zh_tw or node.canonical_name_zh_cn or node.canonical_name_en or node.slug
 
 
+def _public_node_type(node: KnowledgeNode) -> str:
+    if node.presentation_type == ROLE_GROUP_PRESENTATION:
+        return "mechanic"
+    return node.node_type
+
+
 def _node_card(node: KnowledgeNode):
     return {
         "id": node.id,
         "slug": node.slug,
-        "node_type": node.node_type,
+        "node_type": _public_node_type(node),
         "name": _display_name(node),
         "name_zh_tw": node.canonical_name_zh_tw,
         "name_zh_cn": node.canonical_name_zh_cn,
@@ -86,11 +97,15 @@ def _serialize_source_record(row):
 
 @router.get("/types")
 def list_types(db: Session = Depends(get_db)):
+    public_type = case(
+        (KnowledgeNode.presentation_type == ROLE_GROUP_PRESENTATION, "mechanic"),
+        else_=KnowledgeNode.node_type,
+    )
     rows = (
         _node_query(db)
-        .with_entities(KnowledgeNode.node_type, func.count(KnowledgeNode.id))
-        .group_by(KnowledgeNode.node_type)
-        .order_by(KnowledgeNode.node_type)
+        .with_entities(public_type.label("public_type"), func.count(KnowledgeNode.id))
+        .group_by(public_type)
+        .order_by(public_type)
         .all()
     )
     return {"items": [{"node_type": node_type, "count": count} for node_type, count in rows]}
@@ -118,7 +133,21 @@ def search_knowledge(
     if node_type:
         if node_type not in PUBLIC_NODE_TYPES:
             raise HTTPException(status_code=400, detail="不支援的知識類型")
-        query = query.filter(KnowledgeNode.node_type == node_type)
+        if node_type == "script":
+            raise HTTPException(status_code=400, detail="Scripts are not public knowledge content")
+        if node_type == "mechanic":
+            query = query.filter(or_(
+                KnowledgeNode.node_type == "mechanic",
+                KnowledgeNode.presentation_type == ROLE_GROUP_PRESENTATION,
+            ))
+        else:
+            query = query.filter(
+                KnowledgeNode.node_type == node_type,
+                or_(
+                    KnowledgeNode.presentation_type.is_(None),
+                    KnowledgeNode.presentation_type != ROLE_GROUP_PRESENTATION,
+                ),
+            )
     total = query.count()
     nodes = query.order_by(KnowledgeNode.node_type, KnowledgeNode.canonical_name_zh_tw).offset(offset).limit(limit).all()
     return {"query": keyword, "total": total, "items": [_node_card(node) for node in nodes]}

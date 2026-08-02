@@ -15,6 +15,16 @@
     <select id="knowledge-type-filter" class="form-control dark-input" aria-label="內容類型">
       <option value="">全部類型</option>
     </select>
+    <select id="knowledge-team-filter" class="form-control dark-input" aria-label="角色分類">
+      <option value="">全部角色分類</option>
+      <option value="townsfolk">鎮民</option>
+      <option value="outsider">外來者</option>
+      <option value="minion">爪牙</option>
+      <option value="demon">惡魔</option>
+      <option value="traveller">旅行者</option>
+      <option value="fabled">傳奇角色</option>
+      <option value="loric">奇遇角色</option>
+    </select>
     <button class="btn btn-purple" type="submit">搜尋</button>
   </form>
   <div id="knowledge-search-meta" class="knowledge-search-meta">正在載入知識索引...</div>
@@ -41,7 +51,7 @@
   .knowledge-header h2{font-family:'Cinzel',serif;letter-spacing:.08em;margin:.3rem 0}
   .knowledge-header p{color:var(--text-muted);margin:0;line-height:1.6}
   .knowledge-search-card{margin-bottom:1.25rem}
-  .knowledge-search-form{display:grid;grid-template-columns:minmax(0,1fr) 180px auto;gap:.75rem;align-items:center}
+  .knowledge-search-form{display:grid;grid-template-columns:minmax(0,1fr) 160px 160px auto;gap:.75rem;align-items:center}
   .knowledge-search-box{position:relative}
   .knowledge-search-box i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-muted)}
   .knowledge-search-box input{padding-left:2.8rem!important}
@@ -53,7 +63,8 @@
   .knowledge-result-title{font-weight:900;color:#fff}
   .knowledge-result-meta{font-size:.74rem;color:var(--text-muted);margin-top:.25rem}
   .knowledge-type-chip{display:inline-flex;padding:.16rem .45rem;border-radius:999px;background:rgba(124,58,237,.18);color:#d9ccff;font-size:.68rem;margin-right:.4rem}
-  .knowledge-empty,.knowledge-detail-empty{text-align:center;color:var(--text-muted);padding:2.5rem 1rem}
+  .knowledge-empty,.knowledge-detail-empty{text-align:center;color:var(--text-muted);padding:2.5rem 1rem;line-height:1.65}
+  .knowledge-empty i,.knowledge-detail-empty i{display:block;font-size:1.55rem;color:var(--accent-gold);margin-bottom:.7rem}
   .knowledge-detail-empty i{font-size:2rem;color:var(--accent-gold);margin-bottom:.8rem}
   .knowledge-detail-title{display:grid;grid-template-columns:minmax(180px,.8fr) minmax(280px,1.2fr);gap:1.25rem;align-items:start;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:1rem}
   .knowledge-title-identity{min-width:0}
@@ -111,9 +122,9 @@
   .knowledge-relation-toggle{border:0;background:transparent;color:var(--accent-gold);cursor:pointer;font-size:.76rem;padding:.2rem}
   .knowledge-relation-toggle:hover{text-decoration:underline}
   @media(max-width:900px){.knowledge-search-form,.knowledge-layout{grid-template-columns:1fr}.knowledge-results{max-height:none}.knowledge-detail-card{min-height:320px}}
-  @media(max-width:640px){.knowledge-search-form .btn{width:100%}.knowledge-detail-title{grid-template-columns:1fr}.knowledge-relation-group-head{align-items:flex-start}.knowledge-relations{gap:.4rem}.knowledge-relation{font-size:.78rem}.knowledge-block-body{font-size:.9rem;line-height:1.75}.knowledge-source-toggle{align-items:flex-start}.knowledge-table{min-width:460px}}
+  @media(max-width:640px){.knowledge-search-card,.knowledge-results-card,.knowledge-detail-card{padding:1rem}.knowledge-search-form .btn{width:100%;justify-content:center}.knowledge-detail-title{grid-template-columns:1fr}.knowledge-relation-group-head{align-items:flex-start}.knowledge-relations{gap:.4rem}.knowledge-relation{font-size:.78rem}.knowledge-block-body{font-size:.9rem;line-height:1.75}.knowledge-source-toggle{align-items:flex-start}.knowledge-table{min-width:460px}}
 </style>
 
 <link rel="stylesheet" href="/css/knowledge-role-preview.css?v=20260731e">
-<script src="/js/knowledge-role-preview.js?v=20260731i"></script>
-<script src="/js/knowledge.js?v=20260731e"></script>
+<script src="/js/knowledge-role-preview.js?v=20260802a"></script>
+<script src="/js/knowledge.js?v=20260802a"></script>

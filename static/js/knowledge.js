@@ -1,11 +1,12 @@
 (() => {
   const apiBase = window.API_BASE || '';
-  const state = { items: [], activeSlug: null, types: [], expandedRelationGroups: new Set(), expandedSourceBlocks: new Set(), nodeRequestId: 0, roleCatalogPromise: null };
+  const state = { items: [], activeSlug: null, types: [], resultStatus: 'idle', expandedRelationGroups: new Set(), expandedSourceBlocks: new Set(), nodeRequestId: 0, roleCatalogPromise: null };
   const $ = (id) => document.getElementById(id);
   const escapeHtml = (value) => String(value ?? '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
   const typeLabel = (type) => ({ role: '角色', script: '劇本', guide: '指南', mechanic: '規則／機制', article: '文章' }[type] || type || '其他');
+  const teamLabel = (team) => ({ townsfolk: '鎮民', outsider: '外來者', minion: '爪牙', demon: '惡魔', traveller: '旅行者', fabled: '傳奇角色', loric: '奇遇角色' }[team] || '');
   const blockLabel = (type) => ({ background: '背景故事', ability: '角色能力', overview: '角色簡介', how_it_works: '運作方式', rules_detail: '規則細節', rules_interactions: '角色互動', rules_jinx: '相剋規則', reminders: '提示標記', examples: '範例', strategy_play: '如何遊玩', strategy_bluff: '如何偽裝', strategy_counter: '如何對抗', storyteller_advice: '說書人建議', source_excerpt: '原始來源節錄' }[type] || typeLabel(type));
   const blockIcon = (type) => ({ background: 'fa-book-open', ability: 'fa-wand-sparkles', overview: 'fa-circle-info', how_it_works: 'fa-gears', rules_detail: 'fa-scale-balanced', rules_interactions: 'fa-arrows-left-right', rules_jinx: 'fa-link', reminders: 'fa-tag', examples: 'fa-lightbulb', strategy_play: 'fa-chess', strategy_bluff: 'fa-masks-theater', strategy_counter: 'fa-shield-halved', storyteller_advice: 'fa-user-tie', source_excerpt: 'fa-box-archive' }[type] || 'fa-note-sticky');
   const relationGroupOrder = ['mechanic', 'article'];
@@ -21,7 +22,7 @@
     const select = $('knowledge-type-filter');
     if (!select) return;
     select.innerHTML = '<option value="">全部類型</option>' + state.types
-      .map((item) => `<option value="${escapeHtml(item.node_type)}">${escapeHtml(typeLabel(item.node_type))}（${item.count}）</option>`)
+      .map((item) => `<option value="${escapeHtml(item.node_type)}">${escapeHtml(typeLabel(item.node_type))}${item.node_type === 'role' ? '' : `（${item.count}）`}</option>`)
       .join('');
   }
 
@@ -29,16 +30,44 @@
     const container = $('knowledge-results');
     if (!container) return;
     if (!state.items.length) {
-      container.innerHTML = '<div class="knowledge-empty">沒有找到符合條件的條目。</div>';
+      const messages = {
+        idle: '<i class="fa-solid fa-magnifying-glass"></i>輸入名稱、英文名或別名，或選擇內容／角色分類開始瀏覽。',
+        loading: '<i class="fa-solid fa-spinner fa-spin"></i>正在整理搜尋結果...',
+        error: '<i class="fa-solid fa-triangle-exclamation"></i>搜尋暫時無法使用，請稍後再試。',
+        ready: '<i class="fa-solid fa-circle-info"></i>沒有找到符合條件的條目。',
+      };
+      container.innerHTML = `<div class="knowledge-empty">${messages[state.resultStatus] || messages.ready}</div>`;
       return;
     }
     container.innerHTML = state.items.map((item) => `
       <button class="knowledge-result ${state.activeSlug === item.slug ? 'is-active' : ''}" type="button" data-knowledge-slug="${escapeHtml(item.slug)}">
         <div class="knowledge-result-title">${escapeHtml(item.name)}</div>
-        <div class="knowledge-result-meta"><span class="knowledge-type-chip">${escapeHtml(typeLabel(item.node_type))}</span>${escapeHtml(item.name_en || item.name_zh_cn || item.slug)}</div>
+        <div class="knowledge-result-meta"><span class="knowledge-type-chip">${escapeHtml(item.team ? teamLabel(item.team) : typeLabel(item.node_type))}</span>${escapeHtml(item.name_en || item.name_zh_cn || item.slug)}</div>
       </button>
     `).join('');
-    container.querySelectorAll('[data-knowledge-slug]').forEach((button) => button.addEventListener('click', () => loadNode(button.dataset.knowledgeSlug)));
+    container.querySelectorAll('[data-knowledge-slug]').forEach((button) => button.addEventListener('click', () => loadNode(button.dataset.knowledgeSlug, { focusDetail: true })));
+  }
+
+  function sortedUniqueItems(items, query) {
+    const seen = new Set();
+    const keyword = String(query || '').toLocaleLowerCase('zh-Hant');
+    return (items || []).filter((item) => {
+      if (!item.slug || seen.has(item.slug)) return false;
+      seen.add(item.slug);
+      return true;
+    }).sort((a, b) => {
+      const score = (item) => {
+        if (!keyword) return 3;
+        const names = [item.name, item.name_en, item.name_zh_cn, item.slug].filter(Boolean).map((value) => String(value).toLocaleLowerCase('zh-Hant'));
+        if (names.some((value) => value === keyword)) return 0;
+        if (names.some((value) => value.startsWith(keyword))) return 1;
+        if (names.some((value) => value.includes(keyword))) return 2;
+        return 3;
+      };
+      return score(a) - score(b)
+        || (a.node_type === 'role' ? -1 : 0) - (b.node_type === 'role' ? -1 : 0)
+        || String(a.name || '').localeCompare(String(b.name || ''), 'zh-Hant');
+    });
   }
 
   function relationButton(rel) {
@@ -229,7 +258,7 @@
     try { return decodeURIComponent(match[1]); } catch (_) { return match[1]; }
   };
 
-  async function loadNode(slug, { historyMode = 'push' } = {}) {
+  async function loadNode(slug, { historyMode = 'push', focusDetail = false } = {}) {
     if (!slug) return;
     const requestId = ++state.nodeRequestId;
     state.activeSlug = slug;
@@ -262,6 +291,7 @@
         if (historyMode === 'replace') history.replaceState({ knowledgeSlug: slug }, '', `#${hash}`);
         else if (historyMode === 'push') history.pushState({ knowledgeSlug: slug }, '', `#${hash}`);
       }
+      if (focusDetail && window.innerWidth <= 900) detail?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (err) {
       if (requestId !== state.nodeRequestId) return;
       if (detail) detail.innerHTML = `<div class="knowledge-detail-empty"><h3>無法讀取條目</h3><p>${escapeHtml(err.message)}</p></div>`;
@@ -271,18 +301,50 @@
   async function searchKnowledge() {
     const q = $('knowledge-search-input')?.value.trim() || '';
     const nodeType = $('knowledge-type-filter')?.value || '';
+    const team = $('knowledge-team-filter')?.value || '';
     const meta = $('knowledge-search-meta');
+    const detail = $('knowledge-detail');
+    if (!state.activeSlug && detail) {
+      detail.className = 'knowledge-detail-empty';
+      detail.innerHTML = '<i class="fa-solid fa-book-open"></i><h3>選擇一個條目</h3><p>搜尋後從結果中選擇角色、規則或文章。</p>';
+    }
+    if (!q && !nodeType && !team) {
+      state.items = [];
+      state.resultStatus = 'idle';
+      if (meta) meta.textContent = '輸入關鍵字，或選擇內容類型與角色分類。';
+      renderResults();
+      return;
+    }
+    state.items = [];
+    state.resultStatus = 'loading';
+    renderResults();
     if (meta) meta.textContent = '正在搜尋...';
     try {
-      const params = new URLSearchParams({ q, limit: '60' });
-      if (nodeType) params.set('node_type', nodeType);
-      const data = await fetch(`${apiBase}/api/knowledge/search?${params.toString()}`, { cache: 'no-store' }).then(requireJson);
-      state.items = data.items || [];
-      if (meta) meta.textContent = q ? `找到 ${data.total} 筆與「${q}」相關的條目` : `目前共有 ${data.total} 筆可查詢條目`;
+      let data;
+      if (team || nodeType === 'role') {
+        const params = new URLSearchParams({ q, team, limit: '500' });
+        const roles = await fetch(`${apiBase}/api/roles?${params.toString()}`, { cache: 'no-store' }).then(requireJson);
+        const items = (roles.items || []).filter((role) => role.knowledge_slug).map((role) => ({
+          slug: role.knowledge_slug,
+          node_type: 'role',
+          name: role.name_zh_tw,
+          name_en: role.name_en,
+          team: role.team,
+        }));
+        data = { total: items.length, items };
+      } else {
+        const params = new URLSearchParams({ q, limit: '100' });
+        if (nodeType) params.set('node_type', nodeType);
+        data = await fetch(`${apiBase}/api/knowledge/search?${params.toString()}`, { cache: 'no-store' }).then(requireJson);
+      }
+      state.items = sortedUniqueItems(data.items, q);
+      state.resultStatus = 'ready';
+      const category = team ? teamLabel(team) : (nodeType ? typeLabel(nodeType) : '全部類型');
+      if (meta) meta.textContent = q ? `找到 ${state.items.length} 筆與「${q}」相關的${category}條目` : `${category}共有 ${state.items.length} 筆可查詢條目`;
       renderResults();
-      if (state.items.length && !state.activeSlug) loadNode(state.items[0].slug, { historyMode: 'replace' });
     } catch (err) {
       state.items = [];
+      state.resultStatus = 'error';
       renderResults();
       if (meta) meta.textContent = err.message;
     }
@@ -290,15 +352,24 @@
 
   async function init() {
     $('knowledge-search-form')?.addEventListener('submit', (event) => { event.preventDefault(); state.activeSlug = null; searchKnowledge(); });
-    $('knowledge-type-filter')?.addEventListener('change', () => { state.activeSlug = null; searchKnowledge(); });
+    $('knowledge-type-filter')?.addEventListener('change', (event) => {
+      state.activeSlug = null;
+      if (event.target.value && event.target.value !== 'role') $('knowledge-team-filter').value = '';
+      searchKnowledge();
+    });
+    $('knowledge-team-filter')?.addEventListener('change', (event) => {
+      state.activeSlug = null;
+      if (event.target.value) $('knowledge-type-filter').value = 'role';
+      searchKnowledge();
+    });
     try {
       const data = await fetch(`${apiBase}/api/knowledge/types`, { cache: 'no-store' }).then(requireJson);
       state.types = data.items || [];
       renderTypes();
     } catch (err) { console.warn('知識類型載入失敗', err); }
     const hash = slugFromLocation();
-    await searchKnowledge();
     if (hash) await loadNode(hash, { historyMode: 'replace' });
+    else await searchKnowledge();
     window.addEventListener('popstate', () => {
       const slug = slugFromLocation();
       if (slug) loadNode(slug, { historyMode: 'none' });

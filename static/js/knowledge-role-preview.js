@@ -174,6 +174,12 @@
           icon.src = imageUrl;
           icon.alt = '';
           icon.loading = 'lazy';
+          icon.addEventListener('error', () => {
+            const fallback = root.ownerDocument.createElement('span');
+            fallback.className = 'role-mention-list-icon role-mention-list-icon-fallback';
+            fallback.innerHTML = '<i class="fa-solid fa-user"></i>';
+            icon.replaceWith(fallback);
+          }, { once: true });
         } else {
           icon.innerHTML = '<i class="fa-solid fa-user"></i>';
         }
@@ -269,7 +275,7 @@
       const showSourceStatus = visible('source_status');
       const nightSection = visible('night_operation') ? section('夜間操作', '只在說書人視角顯示', `<div class="role-night-grid"><article><b>首夜順序</b><strong>${esc(role.first_night_order ?? '未設定')}</strong><p>${esc(role.first_night_reminder || '無首夜提醒')}</p></article><article><b>其他夜順序</b><strong>${esc(role.other_night_order ?? '未設定')}</strong><p>${esc(role.other_night_reminder || '無其他夜提醒')}</p></article></div>`) : '';
       const reminderSection = visible('reminders') ? section('提示標記', '以 GStone 百科資料為準', reminderCards(role.reminders)) : '';
-      const hero = visible('identity') ? `<article class="role-hero role-team-${esc(role.team || 'unknown')}"><div class="role-hero-icon">${role.image_url ? `<img src="${esc(role.image_url)}" alt="${esc(role.name_zh_tw)}角色圖示">` : '<i class="fa-solid fa-masks-theater"></i>'}</div><div class="role-hero-copy"><div class="role-eyebrow">${esc(teamLabel(role.team))}${role.is_official ? ' · 官方角色' : ''}</div><h2>${esc(role.name_zh_tw)}</h2>${visible('role_metadata') ? `<div class="knowledge-name-en">${esc(role.name_en || role.canonical_key || '')}</div><div class="role-meta-row">${(role.script_names || []).map((item) => knowledgeTag(item, 'fa-book')).join('')}${(role.ability_tags || []).map((item) => knowledgeTag(item, 'fa-diagram-project')).join('')}</div>` : ''}</div>${visible('references') ? `<div class="role-hero-links">${(role.references || []).map((ref) => `<a href="${esc(ref.url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>${esc(ref.label)}</a>`).join('')}</div>` : ''}</article>` : '';
+      const hero = visible('identity') ? `<article class="role-hero role-team-${esc(role.team || 'unknown')}"><div class="role-hero-icon">${role.image_url ? `<img src="${esc(role.image_url)}" alt="${esc(role.name_zh_tw)}角色圖示"><i class="fa-solid fa-masks-theater" hidden></i>` : '<i class="fa-solid fa-masks-theater"></i>'}</div><div class="role-hero-copy"><div class="role-eyebrow">${esc(teamLabel(role.team))}${role.is_official ? ' · 官方角色' : ''}</div><h2>${esc(role.name_zh_tw)}</h2>${visible('role_metadata') ? `<div class="knowledge-name-en">${esc(role.name_en || role.canonical_key || '')}</div><div class="role-meta-row">${(role.script_names || []).map((item) => knowledgeTag(item, 'fa-book')).join('')}${(role.ability_tags || []).map((item) => knowledgeTag(item, 'fa-diagram-project')).join('')}</div>` : ''}</div>${visible('references') ? `<div class="role-hero-links">${(role.references || []).map((ref) => `<a href="${esc(ref.url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>${esc(ref.label)}</a>`).join('')}</div>` : ''}</article>` : '';
       const ability = visible('official_ability') ? `<section class="role-ability-panel"><div><i class="fa-solid fa-wand-sparkles"></i><span>官方能力</span></div><div class="knowledge-block-body">${richText(role.ability_zh_tw || '尚未填入官方能力文字。')}</div></section>` : '';
       const coreBlocks = blockGroup(blocks, 'core', showSourceStatus);
       const extendedBlocks = blockGroup(blocks, 'extended', showSourceStatus);
@@ -288,6 +294,16 @@
       }
       detail.className = 'role-preview';
       detail.innerHTML = `${hero}<nav class="role-view-tabs" aria-label="${'\u89d2\u8272\u9810\u89bd\u8996\u89d2'}">${['player', 'encyclopedia', 'storyteller'].map((item) => `<button type="button" data-role-view="${item}" class="${role.view === item ? 'is-active' : ''}">${viewLabel(item)}</button>`).join('')}</nav><div class="role-view-content">${viewContent}</div>`;
+      const heroImage = detail.querySelector('.role-hero-icon img');
+      if (heroImage) {
+        const showFallback = () => {
+          heroImage.hidden = true;
+          const fallback = detail.querySelector('.role-hero-icon i');
+          if (fallback) fallback.hidden = false;
+        };
+        heroImage.addEventListener('error', showFallback, { once: true });
+        if (heroImage.complete && !heroImage.naturalWidth) showFallback();
+      }
       applyRoleMentionLinks(detail.querySelector('.role-view-content'));
       detail.querySelectorAll('[data-role-view]').forEach((button) => button.addEventListener('click', () => {
         if (button.classList.contains('is-active')) return;
