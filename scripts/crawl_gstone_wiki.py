@@ -30,7 +30,22 @@ from gstone_wiki import BASE_URL, HEADERS, article_url, is_excluded_knowledge_pa
 from gstone_wiki import parse_role_information
 
 ROLE_COVERAGE_SEEDS = ["钟表匠", "镜像双子", "理发师", "卡扎力", "炼金术士", "狸猫", "传奇角色", "奇遇角色", "末日预言者"]
-DEFAULT_SEEDS = ["首頁", "首页", "角色", "剧本", "規則", "规则", "相克規則", "相克规则", *ROLE_COVERAGE_SEEDS]
+CURATED_READING_SEEDS = [
+    "“规则”与“理念”——关于角色能力互动的说明",
+    "设计师的平衡天书",
+    "创作幕后——超越暗流涌动",
+    "成为一个好说书人的经历",
+    "创作幕后——逻辑一片混乱？",
+    "染·钟楼谜团是一款策略游戏",
+    "设计师总结的国内玩家对染的错误理解",
+    "疯狂规则如何运作？——疯狂的小精灵",
+    "有关说书人的创造力--有趣的巫师",
+    "钟楼笔记：相克更新",
+]
+DEFAULT_SEEDS = [
+    "首頁", "首页", "角色", "剧本", "規則", "规则", "相克規則", "相克规则",
+    *ROLE_COVERAGE_SEEDS, *CURATED_READING_SEEDS,
+]
 ARTICLE_PATH = "/index.php"
 SKIP_NAMESPACES = {
     "特殊", "Special", "討論", "Talk", "使用者", "User", "使用者討論", "User_talk",
