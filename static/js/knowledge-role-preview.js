@@ -98,7 +98,24 @@
       .filter((item) => !currentNames.has(item.label) && !currentNames.has(item.target));
     if (!candidates.length) return;
 
+    const isNightOrder = currentNode.presentation_type === 'night_order';
+    const isNightOrderPrefixLink = (link) => {
+      const row = link.closest('p, li');
+      if (!row) return false;
+      const range = root.ownerDocument.createRange();
+      range.setStart(row, 0);
+      range.setEndBefore(link);
+      const before = range.toString().trim();
+      const label = String(link.textContent || '').trim();
+      const rowText = String(row.textContent || '').trim();
+      return !before && rowText.startsWith(label) && /^[：:]/.test(rowText.slice(label.length).trimStart());
+    };
+
     root.querySelectorAll('a[data-knowledge-slug]').forEach((link) => {
+      if (isNightOrder && !isNightOrderPrefixLink(link)) {
+        link.replaceWith(root.ownerDocument.createTextNode(link.textContent || ''));
+        return;
+      }
       const target = String(link.dataset.knowledgeSlug || '').trim();
       const label = String(link.textContent || '').trim();
       const item = candidates.find((candidate) => candidate.target === target || candidate.label === label || candidate.displayLabel === label);
@@ -115,6 +132,10 @@
       button.addEventListener('click', () => onNavigate(item.target));
       link.replaceWith(button);
     });
+    if (isNightOrder) {
+      enhanceNightOrderBlocks(root);
+      return;
+    }
     const nodeFilter = root.ownerDocument.defaultView.NodeFilter;
     root.querySelectorAll('.role-ability-panel p, .knowledge-block-body, .role-reminder-field p, .role-night-grid p').forEach((body) => {
       const walker = root.ownerDocument.createTreeWalker(body, nodeFilter.SHOW_TEXT, {
@@ -166,7 +187,6 @@
     const currentName = String(currentNode.name || currentNode.slug || '').trim();
     const forceRoleCards = currentNode.presentation_type === 'role_group' || roleListHeadings.has(currentName);
     enhanceRoleListBlocks(root, forceRoleCards);
-    if (currentNode.presentation_type === 'night_order') enhanceNightOrderBlocks(root);
   }
   function enhanceNightOrderBlocks(root) {
     root.querySelectorAll('.knowledge-block-body p, .knowledge-block-body li').forEach((row) => {
