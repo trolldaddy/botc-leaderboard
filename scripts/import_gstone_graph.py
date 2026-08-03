@@ -237,6 +237,7 @@ def import_report(report: dict, write: bool):
                 stats["nodes_reused"] += 1
             if title_tw in {to_traditional(value) for value in CURATED_READING_TITLES}:
                 node.node_type = "guide"
+                node.status = "discovered"
             nodes_by_title[title] = node
             nodes_by_title[title_tw] = node
 
