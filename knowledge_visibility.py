@@ -30,8 +30,10 @@ def recommended_node_visibility(node) -> str:
 
     if status in HIDDEN_STATUSES or node_type not in PUBLIC_NODE_TYPES:
         return "internal"
+    if name in PUBLIC_OFFICIAL_SCRIPT_NAMES:
+        return "public"
     if node_type == "script":
-        if presentation_type == "role_group" or name in PUBLIC_OFFICIAL_SCRIPT_NAMES:
+        if presentation_type == "role_group":
             return "public"
         return "internal"
     if presentation_type == "excluded":
