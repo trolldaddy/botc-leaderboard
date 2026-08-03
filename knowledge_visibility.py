@@ -16,6 +16,7 @@ PUBLIC_PRESENTATION_TYPES = {
     "role_profile", "mechanic", "glossary", "night_order", "taxonomy", "reference_table",
     "rules_hub", "role_group", "script_guide", "guide", "index",
 }
+INTERNAL_NODE_NAMES = {"首頁", "首页"}
 
 def node_display_name(node) -> str:
     return (node.canonical_name_zh_tw or node.canonical_name_zh_cn or node.slug or "").strip()
@@ -27,6 +28,8 @@ def recommended_node_visibility(node) -> str:
     node_type = (node.node_type or "").strip().lower()
     presentation_type = (node.presentation_type or "").strip().lower()
     name = node_display_name(node)
+    if name in INTERNAL_NODE_NAMES:
+        return "internal"
 
     if status in HIDDEN_STATUSES or node_type not in PUBLIC_NODE_TYPES:
         return "internal"

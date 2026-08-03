@@ -35,6 +35,11 @@ def test_uncertain_standard_articles_wait_for_review():
     assert recommended_node_visibility(node("rules", presentation_type="rules_hub")) == "public"
 
 
+def test_homepage_is_always_internal():
+    assert recommended_node_visibility(node("\u9996\u9801", presentation_type="index")) == "internal"
+    assert recommended_node_visibility(node("\u9996\u9875", presentation_type="index")) == "internal"
+
+
 def test_hidden_and_excluded_articles_stay_internal():
     assert recommended_node_visibility(node("認證公示", presentation_type="excluded")) == "internal"
     assert recommended_node_visibility(node("舊文章", status="disabled")) == "internal"
