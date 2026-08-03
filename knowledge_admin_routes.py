@@ -29,6 +29,15 @@ ABILITY_CATEGORY_NAMES = [
 ]
 
 
+def serialize_knowledge_block(block: KnowledgeBlock):
+    return {
+        "id": block.id, "block_type": block.block_type, "title": block.title,
+        "content_format": block.content_format, "content": block.content,
+        "sort_order": block.sort_order, "language": block.language, "layer": block.layer,
+        "review_status": block.review_status, "visibility": block.visibility,
+    }
+
+
 @router.get("/summary")
 def graph_summary(
     db: Session = Depends(get_db),
@@ -70,12 +79,18 @@ def list_nodes(
     q: str = "",
     node_type: str = "",
     status: str = "",
+    include_disabled: bool = False,
     limit: int = 100,
     offset: int = 0,
     db: Session = Depends(get_db),
     admin: models.StorytellerAccount = Depends(require_admin_account),
 ):
     query = db.query(KnowledgeNode)
+    if not include_disabled:
+        query = query.filter(
+            ~KnowledgeNode.status.in_(["deleted", "archived", "disabled"]),
+            or_(KnowledgeNode.presentation_type.is_(None), KnowledgeNode.presentation_type != "excluded"),
+        )
     keyword = q.strip()
     if keyword:
         alias_node_ids = db.query(KnowledgeAlias.node_id).filter(KnowledgeAlias.alias.ilike(f"%{keyword}%"))
@@ -109,6 +124,47 @@ def list_nodes(
             "is_official": bool(node.is_official),
         } for node in nodes],
     }
+
+
+
+@router.patch("/nodes/{node_id}")
+def update_node(node_id: int, data: dict, db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_account)):
+    node = db.query(KnowledgeNode).filter(KnowledgeNode.id == node_id).first()
+    if not node:
+        raise HTTPException(status_code=404, detail="Knowledge node not found")
+    if "summary" in data:
+        node.summary = str(data.get("summary") or "").strip() or None
+    if "status" in data:
+        status = str(data.get("status") or "").strip()
+        if status not in {"discovered", "reviewed", "published", "disabled", "archived"}:
+            raise HTTPException(status_code=400, detail="Unsupported article status")
+        node.status = status
+    if "visibility" in data:
+        visibility = str(data.get("visibility") or "").strip()
+        if visibility not in {"internal", "public", "published"}:
+            raise HTTPException(status_code=400, detail="Unsupported article visibility")
+        node.visibility = visibility
+    db.commit()
+    return {"status": "success", "id": node.id, "node_status": node.status, "visibility": node.visibility, "summary": node.summary}
+
+
+@router.patch("/nodes/{node_id}/blocks/{block_id}")
+def update_node_block(node_id: int, block_id: int, data: dict, db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_account)):
+    block = db.query(KnowledgeBlock).filter(KnowledgeBlock.id == block_id, KnowledgeBlock.node_id == node_id).first()
+    if not block:
+        raise HTTPException(status_code=404, detail="Article content block not found")
+    for field in ("block_type", "title", "content", "sort_order", "content_format", "review_status", "visibility"):
+        if field not in data:
+            continue
+        value = data.get(field)
+        if field == "sort_order": value = int(value or 0)
+        elif field == "content_format" and value not in {"text", "markdown", "html"}: raise HTTPException(status_code=400, detail="Unsupported content format")
+        elif field == "review_status" and value not in {"needs_review", "confirmed", "rejected"}: raise HTTPException(status_code=400, detail="Unsupported review status")
+        elif field == "visibility" and value not in {"internal", "public", "published"}: raise HTTPException(status_code=400, detail="Unsupported block visibility")
+        elif field in {"block_type", "title", "content"}: value = str(value or "").strip() or (None if field == "title" else "")
+        setattr(block, field, value)
+    db.commit(); db.refresh(block)
+    return {"status": "success", "block": serialize_knowledge_block(block)}
 
 
 
@@ -227,14 +283,6 @@ def get_node(
             "alias_type": alias.alias_type,
             "is_preferred": bool(alias.is_preferred),
         } for alias in node.aliases],
-        "blocks": [{
-            "id": block.id,
-            "block_type": block.block_type,
-            "title": block.title,
-            "language": block.language,
-            "layer": block.layer,
-            "review_status": block.review_status,
-            "visibility": block.visibility,
-        } for block in node.blocks],
+        "blocks": [serialize_knowledge_block(block) for block in sorted(node.blocks, key=lambda item: (item.sort_order, item.id))],
         "edges": [edge_data(edge, "outgoing") for edge in outgoing] + [edge_data(edge, "incoming") for edge in incoming],
     }
