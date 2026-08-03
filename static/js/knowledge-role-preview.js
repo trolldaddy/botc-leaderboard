@@ -98,6 +98,23 @@
       .filter((item) => !currentNames.has(item.label) && !currentNames.has(item.target));
     if (!candidates.length) return;
 
+    root.querySelectorAll('a[data-knowledge-slug]').forEach((link) => {
+      const target = String(link.dataset.knowledgeSlug || '').trim();
+      const label = String(link.textContent || '').trim();
+      const item = candidates.find((candidate) => candidate.target === target || candidate.label === label || candidate.displayLabel === label);
+      if (!item) return;
+      const button = root.ownerDocument.createElement('button');
+      button.type = 'button';
+      button.className = 'role-mention-chip role-mention-inline role-mention-' + mentionTone(item.team);
+      button.dataset.roleTarget = item.target;
+      button.dataset.roleLabel = item.displayLabel || item.label;
+      button.dataset.roleTeam = item.team || '';
+      button.dataset.roleImage = item.imageUrl || '';
+      button.textContent = item.displayLabel || item.label;
+      button.title = '查看「' + item.label + '」資料';
+      button.addEventListener('click', () => onNavigate(item.target));
+      link.replaceWith(button);
+    });
     const nodeFilter = root.ownerDocument.defaultView.NodeFilter;
     root.querySelectorAll('.role-ability-panel p, .knowledge-block-body, .role-reminder-field p, .role-night-grid p').forEach((body) => {
       const walker = root.ownerDocument.createTreeWalker(body, nodeFilter.SHOW_TEXT, {
@@ -149,6 +166,34 @@
     const currentName = String(currentNode.name || currentNode.slug || '').trim();
     const forceRoleCards = currentNode.presentation_type === 'role_group' || roleListHeadings.has(currentName);
     enhanceRoleListBlocks(root, forceRoleCards);
+    if (currentNode.presentation_type === 'night_order') enhanceNightOrderBlocks(root);
+  }
+  function enhanceNightOrderBlocks(root) {
+    root.querySelectorAll('.knowledge-block-body p, .knowledge-block-body li').forEach((row) => {
+      const button = row.querySelector('.role-mention-chip[data-role-target]');
+      if (!button || row.querySelector('.role-night-order-card')) return;
+      const text = String(row.textContent || '').trim();
+      const roleName = String(button.textContent || '').trim();
+      if (!text.startsWith(roleName) || !/[：:]/.test(text.slice(roleName.length, roleName.length + 3))) return;
+      button.classList.remove('role-mention-inline');
+      button.classList.add('role-night-order-card');
+      const label = button.dataset.roleLabel || roleName;
+      const imageUrl = button.dataset.roleImage || '';
+      button.replaceChildren();
+      const icon = imageUrl ? root.ownerDocument.createElement('img') : root.ownerDocument.createElement('span');
+      icon.className = 'role-night-order-icon';
+      if (imageUrl) {
+        icon.src = imageUrl;
+        icon.alt = '';
+        icon.loading = 'lazy';
+      } else {
+        icon.innerHTML = '<i class="fa-solid fa-user"></i>';
+      }
+      const name = root.ownerDocument.createElement('strong');
+      name.textContent = label;
+      button.append(icon, name);
+      row.classList.add('knowledge-night-order-row');
+    });
   }
   const roleListHeadings = new Set(['鎮民', '镇民', '外來者', '外来者', '爪牙', '惡魔', '恶魔', '旅行者', '傳奇角色', '传奇角色', '傳奇', '奇遇角色', '奇遇']);
   function enhanceRoleListBlocks(root, forceRoleCards = false) {

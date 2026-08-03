@@ -13,7 +13,7 @@ import sys
 import time
 from collections import Counter
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
+from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup, NavigableString, Tag
@@ -50,8 +50,45 @@ def normalize_heading(value: str) -> str:
     return re.sub(r"\[(?:編輯|编辑)\]\s*$", "", text).strip()
 
 
+def knowledge_target(href: str) -> str:
+    absolute = urljoin(f"https://{GSTONE_HOST}/", href or "")
+    if not is_gstone_url(absolute):
+        return ""
+    parsed = urlparse(absolute)
+    title = parse_qs(parsed.query).get("title", [""])[0]
+    if not title and "/wiki/" in parsed.path:
+        title = unquote(parsed.path.split("/wiki/", 1)[1])
+    title = clean_inline(to_traditional(title.replace("_", " ")))
+    if not title or title.startswith(("檔案:", "文件:", "分類:", "分类:", "特殊:")):
+        return ""
+    return title
+
+
+def inline_text(node: Tag) -> str:
+    parts: list[str] = []
+    for child in node.children:
+        if isinstance(child, NavigableString):
+            parts.append(to_traditional(str(child)))
+        elif isinstance(child, Tag):
+            value = inline_text(child)
+            if not value:
+                continue
+            if child.name == "a":
+                target = knowledge_target(child.get("href", ""))
+                parts.append(f"[knowledge={target}]{value}[/knowledge]" if target else value)
+            elif child.name in {"b", "strong"}:
+                parts.append(f"[b]{value}[/b]")
+            elif child.name in {"i", "em"}:
+                parts.append(f"[i]{value}[/i]")
+            elif child.name == "br":
+                parts.append("\n")
+            else:
+                parts.append(value)
+    return clean_inline("".join(parts))
+
+
 def text_of(node: Tag) -> str:
-    return clean_inline(to_traditional(node.get_text(" ", strip=True)))
+    return inline_text(node)
 
 
 def render_list(node: Tag, depth: int = 0) -> list[str]:
@@ -166,31 +203,28 @@ def extract_article_sections(html: str) -> tuple[str, list[dict]]:
 
     blocks: list[dict] = []
     first_h2 = root.find("h2")
-    intro_link = None
     intro_nodes = []
     for child in root.children:
         if child is first_h2:
             break
         if isinstance(child, Tag):
             intro_nodes.append(child)
+    intro_lines: list[str] = []
     for child in intro_nodes:
-        for anchor in child.select("a[href]"):
-            href = urljoin(f"https://{GSTONE_HOST}/", anchor.get("href", ""))
-            label = clean_text(anchor.get_text(" ", strip=True))
-            if label and is_gstone_url(href):
-                intro_link = (label, href)
-                break
-        if intro_link:
-            break
-    if intro_link:
+        rendered = render_node(child, 2)
+        if rendered:
+            if intro_lines:
+                intro_lines.append("")
+            intro_lines.extend(rendered)
+    intro_content = clean_text("\n".join(intro_lines))
+    if intro_content:
         blocks.append({
             "block_type": "article_intro",
-            "title": "上層分類",
-            "content": f"[knowledge={intro_link[0]}]{intro_link[0]}[/knowledge]",
+            "title": "導言",
+            "content": intro_content,
             "content_format": "structured_text",
             "sort_order": 100,
         })
-
     for index, heading in enumerate(root.find_all("h2"), start=1):
         title = normalize_heading(heading.get_text(" ", strip=True))
         if not title or title in {"參考資料", "參考文獻", "注釋", "註釋", "外部連結"}:

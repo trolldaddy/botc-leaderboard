@@ -1,4 +1,4 @@
-﻿from seed_gstone_knowledge_articles import extract_article_sections, is_gstone_url, or_
+from seed_gstone_knowledge_articles import extract_article_sections, is_gstone_url, or_
 
 
 HTML = """
@@ -18,12 +18,18 @@ HTML = """
 def main():
     assert callable(or_)
     normalized, blocks = extract_article_sections(HTML)
-    assert [block["title"] for block in blocks] == ["上層分類", "第一節", "資料表"]
-    assert blocks[0]["content"] == "[knowledge=規則]規則[/knowledge]"
+    assert [block["title"] for block in blocks] == ["導言", "第一節", "資料表"]
+    assert "這是導言" in blocks[0]["content"]
+    assert "[knowledge=規則]規則[/knowledge]" in blocks[0]["content"]
     assert "### 子標題" in blocks[1]["content"]
     assert "- 專案甲" in blocks[1]["content"]
     assert "| 名稱 | 效果 |" in blocks[2]["content"]
     assert "參考資料" not in normalized
+    intro_only = '<div id="mw-content-text"><div class="mw-parser-output"><ol><li>完整規則一</li><li><a href="/index.php?title=占卜師">占卜師</a>：完整規則二</li></ol></div></div>'
+    _, intro_blocks = extract_article_sections(intro_only)
+    assert len(intro_blocks) == 1
+    assert "完整規則一" in intro_blocks[0]["content"]
+    assert "[knowledge=占卜師]占卜師[/knowledge]" in intro_blocks[0]["content"]
     assert is_gstone_url("https://clocktower-wiki.gstonegames.com/index.php?title=瘋狂")
     assert not is_gstone_url("https://zh.moegirl.org.cn/血染鐘樓")
     print({"status": "ok", "blocks": len(blocks), "source_policy": "gstone_only"})

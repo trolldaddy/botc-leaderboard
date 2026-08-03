@@ -90,6 +90,8 @@ def run(write: bool):
         nodes = db.query(KnowledgeNode).order_by(KnowledgeNode.node_type, KnowledgeNode.canonical_name_zh_tw).all()
         contest_excluded_ids = irrelevant_contest_node_ids(db)
         for node in nodes:
+            if (node.canonical_name_zh_tw or node.canonical_name_zh_cn or "").strip() in {"重要細節", "重要细节"} and node.node_type == "role":
+                node.node_type = "article"
             if node.classification_method == "manual" and node.presentation_type:
                 type_counts[node.presentation_type] += 1
                 status_counts[node.classification_status or "manual_confirmed"] += 1

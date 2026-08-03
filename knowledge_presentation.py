@@ -16,7 +16,8 @@ REFERENCE_TABLE_TITLES = {"設定調整", "设置调整", "特殊勝利失敗條
 RULES_HUB_TITLES = {
     "規則", "规则", "規則概要", "重要細節", "术语汇总", "術語彙總",
     "給說書人的建議", "規則解釋", "相剋規則", "相克规则", "“ 可以但不建議 ”",
-    "夜晚行動順序一覽", "隱性規則", "規則調整提前公示",
+    "夜晚行動順序一覽", "隱性規則", "鐘樓謎團隱性規則彙總", "钟楼谜团隐性规则汇总",
+    "規則調整提前公示", "规则调整提前公示", "哪些是“可以但不建議”", "哪些是“可以但不建议”",
 }
 ROLE_GROUP_TITLES = {
     "鎮民", "镇民", "外來者", "外来者", "爪牙", "惡魔", "恶魔",
@@ -73,8 +74,6 @@ def classify_knowledge_node(node) -> PresentationClassification:
 
     if status in HIDDEN_STATUSES or node_type == "script" or is_excluded_knowledge_title(name):
         return _result("excluded", "status_or_exclusion_rule", 1.0, "節點已停用或屬明確排除內容")
-    if node_type == "role":
-        return _result("role_profile", "node_type", 1.0, "角色節點使用角色資料頁")
     if name in GLOSSARY_TITLES:
         return _result("glossary", "exact_title", 1.0, "術語辭典頁")
     if name in NIGHT_ORDER_TITLES:
@@ -89,6 +88,8 @@ def classify_knowledge_node(node) -> PresentationClassification:
         return _result("role_group", "exact_title", 0.98, "角色類型入口")
     if name in INDEX_TITLES:
         return _result("index", "exact_title", 0.98, "索引或導航頁")
+    if node_type == "role":
+        return _result("role_profile", "node_type", 1.0, "角色節點使用角色資料頁")
     if name in SCRIPT_GUIDE_TITLES or node_type == "script":
         return _result("script_guide", "title_or_node_type", 0.96, "官方劇本或劇本指南")
     if name in MECHANIC_TITLES or node_type == "mechanic":

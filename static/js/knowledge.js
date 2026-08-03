@@ -285,7 +285,7 @@
     try {
       const node = await fetch(`${apiBase}/api/knowledge/nodes/${encodeURIComponent(slug)}`, { cache: 'no-store' }).then(requireJson);
       if (requestId !== state.nodeRequestId) return;
-      if (node.node_type === 'role' && window.RoleKnowledgePreview) {
+      if (node.node_type === 'role' && node.presentation_type === 'role_profile' && window.RoleKnowledgePreview) {
         await window.RoleKnowledgePreview.render({
           apiBase, node, detail, requireJson,
           onNavigate: loadNode,
