@@ -13,22 +13,22 @@
 .knowledge-block-body.role-mention-card-grid > p { display: contents; }
 .role-mention-card-grid .role-mention-list-card {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
+  grid-template-columns: 56px minmax(0, 1fr);
   align-items: center;
   gap: .55rem;
   width: 100%;
-  min-height: 70px;
+  min-height: 84px;
   margin: 0;
-  padding: .55rem .65rem;
+  padding: .65rem .75rem;
   border-radius: 12px;
   text-align: left;
   line-height: 1.2;
   white-space: normal;
 }
 .role-mention-card-grid .role-mention-list-icon {
-  width: 44px !important;
-  height: 44px !important;
-  max-width: 44px !important;
+  width: 56px !important;
+  height: 56px !important;
+  max-width: 56px !important;
   object-fit: contain;
   border-radius: 50%;
   background: rgba(255, 255, 255, .08);

@@ -194,6 +194,7 @@
         copy.append(name, meta);
         button.append(icon, copy);
       });
+      body.replaceChildren(...buttons);
     });
   }
 
