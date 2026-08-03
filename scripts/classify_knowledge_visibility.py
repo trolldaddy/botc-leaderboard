@@ -12,7 +12,9 @@ if str(ROOT) not in sys.path:
 
 from database import SessionLocal
 from knowledge_models import KnowledgeBlock, KnowledgeNode
-from knowledge_visibility import recommended_block_visibility, recommended_node_visibility
+from knowledge_visibility import HIDDEN_STATUSES, node_display_name, recommended_block_visibility, recommended_node_visibility
+
+RESTORABLE_RULE_NAMES = {"規則調整提前公示", "规则调整提前公示"}
 
 
 def run(write: bool):
@@ -22,9 +24,14 @@ def run(write: bool):
     node_changes = 0
     block_changes = 0
     samples = []
+    statuses_restored = 0
     try:
         nodes = db.query(KnowledgeNode).order_by(KnowledgeNode.id).all()
         for node in nodes:
+            restore_status = node_display_name(node) in RESTORABLE_RULE_NAMES and (node.status or "").lower() in HIDDEN_STATUSES
+            if restore_status:
+                statuses_restored += 1
+                node.status = "discovered"
             visibility = recommended_node_visibility(node)
             node_counts[visibility] += 1
             if node.visibility != visibility:
@@ -57,6 +64,7 @@ def run(write: bool):
         print(json.dumps({
             "mode": "write" if write else "preview",
             "nodes_scanned": len(nodes),
+            "statuses_restored" if write else "statuses_would_restore": statuses_restored,
             "node_visibility": dict(sorted(node_counts.items())),
             "node_changes" if write else "node_would_change": node_changes,
             "block_visibility": dict(sorted(block_counts.items())),
