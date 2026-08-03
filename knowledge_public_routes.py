@@ -121,6 +121,7 @@ def search_knowledge(
     q: str = Query(default="", max_length=120),
     node_type: str = Query(default="", max_length=40),
     limit: int = Query(default=24, ge=1, le=100),
+    search_scope: str = Query(default="title", pattern="^(title|fulltext)$"),
     offset: int = Query(default=0, ge=0),
     db: Session = Depends(get_db),
 ):
@@ -128,13 +129,23 @@ def search_knowledge(
     keyword = q.strip()
     if keyword:
         alias_node_ids = db.query(KnowledgeAlias.node_id).filter(KnowledgeAlias.alias.ilike(f"%{keyword}%"))
-        query = query.filter(or_(
+        block_node_ids = db.query(KnowledgeBlock.node_id).filter(
+            KnowledgeBlock.visibility.in_(["public", "published"]),
+            or_(
+                KnowledgeBlock.title.ilike(f"%{keyword}%"),
+                KnowledgeBlock.content.ilike(f"%{keyword}%"),
+            ),
+        )
+        matches = [
             KnowledgeNode.canonical_name_zh_tw.ilike(f"%{keyword}%"),
             KnowledgeNode.canonical_name_zh_cn.ilike(f"%{keyword}%"),
             KnowledgeNode.canonical_name_en.ilike(f"%{keyword}%"),
             KnowledgeNode.slug.ilike(f"%{keyword}%"),
             KnowledgeNode.id.in_(alias_node_ids),
-        ))
+        ]
+        if search_scope == "fulltext":
+            matches.append(KnowledgeNode.id.in_(block_node_ids))
+        query = query.filter(or_(*matches))
     if node_type:
         if node_type not in PUBLIC_NODE_TYPES:
             raise HTTPException(status_code=400, detail="不支援的知識類型")
@@ -155,7 +166,7 @@ def search_knowledge(
             )
     total = query.count()
     nodes = query.order_by(KnowledgeNode.node_type, KnowledgeNode.canonical_name_zh_tw).offset(offset).limit(limit).all()
-    return {"query": keyword, "total": total, "items": [_node_card(node) for node in nodes]}
+    return {"query": keyword, "search_scope": search_scope, "total": total, "items": [_node_card(node) for node in nodes]}
 
 
 @router.get("/nodes/{slug}")

@@ -316,17 +316,17 @@
   async function searchKnowledge() {
     const q = $('knowledge-search-input')?.value.trim() || '';
     const nodeType = $('knowledge-type-filter')?.value || '';
-    const team = $('knowledge-team-filter')?.value || '';
+    const searchScope = $('knowledge-search-scope')?.value || 'title';
     const meta = $('knowledge-search-meta');
     const detail = $('knowledge-detail');
     if (!state.activeSlug && detail) {
       detail.className = 'knowledge-detail-empty';
       detail.innerHTML = '<i class="fa-solid fa-book-open"></i><h3>選擇一個條目</h3><p>搜尋後從結果中選擇角色、規則或文章。</p>';
     }
-    if (!q && !nodeType && !team) {
+    if (!q && !nodeType) {
       state.items = [];
       state.resultStatus = 'idle';
-      if (meta) meta.textContent = '輸入關鍵字，或選擇內容類型與角色分類。';
+      if (meta) meta.textContent = '輸入關鍵字，或選擇內容類型。';
       renderResults();
       return;
     }
@@ -335,24 +335,9 @@
     renderResults();
     if (meta) meta.textContent = '正在搜尋...';
     try {
-      let data;
-      if (team || nodeType === 'role') {
-        const params = new URLSearchParams({ q, team, limit: '500' });
-        const roles = await fetch(`${apiBase}/api/roles?${params.toString()}`, { cache: 'no-store' }).then(requireJson);
-        const items = (roles.items || []).filter((role) => role.knowledge_slug).map((role) => ({
-          slug: role.knowledge_slug,
-          node_type: 'role',
-          name: role.name_zh_tw,
-          name_en: role.name_en,
-          team: role.team,
-          image_url: role.image_url,
-        }));
-        data = { total: items.length, items };
-      } else {
-        const params = new URLSearchParams({ q, limit: '100' });
-        if (nodeType) params.set('node_type', nodeType);
-        data = await fetch(`${apiBase}/api/knowledge/search?${params.toString()}`, { cache: 'no-store' }).then(requireJson);
-      }
+      const params = new URLSearchParams({ q, search_scope: searchScope, limit: '100' });
+      if (nodeType) params.set('node_type', nodeType);
+      const data = await fetch(`${apiBase}/api/knowledge/search?${params.toString()}`, { cache: 'no-store' }).then(requireJson);
       const needsRoleImages = (data.items || []).some((item) => item.node_type === 'role' && !item.image_url);
       const roleCatalog = needsRoleImages ? await loadRoleCatalog().catch(() => new Map()) : new Map();
       data.items = (data.items || []).map((item) => {
@@ -362,7 +347,7 @@
       });
       state.items = sortedUniqueItems(data.items, q);
       state.resultStatus = 'ready';
-      const category = team ? teamLabel(team) : (nodeType ? typeLabel(nodeType) : '全部類型');
+      const category = nodeType ? typeLabel(nodeType) : '全部類型';
       if (meta) meta.textContent = q ? `找到 ${state.items.length} 筆與「${q}」相關的${category}條目` : `${category}共有 ${state.items.length} 筆可查詢條目`;
       renderResults();
     } catch (err) {
@@ -384,7 +369,7 @@
       const input = $('knowledge-search-input');
       if (input) input.value = link.dataset.quickSearch || '';
       if ($('knowledge-type-filter')) $('knowledge-type-filter').value = '';
-      if ($('knowledge-team-filter')) $('knowledge-team-filter').value = '';
+      if ($('knowledge-search-scope')) $('knowledge-search-scope').value = 'title';
       state.activeSlug = null;
       searchKnowledge();
     }));
@@ -412,14 +397,12 @@
   async function init() {
     bindQuickNavigation();
     $('knowledge-search-form')?.addEventListener('submit', (event) => { event.preventDefault(); state.activeSlug = null; searchKnowledge(); });
-    $('knowledge-type-filter')?.addEventListener('change', (event) => {
+    $('knowledge-type-filter')?.addEventListener('change', () => {
       state.activeSlug = null;
-      if (event.target.value && event.target.value !== 'role') $('knowledge-team-filter').value = '';
       searchKnowledge();
     });
-    $('knowledge-team-filter')?.addEventListener('change', (event) => {
+    $('knowledge-search-scope')?.addEventListener('change', () => {
       state.activeSlug = null;
-      if (event.target.value) $('knowledge-type-filter').value = 'role';
       searchKnowledge();
     });
     try {

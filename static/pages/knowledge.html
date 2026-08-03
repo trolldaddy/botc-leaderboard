@@ -14,7 +14,7 @@
   <section class="knowledge-quick-group">
     <div class="knowledge-quick-heading"><i class="fa-solid fa-masks-theater"></i><span>官方角色</span></div>
     <div class="knowledge-quick-links knowledge-quick-role-links">
-      <a href="#knowledge/鎮民" data-quick-knowledge="鎮民">鎮民</a><a href="#knowledge/外來者" data-quick-knowledge="外來者">外來者</a><a href="#knowledge/爪牙" data-quick-knowledge="爪牙">爪牙</a><a href="#knowledge/惡魔" data-quick-knowledge="惡魔">惡魔</a><a href="#knowledge/奇遇角色" data-quick-knowledge="奇遇角色">奇遇角色</a><a href="#knowledge/傳奇角色" data-quick-knowledge="傳奇角色">傳奇角色</a>
+      <a href="#knowledge/鎮民" data-quick-knowledge="鎮民">鎮民</a><a href="#knowledge/外來者" data-quick-knowledge="外來者">外來者</a><a href="#knowledge/爪牙" data-quick-knowledge="爪牙">爪牙</a><a href="#knowledge/惡魔" data-quick-knowledge="惡魔">惡魔</a><a href="#knowledge/旅行者" data-quick-knowledge="旅行者">旅行者</a><a href="#knowledge/奇遇角色" data-quick-knowledge="奇遇角色">奇遇角色</a><a href="#knowledge/傳奇角色" data-quick-knowledge="傳奇角色">傳奇角色</a>
     </div>
   </section>
   <section class="knowledge-quick-group">
@@ -36,15 +36,9 @@
     <select id="knowledge-type-filter" class="form-control dark-input" aria-label="內容類型">
       <option value="">全部類型</option>
     </select>
-    <select id="knowledge-team-filter" class="form-control dark-input" aria-label="角色分類">
-      <option value="">全部角色分類</option>
-      <option value="townsfolk">鎮民</option>
-      <option value="outsider">外來者</option>
-      <option value="minion">爪牙</option>
-      <option value="demon">惡魔</option>
-      <option value="traveller">旅行者</option>
-      <option value="fabled">傳奇角色</option>
-      <option value="loric">奇遇角色</option>
+    <select id="knowledge-search-scope" class="form-control dark-input" aria-label="搜尋範圍">
+      <option value="title">標題搜尋</option>
+      <option value="fulltext">全文搜尋</option>
     </select>
     <button class="btn btn-purple" type="submit">搜尋</button>
   </form>
@@ -91,7 +85,7 @@
   .knowledge-search-form select.dark-input{cursor:pointer}
   .knowledge-search-box{position:relative}
   .knowledge-search-box i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-muted)}
-  .knowledge-search-box input{padding-left:2.8rem!important}
+  .knowledge-search-form .knowledge-search-box input{padding-left:3.25rem!important}
   .knowledge-search-meta{margin-top:.75rem;color:var(--text-muted);font-size:.9rem}
   .knowledge-layout{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:1.25rem;align-items:start}
   .knowledge-results{display:flex;flex-direction:column;gap:.55rem;max-height:calc(100vh - 300px);overflow:auto;padding-right:.25rem}
@@ -169,4 +163,4 @@
 
 <link rel="stylesheet" href="/css/knowledge-role-preview.css?v=20260803m">
 <script src="/js/knowledge-role-preview.js?v=20260804a"></script>
-<script src="/js/knowledge.js?v=20260804c"></script>
+<script src="/js/knowledge.js?v=20260804d"></script>
