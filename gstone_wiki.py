@@ -21,6 +21,10 @@ CURATED_READING_TITLES = (
     "有关说书人的创造力--有趣的巫师",
     "钟楼笔记：相克更新",
 )
+OFFICIAL_SCRIPT_TITLES = (
+    "暗流涌动", "黯月初升", "梦殒春宵",
+    "实验性角色", "华灯初上", "山雨欲来",
+)
 EXCLUDED_KNOWLEDGE_TITLES = {"第一屆華燈初上劇本創作大賽"}
 EXCLUDED_KNOWLEDGE_TITLES.update({
     "劇本", "剧本", "山雨欲來", "山雨欲来", "暗流湧動", "暗流涌动",
@@ -72,7 +76,11 @@ def to_simplified(value: Any) -> str:
 
 def is_excluded_knowledge_title(title: str) -> bool:
     normalized = to_traditional(title)
-    if normalized in {to_traditional(value) for value in CURATED_READING_TITLES}:
+    preserved_titles = {
+        to_traditional(value)
+        for value in (*CURATED_READING_TITLES, *OFFICIAL_SCRIPT_TITLES)
+    }
+    if normalized in preserved_titles:
         return False
     excluded_titles = {to_traditional(value) for value in EXCLUDED_KNOWLEDGE_TITLES}
     return normalized in excluded_titles or any(
@@ -82,7 +90,10 @@ def is_excluded_knowledge_title(title: str) -> bool:
 
 def is_excluded_knowledge_page(title: str, page_type: str = "") -> bool:
     normalized = to_traditional(title)
-    if normalized in PRESERVED_ROLE_GROUP_TITLES:
+    preserved_titles = PRESERVED_ROLE_GROUP_TITLES | {
+        to_traditional(value) for value in OFFICIAL_SCRIPT_TITLES
+    }
+    if normalized in preserved_titles:
         return False
     return clean_text(page_type).lower() == "script" or is_excluded_knowledge_title(title)
 

@@ -377,7 +377,7 @@
     document.querySelectorAll('[data-quick-knowledge]').forEach((link) => link.addEventListener('click', (event) => {
       event.preventDefault();
       state.activeSlug = null;
-      loadNode(link.dataset.quickKnowledge, { focusDetail: true });
+      resolveQuickKnowledge(link.dataset.quickKnowledge, link);
     }));
     document.querySelectorAll('[data-quick-search]').forEach((link) => link.addEventListener('click', (event) => {
       event.preventDefault();
@@ -388,6 +388,26 @@
       state.activeSlug = null;
       searchKnowledge();
     }));
+  }
+
+  async function resolveQuickKnowledge(title, link) {
+    if (!title || link?.dataset.quickLoading === 'true') return;
+    if (link) link.dataset.quickLoading = 'true';
+    try {
+      const params = new URLSearchParams({ q: title, limit: '20' });
+      const data = await fetch(`${apiBase}/api/knowledge/search?${params.toString()}`, { cache: 'no-store' }).then(requireJson);
+      const normalize = (value) => String(value || '').normalize('NFKC').replace(/[\\s\\p{P}\\p{S}]/gu, '').toLowerCase();
+      const wanted = normalize(title);
+      const items = data.items || [];
+      const node = items.find((item) => normalize(item.name) === wanted)
+        || items.find((item) => normalize(item.name).includes(wanted) || wanted.includes(normalize(item.name)))
+        || items[0];
+      await loadNode(node?.slug || title, { focusDetail: true });
+    } catch (error) {
+      await loadNode(title, { focusDetail: true });
+    } finally {
+      if (link) delete link.dataset.quickLoading;
+    }
   }
   async function init() {
     bindQuickNavigation();

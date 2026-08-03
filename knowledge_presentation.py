@@ -83,6 +83,8 @@ def classify_knowledge_node(node) -> PresentationClassification:
     node_type = (node.node_type or "").strip().lower()
     status = (node.status or "").strip().lower()
 
+    if name in SCRIPT_GUIDE_TITLES:
+        return _result("script_guide", "exact_official_script_title", 1.0, "官方劇本或官方角色集")
     if status in HIDDEN_STATUSES or node_type == "script" or is_excluded_knowledge_title(name):
         return _result("excluded", "status_or_exclusion_rule", 1.0, "節點已停用或屬明確排除內容")
     if name in GLOSSARY_TITLES:
