@@ -1,6 +1,8 @@
 (() => {
-  const editor = document.getElementById('role-admin-editor');
-  if (!editor) return;
+  const roleEditor = document.getElementById('role-admin-editor');
+  const articleEditor = document.getElementById('knowledge-article-admin');
+  const editors = [roleEditor, articleEditor].filter(Boolean);
+  if (!editors.length) return;
 
   const toolbar = document.createElement('div');
   toolbar.className = 'role-rich-toolbar';
@@ -93,8 +95,10 @@
     visual.addEventListener('keyup',saveRange);visual.addEventListener('mouseup',saveRange);
     visual.addEventListener('paste',(event)=>{event.preventDefault();document.execCommand('insertText',false,event.clipboardData.getData('text/plain'));});
   };
-  const enhanceAll = (root=editor) => root.querySelectorAll('textarea').forEach(enhance);
-  enhanceAll(); new MutationObserver((records)=>records.forEach((record)=>record.addedNodes.forEach((node)=>{if(node.nodeType===1){if(node.matches?.('textarea'))enhance(node);enhanceAll(node);}}))).observe(editor,{childList:true,subtree:true});
+  const shouldEnhance = (textarea) => Boolean(roleEditor?.contains(textarea) || textarea.matches('[data-rich-text]'));
+  const enhanceAll = (root) => root.querySelectorAll('textarea').forEach((textarea) => { if (shouldEnhance(textarea)) enhance(textarea); });
+  const observer = new MutationObserver((records)=>records.forEach((record)=>record.addedNodes.forEach((node)=>{if(node.nodeType===1){if(node.matches?.('textarea') && shouldEnhance(node))enhance(node);enhanceAll(node);}})));
+  editors.forEach((root) => { enhanceAll(root); observer.observe(root,{childList:true,subtree:true}); });
 
   const saveRange = () => {const selection=getSelection();if(active&&selection?.rangeCount&&active.contains(selection.anchorNode))savedRange=selection.getRangeAt(0).cloneRange();};
   const restoreRange = () => {active?.focus();if(savedRange&&active.contains(savedRange.commonAncestorContainer)){const selection=getSelection();selection.removeAllRanges();selection.addRange(savedRange);}};
@@ -106,5 +110,5 @@
   toolbar.addEventListener('pointerdown',(event)=>{if(!event.target.matches('select'))event.preventDefault();saveRange();});
   toolbar.addEventListener('click',(event)=>{const button=event.target.closest('button');if(!button||!active)return;if(button.dataset.richTag==='b')command('bold');else if(button.dataset.richTag==='i')command('italic');else if(button.dataset.richList)command(button.dataset.richList==='ol'?'insertOrderedList':'insertUnorderedList');else if(button.hasAttribute('data-rich-quote'))command('formatBlock','blockquote');else if(button.hasAttribute('data-rich-link')){const url=prompt('請輸入 https:// 開頭的網址','https://');if(url&&/^https?:\/\//i.test(url))command('createLink',url);}else if(button.hasAttribute('data-rich-clear'))command('removeFormat');else if(button.hasAttribute('data-rich-undo'))undo();else if(button.hasAttribute('data-rich-redo'))redo();});
   toolbar.querySelector('[data-rich-size]').addEventListener('change',(event)=>{if(event.target.value)wrapSelection('span',{class:`rich-size-${event.target.value}`,richSize:event.target.value});event.target.value='';});
-  document.addEventListener('pointerdown',(event)=>{if(!toolbar.contains(event.target)&&!editor.contains(event.target))toolbar.classList.remove('is-visible');});addEventListener('resize',position);addEventListener('scroll',position,true);
+  document.addEventListener('pointerdown',(event)=>{if(!toolbar.contains(event.target)&&!editors.some((root)=>root.contains(event.target)))toolbar.classList.remove('is-visible');});addEventListener('resize',position);addEventListener('scroll',position,true);
 })();
