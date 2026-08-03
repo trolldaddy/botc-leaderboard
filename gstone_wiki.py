@@ -9,6 +9,18 @@ from bs4 import BeautifulSoup, Tag
 from opencc import OpenCC
 
 BASE_URL = "https://clocktower-wiki.gstonegames.com"
+CURATED_READING_TITLES = (
+    "“规则”与“理念”——关于角色能力互动的说明",
+    "设计师的平衡天书",
+    "创作幕后——超越暗流涌动",
+    "成为一个好说书人的经历",
+    "创作幕后——逻辑一片混乱？",
+    "染·钟楼谜团是一款策略游戏",
+    "设计师总结的国内玩家对染的错误理解",
+    "疯狂规则如何运作？——疯狂的小精灵",
+    "有关说书人的创造力--有趣的巫师",
+    "钟楼笔记：相克更新",
+)
 EXCLUDED_KNOWLEDGE_TITLES = {"第一屆華燈初上劇本創作大賽"}
 EXCLUDED_KNOWLEDGE_TITLES.update({
     "劇本", "剧本", "山雨欲來", "山雨欲来", "暗流湧動", "暗流涌动",
@@ -60,6 +72,8 @@ def to_simplified(value: Any) -> str:
 
 def is_excluded_knowledge_title(title: str) -> bool:
     normalized = to_traditional(title)
+    if normalized in {to_traditional(value) for value in CURATED_READING_TITLES}:
+        return False
     excluded_titles = {to_traditional(value) for value in EXCLUDED_KNOWLEDGE_TITLES}
     return normalized in excluded_titles or any(
         re.search(pattern, normalized) for pattern in EXCLUDED_KNOWLEDGE_TITLE_PATTERNS

@@ -20,7 +20,7 @@ if str(REPO_ROOT) not in sys.path:
 
 import models  # noqa: F401  registers all SQLAlchemy models
 from database import Base, SessionLocal, engine
-from gstone_wiki import BASE_URL, is_excluded_knowledge_page, is_excluded_knowledge_title, to_traditional
+from gstone_wiki import BASE_URL, CURATED_READING_TITLES, is_excluded_knowledge_page, is_excluded_knowledge_title, to_traditional
 from knowledge_models import (
     CrawlLink,
     CrawlPage,
@@ -215,7 +215,9 @@ def import_report(report: dict, write: bool):
 
             title_tw = to_traditional(title)
             node_type = TYPE_MAP.get(page.get("page_type"), "article")
-            if title_tw in {to_traditional(value) for value in ROLE_GROUP_TITLES}:
+            if title_tw in {to_traditional(value) for value in CURATED_READING_TITLES}:
+                node_type = "guide"
+            elif title_tw in {to_traditional(value) for value in ROLE_GROUP_TITLES}:
                 node_type = "article"
             node = find_existing_node(db, title, title_tw)
             if not node:
@@ -233,6 +235,8 @@ def import_report(report: dict, write: bool):
                 stats["nodes_created"] += 1
             else:
                 stats["nodes_reused"] += 1
+            if title_tw in {to_traditional(value) for value in CURATED_READING_TITLES}:
+                node.node_type = "guide"
             nodes_by_title[title] = node
             nodes_by_title[title_tw] = node
 

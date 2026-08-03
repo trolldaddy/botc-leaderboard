@@ -26,22 +26,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from gstone_wiki import BASE_URL, HEADERS, article_url, is_excluded_knowledge_page, is_excluded_knowledge_title, parse_reminders, to_traditional
+from gstone_wiki import BASE_URL, CURATED_READING_TITLES, HEADERS, article_url, is_excluded_knowledge_page, is_excluded_knowledge_title, parse_reminders, to_traditional
 from gstone_wiki import parse_role_information
 
 ROLE_COVERAGE_SEEDS = ["钟表匠", "镜像双子", "理发师", "卡扎力", "炼金术士", "狸猫", "传奇角色", "奇遇角色", "末日预言者"]
-CURATED_READING_SEEDS = [
-    "“规则”与“理念”——关于角色能力互动的说明",
-    "设计师的平衡天书",
-    "创作幕后——超越暗流涌动",
-    "成为一个好说书人的经历",
-    "创作幕后——逻辑一片混乱？",
-    "染·钟楼谜团是一款策略游戏",
-    "设计师总结的国内玩家对染的错误理解",
-    "疯狂规则如何运作？——疯狂的小精灵",
-    "有关说书人的创造力--有趣的巫师",
-    "钟楼笔记：相克更新",
-]
+CURATED_READING_SEEDS = list(CURATED_READING_TITLES)
 DEFAULT_SEEDS = [
     "首頁", "首页", "角色", "剧本", "規則", "规则", "相克規則", "相克规则",
     *ROLE_COVERAGE_SEEDS, *CURATED_READING_SEEDS,
@@ -184,6 +173,9 @@ def classify_page(
         return "category", ["title_namespace"]
     # Faction overview pages list many roles and repeat role metadata. They are
     # navigation/group pages, never profiles for one role.
+    if title_t in {to_traditional(value) for value in CURATED_READING_TITLES}:
+        return "guide", ["curated_reading_title"]
+
     if title_t in {to_traditional(value) for value in ROLE_GROUP_TITLES}:
         return "article", ["role_group_overview"]
 
