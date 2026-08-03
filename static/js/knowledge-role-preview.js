@@ -146,14 +146,16 @@
         textNode.replaceWith(fragment);
       });
     });
-    enhanceRoleListBlocks(root);
+    const currentName = String(currentNode.name || currentNode.slug || '').trim();
+    const forceRoleCards = currentNode.presentation_type === 'role_group' || roleListHeadings.has(currentName);
+    enhanceRoleListBlocks(root, forceRoleCards);
   }
   const roleListHeadings = new Set(['鎮民', '镇民', '外來者', '外来者', '爪牙', '惡魔', '恶魔', '旅行者', '傳奇角色', '传奇角色', '傳奇', '奇遇角色', '奇遇']);
-  function enhanceRoleListBlocks(root) {
+  function enhanceRoleListBlocks(root, forceRoleCards = false) {
     root.querySelectorAll('.knowledge-block').forEach((block) => {
       const heading = block.querySelector('.knowledge-block-heading strong');
       const body = block.querySelector('.knowledge-block-body');
-      if (!heading || !body || !roleListHeadings.has(String(heading.textContent || '').trim())) return;
+      if (!heading || !body || (!forceRoleCards && !roleListHeadings.has(String(heading.textContent || '').trim()))) return;
       const buttons = [...body.querySelectorAll('.role-mention-chip[data-role-target]')];
       if (!buttons.length) return;
       body.classList.add('role-mention-card-grid');

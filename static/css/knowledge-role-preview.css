@@ -7,17 +7,17 @@
 /* Wiki role-list cards */
 .knowledge-block-body.role-mention-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: .55rem;
 }
 .knowledge-block-body.role-mention-card-grid > p { display: contents; }
 .role-mention-card-grid .role-mention-list-card {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
+  grid-template-columns: 44px minmax(0, 1fr);
   align-items: center;
   gap: .55rem;
   width: 100%;
-  min-height: 58px;
+  min-height: 70px;
   margin: 0;
   padding: .55rem .65rem;
   border-radius: 12px;
@@ -26,9 +26,9 @@
   white-space: normal;
 }
 .role-mention-card-grid .role-mention-list-icon {
-  width: 34px !important;
-  height: 34px !important;
-  max-width: 34px !important;
+  width: 44px !important;
+  height: 44px !important;
+  max-width: 44px !important;
   object-fit: contain;
   border-radius: 50%;
   background: rgba(255, 255, 255, .08);
@@ -51,3 +51,6 @@
   color: var(--text-muted);
   font-size: .68rem;
 }
+@media(max-width:1400px){.knowledge-block-body.role-mention-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:900px){.knowledge-block-body.role-mention-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.knowledge-block-body.role-mention-card-grid{grid-template-columns:1fr}}
