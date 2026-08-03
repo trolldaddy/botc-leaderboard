@@ -28,6 +28,14 @@ def test_public_search_keeps_only_official_scripts_and_role_groups():
             KnowledgeNode(node_type="mechanic", slug="voting", canonical_name_zh_tw="投票"),
         ])
         db.commit()
+        db.query(KnowledgeNode).update({"visibility": "public"})
+        db.add(KnowledgeNode(
+            node_type="mechanic",
+            slug="private-mechanic",
+            canonical_name_zh_tw="private mechanic",
+            visibility="internal",
+        ))
+        db.commit()
 
         result = search_knowledge(q="", node_type="", limit=100, offset=0, db=db)
 
@@ -46,6 +54,7 @@ def test_public_types_fold_role_groups_into_mechanics():
             KnowledgeNode(node_type="mechanic", slug="voting", canonical_name_zh_tw="投票"),
         ])
         db.commit()
+        db.query(KnowledgeNode).update({"visibility": "public"})
 
         result = list_types(db=db)
 

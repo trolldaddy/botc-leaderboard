@@ -13,6 +13,7 @@ from knowledge_models import (
     KnowledgeSource,
     KnowledgeSourceRecord,
 )
+from knowledge_visibility import PUBLIC_VISIBILITIES
 
 router = APIRouter(prefix="/api/knowledge", tags=["knowledge-public"])
 
@@ -24,6 +25,7 @@ PUBLIC_OFFICIAL_SCRIPT_NAMES = {"暗流湧動", "黯月初升", "夢殞春宵", 
 
 def _node_query(db: Session):
     return db.query(KnowledgeNode).filter(
+        KnowledgeNode.visibility.in_(PUBLIC_VISIBILITIES),
         KnowledgeNode.node_type.in_(PUBLIC_NODE_TYPES),
         or_(
             KnowledgeNode.node_type != "script",
