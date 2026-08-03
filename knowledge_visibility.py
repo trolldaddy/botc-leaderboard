@@ -12,6 +12,10 @@ PUBLIC_OFFICIAL_SCRIPT_NAMES = {
     "山雨欲來", "山雨欲来",
 }
 
+PUBLIC_PRESENTATION_TYPES = {
+    "role_profile", "mechanic", "glossary", "night_order", "taxonomy", "reference_table",
+    "rules_hub", "role_group", "script_guide", "guide", "index",
+}
 
 def node_display_name(node) -> str:
     return (node.canonical_name_zh_tw or node.canonical_name_zh_cn or node.slug or "").strip()
@@ -31,6 +35,8 @@ def recommended_node_visibility(node) -> str:
             return "public"
         return "internal"
     if presentation_type == "excluded":
+        return "internal"
+    if presentation_type not in PUBLIC_PRESENTATION_TYPES:
         return "internal"
     return "public"
 

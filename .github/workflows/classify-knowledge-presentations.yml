@@ -43,3 +43,15 @@ jobs:
           else
             python scripts/classify_knowledge_presentations.py
           fi
+
+      - name: Classify public and internal visibility
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.mode }}" = "write" ]; then
+            python scripts/classify_knowledge_visibility.py --write
+          else
+            python scripts/classify_knowledge_visibility.py
+          fi

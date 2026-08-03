@@ -30,6 +30,11 @@ def test_only_allowlisted_scripts_are_public():
     assert recommended_node_visibility(node("社群活動劇本", "script", "excluded")) == "internal"
 
 
+def test_uncertain_standard_articles_wait_for_review():
+    assert recommended_node_visibility(node("unclassified")) == "internal"
+    assert recommended_node_visibility(node("rules", presentation_type="rules_hub")) == "public"
+
+
 def test_hidden_and_excluded_articles_stay_internal():
     assert recommended_node_visibility(node("認證公示", presentation_type="excluded")) == "internal"
     assert recommended_node_visibility(node("舊文章", status="disabled")) == "internal"
