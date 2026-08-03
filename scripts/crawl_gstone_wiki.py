@@ -46,6 +46,7 @@ ROLE_GROUP_TITLES = ROLE_FACTIONS | {"\u5be6\u9a57\u6027\u89d2\u8272", "\u5b9e\u
 ROLE_CATEGORY_TITLES = {to_traditional(value) for value in ROLE_FACTIONS}
 
 SCRIPT_HEADINGS = {"角色列表", "角色清單", "剧本信息", "劇本資訊", "配置", "角色配置"}
+SCRIPT_FACTION_HEADINGS = {"鎮民", "外來者", "爪牙", "惡魔"}
 
 
 @dataclass
@@ -175,6 +176,10 @@ def classify_page(
     valid_role_types = {to_traditional(value) for value in ROLE_FACTIONS}
     if (role_information or {}).get("found") and role_type in valid_role_types:
         return "role", [f"wiki_role_type:{role_type}"]
+
+    script_faction_hits = sorted({item for item in heading_values if item in SCRIPT_FACTION_HEADINGS})
+    if len(script_faction_hits) >= 3:
+        return "script", [f"script_faction_headings:{','.join(script_faction_hits)}"]
 
     script_heading_hits = sorted({item for item in heading_values if item in {to_traditional(x) for x in SCRIPT_HEADINGS}})
     if script_heading_hits and any(word in haystack for word in ("劇本", "剧本", "暗流湧動", "黯月初升", "紫羅蘭教派")):

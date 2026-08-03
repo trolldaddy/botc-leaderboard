@@ -5,13 +5,13 @@ from crawl_gstone_wiki import classify_page
 from import_gstone_graph import page_fetch_failed, validate_report_source
 
 
-def classify(title, categories, html, role_type="", found=False):
+def classify(title, categories, html, role_type="", found=False, headings=None):
     soup = BeautifulSoup(
         f'<div id="mw-content-text"><div class="mw-parser-output">{html}</div></div>',
         "html.parser",
     )
     role_information = {"found": found, "role_type": role_type}
-    return classify_page(title, categories, [], soup, role_information)
+    return classify_page(title, categories, headings or [], soup, role_information)
 
 
 def main():
@@ -75,6 +75,18 @@ def main():
     assert not is_excluded_knowledge_title("中毒")
     assert not is_excluded_knowledge_page("旅行者", "script")
     assert not is_excluded_knowledge_page("傳奇角色", "script")
+    assert is_excluded_knowledge_title("新角色公佈計劃")
+    assert is_excluded_knowledge_title("一限生機")
+    assert is_excluded_knowledge_title("上帝缺席")
+    assert is_excluded_knowledge_title("各憑本事·改")
+    assert is_excluded_knowledge_title("先禮後兵·改")
+
+    page_type, reasons = classify(
+        "未來主題劇本", [], "<p>角色配置</p>", headings=["鎮民", "外來者", "爪牙", "惡魔"]
+    )
+    assert page_type == "script"
+    assert reasons == ["script_faction_headings:外來者,惡魔,爪牙,鎮民"]
+
 
 
     assert page_fetch_failed({"status": 404, "error": "HTTP 404"})

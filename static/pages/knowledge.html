@@ -52,6 +52,16 @@
   .knowledge-header p{color:var(--text-muted);margin:0;line-height:1.6}
   .knowledge-search-card{margin-bottom:1.25rem}
   .knowledge-search-form{display:grid;grid-template-columns:minmax(0,1fr) 160px 160px auto;gap:.75rem;align-items:center}
+  .knowledge-search-form .dark-input{width:100%;min-height:42px;padding:.72rem .85rem!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:8px;background:#14131b!important;color:#f7f4ff!important;color-scheme:dark;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+  .knowledge-search-form .dark-input::placeholder{color:#9a96a8!important;opacity:1}
+  .knowledge-search-form select.dark-input option{background:#14131b;color:#f7f4ff}
+  .knowledge-search-form .dark-input:hover{border-color:rgba(255,183,3,.45)!important}
+  .knowledge-search-form .dark-input:focus{outline:2px solid transparent!important;border-color:var(--accent-gold)!important;box-shadow:0 0 0 3px rgba(255,183,3,.18)!important}
+  .knowledge-search-form .btn-purple{min-height:42px;border:1px solid #ffca3a;background:var(--accent-gold);color:#18120a!important;font-weight:900;white-space:nowrap}
+  .knowledge-search-form .btn-purple:hover{background:#ffc533;transform:translateY(-1px)}
+  .knowledge-search-form .btn-purple:active{transform:translateY(1px)}
+  .knowledge-search-form .btn-purple:focus-visible{outline:3px solid rgba(255,183,3,.35);outline-offset:2px}
+  .knowledge-search-form select.dark-input{cursor:pointer}
   .knowledge-search-box{position:relative}
   .knowledge-search-box i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:var(--text-muted)}
   .knowledge-search-box input{padding-left:2.8rem!important}
