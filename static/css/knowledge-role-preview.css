@@ -46,11 +46,17 @@
 .role-mention-list-copy strong {
   overflow-wrap: anywhere;
   color: #fff;
+  font-size: 1.02rem;
+  line-height: 1.25;
 }
 .role-mention-list-copy small {
   color: var(--text-muted);
-  font-size: .68rem;
+  font-size: .82rem;
+  line-height: 1.25;
 }
 @media(max-width:1400px){.knowledge-block-body.role-mention-card-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:900px){.knowledge-block-body.role-mention-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.knowledge-block-body.role-mention-card-grid{grid-template-columns:1fr}}
+
+.role-mention-card-block .knowledge-block-heading strong{font-size:1.25rem;line-height:1.3}
+.role-mention-card-block .knowledge-block-heading span{font-size:.82rem}

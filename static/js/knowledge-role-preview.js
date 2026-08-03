@@ -158,6 +158,7 @@
       if (!heading || !body || (!forceRoleCards && !roleListHeadings.has(String(heading.textContent || '').trim()))) return;
       const buttons = [...body.querySelectorAll('.role-mention-chip[data-role-target]')];
       if (!buttons.length) return;
+      block.classList.add('role-mention-card-block');
       body.classList.add('role-mention-card-grid');
       buttons.forEach((button) => {
         button.classList.remove('role-mention-inline');
