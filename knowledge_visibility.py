@@ -17,6 +17,11 @@ PUBLIC_PRESENTATION_TYPES = {
     "rules_hub", "role_group", "script_guide", "guide", "index",
 }
 INTERNAL_NODE_NAMES = {"首頁", "首页"}
+PUBLIC_RULE_NAMES = {
+    "規則概要", "重要細節", "術語彙總", "給說書人的建議", "規則解釋", "相剋規則",
+    "哪些是“可以但不建議”", "哪些是“可以但不建议”", "夜晚行動順序一覽",
+    "鐘樓謎團隱性規則彙總", "規則調整提前公示", "规则调整提前公示",
+}
 
 def node_display_name(node) -> str:
     return (node.canonical_name_zh_tw or node.canonical_name_zh_cn or node.slug or "").strip()
@@ -33,6 +38,8 @@ def recommended_node_visibility(node) -> str:
 
     if status in HIDDEN_STATUSES or node_type not in PUBLIC_NODE_TYPES:
         return "internal"
+    if name in PUBLIC_RULE_NAMES:
+        return "public"
     if name in PUBLIC_OFFICIAL_SCRIPT_NAMES:
         return "public"
     if node_type == "script":
