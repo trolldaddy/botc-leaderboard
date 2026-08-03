@@ -21,10 +21,10 @@
     <div class="knowledge-quick-heading"><i class="fa-solid fa-scroll"></i><span>官方劇本</span></div>
     <div class="knowledge-quick-links"><a href="#knowledge/暗流湧動" data-quick-knowledge="暗流湧動">暗流湧動</a><a href="#knowledge/黯月初升" data-quick-knowledge="黯月初升">黯月初升</a><a href="#knowledge/夢殞春宵" data-quick-knowledge="夢殞春宵">夢殞春宵</a><a href="#knowledge/實驗性角色" data-quick-knowledge="實驗性角色">實驗性角色</a><a href="#knowledge/華燈初上" data-quick-knowledge="華燈初上">華燈初上</a><a href="#knowledge/山雨欲來" data-quick-knowledge="山雨欲來">山雨欲來</a></div>
   </section>
-  <details class="knowledge-quick-group knowledge-quick-reading">
-    <summary class="knowledge-quick-heading"><i class="fa-solid fa-compass"></i><span>拓展閱讀</span><i class="fa-solid fa-chevron-down"></i></summary>
+  <section class="knowledge-quick-group knowledge-quick-reading">
+    <div class="knowledge-quick-heading"><i class="fa-solid fa-compass"></i><span>拓展閱讀</span></div>
     <div class="knowledge-quick-links"><a href="#knowledge/“規則”與“理念”——關於角色能力互動的說明" data-quick-knowledge="“規則”與“理念”——關於角色能力互動的說明">“規則”與“理念”——關於角色能力互動的說明</a><a href="#knowledge/設計師的平衡天書" data-quick-knowledge="設計師的平衡天書">設計師的平衡天書</a><a href="#knowledge/創作幕後——超越暗流湧動" data-quick-knowledge="創作幕後——超越暗流湧動">創作幕後——超越暗流湧動</a><a href="#knowledge/成為一個好說書人的經歷" data-quick-knowledge="成為一個好說書人的經歷">成為一個好說書人的經歷</a><a href="#knowledge/創作幕後——邏輯一片混亂？" data-quick-knowledge="創作幕後——邏輯一片混亂？">創作幕後——邏輯一片混亂？</a><a href="#knowledge/染·鐘樓謎團是一款策略遊戲" data-quick-knowledge="染·鐘樓謎團是一款策略遊戲">染·鐘樓謎團是一款策略遊戲</a><a href="#knowledge/設計師總結的國內玩家對染的錯誤理解" data-quick-knowledge="設計師總結的國內玩家對染的錯誤理解">設計師總結的國內玩家對染的錯誤理解</a><a href="#knowledge/瘋狂規則如何運作？——瘋狂的小精靈" data-quick-knowledge="瘋狂規則如何運作？——瘋狂的小精靈">瘋狂規則如何運作？——瘋狂的小精靈</a><a href="#knowledge/有關說書人的創造力--有趣的巫師" data-quick-knowledge="有關說書人的創造力--有趣的巫師">有關說書人的創造力--有趣的巫師</a><a href="#knowledge/鐘樓筆記：相剋更新" data-quick-knowledge="鐘樓筆記：相剋更新">鐘樓筆記：相剋更新</a></div>
-  </details>
+  </section>
 </nav>
 
 <section class="card knowledge-search-card">
@@ -76,7 +76,7 @@
   .knowledge-quick-group:last-child{border-bottom:0}
   .knowledge-quick-heading{display:flex;align-items:center;gap:.55rem;color:#fff;font-size:.94rem;font-weight:900;line-height:1.5;list-style:none;cursor:default}
   .knowledge-quick-heading::-webkit-details-marker{display:none}.knowledge-quick-heading>i:first-child{width:1.2rem;color:var(--accent-gold);text-align:center}.knowledge-quick-heading .fa-chevron-down{display:none;margin-left:auto;color:var(--text-muted);font-size:.72rem}
-  .knowledge-quick-links{display:flex;flex-wrap:wrap;gap:.4rem .5rem}.knowledge-quick-links a{display:inline-flex;align-items:center;min-height:32px;padding:.36rem .65rem;border:1px solid rgba(167,139,250,.24);border-radius:8px;background:rgba(124,58,237,.1);color:#e9e2ff;font-size:.86rem;font-weight:800;text-decoration:none;transition:border-color .15s ease,background .15s ease,transform .15s ease}.knowledge-quick-links a:hover,.knowledge-quick-links a:focus-visible{border-color:rgba(255,183,3,.55);background:rgba(255,183,3,.1);color:#fff;outline:0}.knowledge-quick-links a:active{transform:translateY(1px)}.knowledge-quick-reading .knowledge-quick-links a{max-width:280px;white-space:normal;line-height:1.35;text-align:left}
+  .knowledge-quick-links{display:flex;flex-wrap:wrap;gap:.4rem .5rem}.knowledge-quick-links a{display:inline-flex;align-items:center;min-height:32px;padding:.36rem .65rem;border:1px solid rgba(167,139,250,.24);border-radius:8px;background:rgba(124,58,237,.1);color:#e9e2ff;font-size:.86rem;font-weight:800;text-decoration:none;white-space:nowrap;transition:border-color .15s ease,background .15s ease,transform .15s ease}.knowledge-quick-links a:hover,.knowledge-quick-links a:focus-visible{border-color:rgba(255,183,3,.55);background:rgba(255,183,3,.1);color:#fff;outline:0}.knowledge-quick-links a:active{transform:translateY(1px)}
   .knowledge-search-card{margin-bottom:1.25rem}
   .knowledge-search-form{display:grid;grid-template-columns:minmax(0,1fr) 160px 160px auto;gap:.75rem;align-items:center}
   .knowledge-search-form .dark-input{width:100%;min-height:42px;padding:.72rem .85rem!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:8px;background:#14131b!important;color:#f7f4ff!important;color-scheme:dark;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
@@ -158,7 +158,7 @@
   .knowledge-relation-group-head h4 span{display:inline-flex;min-width:1.6rem;justify-content:center;margin-left:.3rem;padding:.1rem .35rem;border-radius:999px;background:rgba(255,255,255,.08);color:var(--text-muted);font-size:.7rem}
   .knowledge-relation-toggle{border:0;background:transparent;color:var(--accent-gold);cursor:pointer;font-size:.76rem;padding:.2rem}
   .knowledge-relation-toggle:hover{text-decoration:underline}
-  @media(max-width:900px){.knowledge-quick-group{grid-template-columns:1fr}.knowledge-quick-heading{cursor:pointer}.knowledge-quick-reading:not([open]) .knowledge-quick-links{display:none}.knowledge-quick-heading .fa-chevron-down{display:block}.knowledge-quick-reading[open] .fa-chevron-down{transform:rotate(180deg)}.knowledge-search-form,.knowledge-layout{grid-template-columns:1fr}.knowledge-results{max-height:none}.knowledge-detail-card{min-height:320px}}
+  @media(max-width:900px){.knowledge-quick-group{grid-template-columns:1fr}.knowledge-quick-heading{cursor:default}.knowledge-search-form,.knowledge-layout{grid-template-columns:1fr}.knowledge-results{max-height:none}.knowledge-detail-card{min-height:320px}}
   @media(max-width:640px){.knowledge-search-card,.knowledge-results-card,.knowledge-detail-card{padding:1rem}.knowledge-search-form .btn{width:100%;justify-content:center}.knowledge-detail-title{grid-template-columns:1fr}.knowledge-relation-group-head{align-items:flex-start}.knowledge-relations{gap:.4rem}.knowledge-relation{font-size:.78rem}.knowledge-block-body{font-size:.98rem;line-height:1.8}.knowledge-source-toggle{align-items:flex-start}.knowledge-table{min-width:460px}}
   .knowledge-night-order-row{display:grid;grid-template-columns:220px minmax(0,1fr);align-items:center;gap:1rem;padding:.7rem 0;border-bottom:1px solid rgba(255,255,255,.06)}
   .role-night-order-card{display:grid;grid-template-columns:76px max-content;align-items:center;gap:.65rem;width:100%;padding:.55rem .7rem;border-radius:14px;text-align:left;white-space:nowrap}
