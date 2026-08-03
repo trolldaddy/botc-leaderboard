@@ -11,7 +11,7 @@
   toolbar.innerHTML = `
     <select data-rich-size title="文字尺寸"><option value="">文字大小</option><option value="sm">小</option><option value="md">一般</option><option value="lg">大</option><option value="xl">標題</option></select>
     <button type="button" data-rich-tag="b" title="粗體"><b>B</b></button><button type="button" data-rich-tag="i" title="斜體"><i>I</i></button>
-    <span class="role-rich-separator"></span><button type="button" data-rich-list="ul" title="項目清單">•</button><button type="button" data-rich-list="ol" title="編號清單">1.</button><button type="button" data-rich-quote title="引用">❝</button><button type="button" data-rich-link title="插入連結">🔗</button><button type="button" data-rich-clear title="清除格式">Tx</button>
+    <span class="role-rich-separator"></span><button type="button" data-rich-list="ul" title="項目清單">•</button><button type="button" data-rich-list="ol" title="編號清單">1.</button><button type="button" data-rich-quote title="引用">❝</button><button type="button" data-rich-link title="插入外部連結">🔗</button><button type="button" data-rich-knowledge title="插入知識文章連結">知識</button><button type="button" data-rich-clear title="清除格式">Tx</button>
     <span class="role-rich-separator"></span><button type="button" data-rich-undo title="復原">↶</button><button type="button" data-rich-redo title="重做">↷</button>`;
   document.body.appendChild(toolbar);
 
@@ -32,6 +32,7 @@
   const esc = (value) => String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const inlineHtml = (value) => esc(value)
     .replace(/\[size=(sm|md|lg|xl)\]([\s\S]*?)\[\/size\]/gi,'<span class="rich-size-$1" data-rich-size="$1">$2</span>')
+    .replace(/\[knowledge=([^\]]+)\]([\s\S]*?)\[\/knowledge\]/gi,'<a href="#knowledge/$1" data-rich-knowledge="$1">$2</a>')
     .replace(/\[b\]([\s\S]*?)\[\/b\]/gi,'<strong>$1</strong>')
     .replace(/\[i\]([\s\S]*?)\[\/i\]/gi,'<em>$1</em>')
     .replace(/\[url=(https?:\/\/[^\]\s]+)\]([\s\S]*?)\[\/url\]/gi,'<a href="$1" target="_blank" rel="noopener">$2</a>')
@@ -52,6 +53,7 @@
     if (tag === 'strong' || tag === 'b') return `[b]${inner}[/b]`;
     if (tag === 'em' || tag === 'i') return `[i]${inner}[/i]`;
     if (tag === 'span' && node.dataset.richSize) return `[size=${node.dataset.richSize}]${inner}[/size]`;
+    if (tag === 'a' && node.dataset.richKnowledge) return `[knowledge=${node.dataset.richKnowledge}]${inner}[/knowledge]`;
     if (tag === 'a' && /^https?:\/\//i.test(node.href)) return `[url=${node.href}]${inner}[/url]`;
     if (tag === 'blockquote') return `[quote]${inner.replace(/\n+$/,'')}[/quote]\n`;
     if (tag === 'li') return inner.replace(/\n+$/,'');
@@ -108,7 +110,7 @@
 
   document.addEventListener('selectionchange',()=>{if(active&&active.contains(getSelection()?.anchorNode))saveRange();});
   toolbar.addEventListener('pointerdown',(event)=>{if(!event.target.matches('select'))event.preventDefault();saveRange();});
-  toolbar.addEventListener('click',(event)=>{const button=event.target.closest('button');if(!button||!active)return;if(button.dataset.richTag==='b')command('bold');else if(button.dataset.richTag==='i')command('italic');else if(button.dataset.richList)command(button.dataset.richList==='ol'?'insertOrderedList':'insertUnorderedList');else if(button.hasAttribute('data-rich-quote'))command('formatBlock','blockquote');else if(button.hasAttribute('data-rich-link')){const url=prompt('請輸入 https:// 開頭的網址','https://');if(url&&/^https?:\/\//i.test(url))command('createLink',url);}else if(button.hasAttribute('data-rich-clear'))command('removeFormat');else if(button.hasAttribute('data-rich-undo'))undo();else if(button.hasAttribute('data-rich-redo'))redo();});
+  toolbar.addEventListener('click',(event)=>{const button=event.target.closest('button');if(!button||!active)return;if(button.dataset.richTag==='b')command('bold');else if(button.dataset.richTag==='i')command('italic');else if(button.dataset.richList)command(button.dataset.richList==='ol'?'insertOrderedList':'insertUnorderedList');else if(button.hasAttribute('data-rich-quote'))command('formatBlock','blockquote');else if(button.hasAttribute('data-rich-link')){const url=prompt('請輸入 https:// 開頭的網址','https://');if(url&&/^https?:\/\//i.test(url))command('createLink',url);}else if(button.hasAttribute('data-rich-knowledge')){const slug=prompt('請輸入知識文章名稱或 slug','');if(slug)wrapSelection('a',{richKnowledge:slug.trim()});}else if(button.hasAttribute('data-rich-clear'))command('removeFormat');else if(button.hasAttribute('data-rich-undo'))undo();else if(button.hasAttribute('data-rich-redo'))redo();});
   toolbar.querySelector('[data-rich-size]').addEventListener('change',(event)=>{if(event.target.value)wrapSelection('span',{class:`rich-size-${event.target.value}`,richSize:event.target.value});event.target.value='';});
   document.addEventListener('pointerdown',(event)=>{if(!toolbar.contains(event.target)&&!editors.some((root)=>root.contains(event.target)))toolbar.classList.remove('is-visible');});addEventListener('resize',position);addEventListener('scroll',position,true);
 })();

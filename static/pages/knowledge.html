@@ -6,6 +6,27 @@
   </div>
 </header>
 
+<nav class="knowledge-quick-nav" aria-label="知識快速入口">
+  <section class="knowledge-quick-group knowledge-quick-rules">
+    <div class="knowledge-quick-heading"><i class="fa-solid fa-book-open"></i><span>遊戲規則</span></div>
+    <div class="knowledge-quick-links"><a href="#knowledge/首頁" data-quick-knowledge="首頁">規則總覽</a></div>
+  </section>
+  <section class="knowledge-quick-group">
+    <div class="knowledge-quick-heading"><i class="fa-solid fa-masks-theater"></i><span>官方角色</span></div>
+    <div class="knowledge-quick-links knowledge-quick-role-links">
+      <a href="#knowledge/鎮民" data-quick-knowledge="鎮民">鎮民</a><a href="#knowledge/外來者" data-quick-knowledge="外來者">外來者</a><a href="#knowledge/爪牙" data-quick-knowledge="爪牙">爪牙</a><a href="#knowledge/惡魔" data-quick-knowledge="惡魔">惡魔</a><a href="#knowledge/奇遇角色" data-quick-knowledge="奇遇角色">奇遇角色</a><a href="#knowledge/傳奇角色" data-quick-knowledge="傳奇角色">傳奇角色</a>
+    </div>
+  </section>
+  <section class="knowledge-quick-group">
+    <div class="knowledge-quick-heading"><i class="fa-solid fa-scroll"></i><span>官方劇本</span></div>
+    <div class="knowledge-quick-links"><a href="#knowledge/暗流湧動" data-quick-knowledge="暗流湧動">暗流湧動</a><a href="#knowledge/黯月初升" data-quick-knowledge="黯月初升">黯月初升</a><a href="#knowledge/夢殞春宵" data-quick-knowledge="夢殞春宵">夢殞春宵</a><a href="#knowledge/實驗性角色" data-quick-knowledge="實驗性角色">實驗性角色</a><a href="#knowledge/華燈初上" data-quick-knowledge="華燈初上">華燈初上</a><a href="#knowledge/山雨欲來" data-quick-knowledge="山雨欲來">山雨欲來</a></div>
+  </section>
+  <details class="knowledge-quick-group knowledge-quick-reading">
+    <summary class="knowledge-quick-heading"><i class="fa-solid fa-compass"></i><span>拓展閱讀</span><i class="fa-solid fa-chevron-down"></i></summary>
+    <div class="knowledge-quick-links"><a href="#knowledge/規則與理念" data-quick-search="規則與理念">規則與理念</a><a href="#knowledge/設計師的平衡天書" data-quick-knowledge="設計師的平衡天書">設計師的平衡天書</a><a href="#knowledge/創作幕後" data-quick-search="創作幕後">創作幕後</a><a href="#knowledge/成為一個好說書人的經歷" data-quick-knowledge="成為一個好說書人的經歷">說書人經驗</a><a href="#knowledge/策略遊戲" data-quick-search="策略遊戲">策略遊戲</a><a href="#knowledge/錯誤理解" data-quick-search="錯誤理解">常見錯誤理解</a><a href="#knowledge/瘋狂規則如何運作" data-quick-search="瘋狂規則如何運作">瘋狂規則</a><a href="#knowledge/相剋更新" data-quick-search="相剋更新">相剋更新</a></div>
+  </details>
+</nav>
+
 <section class="card knowledge-search-card">
   <form id="knowledge-search-form" class="knowledge-search-form">
     <div class="knowledge-search-box">
@@ -50,6 +71,12 @@
   .knowledge-kicker{font-size:.72rem;letter-spacing:.18em;color:var(--accent-gold);font-weight:900}
   .knowledge-header h2{font-family:'Cinzel',serif;letter-spacing:.08em;margin:.3rem 0}
   .knowledge-header p{color:var(--text-muted);margin:0;line-height:1.6}
+  .knowledge-quick-nav{display:grid;gap:.6rem;margin-bottom:1rem;padding:.75rem 1rem;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.022)}
+  .knowledge-quick-group{display:grid;grid-template-columns:150px minmax(0,1fr);align-items:start;gap:.85rem;padding:.5rem 0;border:0;border-bottom:1px solid rgba(255,255,255,.065);background:transparent}
+  .knowledge-quick-group:last-child{border-bottom:0}
+  .knowledge-quick-heading{display:flex;align-items:center;gap:.55rem;color:#fff;font-size:.94rem;font-weight:900;line-height:1.5;list-style:none;cursor:default}
+  .knowledge-quick-heading::-webkit-details-marker{display:none}.knowledge-quick-heading>i:first-child{width:1.2rem;color:var(--accent-gold);text-align:center}.knowledge-quick-heading .fa-chevron-down{display:none;margin-left:auto;color:var(--text-muted);font-size:.72rem}
+  .knowledge-quick-links{display:flex;flex-wrap:wrap;gap:.4rem .5rem}.knowledge-quick-links a{display:inline-flex;align-items:center;min-height:32px;padding:.36rem .65rem;border:1px solid rgba(167,139,250,.24);border-radius:8px;background:rgba(124,58,237,.1);color:#e9e2ff;font-size:.86rem;font-weight:800;text-decoration:none;transition:border-color .15s ease,background .15s ease,transform .15s ease}.knowledge-quick-links a:hover,.knowledge-quick-links a:focus-visible{border-color:rgba(255,183,3,.55);background:rgba(255,183,3,.1);color:#fff;outline:0}.knowledge-quick-links a:active{transform:translateY(1px)}
   .knowledge-search-card{margin-bottom:1.25rem}
   .knowledge-search-form{display:grid;grid-template-columns:minmax(0,1fr) 160px 160px auto;gap:.75rem;align-items:center}
   .knowledge-search-form .dark-input{width:100%;min-height:42px;padding:.72rem .85rem!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:8px;background:#14131b!important;color:#f7f4ff!important;color-scheme:dark;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
@@ -68,9 +95,9 @@
   .knowledge-search-meta{margin-top:.75rem;color:var(--text-muted);font-size:.9rem}
   .knowledge-layout{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:1.25rem;align-items:start}
   .knowledge-results{display:flex;flex-direction:column;gap:.55rem;max-height:calc(100vh - 300px);overflow:auto;padding-right:.25rem}
-  .knowledge-result{width:100%;text-align:left;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:inherit;border-radius:10px;padding:.8rem;cursor:pointer}
+  .knowledge-result{width:100%;display:grid;grid-template-columns:46px minmax(0,1fr);gap:.7rem;align-items:center;text-align:left;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:inherit;border-radius:10px;padding:.8rem;cursor:pointer}
   .knowledge-result:hover,.knowledge-result.is-active{border-color:rgba(255,183,3,.4);background:rgba(255,255,255,.065)}
-  .knowledge-result-title{font-weight:900;color:#fff}
+  .knowledge-result-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:rgba(124,58,237,.14);border:1px solid rgba(167,139,250,.2);overflow:hidden}.knowledge-result-icon img{width:40px;height:40px;object-fit:contain}.knowledge-result-icon i{color:var(--accent-gold);font-size:1rem}.knowledge-result-copy{min-width:0}`r`n  .knowledge-result-title{font-weight:900;color:#fff}
   .knowledge-result-meta{font-size:.8rem;color:var(--text-muted);margin-top:.25rem}
   .knowledge-type-chip{display:inline-flex;padding:.16rem .45rem;border-radius:999px;background:rgba(124,58,237,.18);color:#d9ccff;font-size:.74rem;margin-right:.4rem}
   .knowledge-empty,.knowledge-detail-empty{text-align:center;color:var(--text-muted);padding:2.5rem 1rem;line-height:1.65}
@@ -131,10 +158,10 @@
   .knowledge-relation-group-head h4 span{display:inline-flex;min-width:1.6rem;justify-content:center;margin-left:.3rem;padding:.1rem .35rem;border-radius:999px;background:rgba(255,255,255,.08);color:var(--text-muted);font-size:.7rem}
   .knowledge-relation-toggle{border:0;background:transparent;color:var(--accent-gold);cursor:pointer;font-size:.76rem;padding:.2rem}
   .knowledge-relation-toggle:hover{text-decoration:underline}
-  @media(max-width:900px){.knowledge-search-form,.knowledge-layout{grid-template-columns:1fr}.knowledge-results{max-height:none}.knowledge-detail-card{min-height:320px}}
+  @media(max-width:900px){.knowledge-quick-group{grid-template-columns:1fr}.knowledge-quick-heading{cursor:pointer}.knowledge-quick-reading:not([open]) .knowledge-quick-links{display:none}.knowledge-quick-heading .fa-chevron-down{display:block}.knowledge-quick-reading[open] .fa-chevron-down{transform:rotate(180deg)}.knowledge-search-form,.knowledge-layout{grid-template-columns:1fr}.knowledge-results{max-height:none}.knowledge-detail-card{min-height:320px}}
   @media(max-width:640px){.knowledge-search-card,.knowledge-results-card,.knowledge-detail-card{padding:1rem}.knowledge-search-form .btn{width:100%;justify-content:center}.knowledge-detail-title{grid-template-columns:1fr}.knowledge-relation-group-head{align-items:flex-start}.knowledge-relations{gap:.4rem}.knowledge-relation{font-size:.78rem}.knowledge-block-body{font-size:.98rem;line-height:1.8}.knowledge-source-toggle{align-items:flex-start}.knowledge-table{min-width:460px}}
 </style>
 
-<link rel="stylesheet" href="/css/knowledge-role-preview.css?v=20260803l">
+<link rel="stylesheet" href="/css/knowledge-role-preview.css?v=20260803m">
 <script src="/js/knowledge-role-preview.js?v=20260803d"></script>
-<script src="/js/knowledge.js?v=20260802a"></script>
+<script src="/js/knowledge.js?v=20260803b"></script>

@@ -26,6 +26,21 @@
       .join('');
   }
 
+  function loadRoleCatalog() {
+    if (!state.roleCatalogPromise) {
+      state.roleCatalogPromise = fetch(`${apiBase}/api/roles?limit=500`, { cache: 'no-store' })
+        .then(requireJson)
+        .then((payload) => {
+          const catalog = new Map();
+          (payload.items || []).forEach((role) => {
+            [role.knowledge_slug, role.name_zh_tw, role.name_en, role.canonical_key].filter(Boolean).forEach((key) => catalog.set(String(key), role));
+          });
+          return catalog;
+        })
+        .catch((error) => { state.roleCatalogPromise = null; throw error; });
+    }
+    return state.roleCatalogPromise;
+  }
   function renderResults() {
     const container = $('knowledge-results');
     if (!container) return;
@@ -41,11 +56,10 @@
     }
     container.innerHTML = state.items.map((item) => `
       <button class="knowledge-result ${state.activeSlug === item.slug ? 'is-active' : ''}" type="button" data-knowledge-slug="${escapeHtml(item.slug)}">
-        <div class="knowledge-result-title">${escapeHtml(item.name)}</div>
-        <div class="knowledge-result-meta"><span class="knowledge-type-chip">${escapeHtml(item.team ? teamLabel(item.team) : typeLabel(item.node_type))}</span>${escapeHtml(item.name_en || item.name_zh_cn || item.slug)}</div>
+        <span class="knowledge-result-icon">${item.image_url ? `<img src="${escapeHtml(item.image_url)}" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><i class="fa-solid fa-masks-theater" hidden></i>` : `<i class="fa-solid ${item.node_type === 'role' ? 'fa-masks-theater' : 'fa-book-open'}"></i>`}</span>
+        <span class="knowledge-result-copy"><span class="knowledge-result-title">${escapeHtml(item.name)}</span><span class="knowledge-result-meta"><span class="knowledge-type-chip">${escapeHtml(item.team ? teamLabel(item.team) : typeLabel(item.node_type))}</span>${escapeHtml(item.name_en || item.name_zh_cn || item.slug)}</span></span>
       </button>
-    `).join('');
-    container.querySelectorAll('[data-knowledge-slug]').forEach((button) => button.addEventListener('click', () => loadNode(button.dataset.knowledgeSlug, { focusDetail: true })));
+    `).join('');    container.querySelectorAll('[data-knowledge-slug]').forEach((button) => button.addEventListener('click', () => loadNode(button.dataset.knowledgeSlug, { focusDetail: true })));
   }
 
   function sortedUniqueItems(items, query) {
@@ -215,6 +229,7 @@
   }
 
   function bindDetailEvents(detail, node) {
+    detail.querySelectorAll('a[data-knowledge-slug]').forEach((link) => link.addEventListener('click', (event) => { event.preventDefault(); loadNode(link.dataset.knowledgeSlug); }));
     detail.querySelectorAll('[data-related-slug]').forEach((button) => button.addEventListener('click', () => loadNode(button.dataset.relatedSlug)));
     detail.querySelectorAll('[data-relation-group]').forEach((button) => button.addEventListener('click', () => {
       const key = button.dataset.relationGroup;
@@ -330,6 +345,7 @@
           name: role.name_zh_tw,
           name_en: role.name_en,
           team: role.team,
+          image_url: role.image_url,
         }));
         data = { total: items.length, items };
       } else {
@@ -337,6 +353,13 @@
         if (nodeType) params.set('node_type', nodeType);
         data = await fetch(`${apiBase}/api/knowledge/search?${params.toString()}`, { cache: 'no-store' }).then(requireJson);
       }
+      const needsRoleImages = (data.items || []).some((item) => item.node_type === 'role' && !item.image_url);
+      const roleCatalog = needsRoleImages ? await loadRoleCatalog().catch(() => new Map()) : new Map();
+      data.items = (data.items || []).map((item) => {
+        if (item.node_type !== 'role' || item.image_url) return item;
+        const role = roleCatalog.get(String(item.slug)) || roleCatalog.get(String(item.name));
+        return role ? { ...item, team: item.team || role.team, name_en: item.name_en || role.name_en, image_url: role.image_url } : item;
+      });
       state.items = sortedUniqueItems(data.items, q);
       state.resultStatus = 'ready';
       const category = team ? teamLabel(team) : (nodeType ? typeLabel(nodeType) : '全部類型');
@@ -350,7 +373,24 @@
     }
   }
 
+  function bindQuickNavigation() {
+    document.querySelectorAll('[data-quick-knowledge]').forEach((link) => link.addEventListener('click', (event) => {
+      event.preventDefault();
+      state.activeSlug = null;
+      loadNode(link.dataset.quickKnowledge, { focusDetail: true });
+    }));
+    document.querySelectorAll('[data-quick-search]').forEach((link) => link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const input = $('knowledge-search-input');
+      if (input) input.value = link.dataset.quickSearch || '';
+      if ($('knowledge-type-filter')) $('knowledge-type-filter').value = '';
+      if ($('knowledge-team-filter')) $('knowledge-team-filter').value = '';
+      state.activeSlug = null;
+      searchKnowledge();
+    }));
+  }
   async function init() {
+    bindQuickNavigation();
     $('knowledge-search-form')?.addEventListener('submit', (event) => { event.preventDefault(); state.activeSlug = null; searchKnowledge(); });
     $('knowledge-type-filter')?.addEventListener('change', (event) => {
       state.activeSlug = null;

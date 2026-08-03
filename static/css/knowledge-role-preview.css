@@ -60,3 +60,5 @@
 
 .role-mention-card-block .knowledge-block-heading strong{font-size:1.25rem;line-height:1.3}
 .role-mention-card-block .knowledge-block-heading span{font-size:.82rem}
+
+.role-ability-panel .knowledge-block-body{font-size:1.14rem;line-height:1.85;font-weight:700}.role-ability-panel .knowledge-block-body p{font-size:inherit;line-height:inherit}

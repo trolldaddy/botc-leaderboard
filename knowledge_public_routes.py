@@ -19,6 +19,7 @@ router = APIRouter(prefix="/api/knowledge", tags=["knowledge-public"])
 PUBLIC_NODE_TYPES = {"role", "script", "guide", "mechanic", "article"}
 HIDDEN_STATUSES = {"deleted", "archived", "disabled"}
 ROLE_GROUP_PRESENTATION = "role_group"
+PUBLIC_OFFICIAL_SCRIPT_NAMES = {"暗流湧動", "黯月初升", "夢殞春宵", "實驗性角色", "華燈初上", "山雨欲來"}
 
 
 def _node_query(db: Session):
@@ -27,11 +28,13 @@ def _node_query(db: Session):
         or_(
             KnowledgeNode.node_type != "script",
             KnowledgeNode.presentation_type == ROLE_GROUP_PRESENTATION,
+            KnowledgeNode.canonical_name_zh_tw.in_(PUBLIC_OFFICIAL_SCRIPT_NAMES),
         ),
         ~KnowledgeNode.status.in_(HIDDEN_STATUSES),
         or_(
             KnowledgeNode.presentation_type.is_(None),
             KnowledgeNode.presentation_type != "excluded",
+            KnowledgeNode.canonical_name_zh_tw.in_(PUBLIC_OFFICIAL_SCRIPT_NAMES),
         ),
     )
 
@@ -134,7 +137,7 @@ def search_knowledge(
         if node_type not in PUBLIC_NODE_TYPES:
             raise HTTPException(status_code=400, detail="不支援的知識類型")
         if node_type == "script":
-            raise HTTPException(status_code=400, detail="Scripts are not public knowledge content")
+            query = query.filter(KnowledgeNode.canonical_name_zh_tw.in_(PUBLIC_OFFICIAL_SCRIPT_NAMES))
         if node_type == "mechanic":
             query = query.filter(or_(
                 KnowledgeNode.node_type == "mechanic",
@@ -155,7 +158,12 @@ def search_knowledge(
 
 @router.get("/nodes/{slug}")
 def get_public_node(slug: str, db: Session = Depends(get_db)):
-    node = _node_query(db).filter(KnowledgeNode.slug == slug).first()
+    node = _node_query(db).filter(or_(
+        KnowledgeNode.slug == slug,
+        KnowledgeNode.canonical_name_zh_tw == slug,
+        KnowledgeNode.canonical_name_zh_cn == slug,
+        KnowledgeNode.canonical_name_en == slug,
+    )).first()
     if not node:
         alias = db.query(KnowledgeAlias).filter(func.lower(KnowledgeAlias.alias) == slug.lower()).first()
         if alias:
@@ -219,7 +227,12 @@ def get_public_node(slug: str, db: Session = Depends(get_db)):
 
 @router.get("/nodes/{slug}/relations")
 def get_public_relations(slug: str, limit: int = Query(default=100, ge=1, le=250), db: Session = Depends(get_db)):
-    node = _node_query(db).filter(KnowledgeNode.slug == slug).first()
+    node = _node_query(db).filter(or_(
+        KnowledgeNode.slug == slug,
+        KnowledgeNode.canonical_name_zh_tw == slug,
+        KnowledgeNode.canonical_name_zh_cn == slug,
+        KnowledgeNode.canonical_name_en == slug,
+    )).first()
     if not node:
         raise HTTPException(status_code=404, detail="找不到知識條目")
     edges = db.query(KnowledgeEdge).filter(or_(KnowledgeEdge.from_node_id == node.id, KnowledgeEdge.to_node_id == node.id)).limit(limit).all()

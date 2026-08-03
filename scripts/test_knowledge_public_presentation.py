@@ -17,12 +17,13 @@ def test_regular_roles_keep_their_public_type():
     assert _public_node_type(node) == "role"
 
 
-def test_public_search_hides_scripts_but_keeps_role_groups():
+def test_public_search_keeps_only_official_scripts_and_role_groups():
     engine = create_engine("sqlite:///:memory:")
     KnowledgeNode.__table__.create(engine)
     with Session(engine) as db:
         db.add_all([
             KnowledgeNode(node_type="script", slug="event-script", canonical_name_zh_tw="活動劇本"),
+            KnowledgeNode(node_type="script", slug="trouble-brewing", canonical_name_zh_tw="暗流湧動", presentation_type="excluded"),
             KnowledgeNode(node_type="script", slug="travellers", canonical_name_zh_tw="旅行者", presentation_type="role_group"),
             KnowledgeNode(node_type="mechanic", slug="voting", canonical_name_zh_tw="投票"),
         ])
@@ -30,8 +31,8 @@ def test_public_search_hides_scripts_but_keeps_role_groups():
 
         result = search_knowledge(q="", node_type="", limit=100, offset=0, db=db)
 
-    assert [item["name"] for item in result["items"]] == ["投票", "旅行者"]
-    assert {item["node_type"] for item in result["items"]} == {"mechanic"}
+    assert [item["name"] for item in result["items"]] == ["投票", "旅行者", "暗流湧動"]
+    assert {item["node_type"] for item in result["items"]} == {"mechanic", "script"}
 
 
 def test_public_types_fold_role_groups_into_mechanics():
@@ -40,6 +41,7 @@ def test_public_types_fold_role_groups_into_mechanics():
     with Session(engine) as db:
         db.add_all([
             KnowledgeNode(node_type="script", slug="event-script", canonical_name_zh_tw="活動劇本"),
+            KnowledgeNode(node_type="script", slug="trouble-brewing", canonical_name_zh_tw="暗流湧動", presentation_type="excluded"),
             KnowledgeNode(node_type="script", slug="travellers", canonical_name_zh_tw="旅行者", presentation_type="role_group"),
             KnowledgeNode(node_type="mechanic", slug="voting", canonical_name_zh_tw="投票"),
         ])
@@ -47,4 +49,4 @@ def test_public_types_fold_role_groups_into_mechanics():
 
         result = list_types(db=db)
 
-    assert result == {"items": [{"node_type": "mechanic", "count": 2}]}
+    assert result == {"items": [{"node_type": "mechanic", "count": 2}, {"node_type": "script", "count": 1}]}
