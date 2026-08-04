@@ -184,9 +184,7 @@
         textNode.replaceWith(fragment);
       });
     });
-    const currentName = String(currentNode.name || currentNode.slug || '').trim();
-    const forceRoleCards = currentNode.presentation_type === 'role_group' || roleListHeadings.has(currentName);
-    enhanceRoleListBlocks(root, forceRoleCards);
+    enhanceRoleListBlocks(root);
   }
   function enhanceNightOrderBlocks(root) {
     root.querySelectorAll('.knowledge-block-body p, .knowledge-block-body li').forEach((row) => {
@@ -215,12 +213,18 @@
       row.classList.add('knowledge-night-order-row');
     });
   }
-  const roleListHeadings = new Set(['鎮民', '镇民', '外來者', '外来者', '爪牙', '惡魔', '恶魔', '旅行者', '傳奇角色', '传奇角色', '傳奇', '奇遇角色', '奇遇']);
-  function enhanceRoleListBlocks(root, forceRoleCards = false) {
+  const roleListHeadings = new Set([
+    '鎮民', '镇民', '外來者', '外来者', '爪牙', '惡魔', '恶魔', '旅行者',
+    '傳奇角色', '传奇角色', '傳奇', '奇遇角色', '奇遇',
+    '角色列表', '角色名單', '角色名单', '角色清單', '角色清单',
+    '暗流湧動', '暗流涌动', '黯月初升', '夢殞春宵', '梦殒春宵',
+    '實驗性角色', '实验性角色', '華燈初上', '华灯初上', '山雨欲來', '山雨欲来',
+  ]);
+  function enhanceRoleListBlocks(root) {
     root.querySelectorAll('.knowledge-block').forEach((block) => {
       const heading = block.querySelector('.knowledge-block-heading strong');
       const body = block.querySelector('.knowledge-block-body');
-      if (!heading || !body || (!forceRoleCards && !roleListHeadings.has(String(heading.textContent || '').trim()))) return;
+      if (!heading || !body || !roleListHeadings.has(String(heading.textContent || '').trim())) return;
       const buttons = [...body.querySelectorAll('.role-mention-chip[data-role-target]')];
       if (!buttons.length) return;
       block.classList.add('role-mention-card-block');
