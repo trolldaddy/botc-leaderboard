@@ -3,6 +3,14 @@ name: Seed Bilibili Script
 on:
   workflow_dispatch:
     inputs:
+      script:
+        description: Reviewed script to import
+        required: true
+        default: wafuleiming
+        type: choice
+        options:
+          - wafuleiming
+          - gongshengti
       mode:
         description: Preview validates matching; write updates the database
         required: true
@@ -23,18 +31,28 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: pip install -r requirements.txt
-      - name: Validate write configuration
-        if: inputs.mode == 'write'
+      - name: Validate database configuration
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: test -n "$DATABASE_URL"
       - name: Import reviewed script
         env:
-          DATABASE_URL: ${{ inputs.mode == 'write' && secrets.DATABASE_URL || '' }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
+          case "${{ inputs.script }}" in
+            wafuleiming)
+              metadata=data/scripts/wafuleiming.json
+              script_json=data/scripts/wafuleiming-script.json
+              ;;
+            gongshengti)
+              metadata=data/scripts/gongshengti.json
+              script_json=data/scripts/gongshengti-script.json
+              ;;
+            *) echo "Unsupported script: ${{ inputs.script }}"; exit 1 ;;
+          esac
           args=()
           if [ "${{ inputs.mode }}" = "write" ]; then args+=(--write); fi
           python scripts/import_bilibili_script.py \
-            data/scripts/wafuleiming.json \
-            data/scripts/wafuleiming-script.json \
+            "$metadata" \
+            "$script_json" \
             "${args[@]}"
