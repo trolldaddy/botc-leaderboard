@@ -1,7 +1,8 @@
 (() => {
   const roleEditor = document.getElementById('role-admin-editor');
   const articleEditor = document.getElementById('knowledge-article-admin');
-  const editors = [roleEditor, articleEditor].filter(Boolean);
+  const scriptEditor = document.getElementById('script-admin');
+  const editors = [roleEditor, articleEditor, scriptEditor].filter(Boolean);
   if (!editors.length) return;
 
   const toolbar = document.createElement('div');

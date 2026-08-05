@@ -68,7 +68,7 @@ def main():
             role = find_role(db, reference)
             if role:
                 matched.append(role)
-            elif reference.get("team") in SPECIAL_ENTRY_TYPES:
+            elif reference.get("team"):
                 supplements.append(reference)
             else:
                 missing.append(reference)
@@ -101,8 +101,8 @@ def main():
                     value = json.dumps(value, ensure_ascii=False)
                 setattr(script, field, value)
         script.published_at = datetime.fromisoformat(metadata["published_at"]) if metadata.get("published_at") else None
-        script.is_public = bool(metadata.get("is_public")) and not missing and len(matched) >= 5
-        script.needs_review = bool(missing) or len(matched) < 5
+        script.is_public = bool(metadata.get("is_public")) and not missing and (len(matched) + len(supplements)) >= 5
+        script.needs_review = bool(missing) or (len(matched) + len(supplements)) < 5
         db.query(ScriptImage).filter(ScriptImage.script_id == script.id).delete(synchronize_session=False)
         db.query(ScriptRole).filter(ScriptRole.script_id == script.id).delete(synchronize_session=False)
         db.query(ScriptSupplement).filter(ScriptSupplement.script_id == script.id).delete(synchronize_session=False)

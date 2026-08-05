@@ -1,4 +1,4 @@
-<nav class="knowledge-admin-modes" aria-label="知識庫管理模式"><button type="button" class="is-active" data-admin-mode="roles"><i class="fa-solid fa-address-book"></i> 角色管理</button><button type="button" data-admin-mode="articles"><i class="fa-solid fa-newspaper"></i> 文章管理</button></nav>
+<nav class="knowledge-admin-modes" aria-label="知識庫管理模式"><button type="button" class="is-active" data-admin-mode="roles"><i class="fa-solid fa-address-book"></i> 角色管理</button><button type="button" data-admin-mode="articles"><i class="fa-solid fa-newspaper"></i> 文章管理</button><button type="button" data-admin-mode="scripts"><i class="fa-solid fa-scroll"></i> 劇本管理系統</button></nav>
 <header class="top-header" data-role-mode>
   <div style="display:flex;justify-content:space-between;align-items:center;width:100%;gap:1rem;flex-wrap:wrap;">
     <h2 style="font-family:'Cinzel',serif;letter-spacing:2px;">角色知識庫管理</h2>
@@ -82,6 +82,12 @@
   <div class="article-admin-toolbar"><input id="article-admin-search" class="form-control dark-input" placeholder="搜尋文章名稱"><select id="article-admin-type" class="form-control dark-input"><option value="">全部文章類型</option><option value="article">文章</option><option value="mechanic">規則／機制</option><option value="script">劇本</option><option value="guide">指南</option></select><label class="article-admin-disabled"><input id="article-admin-include-disabled" type="checkbox"> &#21253;&#21547;&#24050;&#20572;&#29992;</label><button id="article-admin-refresh" class="btn btn-purple" type="button"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button></div>
   <div id="article-admin-status" class="role-admin-status">切換到文章管理後載入。</div>
   <div class="article-admin-layout"><div id="article-admin-list" class="article-admin-list"></div><div id="article-admin-detail" class="article-admin-detail"><div class="role-admin-empty">請從左側選擇文章。</div></div></div>
+</section>
+<section id="script-admin" class="card knowledge-article-admin" hidden>
+  <div class="role-admin-intro"><h3><i class="fa-solid fa-scroll text-gold"></i> 劇本管理系統</h3><p>管理劇本介紹、攻略、圖片與角色構成；官方角色連回角色庫，自創角色保留能力與圖示。</p></div>
+  <div class="article-admin-toolbar"><input id="script-admin-search" class="form-control dark-input" placeholder="搜尋劇本、作者或 slug"><button id="script-admin-refresh" class="btn btn-purple" type="button"><i class="fa-solid fa-magnifying-glass"></i> 搜尋</button></div>
+  <div id="script-admin-status" class="role-admin-status">切換到劇本管理後載入。</div>
+  <div class="article-admin-layout"><div id="script-admin-list" class="article-admin-list"></div><div id="script-admin-detail" class="article-admin-detail"><div class="role-admin-empty">請從左側選擇劇本。</div></div></div>
 </section>
 <div id="role-display-settings-modal" class="rds-modal" hidden>
   <div class="rds-backdrop" data-rds-close></div>
@@ -188,6 +194,7 @@
   .rds-target { display:grid; grid-template-columns:auto 64px; gap:.45rem; align-items:center; justify-content:center; color:#dfe3ee; }.rds-target-label{display:none}.rds-target input[type=checkbox]{width:19px;height:19px;accent-color:#8b7cf6;cursor:pointer}.rds-target input[type=number]{min-width:64px;width:64px;background:#202638;color:#fff;border:1px solid #39415a;border-radius:8px;padding:.45rem}
   .rds-legend { display:none; }
   @media(max-width:720px){.rds-body{grid-template-rows:minmax(160px,.8fr) minmax(220px,1.2fr)}.rds-columns{display:none}.rds-row{grid-template-columns:1fr}.rds-target-label{display:block}.rds-row strong{margin-bottom:.2rem}.rds-target{grid-template-columns:80px 1fr}.rds-dialog{width:calc(100vw - 1rem);height:calc(100dvh - 1rem);max-height:calc(100dvh - 1rem)}.rds-head{align-items:flex-start}.rds-head p{font-size:.82rem}}
+  #script-admin .article-admin-toolbar{grid-template-columns:minmax(260px,1fr) auto}.script-admin-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin:1rem 0}.script-admin-meta label,.script-admin-field,.script-custom-grid label{display:grid;gap:.35rem;color:#ffd166;font-size:.8rem;font-weight:800}.script-admin-copy{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}.script-admin-field.wide{grid-column:1/-1}.script-admin-field textarea{min-height:170px;resize:vertical}.script-role-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.55rem}.script-role-summary span{display:flex;align-items:center;gap:.55rem;padding:.55rem;border:1px solid #39415a;border-radius:10px;background:#151924}.script-role-summary img,.script-custom-head img{width:42px;height:42px;object-fit:contain;border-radius:50%;background:#252a38}.script-custom-card{margin:.75rem 0;padding:.8rem;border:1px solid #39415a;border-radius:12px;background:#151924}.script-custom-head{display:flex;align-items:center;gap:.55rem;margin-bottom:.65rem}.script-custom-head small{color:#aeb6c9}.script-custom-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}.script-custom-grid .wide{grid-column:1/-1}.script-custom-grid textarea{min-height:130px}@media(max-width:800px){.script-admin-meta,.script-admin-copy,.script-custom-grid{grid-template-columns:1fr}.script-admin-field.wide,.script-custom-grid .wide{grid-column:auto}.script-role-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 
 <script src="/js/knowledge_article_admin.js?v=20260803b"></script>
@@ -197,4 +204,5 @@
 <script src="/js/role_sync.js"></script>
 <script src="/js/role_admin_reminder_merge.js"></script>
 <script src="/js/role_display_settings.js"></script>
-<script src="/js/role_admin_rich_text.js?v=20260803g"></script>
+<script src="/js/script_admin.js?v=20260806a"></script>
+<script src="/js/role_admin_rich_text.js?v=20260806a"></script>
