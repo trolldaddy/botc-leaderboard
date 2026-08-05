@@ -60,7 +60,7 @@
     return `<article class="script-carousel-slide" data-script-slide data-index="${index}" data-slug="${escapeHtml(item.slug)}"><div class="script-carousel-card">
       <div class="script-carousel-title"><div><div class="script-category">${escapeHtml(item.category || '\u5287\u672c')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2><div class="script-byline">${escapeHtml(item.author_name ? `\u4f5c\u8005　${item.author_name}` : '\u4f5c\u8005\u5f85\u88dc')}</div></div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> \u539f\u59cb\u6587\u7ae0</a>` : ''}</div>
       <div class="script-carousel-image" data-gallery-view>${imageMarkup}</div>
-      <div class="script-carousel-controls">${images.length > 1 ? '<button type="button" data-script-flip><i class="fa-solid fa-repeat"></i><span>\u7ffb\u81f3\u80cc\u9762</span></button>' : ''}<button type="button" data-script-fullscreen><i class="fa-solid fa-expand"></i><span>\u5168\u87a2\u5e55\u67e5\u770b</span></button></div>
+      <div class="script-carousel-controls"><button type="button" data-script-previous><i class="fa-solid fa-chevron-left"></i><span>\u4e0a\u4e00\u5957</span></button>${images.length > 1 ? '<button type="button" data-script-flip><i class="fa-solid fa-repeat"></i><span>\u7ffb\u81f3\u80cc\u9762</span></button>' : ''}<button type="button" data-script-fullscreen><i class="fa-solid fa-expand"></i><span>\u5168\u87a2\u5e55\u67e5\u770b</span></button><button type="button" data-script-next><i class="fa-solid fa-chevron-right"></i><span>\u4e0b\u4e00\u5957</span></button></div>
     </div></article>`;
   }
 
@@ -105,8 +105,10 @@
     if (!frame || !images.length) return;
     const mainImage = frame.querySelector('[data-gallery-main-image]');
     let activeIndex = 0, flipping = false;
+    const previousControl = slide.querySelector('[data-script-previous]');
     const flipControl = slide.querySelector('[data-script-flip]');
     const fullscreenControl = slide.querySelector('[data-script-fullscreen]');
+    const nextControl = slide.querySelector('[data-script-next]');
     const syncControls = () => {
       const label = flipControl?.querySelector('span');
       if (label) label.textContent = activeIndex === 0 ? '\u7ffb\u81f3\u80cc\u9762' : '\u7ffb\u56de\u6b63\u9762';
@@ -125,8 +127,10 @@
       window.setTimeout(() => { frame.classList.remove('is-flipping'); flipping = false; }, 300);
     };
     slide.openScriptImage = () => openScriptViewer(images, activeIndex, setFace);
+    previousControl?.addEventListener('click', event => { event.stopPropagation(); moveCarousel(-1); });
     flipControl?.addEventListener('click', event => { event.stopPropagation(); slide.flipScriptImage(); });
     fullscreenControl?.addEventListener('click', event => { event.stopPropagation(); slide.openScriptImage(); });
+    nextControl?.addEventListener('click', event => { event.stopPropagation(); moveCarousel(1); });
   }
   function renderDetail(item) {
     const roster = groupedRosterMarkup(item.roles || [], item.special_entries || []);
