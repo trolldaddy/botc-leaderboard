@@ -92,7 +92,7 @@
       onChange(activeIndex);
     });
     viewer.querySelector('[data-viewer-close]').addEventListener('click', close);
-    viewer.addEventListener('click', event => { if (event.target === viewer) close(); });
+    viewer.addEventListener('click', event => { if (event.target === viewer || event.target.classList.contains('script-image-viewer-stage')) close(); });
     document.addEventListener('keydown', onKeyDown);
     document.body.classList.add('script-viewer-open');
     document.body.appendChild(viewer);
@@ -165,7 +165,9 @@
 
   function scrollToSlug(slug, behavior = 'smooth') {
     const slide = slideForSlug(slug);
-    if (slide) slide.scrollIntoView({ behavior, block: 'nearest', inline: 'center' });
+    if (!slide) return;
+    const left = slide.offsetLeft - (carousel.clientWidth - slide.offsetWidth) / 2;
+    carousel.scrollTo({ left: Math.max(0, left), behavior });
   }
 
   function renderCarousel() {
@@ -199,6 +201,7 @@
 
   let dragging = false, dragStartX = 0, dragStartScroll = 0, draggedSlide = null, dragMoved = false;
   carousel.addEventListener('pointerdown', event => {
+    if (event.target.closest('button, a')) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     dragging = true; dragMoved = false; dragStartX = event.clientX; dragStartScroll = carousel.scrollLeft;
     draggedSlide = event.target.closest('[data-script-slide]');
