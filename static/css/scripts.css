@@ -18,3 +18,18 @@
 .script-carousel-shell{overflow:hidden;padding-block:.5rem 1.25rem}.script-carousel{gap:1.15rem;padding-inline:max(1rem,calc(50% - 205px));scroll-padding-inline:max(1rem,calc(50% - 205px));border-radius:0}.script-carousel-slide{flex:0 0 clamp(320px,32vw,410px);padding-block:1rem;opacity:.5;transform:scale(.9)}.script-carousel-slide.active{opacity:1;transform:scale(1)}.script-carousel-card{display:flex;min-height:0;height:100%;padding:.85rem;flex-direction:column;border-color:rgba(255,255,255,.13);box-shadow:0 24px 70px rgba(0,0,0,.35)}.script-carousel-slide.active .script-carousel-card{border-color:rgba(255,183,3,.5);box-shadow:0 28px 90px rgba(40,13,74,.55)}.script-carousel-title{min-height:88px;margin:0;padding:.25rem .25rem .8rem}.script-carousel-title h2{font-size:1.45rem;line-height:1.2}.script-carousel-title .script-source{font-size:.78rem;white-space:nowrap}.script-carousel-image{height:auto;min-height:0;aspect-ratio:1192/1610;border-radius:10px}.script-carousel-image img{object-fit:cover}.script-gallery-hint{font-size:.8rem}.script-carousel-arrow{top:52%;border-radius:999px;width:48px;height:48px}.script-carousel-arrow.previous{left:max(10px,calc(50% - 260px))}.script-carousel-arrow.next{right:max(10px,calc(50% - 260px))}@media(max-width:850px){.script-carousel{gap:.75rem;padding-inline:calc(50% - min(39vw,190px));scroll-padding-inline:calc(50% - min(39vw,190px))}.script-carousel-slide{flex-basis:min(78vw,380px)}.script-carousel-card{min-height:0;padding:.65rem}.script-carousel-image{height:auto;min-height:0}.script-carousel-arrow.previous{left:8px}.script-carousel-arrow.next{right:8px}}@media(max-width:560px){.script-carousel-title{display:flex;min-height:80px;padding:.15rem .15rem .65rem}.script-carousel-title h2{font-size:1.25rem}.script-carousel-card{min-height:0}.script-carousel-image{height:auto;min-height:0}.script-carousel-arrow{top:55%;bottom:auto;transform:translateY(-50%)}}
 
 .script-carousel-image img{object-fit:contain}
+
+
+/* Canvas review: portrait-first carousel, explicit page flip, and details below the book. */
+.script-carousel-image{perspective:1200px}
+.script-carousel-image img{transform:rotateY(0);transition:transform .28s ease,opacity .18s ease;transform-origin:center}
+.script-carousel-image.is-flipping img{transform:rotateY(90deg);opacity:.65}
+.script-gallery-hint{display:inline-flex;align-items:center;gap:.38rem;background:rgba(8,7,12,.9);border-color:rgba(255,183,3,.48);color:#fff}
+.script-detail{position:relative;z-index:1;clear:both;width:100%;margin-top:0;overflow:visible}
+.script-detail-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.25rem;background:radial-gradient(circle at 15% 0,rgba(124,58,237,.18),transparent 42%),#111018}
+.script-detail-heading h2{margin:.2rem 0;color:#fff;font-size:1.75rem}.script-detail-heading h2 small{color:var(--text-muted);font-size:.68em;font-weight:600}
+.script-detail-heading p{max-width:76ch;margin:.65rem 0 0;color:#ddd2ee;line-height:1.7}
+.script-detail-meta{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.4rem;color:var(--text-muted)}
+.script-detail-meta span{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .55rem;border:1px solid rgba(167,139,250,.2);border-radius:999px;background:rgba(124,58,237,.1);font-size:.82rem}
+.script-roster-group{display:block}.script-roster-group h4{font-size:1.15rem}.script-role-grid{align-items:stretch}
+@media(max-width:560px){.script-detail-heading{display:grid}.script-detail-heading .script-source{justify-self:start}.script-detail-heading h2{font-size:1.45rem}}

@@ -10,6 +10,13 @@
   let visibleScripts = [], activeSlug = '', scrollTimer = null;
   const escapeHtml = value => String(value || '').replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
 
+  function displayImages(item) {
+    const images = item.images || [];
+    // The first Wafuleiming asset is a horizontal logo, not a script face.
+    if (item.slug === '\u74e6\u91dc\u96f7\u9cf4' && images.length >= 3) return images.slice(1, 3);
+    return images.slice(0, 2);
+  }
+
   function roleCard(role) {
     const href = `#knowledge/${encodeURIComponent(role.knowledge_slug || role.canonical_key)}`;
     const icon = role.image_url ? `<img src="${escapeHtml(role.image_url)}" alt="" loading="lazy">` : '<span class="script-role-fallback"><i class="fa-solid fa-masks-theater"></i></span>';
@@ -48,23 +55,32 @@
   }
 
   function carouselSlideMarkup(item, index) {
-    const images = item.images || [], first = images[0];
+    const images = displayImages(item), first = images[0];
     const imageMarkup = first ? `<img src="${escapeHtml(first.url)}" alt="${escapeHtml(first.alt)}" draggable="false" data-gallery-main-image>` : '<span class="script-carousel-no-image"><i class="fa-solid fa-image"></i></span>';
     return `<article class="script-carousel-slide" data-script-slide data-index="${index}" data-slug="${escapeHtml(item.slug)}"><div class="script-carousel-card">
       <div class="script-carousel-title"><div><div class="script-category">${escapeHtml(item.category || '\u5287\u672c')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2><div class="script-byline">${escapeHtml(item.author_name ? `\u4f5c\u8005　${item.author_name}` : '\u4f5c\u8005\u5f85\u88dc')}</div></div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> \u539f\u59cb\u6587\u7ae0</a>` : ''}</div>
-      <button class="script-carousel-image" type="button" data-gallery-next aria-label="${images.length > 1 ? '\u7ffb\u81f3\u5287\u672c\u53e6\u4e00\u9762' : '\u5287\u672c\u5716'}">${imageMarkup}<span class="script-gallery-counter" data-gallery-counter>${images.length ? `1 / ${images.length}` : ''}</span>${images.length > 1 ? '<span class="script-gallery-hint"><i class="fa-solid fa-rotate"></i> \u9ede\u64ca\u7ffb\u9762</span>' : ''}</button>
+      <button class="script-carousel-image" type="button" data-gallery-next aria-label="${images.length > 1 ? '\u7ffb\u81f3\u5287\u672c\u53e6\u4e00\u9762' : '\u5287\u672c\u5716'}">${imageMarkup}<span class="script-gallery-counter" data-gallery-counter>${images.length ? `1 / ${images.length}` : ''}</span>${images.length > 1 ? '<span class="script-gallery-hint" data-gallery-hint><i class="fa-solid fa-rotate"></i> <span>\u67e5\u770b\u80cc\u9762</span></span>' : ''}</button>
     </div></article>`;
   }
 
   function bindSlideGallery(slide, item) {
-    const images = item.images || [], button = slide.querySelector('[data-gallery-next]');
+    const images = displayImages(item), button = slide.querySelector('[data-gallery-next]');
     if (!button || images.length < 2) return;
     const mainImage = button.querySelector('[data-gallery-main-image]'), counter = button.querySelector('[data-gallery-counter]');
-    let activeIndex = 0;
+    const hint = button.querySelector('[data-gallery-hint] span');
+    let activeIndex = 0, flipping = false;
     button.addEventListener('click', event => {
-      if (slide.dataset.wasDragged === 'true') return;
-      event.stopPropagation(); activeIndex = (activeIndex + 1) % images.length;
-      mainImage.src = images[activeIndex].url; mainImage.alt = images[activeIndex].alt || `\u5287\u672c\u5716 ${activeIndex + 1}`; counter.textContent = `${activeIndex + 1} / ${images.length}`;
+      if (slide.dataset.wasDragged === 'true' || flipping) return;
+      event.stopPropagation();
+      flipping = true; button.classList.add('is-flipping');
+      window.setTimeout(() => {
+        activeIndex = (activeIndex + 1) % images.length;
+        mainImage.src = images[activeIndex].url;
+        mainImage.alt = images[activeIndex].alt || `\u5287\u672c\u5716 ${activeIndex + 1}`;
+        counter.textContent = `${activeIndex + 1} / ${images.length}`;
+        if (hint) hint.textContent = activeIndex === 0 ? '\u67e5\u770b\u80cc\u9762' : '\u8fd4\u56de\u6b63\u9762';
+      }, 140);
+      window.setTimeout(() => { button.classList.remove('is-flipping'); flipping = false; }, 300);
     });
   }
 
@@ -74,7 +90,9 @@
     const storytellerGuide = guides.storyteller || {};
     const loginNext = encodeURIComponent(`/#scripts/${item.slug}`);
     const locked = `<div class="script-guide-lock"><i class="fa-solid fa-lock"></i><h4>\u767b\u5165\u5f8c\u67e5\u770b\u8aaa\u66f8\u4eba\u653b\u7565</h4><p>\u73a9\u5bb6\u653b\u7565\u5c0d\u6240\u6709\u4eba\u516c\u958b\uff1b\u8aaa\u66f8\u4eba\u64cd\u4f5c\u7d30\u7bc0\u9700\u4f7f\u7528 LINE \u767b\u5165\u5f8c\u67e5\u770b\u3002</p><a class="script-guide-action" href="/api/auth/line/login?next=${loginNext}"><i class="fa-brands fa-line"></i> \u4f7f\u7528 LINE \u767b\u5165</a></div>`;
+    const tags = (item.tags || []).map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
     detail.innerHTML = `
+      <header class="script-detail-heading"><div><div class="script-category">${escapeHtml(item.category || '\u5287\u672c')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2><div class="script-detail-meta"><span><i class="fa-solid fa-user-pen"></i> ${escapeHtml(item.author_name || '\u4f5c\u8005\u5f85\u88dc')}</span>${tags}</div>${item.tagline ? `<p>${escapeHtml(item.tagline)}</p>` : ''}</div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> \u539f\u59cb\u6587\u7ae0</a>` : ''}</header>
       <nav class="script-tabs" role="tablist" aria-label="\u5287\u672c\u5167\u5bb9"><button class="active" type="button" role="tab" aria-selected="true" data-script-tab="intro">\u5287\u672c\u4ecb\u7d39</button><button type="button" role="tab" aria-selected="false" data-script-tab="roster">\u89d2\u8272\u69cb\u6210</button><button type="button" role="tab" aria-selected="false" data-script-tab="guide">\u62c9\u666e\u62c9\u65af\u653b\u7565</button></nav>
       <div data-script-panel="intro"><div class="script-intro-layout"><div><section class="script-section"><h3>\u5287\u672c\u80cc\u666f\u4ecb\u7d39${item.needs_review ? '<span class="script-review">\u5f85\u5be9\u95b1</span>' : ''}</h3><div class="script-prose">${escapeHtml(item.background_introduction || item.introduction || '\u5c1a\u672a\u6574\u7406\u80cc\u666f\u4ecb\u7d39\u3002')}</div></section><section class="script-section"><h3>\u6838\u5fc3\u9ad4\u9a57\u8207\u73a9\u6cd5\u7279\u8272</h3><div class="script-prose">${escapeHtml(item.gameplay_overview || '\u5c1a\u672a\u6574\u7406\u73a9\u6cd5\u7279\u8272\u3002')}</div></section></div><aside><section class="script-section"><h3>\u4f5c\u8005</h3><div class="script-prose">${escapeHtml(item.author_name || '\u5f85\u88dc')}</div></section><section class="script-section"><h3>\u4f5c\u8005\u7684\u8a71</h3><div class="script-prose">${escapeHtml(item.author_note || '\u5c1a\u672a\u6536\u9304\u3002')}</div></section><section class="script-section"><h3>\u88fd\u4f5c\u8207\u66f4\u65b0\u8cc7\u8a0a</h3><div class="script-prose">${escapeHtml(item.production_updates || item.version || '\u5c1a\u672a\u6536\u9304\u3002')}</div></section></aside></div></div>
       <div data-script-panel="roster" hidden><section class="script-section"><h3>\u89d2\u8272\u8207\u898f\u5247\u69cb\u6210</h3>${roster || '<div class="script-role-missing">\u5c1a\u672a\u53d6\u5f97\u5b8c\u6574\u5287\u672c JSON\u3002</div>'}</section></div>
@@ -133,10 +151,10 @@
     selectScript(visibleScripts[next].slug);
   }
 
-  let dragging = false, dragStartX = 0, dragStartScroll = 0, draggedSlide = null;
+  let dragging = false, dragStartX = 0, dragStartScroll = 0, draggedSlide = null, dragMoved = false;
   carousel.addEventListener('pointerdown', event => {
     if (event.pointerType === 'mouse' && event.button !== 0) return;
-    dragging = true; dragStartX = event.clientX; dragStartScroll = carousel.scrollLeft;
+    dragging = true; dragMoved = false; dragStartX = event.clientX; dragStartScroll = carousel.scrollLeft;
     draggedSlide = event.target.closest('[data-script-slide]');
     if (draggedSlide) draggedSlide.dataset.wasDragged = 'false';
     carousel.setPointerCapture?.(event.pointerId);
@@ -144,12 +162,16 @@
   carousel.addEventListener('pointermove', event => {
     if (!dragging) return;
     const delta = event.clientX - dragStartX;
-    if (Math.abs(delta) > 6 && draggedSlide) draggedSlide.dataset.wasDragged = 'true';
+    if (Math.abs(delta) > 6 && draggedSlide) { dragMoved = true; draggedSlide.dataset.wasDragged = 'true'; }
     carousel.scrollLeft = dragStartScroll - delta;
   });
   const finishDrag = event => {
     dragging = false; carousel.releasePointerCapture?.(event.pointerId);
-    if (draggedSlide) setTimeout(() => { draggedSlide.dataset.wasDragged = 'false'; }, 0);
+    if (draggedSlide) {
+      const slide = draggedSlide;
+      if (!dragMoved) slide.dataset.wasDragged = 'false';
+      else setTimeout(() => { slide.dataset.wasDragged = 'false'; }, 180);
+    }
     draggedSlide = null;
   };
   carousel.addEventListener('pointerup', finishDrag);
