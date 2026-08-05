@@ -2,13 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 
 from database import get_db
+from knowledge_models import KnowledgeNode
 from role_public_routes import role_card
+from role_models import RoleKnowledgeLink
 from script_models import ScriptEntry, ScriptRole
 
 router = APIRouter(prefix="/api/scripts", tags=["scripts-public"])
 
 
-def serialize_script(script, include_roles=False):
+def serialize_script(script, include_roles=False, knowledge_slugs=None):
     payload = {
         "slug": script.slug, "name_zh_tw": script.name_zh_tw, "version": script.version,
         "category": script.category, "introduction": script.introduction,
@@ -20,7 +22,7 @@ def serialize_script(script, include_roles=False):
         "role_count": len(script.roles),
     }
     if include_roles:
-        payload["roles"] = [role_card(item.role)
+        payload["roles"] = [role_card(item.role, knowledge_slug=(knowledge_slugs or {}).get(item.role_id))
                             for item in sorted(script.roles, key=lambda value: (value.sort_order, value.id))
                             if item.role and item.role.is_active]
     return payload
@@ -46,4 +48,11 @@ def get_script(slug: str, db: Session = Depends(get_db)):
     ).filter(ScriptEntry.slug == slug, ScriptEntry.is_public == True).first()  # noqa: E712
     if not script:
         raise HTTPException(status_code=404, detail="找不到劇本")
-    return serialize_script(script, include_roles=True)
+    role_ids = [item.role_id for item in script.roles]
+    knowledge_slugs = {}
+    if role_ids:
+        for role_id, slug in db.query(RoleKnowledgeLink.role_id, KnowledgeNode.slug).join(
+            KnowledgeNode, KnowledgeNode.id == RoleKnowledgeLink.knowledge_node_id
+        ).filter(RoleKnowledgeLink.role_id.in_(role_ids)).order_by(RoleKnowledgeLink.id).all():
+            knowledge_slugs.setdefault(role_id, slug)
+    return serialize_script(script, include_roles=True, knowledge_slugs=knowledge_slugs)
