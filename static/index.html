@@ -62,6 +62,7 @@
     <ul class="nav-links" id="main-nav">
         <li class="active"><a href="#" data-page="dashboard"><i class="fa-solid fa-chart-line"></i> <span>數據看板</span></a></li>
         <li><a href="#" data-page="knowledge"><i class="fa-solid fa-book-atlas"></i> <span>角色與規則</span></a></li>
+        <li><a href="#" data-page="scripts"><i class="fa-solid fa-scroll"></i> <span>劇本瀏覽</span></a></li>
         <li><a href="#" data-page="rooms"><i class="fa-solid fa-door-open"></i> <span>小鎮報到</span></a></li>
         <li><a href="#" data-page="recorder"><i class="fa-solid fa-book-open"></i> <span>覆盤紀錄器</span></a></li>
         <li><a href="#" data-page="record"><i class="fa-solid fa-feather-pointed"></i> <span>錄入對局</span></a></li>
@@ -161,7 +162,9 @@
             let loadedPage = '';
             const pageFromHash = () => {
                 const rawHash = window.location.hash.replace('#', '');
-                return rawHash.startsWith('knowledge/') ? 'knowledge' : (rawHash || 'dashboard');
+                if (rawHash.startsWith('knowledge/')) return 'knowledge';
+                if (rawHash.startsWith('scripts/')) return 'scripts';
+                return rawHash || 'dashboard';
             };
             const loadPageFromHash = () => {
                 const page = pageFromHash();

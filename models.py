@@ -115,6 +115,7 @@ class MatchPlayer(Base):
 
 import knowledge_models  # noqa: E402,F401
 import role_models  # noqa: E402,F401
+import script_models  # noqa: E402,F401
 
 
 def _install_town_checkin_router_patch():
@@ -137,6 +138,7 @@ def _install_town_checkin_router_patch():
             ("account_binding_routes", "", "帳號綁定 API"),
             ("knowledge_public_routes", "", "公開知識庫 API"),
             ("role_public_routes", "", "公開角色視圖 API"),
+            ("script_public_routes", "", "公開劇本瀏覽 API"),
             ("role_admin_routes", "/api/admin", "角色資料庫管理 API"),
             ("role_content_admin_routes", "/api/admin", "角色內容區塊管理 API"),
             ("role_sync_routes", "/api/admin", "角色資料同步 API"),

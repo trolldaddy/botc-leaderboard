@@ -1,0 +1,40 @@
+name: Seed Bilibili Script
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Preview validates matching; write updates the database
+        required: true
+        default: preview
+        type: choice
+        options: [preview, write]
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/town-checkin
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Validate write configuration
+        if: inputs.mode == 'write'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: test -n "$DATABASE_URL"
+      - name: Import reviewed script
+        env:
+          DATABASE_URL: ${{ inputs.mode == 'write' && secrets.DATABASE_URL || '' }}
+        run: |
+          args=()
+          if [ "${{ inputs.mode }}" = "write" ]; then args+=(--write); fi
+          python scripts/import_bilibili_script.py \
+            data/scripts/wafuleiming.json \
+            data/scripts/wafuleiming-script.json \
+            "${args[@]}"
