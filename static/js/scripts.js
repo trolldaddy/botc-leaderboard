@@ -235,7 +235,7 @@
     if (event.target.closest('button, a') || event.touches.length !== 1) return;
     const touch = event.touches[0];
     touchStartX = touch.clientX; touchStartY = touch.clientY; touchStartScroll = carousel.scrollLeft; touchStartSlug = activeSlug;
-    touchDragging = true; touchHorizontal = false;
+    touchDragging = true; touchHorizontal = false; carousel.classList.add('is-touching');
   }, { passive: true });
   carousel.addEventListener('touchmove', event => {
     if (!touchDragging || event.touches.length !== 1) return;
@@ -251,15 +251,15 @@
   carousel.addEventListener('touchend', () => {
     if (touchHorizontal) {
       const delta = carousel.scrollLeft - touchStartScroll;
-      if (Math.abs(delta) > 45) {
+      if (Math.abs(delta) > 20) {
         const start = Math.max(0, visibleScripts.findIndex(item => item.slug === touchStartSlug));
         const next = (start + (delta > 0 ? 1 : -1) + visibleScripts.length) % visibleScripts.length;
         selectScript(visibleScripts[next].slug);
       } else scrollToSlug(touchStartSlug || activeSlug);
     }
-    touchDragging = false; touchHorizontal = false;
+    touchDragging = false; touchHorizontal = false; carousel.classList.remove('is-touching');
   }, { passive: true });
-  carousel.addEventListener('touchcancel', () => { touchDragging = false; touchHorizontal = false; }, { passive: true });
+  carousel.addEventListener('touchcancel', () => { touchDragging = false; touchHorizontal = false; carousel.classList.remove('is-touching'); }, { passive: true });
   carousel.addEventListener('scroll', () => {
     if (touchDragging) return;
     clearTimeout(scrollTimer);
