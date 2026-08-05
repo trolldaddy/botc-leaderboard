@@ -6,8 +6,8 @@
   "published_at": "2024-07-25T07:07:15+00:00", "is_public": true,
   "introduction": "《瓦釜雷鳴》是一套全部採用官方與實驗性官方角色的縫合劇本。它透過處決資訊、死亡資訊與陣營互動形成多層推理，並要求玩家從看似合理的線索中辨認彼此矛盾之處。此條目依作者文章整理，角色名單以劇本 JSON 為準。",
   "images": [
-    {"url": "/script-images/wafuleiming/cover.webp", "alt": "瓦釜雷鳴劇本圖"},
-    {"url": "/script-images/wafuleiming/introduction.webp", "alt": "瓦釜雷鳴介紹圖"},
-    {"url": "/script-images/wafuleiming/update.webp", "alt": "瓦釜雷鳴版本更新圖"}
+    {"url": "/static/script-images/wafuleiming/cover.webp", "alt": "瓦釜雷鳴劇本圖"},
+    {"url": "/static/script-images/wafuleiming/introduction.webp", "alt": "瓦釜雷鳴介紹圖"},
+    {"url": "/static/script-images/wafuleiming/update.webp", "alt": "瓦釜雷鳴版本更新圖"}
   ]
 }
