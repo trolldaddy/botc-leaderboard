@@ -60,7 +60,7 @@
     return `<article class="script-carousel-slide" data-script-slide data-index="${index}" data-slug="${escapeHtml(item.slug)}"><div class="script-carousel-card">
       <div class="script-carousel-title"><div><div class="script-category">${escapeHtml(item.category || '\u5287\u672c')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2><div class="script-byline">${escapeHtml(item.author_name ? `\u4f5c\u8005　${item.author_name}` : '\u4f5c\u8005\u5f85\u88dc')}</div></div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> \u539f\u59cb\u6587\u7ae0</a>` : ''}</div>
       <div class="script-carousel-image" data-gallery-view>${imageMarkup}</div>
-      <div class="script-carousel-controls"><button type="button" data-script-previous><i class="fa-solid fa-chevron-left"></i><span>\u4e0a\u4e00\u5957</span></button>${images.length > 1 ? '<button type="button" data-script-flip><i class="fa-solid fa-repeat"></i><span>\u7ffb\u81f3\u80cc\u9762</span></button>' : ''}<button type="button" data-script-fullscreen><i class="fa-solid fa-expand"></i><span>\u5168\u87a2\u5e55\u67e5\u770b</span></button><button type="button" data-script-next><i class="fa-solid fa-chevron-right"></i><span>\u4e0b\u4e00\u5957</span></button></div>
+      <div class="script-carousel-controls"><button type="button" data-script-previous aria-label="\u4e0a\u4e00\u5957\u5287\u672c" title="\u4e0a\u4e00\u5957\u5287\u672c"><i class="fa-solid fa-chevron-left"></i></button>${images.length > 1 ? '<button type="button" data-script-flip aria-label="\u7ffb\u9762" title="\u7ffb\u9762"><i class="fa-solid fa-repeat"></i></button>' : ''}<button type="button" data-script-fullscreen aria-label="\u5168\u87a2\u5e55\u67e5\u770b" title="\u5168\u87a2\u5e55\u67e5\u770b"><i class="fa-solid fa-expand"></i></button><button type="button" data-script-next aria-label="\u4e0b\u4e00\u5957\u5287\u672c" title="\u4e0b\u4e00\u5957\u5287\u672c"><i class="fa-solid fa-chevron-right"></i></button></div>
     </div></article>`;
   }
 
@@ -72,13 +72,15 @@
     viewer.setAttribute('role', 'dialog');
     viewer.setAttribute('aria-modal', 'true');
     viewer.setAttribute('aria-label', '\u5287\u672c\u5716\u5168\u87a2\u5e55\u6aa2\u8996');
-    viewer.innerHTML = `<div class="script-image-viewer-stage"><img alt=""><div class="script-image-viewer-actions">${images.length > 1 ? '<button type="button" data-viewer-flip><i class="fa-solid fa-repeat"></i><span>\u7ffb\u81f3\u80cc\u9762</span></button>' : ''}<button type="button" data-viewer-close><i class="fa-solid fa-xmark"></i><span>\u95dc\u9589</span></button></div></div>`;
-    const image = viewer.querySelector('img');
+    const desktopSpread = images.length > 1 && window.matchMedia('(min-width: 800px) and (orientation: landscape)').matches;
+    viewer.classList.toggle('is-spread', desktopSpread);
+    viewer.innerHTML = `<div class="script-image-viewer-stage"><div class="script-image-viewer-pages">${desktopSpread ? images.map(item => `<img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt || '\u5287\u672c\u5716')}">`).join('') : '<img alt="">'}</div><div class="script-image-viewer-actions">${!desktopSpread && images.length > 1 ? '<button type="button" data-viewer-flip aria-label="\u7ffb\u9762" title="\u7ffb\u9762"><i class="fa-solid fa-repeat"></i></button>' : ''}<button type="button" data-viewer-close aria-label="\u95dc\u9589\u5168\u87a2\u5e55" title="\u95dc\u9589"><i class="fa-solid fa-xmark"></i></button></div></div>`;
+    const image = viewer.querySelector('.script-image-viewer-pages img');
     const flipButton = viewer.querySelector('[data-viewer-flip]');
     const render = () => {
+      if (desktopSpread) return;
       image.src = images[activeIndex].url;
       image.alt = images[activeIndex].alt || `\u5287\u672c\u5716 ${activeIndex + 1}`;
-      if (flipButton) flipButton.querySelector('span').textContent = activeIndex === 0 ? '\u7ffb\u81f3\u80cc\u9762' : '\u7ffb\u56de\u6b63\u9762';
     };
     const close = () => {
       document.removeEventListener('keydown', onKeyDown);
@@ -110,8 +112,7 @@
     const fullscreenControl = slide.querySelector('[data-script-fullscreen]');
     const nextControl = slide.querySelector('[data-script-next]');
     const syncControls = () => {
-      const label = flipControl?.querySelector('span');
-      if (label) label.textContent = activeIndex === 0 ? '\u7ffb\u81f3\u80cc\u9762' : '\u7ffb\u56de\u6b63\u9762';
+      if (flipControl) flipControl.title = flipControl.getAttribute('aria-label') = activeIndex === 0 ? '\u7ffb\u81f3\u80cc\u9762' : '\u7ffb\u56de\u6b63\u9762';
     };
     const setFace = index => {
       activeIndex = index;
@@ -206,7 +207,7 @@
   let dragging = false, dragStartX = 0, dragStartScroll = 0, draggedSlide = null, dragMoved = false;
   carousel.addEventListener('pointerdown', event => {
     if (event.target.closest('button, a')) return;
-    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    if (event.pointerType !== 'mouse' || event.button !== 0) return;
     dragging = true; dragMoved = false; dragStartX = event.clientX; dragStartScroll = carousel.scrollLeft;
     draggedSlide = event.target.closest('[data-script-slide]');
     if (draggedSlide) draggedSlide.dataset.wasDragged = 'false';
@@ -229,7 +230,38 @@
   };
   carousel.addEventListener('pointerup', finishDrag);
   carousel.addEventListener('pointercancel', finishDrag);
+  let touchStartX = 0, touchStartY = 0, touchStartScroll = 0, touchStartSlug = '', touchDragging = false, touchHorizontal = false;
+  carousel.addEventListener('touchstart', event => {
+    if (event.target.closest('button, a') || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    touchStartX = touch.clientX; touchStartY = touch.clientY; touchStartScroll = carousel.scrollLeft; touchStartSlug = activeSlug;
+    touchDragging = true; touchHorizontal = false;
+  }, { passive: true });
+  carousel.addEventListener('touchmove', event => {
+    if (!touchDragging || event.touches.length !== 1) return;
+    const touch = event.touches[0], deltaX = touch.clientX - touchStartX, deltaY = touch.clientY - touchStartY;
+    if (!touchHorizontal && Math.abs(deltaX) > 8) {
+      if (Math.abs(deltaX) <= Math.abs(deltaY)) { touchDragging = false; return; }
+      touchHorizontal = true;
+    }
+    if (!touchHorizontal) return;
+    event.preventDefault();
+    carousel.scrollLeft = touchStartScroll - deltaX;
+  }, { passive: false });
+  carousel.addEventListener('touchend', () => {
+    if (touchHorizontal) {
+      const delta = carousel.scrollLeft - touchStartScroll;
+      if (Math.abs(delta) > 45) {
+        const start = Math.max(0, visibleScripts.findIndex(item => item.slug === touchStartSlug));
+        const next = (start + (delta > 0 ? 1 : -1) + visibleScripts.length) % visibleScripts.length;
+        selectScript(visibleScripts[next].slug);
+      } else scrollToSlug(touchStartSlug || activeSlug);
+    }
+    touchDragging = false; touchHorizontal = false;
+  }, { passive: true });
+  carousel.addEventListener('touchcancel', () => { touchDragging = false; touchHorizontal = false; }, { passive: true });
   carousel.addEventListener('scroll', () => {
+    if (touchDragging) return;
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(() => {
       const center = carousel.scrollLeft + carousel.clientWidth / 2;
