@@ -60,6 +60,7 @@
     return `<article class="script-carousel-slide" data-script-slide data-index="${index}" data-slug="${escapeHtml(item.slug)}"><div class="script-carousel-card">
       <div class="script-carousel-title"><div><div class="script-category">${escapeHtml(item.category || '\u5287\u672c')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2><div class="script-byline">${escapeHtml(item.author_name ? `\u4f5c\u8005　${item.author_name}` : '\u4f5c\u8005\u5f85\u88dc')}</div></div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> \u539f\u59cb\u6587\u7ae0</a>` : ''}</div>
       <div class="script-carousel-image" data-gallery-view>${imageMarkup}</div>
+      <div class="script-carousel-controls">${images.length > 1 ? '<button type="button" data-script-flip><i class="fa-solid fa-repeat"></i><span>\u7ffb\u81f3\u80cc\u9762</span></button>' : ''}<button type="button" data-script-fullscreen><i class="fa-solid fa-expand"></i><span>\u5168\u87a2\u5e55\u67e5\u770b</span></button></div>
     </div></article>`;
   }
 
@@ -104,9 +105,10 @@
     if (!frame || !images.length) return;
     const mainImage = frame.querySelector('[data-gallery-main-image]');
     let activeIndex = 0, flipping = false;
+    const flipControl = slide.querySelector('[data-script-flip]');
+    const fullscreenControl = slide.querySelector('[data-script-fullscreen]');
     const syncControls = () => {
-      if (activeSlug !== item.slug) return;
-      const label = detail.querySelector('[data-script-flip] span');
+      const label = flipControl?.querySelector('span');
       if (label) label.textContent = activeIndex === 0 ? '\u7ffb\u81f3\u80cc\u9762' : '\u7ffb\u56de\u6b63\u9762';
     };
     const setFace = index => {
@@ -123,7 +125,8 @@
       window.setTimeout(() => { frame.classList.remove('is-flipping'); flipping = false; }, 300);
     };
     slide.openScriptImage = () => openScriptViewer(images, activeIndex, setFace);
-    slide.getScriptFaceIndex = () => activeIndex;
+    flipControl?.addEventListener('click', event => { event.stopPropagation(); slide.flipScriptImage(); });
+    fullscreenControl?.addEventListener('click', event => { event.stopPropagation(); slide.openScriptImage(); });
   }
   function renderDetail(item) {
     const roster = groupedRosterMarkup(item.roles || [], item.special_entries || []);
@@ -134,17 +137,12 @@
     const tags = (item.tags || []).map(tag => `<span>${escapeHtml(tag)}</span>`).join('');
     detail.innerHTML = `
       <header class="script-detail-heading"><div><div class="script-category">${escapeHtml(item.category || '\u5287\u672c')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2><div class="script-detail-meta"><span><i class="fa-solid fa-user-pen"></i> ${escapeHtml(item.author_name || '\u4f5c\u8005\u5f85\u88dc')}</span>${tags}</div>${item.tagline ? `<p>${escapeHtml(item.tagline)}</p>` : ''}</div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> \u539f\u59cb\u6587\u7ae0</a>` : ''}</header>
-      <div class="script-detail-controls">${displayImages(item).length > 1 ? '<button type="button" data-script-flip><i class="fa-solid fa-repeat"></i><span>\u7ffb\u81f3\u80cc\u9762</span></button>' : ''}<button type="button" data-script-fullscreen><i class="fa-solid fa-expand"></i><span>\u5168\u87a2\u5e55\u67e5\u770b</span></button></div>
+
       <nav class="script-tabs" role="tablist" aria-label="\u5287\u672c\u5167\u5bb9"><button class="active" type="button" role="tab" aria-selected="true" data-script-tab="intro">\u5287\u672c\u4ecb\u7d39</button><button type="button" role="tab" aria-selected="false" data-script-tab="roster">\u89d2\u8272\u69cb\u6210</button><button type="button" role="tab" aria-selected="false" data-script-tab="guide">\u62c9\u666e\u62c9\u65af\u653b\u7565</button></nav>
       <div data-script-panel="intro"><div class="script-intro-layout"><div><section class="script-section"><h3>\u5287\u672c\u80cc\u666f\u4ecb\u7d39${item.needs_review ? '<span class="script-review">\u5f85\u5be9\u95b1</span>' : ''}</h3><div class="script-prose">${escapeHtml(item.background_introduction || item.introduction || '\u5c1a\u672a\u6574\u7406\u80cc\u666f\u4ecb\u7d39\u3002')}</div></section><section class="script-section"><h3>\u6838\u5fc3\u9ad4\u9a57\u8207\u73a9\u6cd5\u7279\u8272</h3><div class="script-prose">${escapeHtml(item.gameplay_overview || '\u5c1a\u672a\u6574\u7406\u73a9\u6cd5\u7279\u8272\u3002')}</div></section></div><aside><section class="script-section"><h3>\u4f5c\u8005</h3><div class="script-prose">${escapeHtml(item.author_name || '\u5f85\u88dc')}</div></section><section class="script-section"><h3>\u4f5c\u8005\u7684\u8a71</h3><div class="script-prose">${escapeHtml(item.author_note || '\u5c1a\u672a\u6536\u9304\u3002')}</div></section><section class="script-section"><h3>\u88fd\u4f5c\u8207\u66f4\u65b0\u8cc7\u8a0a</h3><div class="script-prose">${escapeHtml(item.production_updates || item.version || '\u5c1a\u672a\u6536\u9304\u3002')}</div></section></aside></div></div>
       <div data-script-panel="roster" hidden><section class="script-section"><h3>\u89d2\u8272\u8207\u898f\u5247\u69cb\u6210</h3>${roster || '<div class="script-role-missing">\u5c1a\u672a\u53d6\u5f97\u5b8c\u6574\u5287\u672c JSON\u3002</div>'}</section></div>
       <div data-script-panel="guide" hidden><div class="script-guide-grid"><section class="script-section"><h3>\u73a9\u5bb6\u653b\u7565</h3><p class="script-guide-note">\u6240\u6709\u4eba\u7686\u53ef\u95b1\u8b80\u3002</p><div class="script-prose">${escapeHtml(guides.player?.content || '\u73a9\u5bb6\u653b\u7565\u6b63\u5728\u6574\u7406\u4e2d\u3002')}</div></section><section class="script-section"><h3>\u8aaa\u66f8\u4eba\u653b\u7565</h3>${storytellerGuide.locked ? locked : '<div class="script-guide-loading" data-storyteller-guide-content>\u6b63\u5728\u6e96\u5099\u6388\u6b0a\u5167\u5bb9\u3002</div>'}</section></div></div>`;
-    const activeSlide = slideForSlug(item.slug);
-    const flipControl = detail.querySelector('[data-script-flip]');
-    const fullscreenControl = detail.querySelector('[data-script-fullscreen]');
-    flipControl?.addEventListener('click', () => activeSlide?.flipScriptImage?.());
-    fullscreenControl?.addEventListener('click', () => activeSlide?.openScriptImage?.());
-    if (flipControl && activeSlide?.getScriptFaceIndex?.() === 1) flipControl.querySelector('span').textContent = '\u7ffb\u56de\u6b63\u9762';
+
     const tabs = [...detail.querySelectorAll('[data-script-tab]')];
     let storytellerLoaded = false;
     tabs.forEach(button => button.addEventListener('click', async () => {
