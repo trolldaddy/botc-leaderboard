@@ -49,3 +49,14 @@
 }
 .script-carousel-image{touch-action:manipulation}
 @media(max-width:850px){.script-browser-topline{display:block}.script-browser-topline .script-browser-header{margin-bottom:1rem}}
+.script-detail-controls{display:flex;justify-content:flex-end;gap:.65rem;padding:.75rem 1.25rem;background:#0d0c12;border-top:1px solid rgba(255,255,255,.08)}
+.script-detail-controls button,.script-image-viewer-actions button{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:42px;padding:.65rem 1rem;border:1px solid rgba(255,183,3,.38);border-radius:10px;background:linear-gradient(180deg,rgba(255,183,3,.13),rgba(255,183,3,.055));color:#fff;font:inherit;font-weight:850;cursor:pointer}
+.script-detail-controls button:hover,.script-detail-controls button:focus-visible,.script-image-viewer-actions button:hover,.script-image-viewer-actions button:focus-visible{border-color:var(--accent-gold);background:rgba(255,183,3,.18);color:var(--accent-gold);outline:none}
+.script-detail-controls i,.script-image-viewer-actions i{color:var(--accent-gold)}
+.script-image-viewer{position:fixed;z-index:10000;inset:0;display:grid;place-items:center;padding:clamp(.5rem,2vw,1.5rem);background:rgba(3,2,7,.94);backdrop-filter:blur(14px)}
+.script-image-viewer-stage{position:relative;display:grid;place-items:center;width:100%;height:100%;min-height:0}
+.script-image-viewer-stage img{display:block;max-width:100%;max-height:calc(100vh - 88px);width:auto;height:auto;object-fit:contain;user-select:none}
+.script-image-viewer-actions{position:fixed;z-index:1;right:clamp(.75rem,2vw,1.5rem);top:clamp(.75rem,2vw,1.5rem);display:flex;gap:.6rem}
+body.script-viewer-open{overflow:hidden}
+.script-carousel-image{cursor:default}
+@media(max-width:560px){.script-detail-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:.7rem}.script-detail-controls button{padding:.6rem .7rem}.script-image-viewer-actions{right:.65rem;top:.65rem}.script-image-viewer-actions button span{display:none}.script-image-viewer-stage img{max-height:calc(100vh - 64px)}}
