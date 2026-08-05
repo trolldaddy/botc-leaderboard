@@ -33,3 +33,12 @@
 .script-detail-meta span{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .55rem;border:1px solid rgba(167,139,250,.2);border-radius:999px;background:rgba(124,58,237,.1);font-size:.82rem}
 .script-roster-group{display:block}.script-roster-group h4{font-size:1.15rem}.script-role-grid{align-items:stretch}
 @media(max-width:560px){.script-detail-heading{display:grid}.script-detail-heading .script-source{justify-self:start}.script-detail-heading h2{font-size:1.45rem}}
+
+
+@media(min-width:851px){
+  .script-carousel-shell{min-height:720px;height:auto;overflow:hidden}
+  .script-carousel{min-height:700px;align-items:stretch}
+  .script-carousel-slide{height:auto;align-self:stretch}
+  .script-carousel-card{height:auto;min-height:680px}
+}
+.script-carousel-image{touch-action:manipulation}

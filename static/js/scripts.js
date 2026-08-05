@@ -59,7 +59,7 @@
     const imageMarkup = first ? `<img src="${escapeHtml(first.url)}" alt="${escapeHtml(first.alt)}" draggable="false" data-gallery-main-image>` : '<span class="script-carousel-no-image"><i class="fa-solid fa-image"></i></span>';
     return `<article class="script-carousel-slide" data-script-slide data-index="${index}" data-slug="${escapeHtml(item.slug)}"><div class="script-carousel-card">
       <div class="script-carousel-title"><div><div class="script-category">${escapeHtml(item.category || '\u5287\u672c')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2><div class="script-byline">${escapeHtml(item.author_name ? `\u4f5c\u8005　${item.author_name}` : '\u4f5c\u8005\u5f85\u88dc')}</div></div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> \u539f\u59cb\u6587\u7ae0</a>` : ''}</div>
-      <button class="script-carousel-image" type="button" data-gallery-next aria-label="${images.length > 1 ? '\u7ffb\u81f3\u5287\u672c\u53e6\u4e00\u9762' : '\u5287\u672c\u5716'}">${imageMarkup}<span class="script-gallery-counter" data-gallery-counter>${images.length ? `1 / ${images.length}` : ''}</span>${images.length > 1 ? '<span class="script-gallery-hint" data-gallery-hint><i class="fa-solid fa-rotate"></i> <span>\u67e5\u770b\u80cc\u9762</span></span>' : ''}</button>
+      <button class="script-carousel-image" type="button" data-gallery-next aria-label="${images.length > 1 ? '\u96d9\u64ca\u7ffb\u81f3\u5287\u672c\u53e6\u4e00\u9762' : '\u5287\u672c\u5716'}">${imageMarkup}<span class="script-gallery-counter" data-gallery-counter>${images.length ? `1 / ${images.length}` : ''}</span>${images.length > 1 ? '<span class="script-gallery-hint" data-gallery-hint><i class="fa-solid fa-rotate"></i> <span>\u96d9\u64ca\u67e5\u770b\u80cc\u9762</span></span>' : ''}</button>
     </div></article>`;
   }
 
@@ -69,7 +69,7 @@
     const mainImage = button.querySelector('[data-gallery-main-image]'), counter = button.querySelector('[data-gallery-counter]');
     const hint = button.querySelector('[data-gallery-hint] span');
     let activeIndex = 0, flipping = false;
-    button.addEventListener('click', event => {
+    button.addEventListener('dblclick', event => {
       if (slide.dataset.wasDragged === 'true' || flipping) return;
       event.stopPropagation();
       flipping = true; button.classList.add('is-flipping');
@@ -78,7 +78,7 @@
         mainImage.src = images[activeIndex].url;
         mainImage.alt = images[activeIndex].alt || `\u5287\u672c\u5716 ${activeIndex + 1}`;
         counter.textContent = `${activeIndex + 1} / ${images.length}`;
-        if (hint) hint.textContent = activeIndex === 0 ? '\u67e5\u770b\u80cc\u9762' : '\u8fd4\u56de\u6b63\u9762';
+        if (hint) hint.textContent = activeIndex === 0 ? '\u96d9\u64ca\u67e5\u770b\u80cc\u9762' : '\u96d9\u64ca\u8fd4\u56de\u6b63\u9762';
       }, 140);
       window.setTimeout(() => { button.classList.remove('is-flipping'); flipping = false; }, 300);
     });
@@ -162,7 +162,7 @@
   carousel.addEventListener('pointermove', event => {
     if (!dragging) return;
     const delta = event.clientX - dragStartX;
-    if (Math.abs(delta) > 6 && draggedSlide) { dragMoved = true; draggedSlide.dataset.wasDragged = 'true'; }
+    if (Math.abs(delta) > 12 && draggedSlide) { dragMoved = true; draggedSlide.dataset.wasDragged = 'true'; }
     carousel.scrollLeft = dragStartScroll - delta;
   });
   const finishDrag = event => {
