@@ -73,7 +73,9 @@ def main():
         script.published_at = datetime.fromisoformat(metadata["published_at"]) if metadata.get("published_at") else None
         script.is_public = bool(metadata.get("is_public")) and not missing and len(matched) >= 5
         script.needs_review = bool(missing) or len(matched) < 5
-        script.images.clear(); script.roles.clear()
+        db.query(ScriptImage).filter(ScriptImage.script_id == script.id).delete(synchronize_session=False)
+        db.query(ScriptRole).filter(ScriptRole.script_id == script.id).delete(synchronize_session=False)
+        db.flush()
         for index, image in enumerate(metadata.get("images", [])):
             script.images.append(ScriptImage(image_url=image["url"], alt_text=image.get("alt"), sort_order=index))
         for index, role in enumerate(matched):
