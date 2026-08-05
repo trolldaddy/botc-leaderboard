@@ -56,6 +56,7 @@ def main():
     parser.add_argument("metadata", type=Path)
     parser.add_argument("script_json", type=Path)
     parser.add_argument("--write", action="store_true")
+    parser.add_argument("--require-complete", action="store_true")
     args = parser.parse_args()
     metadata = json.loads(args.metadata.read_text(encoding="utf-8-sig"))
     references = role_references_from_json(args.script_json)
@@ -79,6 +80,9 @@ def main():
             "special_entries_preserved": len(supplements),
             "roles_missing": missing,
         }
+        if args.require_complete and missing:
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            raise SystemExit("Script role matching is incomplete; refusing to continue")
         if not args.write:
             print(json.dumps(report, ensure_ascii=False, indent=2))
             return

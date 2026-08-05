@@ -86,20 +86,28 @@ jobs:
             --quiet
 
       - name: Set up Python for approved script seed
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[seed-script]')
+        if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[seed-script]') || contains(github.event.head_commit.message, '[seed-gongshengti]'))
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
       - name: Seed approved reviewed script
-        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[seed-script]')
+        if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[seed-script]') || contains(github.event.head_commit.message, '[seed-gongshengti]'))
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           set -euo pipefail
           test -n "$DATABASE_URL" || { echo "Missing repository secret: DATABASE_URL"; exit 1; }
           pip install -r requirements.txt
-          python scripts/import_bilibili_script.py data/scripts/wafuleiming.json data/scripts/wafuleiming-script.json --write
+          if [[ "${{ github.event.head_commit.message }}" == *"[seed-gongshengti]"* ]]; then
+            metadata=data/scripts/gongshengti.json
+            script_json=data/scripts/gongshengti-script.json
+          else
+            metadata=data/scripts/wafuleiming.json
+            script_json=data/scripts/wafuleiming-script.json
+          fi
+          python scripts/import_bilibili_script.py "$metadata" "$script_json" --require-complete
+          python scripts/import_bilibili_script.py "$metadata" "$script_json" --write --require-complete
 
       - name: Verify deployed APIs
         shell: bash
