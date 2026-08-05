@@ -94,6 +94,22 @@ def ensure_runtime_schema():
                 }.items():
                     if column not in columns:
                         conn.execute(text(add_column_sql("locations", column, definition)))
+        if "script_entries" in table_names:
+            columns = {col["name"] for col in inspector.get_columns("script_entries")}
+            with engine.begin() as conn:
+                for column, definition in {
+                    "author_name": "VARCHAR(220)",
+                    "tagline": "TEXT",
+                    "tags": "TEXT",
+                    "background_introduction": "TEXT",
+                    "gameplay_overview": "TEXT",
+                    "author_note": "TEXT",
+                    "production_updates": "TEXT",
+                    "player_guide": "TEXT",
+                    "storyteller_guide": "TEXT",
+                }.items():
+                    if column not in columns:
+                        conn.execute(text(add_column_sql("script_entries", column, definition)))
         if "knowledge_nodes" in table_names:
             columns = {col["name"] for col in inspector.get_columns("knowledge_nodes")}
             with engine.begin() as conn:

@@ -87,10 +87,15 @@ def main():
             script = ScriptEntry(slug=metadata["slug"], name_zh_tw=metadata["name_zh_tw"])
             db.add(script)
             db.flush()
-        for field in ("name_zh_tw", "version", "category", "introduction", "source_url",
-                      "source_platform", "source_external_id"):
+        for field in ("name_zh_tw", "version", "category", "introduction", "author_name",
+                      "tagline", "tags", "background_introduction", "gameplay_overview",
+                      "author_note", "production_updates", "player_guide", "storyteller_guide",
+                      "source_url", "source_platform", "source_external_id"):
             if field in metadata:
-                setattr(script, field, metadata[field])
+                value = metadata[field]
+                if field == "tags" and isinstance(value, list):
+                    value = json.dumps(value, ensure_ascii=False)
+                setattr(script, field, value)
         script.published_at = datetime.fromisoformat(metadata["published_at"]) if metadata.get("published_at") else None
         script.is_public = bool(metadata.get("is_public")) and not missing and len(matched) >= 5
         script.needs_review = bool(missing) or len(matched) < 5

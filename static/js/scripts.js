@@ -82,12 +82,32 @@
 
   function renderDetail(item) {
     const images = item.images || [];
-    const gallery = galleryMarkup(images);
-    const roles = item.roles || [];
-    const specialEntries = item.special_entries || [];
-    const roster = groupedRosterMarkup(roles, specialEntries);
-    detail.innerHTML = `<header class="script-hero"><div class="script-title-line"><div><div class="script-category">${escapeHtml(item.category || '劇本')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2></div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> 原始文章</a>` : ''}</div>${gallery}</header><section class="script-section"><h3>劇本介紹${item.needs_review ? '<span class="script-review">待審閱</span>' : ''}</h3><div class="script-intro">${escapeHtml(item.introduction || '尚未整理介紹。')}</div></section><section class="script-section"><h3>角色與規則構成</h3>${roster || '<div class="script-role-missing">尚未取得完整劇本 JSON，因此目前不公開不完整的角色名單。換上完整 JSON 重新匯入後，角色卡會依劇本順序自動顯示。</div>'}</section>`;
+    const roster = groupedRosterMarkup(item.roles || [], item.special_entries || []);
+    const guides = item.guides || {};
+    const storytellerGuide = guides.storyteller || {};
+    const loginNext = encodeURIComponent(`/#scripts/${item.slug}`);
+    const locked = `<div class="script-guide-lock"><i class="fa-solid fa-lock"></i><h4>\u767b\u5165\u5f8c\u67e5\u770b\u8aaa\u66f8\u4eba\u653b\u7565</h4><p>\u73a9\u5bb6\u653b\u7565\u5c0d\u6240\u6709\u4eba\u516c\u958b\uff1b\u8aaa\u66f8\u4eba\u64cd\u4f5c\u7d30\u7bc0\u9700\u4f7f\u7528 LINE \u767b\u5165\u5f8c\u67e5\u770b\u3002</p><a class="script-guide-action" href="/api/auth/line/login?next=${loginNext}"><i class="fa-brands fa-line"></i> \u4f7f\u7528 LINE \u767b\u5165</a></div>`;
+    detail.innerHTML = `
+      <header class="script-hero"><div class="script-title-line"><div><div class="script-category">${escapeHtml(item.category || '\u5287\u672c')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2><div class="script-byline">${escapeHtml(item.author_name ? `\u4f5c\u8005\u3000${item.author_name}` : '\u4f5c\u8005\u5f85\u88dc')}</div></div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> \u539f\u59cb\u6587\u7ae0</a>` : ''}</div>${item.tagline ? `<p class="script-tagline">${escapeHtml(item.tagline)}</p>` : ''}${galleryMarkup(images)}</header>
+      <nav class="script-tabs" role="tablist" aria-label="\u5287\u672c\u5167\u5bb9"><button class="active" type="button" role="tab" aria-selected="true" data-script-tab="intro">\u5287\u672c\u4ecb\u7d39</button><button type="button" role="tab" aria-selected="false" data-script-tab="roster">\u89d2\u8272\u69cb\u6210</button><button type="button" role="tab" aria-selected="false" data-script-tab="guide">\u62c9\u666e\u62c9\u65af\u653b\u7565</button></nav>
+      <div data-script-panel="intro"><div class="script-intro-layout"><div><section class="script-section"><h3>\u5287\u672c\u80cc\u666f\u4ecb\u7d39${item.needs_review ? '<span class="script-review">\u5f85\u5be9\u95b1</span>' : ''}</h3><div class="script-prose">${escapeHtml(item.background_introduction || item.introduction || '\u5c1a\u672a\u6574\u7406\u80cc\u666f\u4ecb\u7d39\u3002')}</div></section><section class="script-section"><h3>\u6838\u5fc3\u9ad4\u9a57\u8207\u73a9\u6cd5\u7279\u8272</h3><div class="script-prose">${escapeHtml(item.gameplay_overview || '\u5c1a\u672a\u6574\u7406\u73a9\u6cd5\u7279\u8272\u3002')}</div></section></div><aside><section class="script-section"><h3>\u4f5c\u8005</h3><div class="script-prose">${escapeHtml(item.author_name || '\u5f85\u88dc')}</div></section><section class="script-section"><h3>\u4f5c\u8005\u7684\u8a71</h3><div class="script-prose">${escapeHtml(item.author_note || '\u5c1a\u672a\u6536\u9304\u3002')}</div></section><section class="script-section"><h3>\u88fd\u4f5c\u8207\u66f4\u65b0\u8cc7\u8a0a</h3><div class="script-prose">${escapeHtml(item.production_updates || item.version || '\u5c1a\u672a\u6536\u9304\u3002')}</div></section></aside></div></div>
+      <div data-script-panel="roster" hidden><section class="script-section"><h3>\u89d2\u8272\u8207\u898f\u5247\u69cb\u6210</h3>${roster || '<div class="script-role-missing">\u5c1a\u672a\u53d6\u5f97\u5b8c\u6574\u5287\u672c JSON\u3002</div>'}</section></div>
+      <div data-script-panel="guide" hidden><div class="script-guide-grid"><section class="script-section"><h3>\u73a9\u5bb6\u653b\u7565</h3><p class="script-guide-note">\u6240\u6709\u4eba\u7686\u53ef\u95b1\u8b80\u3002</p><div class="script-prose">${escapeHtml(guides.player?.content || '\u73a9\u5bb6\u653b\u7565\u6b63\u5728\u6574\u7406\u4e2d\u3002')}</div></section><section class="script-section"><h3>\u8aaa\u66f8\u4eba\u653b\u7565</h3>${storytellerGuide.locked ? locked : '<div class="script-guide-loading" data-storyteller-guide-content>\u6b63\u5728\u6e96\u5099\u6388\u6b0a\u5167\u5bb9\u3002</div>'}</section></div></div>`;
     bindGallery(images);
+    const tabs = [...detail.querySelectorAll('[data-script-tab]')];
+    let storytellerLoaded = false;
+    tabs.forEach(button => button.addEventListener('click', async () => {
+      tabs.forEach(tab => { const active = tab === button; tab.classList.toggle('active', active); tab.setAttribute('aria-selected', String(active)); });
+      detail.querySelectorAll('[data-script-panel]').forEach(panel => { const active = panel.dataset.scriptPanel === button.dataset.scriptTab; panel.hidden = !active; });
+      if (button.dataset.scriptTab !== 'guide' || storytellerGuide.locked || storytellerLoaded) return;
+      const target = detail.querySelector('[data-storyteller-guide-content]'); if (!target) return;
+      storytellerLoaded = true;
+      try {
+        const response = await fetch(`${apiBase}/api/scripts/${encodeURIComponent(item.slug)}/storyteller-guide`, { credentials: 'same-origin' });
+        const payload = await response.json().catch(() => ({})); if (!response.ok) throw new Error(payload.detail || '\u7121\u6cd5\u8b80\u53d6\u8aaa\u66f8\u4eba\u653b\u7565');
+        target.className = 'script-prose'; target.textContent = payload.content || '\u8aaa\u66f8\u4eba\u653b\u7565\u6b63\u5728\u6574\u7406\u4e2d\u3002';
+      } catch (error) { target.className = 'script-guide-error'; target.textContent = error.message; storytellerLoaded = false; }
+    }));
   }
 
   function renderList() {
