@@ -101,7 +101,7 @@
 
   function scrollToSlug(slug, behavior = 'smooth') {
     const slide = slideForSlug(slug);
-    if (slide) carousel.scrollTo({ left: slide.offsetLeft, behavior });
+    if (slide) slide.scrollIntoView({ behavior, block: 'nearest', inline: 'center' });
   }
 
   function renderCarousel() {
