@@ -68,8 +68,8 @@
     if (!button || images.length < 2) return;
     const mainImage = button.querySelector('[data-gallery-main-image]'), counter = button.querySelector('[data-gallery-counter]');
     const hint = button.querySelector('[data-gallery-hint] span');
-    let activeIndex = 0, flipping = false;
-    button.addEventListener('dblclick', event => {
+    let activeIndex = 0, flipping = false, lastTapAt = 0;
+    const flipImage = event => {
       if (slide.dataset.wasDragged === 'true' || flipping) return;
       event.stopPropagation();
       flipping = true; button.classList.add('is-flipping');
@@ -81,6 +81,22 @@
         if (hint) hint.textContent = activeIndex === 0 ? '\u96d9\u64ca\u67e5\u770b\u80cc\u9762' : '\u96d9\u64ca\u8fd4\u56de\u6b63\u9762';
       }, 140);
       window.setTimeout(() => { button.classList.remove('is-flipping'); flipping = false; }, 300);
+    };
+    button.addEventListener('pointerup', event => {
+      if (slide.dataset.wasDragged === 'true') { lastTapAt = 0; return; }
+      const now = Date.now();
+      if (lastTapAt && now - lastTapAt <= 520) {
+        lastTapAt = 0;
+        flipImage(event);
+      } else {
+        lastTapAt = now;
+      }
+    });
+    button.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        flipImage(event);
+      }
     });
   }
 
@@ -195,6 +211,14 @@
 
   async function init() {
     try {
+      const pageHeader = document.querySelector('.script-browser-header');
+      const pageToolbar = document.querySelector('.script-toolbar');
+      if (pageHeader && pageToolbar && !pageHeader.parentElement.classList.contains('script-browser-topline')) {
+        const topline = document.createElement('div');
+        topline.className = 'script-browser-topline';
+        pageHeader.before(topline);
+        topline.append(pageHeader, pageToolbar);
+      }
       const response = await fetch(`${apiBase}/api/scripts`);
       if (!response.ok) throw new Error('\u5287\u672c\u7d22\u5f15\u8f09\u5165\u5931\u6557');
       const summaries = (await response.json()).items || [];
