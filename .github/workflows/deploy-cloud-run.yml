@@ -85,6 +85,22 @@ jobs:
             --allow-unauthenticated \
             --quiet
 
+      - name: Set up Python for approved script seed
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[seed-script]')
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Seed approved reviewed script
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[seed-script]')
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$DATABASE_URL" || { echo "Missing repository secret: DATABASE_URL"; exit 1; }
+          pip install -r requirements.txt
+          python scripts/import_bilibili_script.py data/scripts/wafuleiming.json data/scripts/wafuleiming-script.json --write
+
       - name: Verify deployed APIs
         shell: bash
         run: |
@@ -104,6 +120,7 @@ jobs:
           required = [
               "/api/admin/knowledge/summary",
               "/api/knowledge/search",
+              "/api/scripts",
               "/api/rooms/{room_code}",
           ]
           missing = [path for path in required if path not in paths]
