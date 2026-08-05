@@ -1,0 +1,12 @@
+{
+  "slug": "共生體", "name_zh_tw": "共生體", "version": "v2",
+  "category": "社群縫合劇本", "source_platform": "bilibili",
+  "source_external_id": "1160738963605946387",
+  "source_url": "https://www.bilibili.com/opus/1160738963605946387/",
+  "is_public": true,
+  "introduction": "《共生體》以小怪寶與宿主之間的共生關係為核心：宿主的能力可能因共生而獲得強化，玩家則要從資訊與行動的變化辨認共生關係。小怪寶在宿主之間的轉移受到次數與生存限制，因此除了判斷陣營，也要追蹤共生關係何時轉移。此條目依藍鈴蘭文章整理，角色名單與版本以提供的劇本 JSON 為準。",
+  "images": [
+    {"url": "/static/script-images/gongshengti/cover.webp", "alt": "共生體劇本圖"},
+    {"url": "/static/script-images/gongshengti/update.webp", "alt": "共生體 v2 版本更新圖"}
+  ]
+}

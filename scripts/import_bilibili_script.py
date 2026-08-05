@@ -22,7 +22,10 @@ def role_references_from_json(path):
     result = []
     for item in payload:
         value = item.get("id") if isinstance(item, dict) else item
-        if value and str(value).lower() != "_meta":
+        team = (item.get("team") or "").strip().lower() if isinstance(item, dict) else ""
+        # Fabled entries describe script-wide setup/rule adjustments rather than
+        # player roles, so they do not belong in the script role-card roster.
+        if value and str(value).lower() != "_meta" and team != "fabled":
             result.append({"id": str(value).strip(), "name": (item.get("name") or "").strip() if isinstance(item, dict) else ""})
     return result
 
