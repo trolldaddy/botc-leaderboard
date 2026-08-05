@@ -13,6 +13,37 @@
     return `<a class="script-role-card" href="${href}">${icon}<span><strong>${escapeHtml(role.name_zh_tw)}</strong><small>${escapeHtml(role.team)}</small></span></a>`;
   }
 
+  const groupOrder = ['townsfolk', 'outsider', 'minion', 'demon', 'traveler', 'traveller', 'fabled', 'jinx', 'loric', 'special'];
+  const groupLabels = {
+    townsfolk: '鎮民', outsider: '外來者', minion: '爪牙', demon: '惡魔',
+    traveler: '旅行者', traveller: '旅行者', fabled: '傳奇角色',
+    jinx: '相剋／奇遇規則', loric: '規則修正標記', special: '其他劇本標記',
+  };
+
+  function specialCard(item) {
+    const icon = item.image_url ? `<img src="${escapeHtml(item.image_url)}" alt="" loading="lazy">` : '<span class="script-role-fallback"><i class="fa-solid fa-scroll"></i></span>';
+    return `<div class="script-role-card script-special-card">${icon}<span><strong>${escapeHtml(item.name_zh_tw)}</strong><small>${escapeHtml(groupLabels[item.team] || item.team || '特殊條目')}</small></span>${item.ability ? `<span class="script-special-ability">${escapeHtml(item.ability)}</span>` : ''}</div>`;
+  }
+
+  function groupedRosterMarkup(roles, specialEntries) {
+    const groups = new Map();
+    roles.forEach(role => {
+      const key = String(role.team || 'special').toLowerCase();
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push({ kind: 'role', value: role });
+    });
+    specialEntries.forEach(item => {
+      const key = String(item.team || 'special').toLowerCase();
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push({ kind: 'special', value: item });
+    });
+    const keys = [...groups.keys()].sort((a, b) => {
+      const left = groupOrder.indexOf(a), right = groupOrder.indexOf(b);
+      return (left < 0 ? 999 : left) - (right < 0 ? 999 : right);
+    });
+    return keys.map(key => `<section class="script-roster-group"><h4>${escapeHtml(groupLabels[key] || key)}</h4><div class="script-role-grid">${groups.get(key).map(item => item.kind === 'role' ? roleCard(item.value) : specialCard(item.value)).join('')}</div></section>`).join('');
+  }
+
   function galleryMarkup(images) {
     if (!images.length) return '';
     const first = images[0];
@@ -53,7 +84,9 @@
     const images = item.images || [];
     const gallery = galleryMarkup(images);
     const roles = item.roles || [];
-    detail.innerHTML = `<header class="script-hero"><div class="script-title-line"><div><div class="script-category">${escapeHtml(item.category || '劇本')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2></div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> 原始文章</a>` : ''}</div>${gallery}</header><section class="script-section"><h3>劇本介紹${item.needs_review ? '<span class="script-review">待審閱</span>' : ''}</h3><div class="script-intro">${escapeHtml(item.introduction || '尚未整理介紹。')}</div></section><section class="script-section"><h3>角色構成</h3>${roles.length ? `<div class="script-role-grid">${roles.map(roleCard).join('')}</div>` : '<div class="script-role-missing">尚未取得完整劇本 JSON，因此目前不公開不完整的角色名單。換上完整 JSON 重新匯入後，角色卡會依劇本順序自動顯示。</div>'}</section>`;
+    const specialEntries = item.special_entries || [];
+    const roster = groupedRosterMarkup(roles, specialEntries);
+    detail.innerHTML = `<header class="script-hero"><div class="script-title-line"><div><div class="script-category">${escapeHtml(item.category || '劇本')}</div><h2>${escapeHtml(item.name_zh_tw)} <small>${escapeHtml(item.version || '')}</small></h2></div>${item.source_url ? `<a class="script-source" href="${escapeHtml(item.source_url)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> 原始文章</a>` : ''}</div>${gallery}</header><section class="script-section"><h3>劇本介紹${item.needs_review ? '<span class="script-review">待審閱</span>' : ''}</h3><div class="script-intro">${escapeHtml(item.introduction || '尚未整理介紹。')}</div></section><section class="script-section"><h3>角色與規則構成</h3>${roster || '<div class="script-role-missing">尚未取得完整劇本 JSON，因此目前不公開不完整的角色名單。換上完整 JSON 重新匯入後，角色卡會依劇本順序自動顯示。</div>'}</section>`;
     bindGallery(images);
   }
 

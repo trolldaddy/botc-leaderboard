@@ -24,6 +24,7 @@ class ScriptEntry(Base):
     updated_at = Column(DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
     images = relationship("ScriptImage", back_populates="script", cascade="all, delete-orphan")
     roles = relationship("ScriptRole", back_populates="script", cascade="all, delete-orphan")
+    supplements = relationship("ScriptSupplement", back_populates="script", cascade="all, delete-orphan")
 
 
 class ScriptImage(Base):
@@ -46,3 +47,17 @@ class ScriptRole(Base):
     sort_order = Column(Integer, nullable=False, default=0)
     script = relationship("ScriptEntry", back_populates="roles")
     role = relationship("Role")
+
+
+class ScriptSupplement(Base):
+    __tablename__ = "script_supplements"
+    __table_args__ = (UniqueConstraint("script_id", "external_id", name="uq_script_supplement"),)
+    id = Column(Integer, primary_key=True)
+    script_id = Column(Integer, ForeignKey("script_entries.id"), nullable=False, index=True)
+    external_id = Column(String(160), nullable=False)
+    name_zh_tw = Column(String(220), nullable=False)
+    entry_type = Column(String(80), nullable=False, default="special", index=True)
+    image_url = Column(Text, nullable=True)
+    ability = Column(Text, nullable=True)
+    sort_order = Column(Integer, nullable=False, default=0)
+    script = relationship("ScriptEntry", back_populates="supplements")

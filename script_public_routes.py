@@ -20,17 +20,32 @@ def serialize_script(script, include_roles=False, knowledge_slugs=None):
         "images": [{"url": image.image_url, "alt": image.alt_text or script.name_zh_tw}
                    for image in sorted(script.images, key=lambda item: (item.sort_order, item.id))],
         "role_count": len(script.roles),
+        "special_entry_count": len(script.supplements),
     }
     if include_roles:
         payload["roles"] = [role_card(item.role, knowledge_slug=(knowledge_slugs or {}).get(item.role_id))
                             for item in sorted(script.roles, key=lambda value: (value.sort_order, value.id))
                             if item.role and item.role.is_active]
+        payload["special_entries"] = [{
+            "external_id": item.external_id,
+            "name_zh_tw": item.name_zh_tw,
+            "team": item.entry_type,
+            "image_url": item.image_url,
+            "ability": item.ability,
+        } for item in sorted(script.supplements, key=lambda value: (value.sort_order, value.id))]
     return payload
+
+
+def script_load_options(include_role_records=False):
+    options = [joinedload(ScriptEntry.images), joinedload(ScriptEntry.supplements)]
+    options.append(joinedload(ScriptEntry.roles).joinedload(ScriptRole.role) if include_role_records
+                   else joinedload(ScriptEntry.roles))
+    return options
 
 
 @router.get("")
 def list_scripts(q: str = Query(default="", max_length=120), db: Session = Depends(get_db)):
-    query = db.query(ScriptEntry).options(joinedload(ScriptEntry.images), joinedload(ScriptEntry.roles)).filter(
+    query = db.query(ScriptEntry).options(*script_load_options()).filter(
         ScriptEntry.is_public == True  # noqa: E712
     )
     keyword = q.strip()
@@ -42,10 +57,9 @@ def list_scripts(q: str = Query(default="", max_length=120), db: Session = Depen
 
 @router.get("/{slug}")
 def get_script(slug: str, db: Session = Depends(get_db)):
-    script = db.query(ScriptEntry).options(
-        joinedload(ScriptEntry.images),
-        joinedload(ScriptEntry.roles).joinedload(ScriptRole.role),
-    ).filter(ScriptEntry.slug == slug, ScriptEntry.is_public == True).first()  # noqa: E712
+    script = db.query(ScriptEntry).options(*script_load_options(include_role_records=True)).filter(
+        ScriptEntry.slug == slug, ScriptEntry.is_public == True
+    ).first()  # noqa: E712
     if not script:
         raise HTTPException(status_code=404, detail="找不到劇本")
     role_ids = [item.role_id for item in script.roles]

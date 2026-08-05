@@ -10,9 +10,10 @@ from sqlalchemy import func, or_  # noqa: E402
 from opencc import OpenCC  # noqa: E402
 from database import Base, SessionLocal, engine  # noqa: E402
 from role_models import Role, RoleAlias  # noqa: E402
-from script_models import ScriptEntry, ScriptImage, ScriptRole  # noqa: E402
+from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement  # noqa: E402
 
 TO_TRADITIONAL = OpenCC("s2twp")
+SPECIAL_ENTRY_TYPES = {"fabled", "jinx", "loric", "special"}
 
 
 def role_references_from_json(path):
@@ -22,11 +23,14 @@ def role_references_from_json(path):
     result = []
     for item in payload:
         value = item.get("id") if isinstance(item, dict) else item
-        team = (item.get("team") or "").strip().lower() if isinstance(item, dict) else ""
-        # Fabled entries describe script-wide setup/rule adjustments rather than
-        # player roles, so they do not belong in the script role-card roster.
-        if value and str(value).lower() != "_meta" and team != "fabled":
-            result.append({"id": str(value).strip(), "name": (item.get("name") or "").strip() if isinstance(item, dict) else ""})
+        if value and str(value).lower() != "_meta":
+            result.append({
+                "id": str(value).strip(),
+                "name": (item.get("name") or "").strip() if isinstance(item, dict) else "",
+                "team": (item.get("team") or "").strip().lower() if isinstance(item, dict) else "",
+                "image": (item.get("image") or "").strip() if isinstance(item, dict) else "",
+                "ability": (item.get("ability") or "").strip() if isinstance(item, dict) else "",
+            })
     return result
 
 
@@ -58,31 +62,55 @@ def main():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
-        matched, missing = [], []
+        matched, missing, supplements = [], [], []
         for reference in references:
             role = find_role(db, reference)
-            (matched if role else missing).append(role if role else reference)
-        report = {"mode": "write" if args.write else "preview", "script": metadata["name_zh_tw"],
-                  "role_ids_found": len(references), "roles_matched": len(matched), "roles_missing": missing}
+            if role:
+                matched.append(role)
+            elif reference.get("team") in SPECIAL_ENTRY_TYPES:
+                supplements.append(reference)
+            else:
+                missing.append(reference)
+        report = {
+            "mode": "write" if args.write else "preview",
+            "script": metadata["name_zh_tw"],
+            "entries_found": len(references),
+            "roles_matched": len(matched),
+            "special_entries_preserved": len(supplements),
+            "roles_missing": missing,
+        }
         if not args.write:
-            print(json.dumps(report, ensure_ascii=False, indent=2)); return
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return
         script = db.query(ScriptEntry).filter(ScriptEntry.slug == metadata["slug"]).first()
         if not script:
             script = ScriptEntry(slug=metadata["slug"], name_zh_tw=metadata["name_zh_tw"])
-            db.add(script); db.flush()
+            db.add(script)
+            db.flush()
         for field in ("name_zh_tw", "version", "category", "introduction", "source_url",
                       "source_platform", "source_external_id"):
-            if field in metadata: setattr(script, field, metadata[field])
+            if field in metadata:
+                setattr(script, field, metadata[field])
         script.published_at = datetime.fromisoformat(metadata["published_at"]) if metadata.get("published_at") else None
         script.is_public = bool(metadata.get("is_public")) and not missing and len(matched) >= 5
         script.needs_review = bool(missing) or len(matched) < 5
         db.query(ScriptImage).filter(ScriptImage.script_id == script.id).delete(synchronize_session=False)
         db.query(ScriptRole).filter(ScriptRole.script_id == script.id).delete(synchronize_session=False)
+        db.query(ScriptSupplement).filter(ScriptSupplement.script_id == script.id).delete(synchronize_session=False)
         db.flush()
         for index, image in enumerate(metadata.get("images", [])):
             script.images.append(ScriptImage(image_url=image["url"], alt_text=image.get("alt"), sort_order=index))
         for index, role in enumerate(matched):
             script.roles.append(ScriptRole(role_id=role.id, sort_order=index))
+        for index, item in enumerate(supplements):
+            script.supplements.append(ScriptSupplement(
+                external_id=item["id"],
+                name_zh_tw=TO_TRADITIONAL.convert(item.get("name") or item["id"]),
+                entry_type=item.get("team") or "special",
+                image_url=item.get("image") or None,
+                ability=TO_TRADITIONAL.convert(item.get("ability") or "") or None,
+                sort_order=index,
+            ))
         db.commit()
         report.update(published=script.is_public, needs_review=script.needs_review)
         print(json.dumps(report, ensure_ascii=False, indent=2))
@@ -90,4 +118,5 @@ def main():
         db.close()
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
