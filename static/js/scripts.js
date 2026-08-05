@@ -72,6 +72,12 @@
     viewer.setAttribute('role', 'dialog');
     viewer.setAttribute('aria-modal', 'true');
     viewer.setAttribute('aria-label', '\u5287\u672c\u5716\u5168\u87a2\u5e55\u6aa2\u8996');
+    const positionBelowNavigation = () => {
+      const navigation = document.querySelector('.sidebar');
+      const navigationBottom = navigation ? Math.ceil(navigation.getBoundingClientRect().bottom) : 0;
+      viewer.style.setProperty('--script-viewer-top', `${Math.max(0, navigationBottom)}px`);
+    };
+    positionBelowNavigation();
     const desktopSpread = images.length > 1 && window.matchMedia('(min-width: 800px) and (orientation: landscape)').matches;
     viewer.classList.toggle('is-spread', desktopSpread);
     viewer.innerHTML = `<div class="script-image-viewer-stage"><div class="script-image-viewer-pages">${desktopSpread ? images.map(item => `<img src="${escapeHtml(item.url)}" alt="${escapeHtml(item.alt || '\u5287\u672c\u5716')}">`).join('') : '<img alt="">'}</div><div class="script-image-viewer-actions">${!desktopSpread && images.length > 1 ? '<button type="button" data-viewer-flip aria-label="\u7ffb\u9762" title="\u7ffb\u9762"><i class="fa-solid fa-repeat"></i></button>' : ''}<button type="button" data-viewer-close aria-label="\u95dc\u9589\u5168\u87a2\u5e55" title="\u95dc\u9589"><i class="fa-solid fa-xmark"></i></button></div></div>`;
@@ -84,6 +90,7 @@
     };
     const close = () => {
       document.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('resize', positionBelowNavigation);
       document.body.classList.remove('script-viewer-open');
       viewer.remove();
     };
@@ -96,6 +103,7 @@
     viewer.querySelector('[data-viewer-close]').addEventListener('click', close);
     viewer.addEventListener('click', event => { if (event.target === viewer || event.target.classList.contains('script-image-viewer-stage')) close(); });
     document.addEventListener('keydown', onKeyDown);
+    window.addEventListener('resize', positionBelowNavigation);
     document.body.classList.add('script-viewer-open');
     document.body.appendChild(viewer);
     render();
@@ -240,18 +248,23 @@
   carousel.addEventListener('touchmove', event => {
     if (!touchDragging || event.touches.length !== 1) return;
     const touch = event.touches[0], deltaX = touch.clientX - touchStartX, deltaY = touch.clientY - touchStartY;
-    if (!touchHorizontal && Math.abs(deltaX) > 8) {
-      if (Math.abs(deltaX) <= Math.abs(deltaY)) { touchDragging = false; return; }
-      touchHorizontal = true;
+    const horizontalDistance = Math.abs(deltaX), verticalDistance = Math.abs(deltaY);
+    if (!touchHorizontal && horizontalDistance > 3) {
+      if (verticalDistance > 12 && horizontalDistance < verticalDistance * 0.65) {
+        touchDragging = false;
+        carousel.classList.remove('is-touching');
+        return;
+      }
+      if (horizontalDistance >= verticalDistance * 0.65) touchHorizontal = true;
     }
     if (!touchHorizontal) return;
     event.preventDefault();
-    carousel.scrollLeft = touchStartScroll - deltaX;
+    carousel.scrollLeft = touchStartScroll - (deltaX * 1.12);
   }, { passive: false });
   carousel.addEventListener('touchend', () => {
     if (touchHorizontal) {
       const delta = carousel.scrollLeft - touchStartScroll;
-      if (Math.abs(delta) > 20) {
+      if (Math.abs(delta) > 12) {
         const start = Math.max(0, visibleScripts.findIndex(item => item.slug === touchStartSlug));
         const next = (start + (delta > 0 ? 1 : -1) + visibleScripts.length) % visibleScripts.length;
         selectScript(visibleScripts[next].slug);
