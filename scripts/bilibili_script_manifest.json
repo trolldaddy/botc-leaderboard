@@ -13,7 +13,8 @@
                   },
                   {
                       "external_id":  "1185815709954867224",
-                      "name_zh_tw":  "按部就班"
+                      "name_zh_tw":  "按部就班",
+                      "script_json":  "reports/bilibili-script-json/按部就班.json"
                   },
                   {
                       "external_id":  "1160738963605946387",
