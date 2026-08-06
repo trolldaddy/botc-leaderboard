@@ -1,4 +1,4 @@
-﻿"""Audit and batch-import the reviewed Bilibili script manifest."""
+"""Audit and batch-import the reviewed Bilibili script manifest."""
 import argparse
 import json
 import re
@@ -72,6 +72,7 @@ def main():
     parser.add_argument("--metadata-dir", type=Path, default=Path("reports/bilibili-scripts"))
     parser.add_argument("--existing-metadata-dir", type=Path, default=Path("data/scripts"))
     parser.add_argument("--json-root", action="append", type=Path, default=[])
+    parser.add_argument("--report", type=Path, help="Write the complete batch audit as JSON.")
     parser.add_argument("--write", action="store_true")
     parser.add_argument("--require-complete", action="store_true")
     args = parser.parse_args()
@@ -116,12 +117,40 @@ def main():
             command.append("--require-complete")
         result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
         row["status"] = "imported" if args.write and result.returncode == 0 else "previewed" if result.returncode == 0 else "failed"
-        row["output"] = (result.stdout or "").strip()
+        raw_output = (result.stdout or "").strip()
+        try:
+            row["result"] = json.loads(raw_output) if raw_output else None
+        except json.JSONDecodeError:
+            row["output"] = raw_output
         row["error"] = (result.stderr or "").strip()
         if result.returncode:
             failed = True
         report.append(row)
-    print(json.dumps({"mode": "write" if args.write else "preview", "items": report}, ensure_ascii=False, indent=2))
+    statuses = {}
+    for row in report:
+        statuses[row["status"]] = statuses.get(row["status"], 0) + 1
+    completed_results = [row.get("result") or {} for row in report if row["status"] in {"previewed", "imported"}]
+    payload = {
+        "mode": "write" if args.write else "preview",
+        "manifest_items": len(manifest["items"]),
+        "json_candidates": len(candidates),
+        "summary": statuses,
+        "import_summary": {
+            "entries_found": sum(result.get("entries_found", 0) for result in completed_results),
+            "roles_matched": sum(result.get("roles_matched", 0) for result in completed_results),
+            "special_entries_preserved": sum(result.get("special_entries_preserved", 0) for result in completed_results),
+            "roles_missing": sum(len(result.get("roles_missing") or []) for result in completed_results),
+            "duplicate_entries_ignored": sum(len(result.get("duplicate_entries_ignored") or []) for result in completed_results),
+        },
+        "missing_json_names": [row["name_zh_tw"] for row in report if row["status"] == "missing_json"],
+        "complete": not failed,
+        "items": report,
+    }
+    rendered = json.dumps(payload, ensure_ascii=False, indent=2)
+    if args.report:
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+        args.report.write_text(rendered + "\n", encoding="utf-8")
+    print(rendered)
     if args.require_complete and failed:
         raise SystemExit(2)
 
