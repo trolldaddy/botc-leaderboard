@@ -13,6 +13,7 @@ from opencc import OpenCC  # noqa: E402
 from database import Base, SessionLocal, engine  # noqa: E402
 from role_models import Role, RoleAlias  # noqa: E402
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement  # noqa: E402
+from script_artwork_classifier import inspect_artwork_path, select_script_faces  # noqa: E402
 
 TO_TRADITIONAL = OpenCC("s2twp")
 SPECIAL_ENTRY_TYPES = {"fabled", "jinx", "loric", "special"}
@@ -30,6 +31,7 @@ OFFICIAL_ICON_CANONICAL_IDS = {
 }
 DEFAULT_JINX_IMAGE_URL = "/static/script-role-icons/reviewed/djinn.png"
 ROLE_CATALOG_PATH = Path(__file__).resolve().parents[1] / "static" / "js" / "roles_db.js"
+ROOT = Path(__file__).resolve().parents[1]
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -60,6 +62,22 @@ def normalized_entry_type(value):
 def image_filename(value):
     return Path(urlparse(str(value or "")).path).name.casefold()
 
+
+def reviewed_script_faces(images):
+    """Resolve reviewed images and select faces by pixels, never ordinal."""
+    candidates = []
+    for index, item in enumerate(images or []):
+        url = str(item.get("url") or "")
+        if not url.startswith("/static/"):
+            continue
+        path = ROOT / url.lstrip("/")
+        if not path.is_file():
+            continue
+        try:
+            candidates.append(inspect_artwork_path(path, index=index, item=item))
+        except OSError:
+            continue
+    return [entry["item"] for entry in select_script_faces(candidates)]
 
 def load_official_role_catalog(path=ROLE_CATALOG_PATH):
     """Read the browser's authoritative built-in role list without executing JS."""
@@ -261,7 +279,7 @@ def main():
         db.query(ScriptRole).filter(ScriptRole.script_id == script.id).delete(synchronize_session=False)
         db.query(ScriptSupplement).filter(ScriptSupplement.script_id == script.id).delete(synchronize_session=False)
         db.flush()
-        for index, image in enumerate(metadata.get("images", [])):
+        for index, image in enumerate(reviewed_script_faces(metadata.get("images", []))):
             script.images.append(ScriptImage(image_url=image["url"], alt_text=image.get("alt"), sort_order=index))
         for index, role in enumerate(matched):
             script.roles.append(ScriptRole(role_id=role.id, sort_order=index))

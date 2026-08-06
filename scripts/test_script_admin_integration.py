@@ -4,6 +4,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from fastapi import HTTPException
+from PIL import Image
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -19,6 +20,7 @@ from script_admin_routes import update_script
 from script_admin_routes import update_script_images
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 import script_import_service
+import scripts.import_bilibili_script as import_bilibili_script
 from script_public_routes import get_storyteller_guide, list_scripts, serialize_script as serialize_public_script
 
 
@@ -272,6 +274,26 @@ def test_remote_artwork_prefers_two_portrait_faces_over_logo():
     selected = script_import_service.rank_remote_artwork(candidates)
     assert [item["name"] for item in selected] == ["front", "back"]
 
+
+
+def test_reviewed_artwork_uses_pixels_not_metadata_order():
+    with tempfile.TemporaryDirectory() as folder:
+        root = Path(folder)
+        previous_root = import_bilibili_script.ROOT
+        import_bilibili_script.ROOT = root
+        try:
+            image_folder = root / "static" / "script-images" / "reviewed" / "sample"
+            image_folder.mkdir(parents=True)
+            Image.new("RGB", (900, 240), "black").save(image_folder / "01.png")
+            Image.new("RGB", (900, 1300), (55, 55, 65)).save(image_folder / "02.png")
+            Image.new("RGB", (900, 1300), (230, 225, 205)).save(image_folder / "03.png")
+            images = [{"url": f"/static/script-images/reviewed/sample/{name}"}
+                      for name in ("01.png", "02.png", "03.png")]
+            selected = import_bilibili_script.reviewed_script_faces(images)
+            assert [Path(item["url"]).name for item in selected] == ["02.png", "03.png"]
+        finally:
+            import_bilibili_script.ROOT = previous_root
+
 def test_admin_can_delete_script_and_cascade_children():
     db = make_session()
     script_id = seed_script(db)
@@ -391,4 +413,5 @@ if __name__ == "__main__":
     test_admin_can_replace_or_add_script_faces()
     test_new_manual_import_creates_internal_draft_and_local_artwork()
     test_remote_artwork_prefers_two_portrait_faces_over_logo()
-    print({"status": "ok", "tests": 10})
+    test_reviewed_artwork_uses_pixels_not_metadata_order()
+    print({"status": "ok", "tests": 11})

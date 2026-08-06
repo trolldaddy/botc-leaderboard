@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 import requests
 from fastapi import HTTPException
 from PIL import Image
+from script_artwork_classifier import inspect_artwork, select_script_faces
 
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 from scripts.crawl_bilibili_scripts import IMAGE_RE, TITLE_RE, author_from_markdown, extracted_fields, slugify
@@ -73,16 +74,21 @@ def unique_slug(db, name, external_id=""):
 
 
 def rank_remote_artwork(candidates, limit=2):
-    """Prefer the two portrait script faces over logos and article banners."""
-    def priority(item):
-        width, height = item.get("width", 0), item.get("height", 0)
-        if not width or not height:
-            return (3, 99, 0, item.get("index", 0))
-        ratio = width / height
-        portrait_tier = 0 if height > width and 0.45 <= ratio <= 0.90 else (1 if height > width else 2)
-        return (portrait_tier, abs(ratio - 0.68), -(width * height), item.get("index", 0))
-
-    return sorted(candidates, key=priority)[:limit]
+    """Prefer visual front/back faces over logos, avatars and article banners."""
+    prepared = []
+    for item in candidates:
+        if item.get("content"):
+            with Image.open(io.BytesIO(item["content"])) as image:
+                prepared.append(inspect_artwork(image, **item))
+        else:
+            width, height = item.get("width", 0), item.get("height", 0)
+            ratio = width / height if height else 0
+            portrait = height > width and 0.48 <= ratio <= 0.86
+            prepared.append({**item, "ratio": ratio, "portrait": portrait,
+                             "face_score": (120 if portrait else 0) - abs(ratio - 0.70) * 80
+                                           + min(width * height / 250_000, 20),
+                             "back_score": item.get("index", 0)})
+    return select_script_faces(prepared, limit=limit)
 
 
 def save_artwork(script, uploads, remote_urls):
