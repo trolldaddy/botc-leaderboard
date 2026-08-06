@@ -122,6 +122,17 @@ def find_role(db, reference):
                       if normalized_role_id(item.external_id) == compact_key), None)
         if alias:
             return db.query(Role).filter(Role.id == alias.role_id).first()
+
+    normalized_name = normalized_role_name(source_name or reference.get("id"))
+    if normalized_name:
+        role = next((item for item in db.query(Role).all()
+                     if normalized_role_name(item.name_zh_tw) == normalized_name), None)
+        if role:
+            return role
+        alias = next((item for item in db.query(RoleAlias).all()
+                      if normalized_role_name(item.external_name) == normalized_name), None)
+        if alias:
+            return db.query(Role).filter(Role.id == alias.role_id).first()
     return None
 
 
