@@ -1,6 +1,7 @@
 """Import one reviewed Bilibili article. BOTC JSON is the only role-list authority."""
 import argparse
 import json
+import re
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -14,6 +15,62 @@ from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 
 TO_TRADITIONAL = OpenCC("s2twp")
 SPECIAL_ENTRY_TYPES = {"fabled", "jinx", "loric", "special"}
+ROLE_CATALOG_PATH = Path(__file__).resolve().parents[1] / "static" / "js" / "roles_db.js"
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
+
+def normalized_role_name(value):
+    converted = TO_TRADITIONAL.convert(str(value or "").strip())
+    return re.sub(r"^[^0-9a-zA-Z\u4e00-\u9fff]+", "", converted).casefold()
+
+
+def normalized_role_id(value):
+    """Compare common BOTC IDs regardless of separators or letter case."""
+    return re.sub(r"[^0-9a-z]+", "", str(value or "").strip().casefold())
+
+
+def load_official_role_catalog(path=ROLE_CATALOG_PATH):
+    """Read the browser's authoritative built-in role list without executing JS."""
+    by_id, by_name = {}, {}
+    for line in Path(path).read_text(encoding="utf-8").splitlines():
+        if "{id:" not in line:
+            continue
+        fields = dict(re.findall(r'(id|name|team|image):"([^"]*)"', line))
+        if not fields.get("id") or not fields.get("name") or not fields.get("team"):
+            continue
+        item = {
+            "id": fields["id"],
+            "name": fields["name"],
+            "team": fields["team"].lower(),
+            "image": fields.get("image", ""),
+        }
+        by_id[normalized_role_id(item["id"])] = item
+        by_name[normalized_role_name(item["name"])] = item
+    return {"by_id": by_id, "by_name": by_name}
+
+
+OFFICIAL_ROLE_CATALOG = load_official_role_catalog()
+
+
+def find_catalog_role(reference):
+    role = OFFICIAL_ROLE_CATALOG["by_id"].get(normalized_role_id(reference.get("id")))
+    if role:
+        return role
+    for candidate in (reference.get("name"), reference.get("id")):
+        role = OFFICIAL_ROLE_CATALOG["by_name"].get(normalized_role_name(candidate))
+        if role:
+            return role
+    return None
+
+
+def text_field(value):
+    if isinstance(value, list):
+        value = next((item for item in value if isinstance(item, str) and item.strip()), "")
+    return str(value or "").strip() if not isinstance(value, dict) else ""
 
 
 def role_references_from_json(path):
@@ -26,10 +83,10 @@ def role_references_from_json(path):
         if value and str(value).lower() != "_meta":
             result.append({
                 "id": str(value).strip(),
-                "name": (item.get("name") or "").strip() if isinstance(item, dict) else "",
-                "team": (item.get("team") or "").strip().lower() if isinstance(item, dict) else "",
-                "image": (item.get("image") or "").strip() if isinstance(item, dict) else "",
-                "ability": (item.get("ability") or "").strip() if isinstance(item, dict) else "",
+                "name": text_field(item.get("name")) if isinstance(item, dict) else "",
+                "team": text_field(item.get("team")).lower() if isinstance(item, dict) else "",
+                "image": text_field(item.get("image")) if isinstance(item, dict) else "",
+                "ability": text_field(item.get("ability")) if isinstance(item, dict) else "",
             })
     return result
 
@@ -48,7 +105,20 @@ def find_role(db, reference):
         return role
     alias = db.query(RoleAlias).filter(or_(func.lower(RoleAlias.external_id) == key,
                                            func.lower(RoleAlias.external_name) == name if name else False)).first()
-    return db.query(Role).filter(Role.id == alias.role_id).first() if alias else None
+    if alias:
+        return db.query(Role).filter(Role.id == alias.role_id).first()
+
+    compact_key = normalized_role_id(key)
+    if compact_key:
+        role = next((item for item in db.query(Role).all()
+                     if normalized_role_id(item.canonical_key) == compact_key), None)
+        if role:
+            return role
+        alias = next((item for item in db.query(RoleAlias).all()
+                      if normalized_role_id(item.external_id) == compact_key), None)
+        if alias:
+            return db.query(Role).filter(Role.id == alias.role_id).first()
+    return None
 
 
 def main():
@@ -63,12 +133,33 @@ def main():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
-        matched, missing, supplements = [], [], []
+        matched, catalog_matched, missing, supplements = [], [], [], []
+        duplicate_references, seen_official, seen_supplements = [], set(), set()
         for reference in references:
             role = find_role(db, reference)
             if role:
+                identity = normalized_role_id(role.canonical_key) or f"db:{role.id}"
+                if identity in seen_official:
+                    duplicate_references.append(reference)
+                    continue
+                seen_official.add(identity)
                 matched.append(role)
+                continue
+            catalog_role = find_catalog_role(reference)
+            if catalog_role:
+                identity = normalized_role_id(catalog_role["id"])
+                if identity in seen_official:
+                    duplicate_references.append(reference)
+                    continue
+                seen_official.add(identity)
+                catalog_matched.append({"reference": reference, "catalog_role": catalog_role})
             elif reference.get("team"):
+                identity = normalized_role_id(reference.get("id")) or normalized_role_name(reference.get("name"))
+                if identity and identity in seen_supplements:
+                    duplicate_references.append(reference)
+                    continue
+                if identity:
+                    seen_supplements.add(identity)
                 supplements.append(reference)
             else:
                 missing.append(reference)
@@ -76,13 +167,20 @@ def main():
             "mode": "write" if args.write else "preview",
             "script": metadata["name_zh_tw"],
             "entries_found": len(references),
-            "roles_matched": len(matched),
+            "roles_matched": len(matched) + len(catalog_matched),
+            "database_roles_matched": len(matched),
+            "catalog_roles_matched": len(catalog_matched),
+            "database_roles_missing": [item["reference"] for item in catalog_matched],
             "special_entries_preserved": len(supplements),
             "roles_missing": missing,
+            "duplicate_entries_ignored": duplicate_references,
         }
         if args.require_complete and missing:
             print(json.dumps(report, ensure_ascii=False, indent=2))
             raise SystemExit("Script role matching is incomplete; refusing to continue")
+        if args.write and catalog_matched:
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            raise SystemExit("Official roles exist in the catalog but not in the target database; refusing to misclassify or write them")
         if not args.write:
             print(json.dumps(report, ensure_ascii=False, indent=2))
             return

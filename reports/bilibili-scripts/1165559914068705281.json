@@ -1,0 +1,36 @@
+{
+  "slug": "只若初見",
+  "name_zh_tw": "只若初見",
+  "version": null,
+  "category": "社群縫合劇本",
+  "introduction": "",
+  "author_name": "",
+  "tagline": "",
+  "tags": [
+    "鐘樓博物館"
+  ],
+  "background_introduction": "",
+  "gameplay_overview": "",
+  "author_note": "",
+  "production_updates": "",
+  "player_guide": "",
+  "storyteller_guide": "",
+  "source_url": "https://www.bilibili.com/opus/1165559914068705281",
+  "source_platform": "bilibili",
+  "source_external_id": "1165559914068705281",
+  "is_public": false,
+  "images": [
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/0c148b4f72294e73d79df2f8028aca0144902471.png@1186w_412h.webp",
+      "alt": "只若初見"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/007cf9e89a4597c534cf54d0a51dfa4f44902471.png@1192w.webp",
+      "alt": "只若初見"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/6ccc1af9c83b04b452447fc304c3c45144902471.png@1192w.webp",
+      "alt": "只若初見"
+    }
+  ]
+}

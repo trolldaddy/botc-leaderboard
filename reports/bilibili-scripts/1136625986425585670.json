@@ -1,0 +1,40 @@
+{
+  "slug": "霍格沃茨之戰",
+  "name_zh_tw": "霍格沃茨之戰",
+  "version": null,
+  "category": "社群縫合劇本",
+  "introduction": "",
+  "author_name": "",
+  "tagline": "",
+  "tags": [
+    "鐘樓博物館"
+  ],
+  "background_introduction": "",
+  "gameplay_overview": "",
+  "author_note": "",
+  "production_updates": "",
+  "player_guide": "",
+  "storyteller_guide": "",
+  "source_url": "https://www.bilibili.com/opus/1136625986425585670",
+  "source_platform": "bilibili",
+  "source_external_id": "1136625986425585670",
+  "is_public": false,
+  "images": [
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/5577cbcf240ad2749ce27178a64e336b44902471.png@1186w_412h.webp",
+      "alt": "霍格沃茨之戰"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/de2b2a4122d2b427f01b76494d2c3b2244902471.png@1192w.webp",
+      "alt": "霍格沃茨之戰"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/6cc0ccbdebe019ad7b666cbf73cc612a44902471.png@1192w.webp",
+      "alt": "霍格沃茨之戰"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/5b18cc40d7dade2b20095a89f304dd2244902471.png@128w_128h_1c_!web-dynamic.webp",
+      "alt": "霍格沃茨之戰"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "slug": "希望與絕望之間",
+  "name_zh_tw": "希望與絕望之間",
+  "version": null,
+  "category": "社群縫合劇本",
+  "introduction": "",
+  "author_name": "",
+  "tagline": "",
+  "tags": [
+    "鐘樓博物館"
+  ],
+  "background_introduction": "",
+  "gameplay_overview": "",
+  "author_note": "",
+  "production_updates": "",
+  "player_guide": "",
+  "storyteller_guide": "",
+  "source_url": "https://www.bilibili.com/opus/1169350136808079369",
+  "source_platform": "bilibili",
+  "source_external_id": "1169350136808079369",
+  "is_public": false,
+  "images": [
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/f2a7630b07a44bcd37000379086b1adb44902471.png@1192w.webp",
+      "alt": "希望與絕望之間"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/26a1ddd73757911144bf20c7143b6c4f44902471.png@1192w.webp",
+      "alt": "希望與絕望之間"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/7278ccd60022fcabf10f251ce22f4b1044902471.png@1192w.webp",
+      "alt": "希望與絕望之間"
+    }
+  ]
+}

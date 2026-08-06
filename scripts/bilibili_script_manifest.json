@@ -1,0 +1,111 @@
+﻿{
+    "source_platform":  "bilibili",
+    "items":  [
+                  {
+                      "external_id":  "1162954548222885888",
+                      "name_zh_tw":  "子不語"
+                  },
+                  {
+                      "external_id":  "1199517299873153026",
+                      "name_zh_tw":  "未來之主"
+                  },
+                  {
+                      "external_id":  "1185815709954867224",
+                      "name_zh_tw":  "按部就班"
+                  },
+                  {
+                      "external_id":  "1160738963605946387",
+                      "name_zh_tw":  "共生體"
+                  },
+                  {
+                      "external_id":  "1165559914068705281",
+                      "name_zh_tw":  "只若初見"
+                  },
+                  {
+                      "external_id":  "1169350136808079369",
+                      "name_zh_tw":  "希望與絕望之間"
+                  },
+                  {
+                      "external_id":  "1173539293274046467",
+                      "name_zh_tw":  "三軍聽令"
+                  },
+                  {
+                      "external_id":  "1204264175028666453",
+                      "name_zh_tw":  "真魘相愛"
+                  },
+                  {
+                      "external_id":  "1136625986425585670",
+                      "name_zh_tw":  "霍格沃茨之戰",
+                      "json_source_url":  "https://www.bloodstar.xyz/p/sc911/HP2_2/script.json?593f2800",
+                      "script_json":  "reports/bilibili-script-json/霍格沃茨之戰.json"
+                  },
+                  {
+                      "external_id":  "1108745567008194560",
+                      "name_zh_tw":  "瘋言瘋語"
+                  },
+                  {
+                      "external_id":  "965782207528435718",
+                      "name_zh_tw":  "小二上酒"
+                  },
+                  {
+                      "external_id":  "1118803757644120069",
+                      "name_zh_tw":  "魚躍龍門"
+                  },
+                  {
+                      "external_id":  "1109911706420641811",
+                      "name_zh_tw":  "鴉木裝配車間"
+                  },
+                  {
+                      "external_id":  "1141822914004254729",
+                      "name_zh_tw":  "分則能成"
+                  },
+                  {
+                      "external_id":  "1108075131170717697",
+                      "name_zh_tw":  "復仇者集結"
+                  },
+                  {
+                      "external_id":  "1040874565334466563",
+                      "name_zh_tw":  "斗轉星移"
+                  },
+                  {
+                      "external_id":  "1040460547632398353",
+                      "name_zh_tw":  "登車拔劍起"
+                  },
+                  {
+                      "external_id":  "1093094139196604418",
+                      "name_zh_tw":  "阿茲卡班"
+                  },
+                  {
+                      "external_id":  "1077848774825476101",
+                      "name_zh_tw":  "赤子之心"
+                  },
+                  {
+                      "external_id":  "1044208967471857681",
+                      "name_zh_tw":  "奇異人生"
+                  },
+                  {
+                      "external_id":  "735177545161375745",
+                      "name_zh_tw":  "夜半狂歡"
+                  },
+                  {
+                      "external_id":  "993306995058540599",
+                      "name_zh_tw":  "瓶中小人"
+                  },
+                  {
+                      "external_id":  "1049053226713743384",
+                      "name_zh_tw":  "上帝出席"
+                  },
+                  {
+                      "external_id":  "1060058479105933312",
+                      "name_zh_tw":  "雛鳳清聲"
+                  },
+                  {
+                      "external_id":  "1052754702584774681",
+                      "name_zh_tw":  "移宮換羽"
+                  },
+                  {
+                      "external_id":  "1085891354530152453",
+                      "name_zh_tw":  "意氣用事"
+                  }
+              ]
+}

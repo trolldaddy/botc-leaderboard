@@ -1,0 +1,36 @@
+{
+  "slug": "共生體",
+  "name_zh_tw": "共生體",
+  "version": null,
+  "category": "社群縫合劇本",
+  "introduction": "",
+  "author_name": "",
+  "tagline": "",
+  "tags": [
+    "鐘樓博物館"
+  ],
+  "background_introduction": "",
+  "gameplay_overview": "",
+  "author_note": "",
+  "production_updates": "",
+  "player_guide": "",
+  "storyteller_guide": "",
+  "source_url": "https://www.bilibili.com/opus/1160738963605946387",
+  "source_platform": "bilibili",
+  "source_external_id": "1160738963605946387",
+  "is_public": false,
+  "images": [
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/42784d388ff77a87d73743d76945e4be44902471.png@1186w_412h.webp",
+      "alt": "共生體"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/683df661c43470020f7aa2cc367438eb44902471.png@1192w.webp",
+      "alt": "共生體"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/5ab7d44787632e19f84c98968b63e2fc44902471.png@1192w.webp",
+      "alt": "共生體"
+    }
+  ]
+}

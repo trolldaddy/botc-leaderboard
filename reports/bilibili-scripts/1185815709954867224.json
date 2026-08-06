@@ -1,0 +1,36 @@
+{
+  "slug": "按部就班",
+  "name_zh_tw": "按部就班",
+  "version": null,
+  "category": "社群縫合劇本",
+  "introduction": "",
+  "author_name": "",
+  "tagline": "",
+  "tags": [
+    "鐘樓博物館"
+  ],
+  "background_introduction": "",
+  "gameplay_overview": "",
+  "author_note": "",
+  "production_updates": "",
+  "player_guide": "",
+  "storyteller_guide": "",
+  "source_url": "https://www.bilibili.com/opus/1185815709954867224",
+  "source_platform": "bilibili",
+  "source_external_id": "1185815709954867224",
+  "is_public": false,
+  "images": [
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/24855713092d0f4b512d773033facaa944902471.png@1192w.webp",
+      "alt": "按部就班"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/8bffff0a0eecec7a58492855feaea84b44902471.png@1192w.webp",
+      "alt": "按部就班"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/c61a118388bee9acada63ebee69cc03444902471.png@1192w.webp",
+      "alt": "按部就班"
+    }
+  ]
+}

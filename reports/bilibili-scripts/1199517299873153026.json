@@ -1,0 +1,36 @@
+{
+  "slug": "未來之主",
+  "name_zh_tw": "未來之主",
+  "version": null,
+  "category": "社群縫合劇本",
+  "introduction": "",
+  "author_name": "",
+  "tagline": "",
+  "tags": [
+    "鐘樓博物館"
+  ],
+  "background_introduction": "",
+  "gameplay_overview": "",
+  "author_note": "",
+  "production_updates": "",
+  "player_guide": "",
+  "storyteller_guide": "",
+  "source_url": "https://www.bilibili.com/opus/1199517299873153026",
+  "source_platform": "bilibili",
+  "source_external_id": "1199517299873153026",
+  "is_public": false,
+  "images": [
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/e797da74b9eb3d42f0c4bd836d2533b644902471.png@1186w_472h.webp",
+      "alt": "未來之主"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/958257f0211ffde4dc5892025cfd0f5944902471.png@1192w.webp",
+      "alt": "未來之主"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/929ab264894220082ef8542e1031068744902471.png@1192w.webp",
+      "alt": "未來之主"
+    }
+  ]
+}

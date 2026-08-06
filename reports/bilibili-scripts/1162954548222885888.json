@@ -1,0 +1,36 @@
+{
+  "slug": "子不語",
+  "name_zh_tw": "子不語",
+  "version": null,
+  "category": "社群縫合劇本",
+  "introduction": "",
+  "author_name": "",
+  "tagline": "",
+  "tags": [
+    "鐘樓博物館"
+  ],
+  "background_introduction": "",
+  "gameplay_overview": "",
+  "author_note": "",
+  "production_updates": "",
+  "player_guide": "",
+  "storyteller_guide": "",
+  "source_url": "https://www.bilibili.com/opus/1162954548222885888",
+  "source_platform": "bilibili",
+  "source_external_id": "1162954548222885888",
+  "is_public": false,
+  "images": [
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/ec6fa77bdd70fd3c73f46603bfa1b5e944902471.png@1186w_468h.webp",
+      "alt": "子不語"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/e005d86e5b861628a86b708324df7b4b44902471.png@1192w.webp",
+      "alt": "子不語"
+    },
+    {
+      "url": "https://i0.hdslb.com/bfs/new_dyn/1c0950771e505513078e33cdf860d7b444902471.png@1192w.webp",
+      "alt": "子不語"
+    }
+  ]
+}
