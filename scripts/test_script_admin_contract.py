@@ -53,6 +53,25 @@ def test_script_admin_role_json_import_is_preview_first():
     assert 'role-json/apply' in routes
     assert 'if not report["can_apply"]' in routes
 
+
+def test_script_admin_new_import_is_preview_first_and_local_only():
+    html = (ROOT / "static/pages/role_admin.html").read_text(encoding="utf-8")
+    javascript = (ROOT / "static/js/script_admin.js").read_text(encoding="utf-8")
+    routes = (ROOT / "script_admin_routes.py").read_text(encoding="utf-8")
+    service = (ROOT / "script_import_service.py").read_text(encoding="utf-8")
+    assert 'id="script-admin-create"' in html
+    assert 'id="si-images"' in javascript
+    assert 'id="si-json"' in javascript
+    assert "/api/admin/scripts/imports/preview" in javascript
+    assert "/api/admin/scripts/imports/apply" in javascript
+    assert '@router.post("/imports/preview")' in routes
+    assert '@router.post("/imports/apply")' in routes
+    assert "/static/script-images/uploads/" in service
+    assert "/static/script-role-icons/uploads/" in service
+    assert "is_public=False" in service
+    assert "needs_review=True" in service
+    assert "沒有成功保存任何劇本圖片" in service
+
 if __name__ == "__main__":
     test_script_admin_has_third_mode_and_editor_mount()
     test_script_admin_exposes_all_required_rich_text_fields()

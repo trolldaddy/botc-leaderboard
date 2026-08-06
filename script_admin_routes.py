@@ -9,6 +9,7 @@ import models
 from account_binding_routes import require_admin_account
 from database import get_db
 from script_models import ScriptEntry, ScriptRole, ScriptSupplement
+from script_import_service import create_script, museum_metadata
 from scripts.import_bilibili_script import (
     TO_TRADITIONAL,
     find_catalog_role,
@@ -115,6 +116,39 @@ def role_json_report(official, supplements, missing, duplicates):
         "special_entries": supplements,
         "can_apply": not missing and len(official) + len(supplements) >= 5,
     }
+
+def script_import_result(db, data):
+    if len(data.get("images") or []) > 2:
+        raise HTTPException(status_code=400, detail="正面與背面最多上傳兩張圖片")
+    try:
+        payload = json.loads(str(data.get("role_json") or ""))
+        matched = match_role_payload(db, payload)
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=400, detail=f"無法讀取劇本 JSON：{exc}") from exc
+    metadata = museum_metadata(str(data.get("source_url") or "").strip()) if data.get("source_url") else {}
+    report = role_json_report(*matched)
+    report["metadata"] = metadata
+    report["uploaded_images"] = len(data.get("images") or [])
+    report["remote_images"] = len(metadata.get("remote_images") or [])
+    return report, matched, metadata
+
+
+@router.post("/imports/preview")
+def preview_script_import(data: dict, db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_account)):
+    report, _, _ = script_import_result(db, data)
+    return report
+
+
+@router.post("/imports/apply")
+def apply_script_import(data: dict, db: Session = Depends(get_db), admin: models.StorytellerAccount = Depends(require_admin_account)):
+    report, (official, supplements, missing, duplicates), metadata = script_import_result(db, data)
+    if not report["can_apply"]:
+        raise HTTPException(status_code=409, detail="JSON 仍有無法辨識的條目，已拒絕建立劇本")
+    external_id = metadata.get("source_external_id")
+    if external_id and db.query(ScriptEntry.id).filter(ScriptEntry.source_platform == "bilibili", ScriptEntry.source_external_id == external_id).first():
+        raise HTTPException(status_code=409, detail="這篇鐘樓博物館文章已經匯入")
+    script = create_script(db, data, official, supplements, metadata)
+    return {"status": "success", "script": serialize_script(script, detail=True), **report}
 
 @router.get("")
 def list_scripts(

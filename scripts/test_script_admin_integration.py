@@ -1,3 +1,6 @@
+import base64
+import tempfile
+from pathlib import Path
 from types import SimpleNamespace
 
 from fastapi import HTTPException
@@ -12,6 +15,7 @@ from role_models import Role
 from script_admin_routes import serialize_script as serialize_admin_script
 from script_admin_routes import update_script
 from script_models import ScriptEntry, ScriptRole, ScriptSupplement
+import script_import_service
 from script_public_routes import get_storyteller_guide, serialize_script as serialize_public_script
 
 
@@ -176,8 +180,52 @@ def test_public_payload_and_storyteller_login_gate():
     assert allowed["content"] == "<p>登入後可看的說書人攻略</p>"
 
 
+
+def test_new_manual_import_creates_internal_draft_and_local_artwork():
+    db = make_session()
+    roles = []
+    for index in range(5):
+        role = Role(
+            canonical_key=f"import-role-{index}",
+            name_zh_tw=f"匯入角色{index}",
+            name_en=f"Import Role {index}",
+            team="townsfolk",
+            is_official=True,
+            is_active=True,
+        )
+        db.add(role)
+        roles.append(role)
+    db.flush()
+    image_bytes = b"fake-image-payload"
+    with tempfile.TemporaryDirectory() as folder:
+        previous = script_import_service.IMAGE_ROOT
+        script_import_service.IMAGE_ROOT = Path(folder)
+        try:
+            script = script_import_service.create_script(
+                db,
+                {
+                    "name_zh_tw": "手動匯入測試",
+                    "images": [{
+                        "filename": "front.png",
+                        "content_type": "image/png",
+                        "content": base64.b64encode(image_bytes).decode("ascii"),
+                    }],
+                },
+                roles,
+                [],
+                {},
+            )
+        finally:
+            script_import_service.IMAGE_ROOT = previous
+    assert script.is_public is False
+    assert script.needs_review is True
+    assert len(script.roles) == 5
+    assert script.images[0].image_url.startswith("/static/script-images/uploads/")
+    assert script.source_platform == "manual"
+
 if __name__ == "__main__":
     test_admin_update_round_trips_rich_text_and_custom_role()
     test_admin_can_create_classify_and_delete_special_entries()
     test_public_payload_and_storyteller_login_gate()
-    print({"status": "ok", "tests": 3})
+    test_new_manual_import_creates_internal_draft_and_local_artwork()
+    print({"status": "ok", "tests": 4})
