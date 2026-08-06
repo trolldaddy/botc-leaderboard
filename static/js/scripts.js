@@ -94,7 +94,7 @@
       }, 0);
       // Keep the viewer above the fixed navigation in stacking order while
       // reserving enough vertical room for its title bar and the close action.
-      viewer.style.setProperty('--script-viewer-top', `${Math.max(112, navigationBottom + 24)}px`);
+      viewer.style.setProperty('--script-viewer-top', `${Math.max(72, navigationBottom + 12)}px`);
     };
     positionBelowNavigation();
     const desktopSpread = images.length > 1 && window.matchMedia('(min-width: 800px) and (orientation: landscape)').matches;
@@ -270,26 +270,26 @@
     if (!touchDragging || event.touches.length !== 1) return;
     const touch = event.touches[0], deltaX = touch.clientX - touchStartX, deltaY = touch.clientY - touchStartY;
     const horizontalDistance = Math.abs(deltaX), verticalDistance = Math.abs(deltaY);
-    if (!touchHorizontal && horizontalDistance >= 2) {
-      if (verticalDistance > 18 && horizontalDistance < verticalDistance * 0.5) {
+    if (!touchHorizontal && horizontalDistance >= 3) {
+      if (verticalDistance > 24 && horizontalDistance < verticalDistance * 0.35) {
         touchDragging = false;
         carousel.classList.remove('is-touching');
         return;
       }
-      if (horizontalDistance >= verticalDistance * 0.45) touchHorizontal = true;
+      if (horizontalDistance >= Math.max(3, verticalDistance * 0.35)) touchHorizontal = true;
     }
     if (!touchHorizontal) return;
     event.preventDefault();
     touchLastX = touch.clientX; touchLastTime = performance.now();
-    // Amplify the drag so portrait cards follow short phone swipes.
-    carousel.scrollLeft = touchStartScroll - deltaX * 2.15;
+    // Keep the card directly under the finger; snapping happens only on release.
+    carousel.scrollLeft = touchStartScroll - deltaX;
   }, { passive: false });
   carousel.addEventListener('touchend', () => {
     if (touchHorizontal) {
       const fingerDelta = touchLastX - touchStartX;
       const elapsed = Math.max(1, touchLastTime - touchStartTime);
       const velocity = Math.abs(fingerDelta) / elapsed;
-      if (Math.abs(fingerDelta) >= 4 || velocity >= 0.035) {
+      if (Math.abs(fingerDelta) >= 18 || velocity >= 0.12) {
         const start = Math.max(0, visibleScripts.findIndex(item => item.slug === touchStartSlug));
         const next = (start + (fingerDelta < 0 ? 1 : -1) + visibleScripts.length) % visibleScripts.length;
         selectScript(visibleScripts[next].slug);
