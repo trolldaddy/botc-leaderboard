@@ -1,13 +1,15 @@
-{
+﻿{
     "source_platform":  "bilibili",
     "items":  [
                   {
                       "external_id":  "1162954548222885888",
-                      "name_zh_tw":  "子不語"
+                      "name_zh_tw":  "子不語",
+                      "script_json":  "reports/bilibili-script-json/子不語.json"
                   },
                   {
                       "external_id":  "1199517299873153026",
-                      "name_zh_tw":  "未來之主"
+                      "name_zh_tw":  "未來之主",
+                      "script_json":  "reports/bilibili-script-json/未來之主.json"
                   },
                   {
                       "external_id":  "1185815709954867224",
@@ -20,11 +22,13 @@
                   },
                   {
                       "external_id":  "1165559914068705281",
-                      "name_zh_tw":  "只若初見"
+                      "name_zh_tw":  "只若初見",
+                      "script_json":  "reports/bilibili-script-json/只若初見.json"
                   },
                   {
                       "external_id":  "1169350136808079369",
-                      "name_zh_tw":  "希望與絕望之間"
+                      "name_zh_tw":  "希望與絕望之間",
+                      "script_json":  "reports/bilibili-script-json/希望與絕望之間.json"
                   },
                   {
                       "external_id":  "1173539293274046467",
@@ -61,7 +65,8 @@
                   },
                   {
                       "external_id":  "1141822914004254729",
-                      "name_zh_tw":  "分則能成"
+                      "name_zh_tw":  "分則能成",
+                      "script_json":  "reports/bilibili-script-json/分則能成.json"
                   },
                   {
                       "external_id":  "1108075131170717697",
@@ -70,11 +75,13 @@
                   },
                   {
                       "external_id":  "1040874565334466563",
-                      "name_zh_tw":  "斗轉星移"
+                      "name_zh_tw":  "斗轉星移",
+                      "script_json":  "reports/bilibili-script-json/斗轉星移.json"
                   },
                   {
                       "external_id":  "1040460547632398353",
-                      "name_zh_tw":  "登車拔劍起"
+                      "name_zh_tw":  "登車拔劍起",
+                      "script_json":  "reports/bilibili-script-json/登車拔劍起.json"
                   },
                   {
                       "external_id":  "1093094139196604418",
@@ -83,7 +90,8 @@
                   },
                   {
                       "external_id":  "1077848774825476101",
-                      "name_zh_tw":  "赤子之心"
+                      "name_zh_tw":  "赤子之心",
+                      "script_json":  "reports/bilibili-script-json/赤子之心.json"
                   },
                   {
                       "external_id":  "1044208967471857681",
@@ -112,7 +120,8 @@
                   },
                   {
                       "external_id":  "1052754702584774681",
-                      "name_zh_tw":  "移宮換羽"
+                      "name_zh_tw":  "移宮換羽",
+                      "script_json":  "reports/bilibili-script-json/移宮換羽.json"
                   },
                   {
                       "external_id":  "1085891354530152453",

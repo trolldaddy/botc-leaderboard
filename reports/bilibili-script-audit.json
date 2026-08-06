@@ -1,0 +1,3487 @@
+{
+  "mode": "preview",
+  "manifest_items": 26,
+  "json_candidates": 96,
+  "summary": {
+    "previewed": 22,
+    "missing_json": 4
+  },
+  "import_summary": {
+    "entries_found": 615,
+    "roles_matched": 423,
+    "special_entries_preserved": 190,
+    "roles_missing": 0,
+    "duplicate_entries_ignored": 2
+  },
+  "missing_json_names": [
+    "按部就班",
+    "三軍聽令",
+    "真魘相愛",
+    "瘋言瘋語"
+  ],
+  "complete": false,
+  "items": [
+    {
+      "external_id": "1162954548222885888",
+      "name_zh_tw": "子不語",
+      "metadata": "reports\\bilibili-scripts\\1162954548222885888.json",
+      "script_json": "reports\\bilibili-script-json\\子不語.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "子不語",
+        "entries_found": 31,
+        "roles_matched": 0,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 0,
+        "database_roles_missing": [],
+        "special_entries_preserved": 31,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1199517299873153026",
+      "name_zh_tw": "未來之主",
+      "metadata": "reports\\bilibili-scripts\\1199517299873153026.json",
+      "script_json": "reports\\bilibili-script-json\\未來之主.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "未來之主",
+        "entries_found": 26,
+        "roles_matched": 20,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 20,
+        "database_roles_missing": [
+          {
+            "id": "_futureking",
+            "name": "洗衣妇",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/_futureking.png",
+            "ability": "在你的首个夜晚，你会得知两名玩家和一个镇民角色：这两名玩家之一是该角色。"
+          },
+          {
+            "id": "1_futureking",
+            "name": "调查员",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/1_futureking.png",
+            "ability": "在你的首个夜晚，你会得知两名玩家和一个爪牙角色：这两名玩家之一是该角色（或者你会得知没有爪牙在场）。"
+          },
+          {
+            "id": "2_futureking",
+            "name": "修行者",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/2_futureking.png",
+            "ability": "在你的首个夜晚，你会得知距离最近的邪恶玩家位于你的顺时针还是逆时针方向。如果两侧的邪恶玩家与你距离相等，你得知的信息由说书人决定。"
+          },
+          {
+            "id": "3_futureking",
+            "name": "占卜师",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/3_futureking.png",
+            "ability": "每个夜晚，你要选择两名玩家：你会得知他们之中是否有恶魔。  会有一名善良玩家始终被你的能力当作恶魔。"
+          },
+          {
+            "id": "5_futureking",
+            "name": "卖花女孩",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/5_futureking.png",
+            "ability": "每个夜晚*，你会得知在今天白天时是否有恶魔投过票。"
+          },
+          {
+            "id": "6_futureking",
+            "name": "食人族",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/6_futureking.png",
+            "ability": "你拥有上个死于处决的玩家的能力。如果该玩家属于邪恶阵营，你中毒直到下个善良玩家死于处决。"
+          },
+          {
+            "id": "8_futureking",
+            "name": "女裁缝",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/8_futureking.png",
+            "ability": "每局游戏限一次，在夜晚时，你可以选择除你以外的两名玩家：你会得知他们是否为同一阵营。"
+          },
+          {
+            "id": "9_futureking",
+            "name": "水手",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/9_futureking.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家：你或他之一会醉酒直到下个黄昏。  你不会死亡。"
+          },
+          {
+            "id": "10_futureking",
+            "name": "气球驾驶员",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/10_futureking.png",
+            "ability": "每个夜晚，你会得知一名与上个夜晚得知的玩家角色类型不同的玩家。[+0~1外来者]"
+          },
+          {
+            "id": "12_futureking",
+            "name": "侍女",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/12_futureking.png",
+            "ability": "每个夜晚，你要选择除你以外的两名存活的玩家：你会得知他们中有几人在当晚因其自身能力而被唤醒。"
+          },
+          {
+            "id": "13_futureking",
+            "name": "畸形秀演员",
+            "team": "outsider",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/13_futureking.png",
+            "ability": "如果你“疯狂”地证明自己是外来者，你可能被处决。"
+          },
+          {
+            "id": "14_futureking",
+            "name": "魔像",
+            "team": "outsider",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/14_futureking.png",
+            "ability": "每局游戏你只能发起提名一次。当你发起提名时，如果被你提名的玩家不是恶魔，他死亡。"
+          },
+          {
+            "id": "15_futureking",
+            "name": "月之子",
+            "team": "outsider",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/15_futureking.png",
+            "ability": "当你得知你死亡时，你要公开选择一名存活的玩家。如果他是善良的，在当晚他会死亡。"
+          },
+          {
+            "id": "16_futureking",
+            "name": "莽夫",
+            "team": "outsider",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/16_futureking.png",
+            "ability": "每个夜晚，首个使用其自身能力选择了你的玩家会醉酒直到下个黄昏。你会转变为他的阵营。"
+          },
+          {
+            "id": "17_futureking",
+            "name": "限",
+            "team": "minion",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/17_futureking.png",
+            "ability": "在等同于初始外来者数量的夜晚，所有镇民玩家中毒直到下个黄昏。[外来者数量任意]"
+          },
+          {
+            "id": "18_futureking",
+            "name": "间谍",
+            "team": "minion",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/18_futureking.png",
+            "ability": "每个夜晚，你能查看魔典。  你可能会被当作善良阵营、镇民角色或外来者角色，即使你已死亡。"
+          },
+          {
+            "id": "20_futureking",
+            "name": "麻脸巫婆",
+            "team": "minion",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/20_futureking.png",
+            "ability": "每个夜晚*，你要选择一名玩家和一个角色，如果该角色不在场，他变成该角色。如果因此创造了一个恶魔，当晚的死亡由说书人决定。"
+          },
+          {
+            "id": "21_futureking",
+            "name": "小恶魔",
+            "team": "demon",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/21_futureking.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。如果你以这种方式自杀，一名爪牙会变成小恶魔。"
+          },
+          {
+            "id": "22_futureking",
+            "name": "亡骨魔",
+            "team": "demon",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/22_futureking.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。  被你杀死的爪牙保留他的能力，且与他邻近的两名镇民之一中毒。[-1外来者]"
+          },
+          {
+            "id": "24_futureking",
+            "name": "普卡",
+            "team": "demon",
+            "image": "https://www.bloodstar.xyz/p/Tiger/Future-King/24_futureking.png",
+            "ability": "每个夜晚，你要选择一名玩家：他中毒。  上个因你的能力中毒的玩家会死亡并恢复健康。"
+          }
+        ],
+        "special_entries_preserved": 6,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1185815709954867224",
+      "name_zh_tw": "按部就班",
+      "metadata": "reports\\bilibili-scripts\\1185815709954867224.json",
+      "script_json": null,
+      "status": "missing_json"
+    },
+    {
+      "external_id": "1160738963605946387",
+      "name_zh_tw": "共生體",
+      "metadata": "data\\scripts\\gongshengti.json",
+      "script_json": "reports\\bilibili-script-json\\共生體.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "共生體",
+        "entries_found": 25,
+        "roles_matched": 24,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 24,
+        "database_roles_missing": [
+          {
+            "id": "1_hongshengti",
+            "name": "祖母",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/df/cud437aq02j4lnizdmdyxp1dcc5lojm.png",
+            "ability": "在你的首个夜晚，你会得知一名善良玩家和他的角色。如果恶魔杀死了他，你也会死亡。"
+          },
+          {
+            "id": "2_hongshengti",
+            "name": "工程师",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/2/28/owc8naw8kwx5z1om04qs6j8aqs5djru.png",
+            "ability": "每局游戏限一次，在夜晚时，你可以选择让恶魔变成你选择的恶魔角色，或让所有爪牙变成你选择的爪牙角色。"
+          },
+          {
+            "id": "4_hongshengti",
+            "name": "村夫",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/7/72/gyk4euf2w6acfyevvmeke03zvv8r1ln.png",
+            "ability": "每个夜晚，你要选择一名玩家：你会得知他的阵营。[+0~2村夫，复数村夫中有一人醉酒]"
+          },
+          {
+            "id": "5_hongshengti",
+            "name": "卖花女孩",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/8/89/qd1r9ozv96l6aftj402m46irjynbrem.png",
+            "ability": "每个夜晚*，你会得知在今天白天时是否有恶魔投过票。"
+          },
+          {
+            "id": "6_hongshengti",
+            "name": "城镇公告员",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/ed/8gb1ezkhqkc865jead15pevypmc72g9.png",
+            "ability": "每个夜晚*，你会得知在今天白天时是否有爪牙发起过提名。"
+          },
+          {
+            "id": "7_hongshengti",
+            "name": "筑梦师",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e8/qjwy9igjkubwnqrk2p4sd2fs4vj59mo.png",
+            "ability": "每个夜晚，你要选择除你及旅行者以外的一名玩家：你会得知一个善良角色和一个邪恶角色，该玩家是其中一个角色。"
+          },
+          {
+            "id": "10_hongshengti",
+            "name": "传教士",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/6/6f/oi460mqpnxwd7zgyboe78patdo8amc5.png",
+            "ability": "每个夜晚，你要选择一名玩家：如果你选中了爪牙，他会得知被传教士选中。所有被你选中的爪牙失去能力。"
+          },
+          {
+            "id": "11_hongshengti",
+            "name": "食人族",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/c/c1/ga80xr3gx817rh5wiqq18d9hv8b6xje.png",
+            "ability": "你拥有上个死于处决的玩家的能力。如果该玩家属于邪恶阵营，你中毒直到下个善良玩家死于处决。"
+          },
+          {
+            "id": "investigator",
+            "name": "调查员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/investigator.png",
+            "ability": "在你的首个夜晚，你会得知两名玩家和一个爪牙角色：这两名玩家之一是该角色（或者你会得知没有爪牙在场）。"
+          },
+          {
+            "id": "artist",
+            "name": "艺术家",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/artist.png",
+            "ability": "每局游戏限一次，在白天时，你可以私下询问说书人一个是非问题，你会得知该问题的答案。"
+          },
+          {
+            "id": "oracle",
+            "name": "神谕者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/oracle.png",
+            "ability": "每个夜晚*，你会得知有多少名死亡的玩家是邪恶的。"
+          },
+          {
+            "id": "empath",
+            "name": "共情者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/empath.png",
+            "ability": "每个夜晚，你会得知与你邻近的两名存活的玩家中邪恶玩家的数量。"
+          },
+          {
+            "id": "savant",
+            "name": "博学者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/savant.png",
+            "ability": "每个白天，你可以私下询问说书人以得知两条信息：一个是正确的，一个是错误的。"
+          },
+          {
+            "id": "16_hongshengti",
+            "name": "告密者",
+            "team": "outsider",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/6/67/q7r2sg4xzntxj5df6j7qepczuoer09p.png",
+            "ability": "爪牙会在其首个夜晚得知三个伪装。"
+          },
+          {
+            "id": "17_hongshengti",
+            "name": "帽匠",
+            "team": "outsider",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/c/c8/5x5dl09pjvag87d6gspfnq79hdiz72h.png",
+            "ability": "如果你死亡，当晚爪牙和恶魔玩家可以选择变成新的爪牙和恶魔角色。"
+          },
+          {
+            "id": "goon",
+            "name": "莽夫",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/goon.png",
+            "ability": "每个夜晚，首个使用其自身能力选择了你的玩家会醉酒直到下个黄昏。你会转变为他的阵营。"
+          },
+          {
+            "id": "recluse",
+            "name": "陌客",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/recluse.png",
+            "ability": "你可能会被当作邪恶阵营、爪牙角色或恶魔角色，即使你已死亡。"
+          },
+          {
+            "id": "18_hongshengti",
+            "name": "刺客",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/d0/ftyh3tzzolrzec1njghipdcbmk7opuf.png",
+            "ability": "每局游戏限一次，在夜晚时*，你可以选择一名玩家：他死亡，即使因为任何原因让他不会死亡。（刺杀：由你来决定谁会被小怪宝杀死）"
+          },
+          {
+            "id": "19_hongshengti",
+            "name": "教父",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/a8/cp4tivyy734ut9fus8od0zub508qx8y.png",
+            "ability": "在你的首个夜晚，你会得知有哪些外来者角色在场。如果有外来者在白天死亡，你会在当晚被唤醒并且你要选择一名玩家：他死亡。[-1或+1外来者]（专权：外来者可能会被善良玩家当作邪恶的爪牙）"
+          },
+          {
+            "id": "20_hongshengti",
+            "name": "寡妇",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/1/1c/9jir4i7ci8p8onrf70xvm49jx5t5l72.png",
+            "ability": "在你的首个夜晚，你能查看魔典并选择一名玩家：他中毒。随后，始终会有一名善良玩家知道寡妇在场。（八爪：与你邻近的两名镇民中毒，即使你中毒）"
+          },
+          {
+            "id": "21_hongshengti",
+            "name": "红唇女郎",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/9/9a/39mexl68b71eyydru1jkze79qhwlfib.png",
+            "ability": "如果大于等于五名玩家存活时（旅行者不计算在内）恶魔死亡，你变成那个恶魔。（继位：因爪牙死亡而将小怪宝传递给你不计入传递次数，你拥有那名爪牙的额外能力。）"
+          },
+          {
+            "id": "22_hongshengti",
+            "name": "提线木偶",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e5/el29kr1dznrpaa089tayj3chd444s6k.png",
+            "ability": "你以为你是一个善良角色，但其实你不是。恶魔会知道你是提线木偶。[提线木偶会与恶魔邻座]（傀儡：会有一名善良玩家把你当作善良阵营和善良角色）"
+          },
+          {
+            "id": "xaan",
+            "name": "限",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202411/c_7860002933371_9c39e151.jpg",
+            "ability": "在等同于初始外来者数量的夜晚，所有镇民玩家中毒直到下个黄昏。[外来者数量任意]"
+          },
+          {
+            "id": "23_hongshengti",
+            "name": "小怪宝",
+            "team": "demon",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/8/8f/8hdy40avvq6iiq66v8dnhf4hpl3ad3b.png",
+            "ability": "每个夜晚，所有爪牙要秘密决定由哪名玩家来照看小怪宝并且“是恶魔”。每个夜晚*，可能会有一名玩家死亡。[+1爪牙]"
+          }
+        ],
+        "special_entries_preserved": 1,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1165559914068705281",
+      "name_zh_tw": "只若初見",
+      "metadata": "reports\\bilibili-scripts\\1165559914068705281.json",
+      "script_json": "reports\\bilibili-script-json\\只若初見.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "只若初見",
+        "entries_found": 25,
+        "roles_matched": 24,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 24,
+        "database_roles_missing": [
+          {
+            "id": "_zhiruochujian",
+            "name": "调查员",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/05/a5613uupc0bffr0sg9egfotdaofup1e.png",
+            "ability": "在你的首个夜晚，你会得知两名玩家和一个爪牙角色：这两名玩家之一是该角色（或者你会得知没有爪牙在场）。"
+          },
+          {
+            "id": "1_zhiruochujian",
+            "name": "占卜师",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/9/91/04je4dg5ituw4nymx4f0x0b80p6gntg.png",
+            "ability": "每个夜晚，你要选择两名玩家：你会得知他们之中是否有恶魔。会有一名善良玩家始终被你的能力当作恶魔。"
+          },
+          {
+            "id": "2_zhiruochujian",
+            "name": "僧侣",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/a3/nxckynoy8mshn7pwnsnnraceso4zx2p.png",
+            "ability": "每个夜晚*，你要选择除你以外的一名玩家：当晚恶魔的负面能力对他无效。"
+          },
+          {
+            "id": "3_zhiruochujian",
+            "name": "祖母",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/df/cud437aq02j4lnizdmdyxp1dcc5lojm.png",
+            "ability": "在你的首个夜晚，你会得知一名善良玩家和他的角色。如果恶魔杀死了他，你也会死亡。"
+          },
+          {
+            "id": "4_zhiruochujian",
+            "name": "水手",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/9/90/bt7yvbzi61ftut2iqheqrgznkdohslh.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家：你或他之一会醉酒直到下个黄昏。你不会死亡。"
+          },
+          {
+            "id": "5_zhiruochujian",
+            "name": "侍女",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/4/48/0d9uthaidhlal5rz0zjx2tvzzrviqdo.png",
+            "ability": "每个夜晚，你要选择除你以外的两名存活的玩家：你会得知他们中有几人在当晚因其自身能力而被唤醒。"
+          },
+          {
+            "id": "6_zhiruochujian",
+            "name": "赌徒",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/0a/55q4nfyb9gftn9jiujtt49ti2qa33h6.png",
+            "ability": "每个夜晚*，你要选择一名玩家并猜测该玩家的角色：如果你猜错了，你会死亡。"
+          },
+          {
+            "id": "7_zhiruochujian",
+            "name": "茶艺师",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/a4/t8h7diw8bpav612k1e3t62b10hlbizz.png",
+            "ability": "如果与你邻近的两名存活的玩家是善良的，他们不会死亡。"
+          },
+          {
+            "id": "8_zhiruochujian",
+            "name": "女裁缝",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/aa/0khyidxxipwitzqjs9iryheur62zkrj.png",
+            "ability": "每局游戏限一次，在夜晚时，你可以选择除你以外的两名玩家：你会得知他们是否为同一阵营。"
+          },
+          {
+            "id": "9_zhiruochujian",
+            "name": "渔夫",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/4/44/bio3bf3g3vunctpnldg6lsct4u4jt81.png",
+            "ability": "每局游戏限一次，在白天时，你可以让说书人给你一些能帮助你的阵营获胜的建议。"
+          },
+          {
+            "id": "10_zhiruochujian",
+            "name": "农夫",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/4/41/a5jfldz9g39nkh59frnwinbwrzevfi4.png",
+            "ability": "当你在夜晚死亡时，一名存活的善良玩家会变成农夫。"
+          },
+          {
+            "id": "11_zhiruochujian",
+            "name": "戏法师",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/b/bf/0wf6zizpzk61n1txjo233fembq7utl3.png",
+            "ability": "'每个白天，你可以公开进行一次谁是爪牙，谁是恶魔的猜测。如果你猜对，善良阵营获胜。"
+          },
+          {
+            "id": "12_zhiruochujian",
+            "name": "公主",
+            "team": "townsfolk",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/b/b5/rdpsq1wjpsq66ah5y3f4p2wyuzl8wuk.png",
+            "ability": "在你的首个白天，如果你提名并处决了一名玩家，当晚恶魔不会造成死亡。"
+          },
+          {
+            "id": "13_zhiruochujian",
+            "name": "陌客",
+            "team": "outsider",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/5/5e/dw5z7fnz58ia54bw160d1numjsjay8f.png",
+            "ability": "你可能会被当作邪恶阵营、爪牙角色或恶魔角色，即使你已死亡。"
+          },
+          {
+            "id": "14_zhiruochujian",
+            "name": "月之子",
+            "team": "outsider",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/3/3c/hulwpl4c71z09ixgyg3dlkeega2a3an.png",
+            "ability": "当你得知你死亡时，你要公开选择一名存活的玩家。如果他是善良的，在当晚他会死亡。"
+          },
+          {
+            "id": "15_zhiruochujian",
+            "name": "解谜大师",
+            "team": "outsider",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/5/59/ns2ifb3z40ukn4xa61a460473sm6lhq.png",
+            "ability": "一名玩家醉酒，即使你已死亡。每局游戏限一次，你可以猜测谁是那个醉酒的玩家，如果猜对了，你会得知谁是恶魔，但如果猜错了，你会得知错误的“谁是恶魔”信息。"
+          },
+          {
+            "id": "16_zhiruochujian",
+            "name": "食人魔",
+            "team": "outsider",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/7/73/pgakqxxr1gostnluw2xkp4cnudn3z7a.png",
+            "ability": "在你的首个夜晚，你要选择除你以外的一名玩家：你转变为他的阵营，即使你已醉酒或中毒，但你不知道你转变后的阵营。"
+          },
+          {
+            "id": "17_zhiruochujian",
+            "name": "魔鬼代言人",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/2/2f/fbxp1pzgxjfs4vsrb0l30otb078m84e.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家（与上个夜晚不同）：如果明天白天他被处决，他不会死亡。"
+          },
+          {
+            "id": "18_zhiruochujian",
+            "name": "刺客",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/d0/ftyh3tzzolrzec1njghipdcbmk7opuf.png",
+            "ability": "每局游戏限一次，在夜晚时*，你可以选择一名玩家：他死亡，即使因为任何原因让他不会死亡。"
+          },
+          {
+            "id": "19_zhiruochujian",
+            "name": "精神病患者",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/d7/msb759ew0f2hudkvxhsz15jnxsqqpy9.png",
+            "ability": "每个白天，在提名开始前，你可以公开选择一名玩家：他死亡。如果你被处决，提名你的玩家需要和你猜拳，只有你输了你才会死亡。"
+          },
+          {
+            "id": "20_zhiruochujian",
+            "name": "提线木偶",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e5/el29kr1dznrpaa089tayj3chd444s6k.png",
+            "ability": "你以为你是一个善良角色，但其实你不是。恶魔会知道你是提线木偶。[提线木偶会与恶魔邻座]"
+          },
+          {
+            "id": "21_zhiruochujian",
+            "name": "限",
+            "team": "minion",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/0d/f64m0fvt72762oey33lurp4wez01hcp.png",
+            "ability": "在等同于初始外来者数量的夜晚，所有镇民玩家中毒直到下个黄昏。[外来者数量任意]"
+          },
+          {
+            "id": "22_zhiruochujian",
+            "name": "小恶魔",
+            "team": "demon",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/03/1trck24gi8o05kklsg93al4co09nakb.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。如果你以这种方式自杀，一名爪牙会变成小恶魔。"
+          },
+          {
+            "id": "23_zhiruochujian",
+            "name": "痢蛭",
+            "team": "demon",
+            "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e7/i3bse7nern4raiqwjpmzrpzjfa0vrq4.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。在你的首个夜晚，你要选择一名存活的玩家：他中毒，只有当他处于死亡状态时你才会立即死亡。"
+          }
+        ],
+        "special_entries_preserved": 1,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1169350136808079369",
+      "name_zh_tw": "希望與絕望之間",
+      "metadata": "reports\\bilibili-scripts\\1169350136808079369.json",
+      "script_json": "reports\\bilibili-script-json\\希望與絕望之間.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "希望與絕望之間",
+        "entries_found": 27,
+        "roles_matched": 1,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 1,
+        "database_roles_missing": [
+          {
+            "id": "clairvoyant_despair",
+            "name": "占卜师",
+            "team": "townsfolk",
+            "image": "https://www.bloodstar.xyz/p/Chad_Pines/Despair/clairvoyant_despair.png",
+            "ability": "每个夜晚*，你要选择一名玩家：如果他当晚被恶魔选中了，你会得知他和与他邻近的玩家的阵营。"
+          }
+        ],
+        "special_entries_preserved": 26,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1173539293274046467",
+      "name_zh_tw": "三軍聽令",
+      "metadata": "reports\\bilibili-scripts\\1173539293274046467.json",
+      "script_json": null,
+      "status": "missing_json"
+    },
+    {
+      "external_id": "1204264175028666453",
+      "name_zh_tw": "真魘相愛",
+      "metadata": "reports\\bilibili-scripts\\1204264175028666453.json",
+      "script_json": null,
+      "status": "missing_json"
+    },
+    {
+      "external_id": "1136625986425585670",
+      "name_zh_tw": "霍格沃茨之戰",
+      "metadata": "reports\\bilibili-scripts\\1136625986425585670.json",
+      "script_json": "reports\\bilibili-script-json\\霍格沃茨之戰.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "霍格沃茨之戰",
+        "entries_found": 27,
+        "roles_matched": 0,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 0,
+        "database_roles_missing": [],
+        "special_entries_preserved": 27,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1108745567008194560",
+      "name_zh_tw": "瘋言瘋語",
+      "metadata": "reports\\bilibili-scripts\\1108745567008194560.json",
+      "script_json": null,
+      "status": "missing_json"
+    },
+    {
+      "external_id": "965782207528435718",
+      "name_zh_tw": "小二上酒",
+      "metadata": "reports\\bilibili-scripts\\965782207528435718.json",
+      "script_json": "reports\\bilibili-script-json\\小二上酒.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "小二上酒",
+        "entries_found": 31,
+        "roles_matched": 0,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 0,
+        "database_roles_missing": [],
+        "special_entries_preserved": 31,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1118803757644120069",
+      "name_zh_tw": "魚躍龍門",
+      "metadata": "reports\\bilibili-scripts\\1118803757644120069.json",
+      "script_json": "reports\\bilibili-script-json\\魚躍龍門.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "魚躍龍門",
+        "entries_found": 28,
+        "roles_matched": 26,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 26,
+        "database_roles_missing": [
+          {
+            "id": "daoke_c",
+            "name": "刀客",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_5751437760171_79dd1401.jpg",
+            "ability": "在你的首个夜晚，你会得知一个在场的爪牙角色。每局游戏限一次，你可以在白天公开选择一名玩家：如果他是你得知的角色，他死亡。"
+          },
+          {
+            "id": "sailor_c",
+            "name": "水手",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/sailor.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家：你或他之一会醉酒直到下个黄昏。你不会死亡。"
+          },
+          {
+            "id": "dreamer_c",
+            "name": "筑梦师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/dreamer.png",
+            "ability": "每个夜晚，你要选择除你及旅行者以外的一名玩家：你会得知一个善良角色和一个邪恶角色，该玩家是其中一个角色。"
+          },
+          {
+            "id": "balloonist_c",
+            "name": "气球驾驶员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202410/c_7787277188271_9eba6446.jpg",
+            "ability": "每个夜晚，你会得知一名与上个夜晚得知的玩家角色类型不同的玩家。[+0~1外来者]"
+          },
+          {
+            "id": "gambler_c",
+            "name": "赌徒",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/gambler.png",
+            "ability": "每个夜晚*，你要选择一名玩家并猜测他的角色：如果你猜错了，你会死亡。"
+          },
+          {
+            "id": "town_crier_c",
+            "name": "城镇公告员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/town_crier.png",
+            "ability": "每个夜晚*，你会得知在今天白天时是否有爪牙发起过提名。"
+          },
+          {
+            "id": "philosopher_c",
+            "name": "哲学家",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/philosopher.png",
+            "ability": "每局游戏限一次，在夜晚时，你可以选择一个善良角色：你获得该角色的能力。如果这个角色在场，他醉酒。"
+          },
+          {
+            "id": "gossip_c",
+            "name": "造谣者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/gossip.png",
+            "ability": "每个白天，你可以公开发表一个声明。如果该声明正确，在当晚会有一名玩家死亡。"
+          },
+          {
+            "id": "drunk_c",
+            "name": "酒鬼",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/drunk.png",
+            "ability": "你不知道你是酒鬼。你以为你是一个镇民角色，但其实你不是。"
+          },
+          {
+            "id": "recluse_c",
+            "name": "陌客",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/recluse.png",
+            "ability": "你可能会被当作邪恶阵营、爪牙角色或恶魔角色，即使你已死亡。"
+          },
+          {
+            "id": "golem_c",
+            "name": "魔像",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/golem.png",
+            "ability": "每局游戏你只能发起提名一次。当你发起提名时，如果被你提名的玩家不是恶魔，他死亡。"
+          },
+          {
+            "id": "snitch_c",
+            "name": "告密者",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/snitch.png",
+            "ability": "爪牙会在其首个夜晚得知三个伪装。"
+          },
+          {
+            "id": "assassin_c",
+            "name": "刺客",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/assassin.png",
+            "ability": "每局游戏限一次，在夜晚时*，你可以选择一名玩家：他死亡，即使因为任何原因让他不会死亡。"
+          },
+          {
+            "id": "mezepheles_c",
+            "name": "灵言师",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/mezepheles.png",
+            "ability": "在你的首个夜晚，你会得知一个关键词。首个说出该关键词的善良玩家会在当晚转变为邪恶阵营。"
+          },
+          {
+            "id": "goblin_c",
+            "name": "哥布林",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/goblin.png",
+            "ability": "如果你在被提名后公开声明自己是哥布林且在那个白天被处决，你的阵营获胜。"
+          },
+          {
+            "id": "marionette_c",
+            "name": "提线木偶",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/marionette.png",
+            "ability": "你以为你是一个善良角色，但其实你不是。恶魔会知道你是提线木偶。[提线木偶会与恶魔邻座]"
+          },
+          {
+            "id": "yanluo_c",
+            "name": "阎罗",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_2190498760171_1c483826.jpg",
+            "ability": "在你的首个夜晚，你能查看魔典并选择一名玩家：他在第三个夜晚死亡，即使因为任何原因让他不会死亡。每个夜晚，你要选择一名玩家：上个夜晚被你选择的玩家死亡。"
+          },
+          {
+            "id": "po_c",
+            "name": "珀",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/po.png",
+            "ability": "每个夜晚*，你可以选择一名玩家：他死亡。如果你上次选择时没有选择任何玩家，当晚你要选择三名玩家：他们死亡。"
+          },
+          {
+            "id": "hundun_c",
+            "name": "混沌",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202310/c_9149178608961_89693def.jpg",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。如果你以这种方式杀死了一名与你邻近的镇民玩家，所有善良玩家会中毒直到下个黄昏。"
+          },
+          {
+            "id": "lil_monsta_c",
+            "name": "小怪宝",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/lil_monsta.png",
+            "ability": "每个夜晚，所有爪牙要秘密决定由哪名玩家来照看小怪宝并且“是恶魔”。每个夜晚*，可能会有一名玩家死亡。[+1爪牙]"
+          },
+          {
+            "id": "shugenja",
+            "name": "修行者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202411/c_9825126871371_4fbea129.jpg",
+            "ability": "在你的首个夜晚，你会得知距离最近的邪恶玩家位于你的顺时针还是逆时针方向。如果两侧的邪恶玩家与你距离相等，你得知的信息由说书人决定。"
+          },
+          {
+            "id": "pixie",
+            "name": "小精灵",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/pixie.png",
+            "ability": "在你的首个夜晚，你会得知一个在场的镇民角色。如果你“疯狂”地证明你是该角色，当他死亡时你获得该角色的能力。"
+          },
+          {
+            "id": "snake_charmer",
+            "name": "舞蛇人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/snake_charmer.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家：如果你选中了恶魔，你和他交换角色和阵营，然后他中毒。"
+          },
+          {
+            "id": "bingbi",
+            "name": "秉笔",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_5918227760171_7f310c1b.jpg",
+            "ability": "如果你在白天死亡，当晚你会得知一名善良玩家。如果你在夜晚死亡，当晚你会得知一名邪恶玩家。"
+          },
+          {
+            "id": "hermit",
+            "name": "隐士",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202506/c_6131437679471_8c370f0a.jpg",
+            "ability": "你拥有所有外来者能力。[-0~1外来者]"
+          },
+          {
+            "id": "taowu",
+            "name": "梼杌",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202310/c_9082388608961_e3ff7173.jpg",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。当你将要死亡时，改为一名存活且具有能力的爪牙失去能力。你不会得知恶魔信息。"
+          }
+        ],
+        "special_entries_preserved": 2,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1109911706420641811",
+      "name_zh_tw": "鴉木裝配車間",
+      "metadata": "reports\\bilibili-scripts\\1109911706420641811.json",
+      "script_json": "reports\\bilibili-script-json\\鴉木裝配車間.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "鴉木裝配車間",
+        "entries_found": 39,
+        "roles_matched": 34,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 34,
+        "database_roles_missing": [
+          {
+            "id": "steward_c",
+            "name": "事务官",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202305/c_9219342584861_b889322f.jpg",
+            "ability": "在你的首个夜晚，你会得知一名善良玩家。"
+          },
+          {
+            "id": "chef_c",
+            "name": "厨师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/chef.png",
+            "ability": "在你的首个夜晚，你会得知场上邻座的邪恶玩家有多少对。"
+          },
+          {
+            "id": "fortune_teller_c",
+            "name": "占卜师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/fortune_teller.png",
+            "ability": "每个夜晚，你要选择两名玩家：你会得知他们之中是否有恶魔。会有一名善良玩家始终被你的能力当作恶魔。"
+          },
+          {
+            "id": "town_crier_c",
+            "name": "城镇公告员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/town_crier.png",
+            "ability": "每个夜晚*，你会得知在今天白天时是否有爪牙发起过提名。"
+          },
+          {
+            "id": "oracle_c",
+            "name": "神谕者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/oracle.png",
+            "ability": "每个夜晚*，你会得知有多少名死亡的玩家是邪恶的。"
+          },
+          {
+            "id": "nightwatchman_c",
+            "name": "守夜人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/nightwatchman.png",
+            "ability": "每局游戏限一次，在夜晚时，你可以选择一名玩家：他会得知你是守夜人。"
+          },
+          {
+            "id": "princess_c",
+            "name": "公主",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/f/f2/Princess.png",
+            "ability": "在你的首个白天，如果你提名并处决了一名玩家，当晚恶魔不会造成死亡。"
+          },
+          {
+            "id": "mayor_c",
+            "name": "镇长",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/mayor.png",
+            "ability": "如果只有三名玩家存活且白天没有人被处决，你的阵营获胜。如果你在夜晚即将死亡，可能会有一名其他玩家代替你死亡。"
+          },
+          {
+            "id": "1investigator_c",
+            "name": "▲调查员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/investigator.png",
+            "ability": "在你的首个夜晚，你会得知两名玩家和一个爪牙角色：这两名玩家之一是该角色（或者你会得知没有爪牙在场）。"
+          },
+          {
+            "id": "1chambermaid_c",
+            "name": "▲侍女",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/chambermaid.png",
+            "ability": "每个夜晚，你要选择除你以外的两名存活的玩家：你会得知他们中有几人在当晚因其自身能力而被唤醒。"
+          },
+          {
+            "id": "1balloonist_c",
+            "name": "▲气球驾驶员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202410/c_7787277188271_9eba6446.jpg",
+            "ability": "每个夜晚，你会得知一名与上个夜晚得知的玩家角色类型不同的玩家。[+0~1外来者]"
+          },
+          {
+            "id": "1preacher_c",
+            "name": "▲传教士",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/preacher.png",
+            "ability": "每个夜晚，你要选择一名玩家：如果你选中了爪牙，他会得知被传教士选中。所有被你选中的爪牙失去能力。"
+          },
+          {
+            "id": "1monk_c",
+            "name": "▲僧侣",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/monk.png",
+            "ability": "每个夜晚*，你要选择除你以外的一名玩家：当晚恶魔的负面能力对他无效。"
+          },
+          {
+            "id": "1juggler_c",
+            "name": "▲杂耍艺人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/juggler.png",
+            "ability": "在你的首个白天，你可以公开猜测任意玩家的角色最多五次。在当晚，你会得知猜测正确的角色数量。"
+          },
+          {
+            "id": "1savant_c",
+            "name": "▲博学者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/savant.png",
+            "ability": "每个白天，你可以私下询问说书人以得知两条信息：一个是正确的，一个是错误的。"
+          },
+          {
+            "id": "1magician_c",
+            "name": "▲魔术师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/magician.png",
+            "ability": "恶魔会以为你是爪牙。爪牙会以为你是恶魔。"
+          },
+          {
+            "id": "1farmer_c",
+            "name": "▲农夫",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/farmer.png",
+            "ability": "当你在夜晚死亡时，一名存活的善良玩家会变成农夫。"
+          },
+          {
+            "id": "recluse_c",
+            "name": "陌客",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/recluse.png",
+            "ability": "你可能会被当作邪恶阵营、爪牙角色或恶魔角色，即使你已死亡。"
+          },
+          {
+            "id": "puzzlemaster_c",
+            "name": "解谜大师",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/puzzlemaster.png",
+            "ability": "一名玩家醉酒，即使你已死亡。每局游戏限一次，你可以猜测谁是那个醉酒的玩家，如果猜对了，你会得知谁是恶魔，但如果猜错了，你会得知错误的“谁是恶魔”信息。"
+          },
+          {
+            "id": "1hatter_c",
+            "name": "▲帽匠",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202312/c_9723021341071_86da6df4.jpg",
+            "ability": "如果你死亡，当晚爪牙和恶魔玩家可以选择变成新的爪牙和恶魔角色。"
+          },
+          {
+            "id": "1golem_c",
+            "name": "▲魔像",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/golem.png",
+            "ability": "每局游戏你只能发起提名一次。当你发起提名时，如果被你提名的玩家不是恶魔，他死亡。"
+          },
+          {
+            "id": "1saint_c",
+            "name": "▲圣徒",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/saint.png",
+            "ability": "如果你死于处决，你的阵营落败。"
+          },
+          {
+            "id": "1ogre_c",
+            "name": "▲食人魔",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202405/c_0102424156171_21d2f372.jpg",
+            "ability": "在你的首个夜晚，你要选择除你以外的一名玩家：你转变为他的阵营，即使你已醉酒或中毒，但你不知道你转变后的阵营。"
+          },
+          {
+            "id": "assassin_c",
+            "name": "刺客",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/assassin.png",
+            "ability": "每局游戏限一次，在夜晚时*，你可以选择一名玩家：他死亡，即使因为任何原因让他不会死亡。"
+          },
+          {
+            "id": "xaan_c",
+            "name": "限",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202411/c_7860002933371_9c39e151.jpg",
+            "ability": "在等同于初始外来者数量的夜晚，所有镇民玩家中毒直到下个黄昏。[外来者数量任意]"
+          },
+          {
+            "id": "1marionette_c",
+            "name": "▲提线木偶",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/marionette.png",
+            "ability": "你以为你是一个善良角色，但其实你不是。恶魔会知道你是提线木偶。[提线木偶会与恶魔邻座]"
+          },
+          {
+            "id": "1psychopath_c",
+            "name": "▲精神病患者",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/psychopath.png",
+            "ability": "每个白天，在提名开始前，你可以公开选择一名玩家：他死亡。如果你被处决，提名你的玩家需要和你猜拳，只有你输了你才会死亡。"
+          },
+          {
+            "id": "1mezepheles_c",
+            "name": "▲灵言师",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/mezepheles.png",
+            "ability": "在你的首个夜晚，你会得知一个关键词。首个说出该关键词的善良玩家会在当晚转变为邪恶阵营。"
+          },
+          {
+            "id": "1spy_c",
+            "name": "▲间谍",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/spy.png",
+            "ability": "每个夜晚，你能查看魔典。你可能会被当作善良阵营、镇民角色或外来者角色，即使你已死亡。"
+          },
+          {
+            "id": "yaggababble_c",
+            "name": "牙噶巴卜",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202402/c_9719440568071_03aa8062.jpg",
+            "ability": "在你的首个夜晚，你会得知一段秘密短语。每次你在白天公开说出这段短语，当天便可能会有一名玩家在这之后死亡。"
+          },
+          {
+            "id": "1imp_c",
+            "name": "▲小恶魔",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/imp.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。如果你以这种方式自杀，一名爪牙会变成小恶魔。"
+          },
+          {
+            "id": "1vigormortis_c",
+            "name": "▲亡骨魔",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/vigormortis.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。被你杀死的爪牙保留他的能力，且与他邻近的两名镇民之一中毒。[-1外来者]"
+          },
+          {
+            "id": "1pukka_c",
+            "name": "▲普卡",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/pukka.png",
+            "ability": "每个夜晚，你要选择一名玩家：他中毒。上个因你的能力中毒的玩家会死亡并恢复健康。"
+          },
+          {
+            "id": "1ojo_c",
+            "name": "▲奥赫",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202310/c_6886084308961_f221dd48.jpg",
+            "ability": "每个夜晚*，你要选择一个角色：他死亡。如果该角色不在场，则由说书人来决定谁会被你杀死。"
+          }
+        ],
+        "special_entries_preserved": 5,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1141822914004254729",
+      "name_zh_tw": "分則能成",
+      "metadata": "reports\\bilibili-scripts\\1141822914004254729.json",
+      "script_json": "reports\\bilibili-script-json\\分則能成.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "分則能成",
+        "entries_found": 26,
+        "roles_matched": 25,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 25,
+        "database_roles_missing": [
+          {
+            "id": "_fenzenengceng",
+            "name": "调查员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/investigator.png",
+            "ability": "在你的首个夜晚，你会得知两名玩家和一个爪牙角色：这两名玩家之一是该角色（或者你会得知没有爪牙在场）。"
+          },
+          {
+            "id": "1_fenzenengceng",
+            "name": "占卜师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fortune_teller.png",
+            "ability": "每个夜晚，你要选择两名玩家：你会得知他们之中是否有恶魔。会有一名善良玩家始终被你的能力当作恶魔。"
+          },
+          {
+            "id": "2_fenzenengceng",
+            "name": "祖母",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/grandmother.png",
+            "ability": "在你的首个夜晚，你会得知一名善良玩家和他的角色。如果恶魔杀死了他，你也会死亡。"
+          },
+          {
+            "id": "3_fenzenengceng",
+            "name": "水手",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/sailor.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家：你或他之一会醉酒直到下个黄昏。你不会死亡。"
+          },
+          {
+            "id": "4_fenzenengceng",
+            "name": "侍女",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/chambermaid.png",
+            "ability": "每个夜晚，你要选择除你以外的两名存活的玩家：你会得知他们中有几人在当晚因其自身能力而被唤醒。"
+          },
+          {
+            "id": "5_fenzenengceng",
+            "name": "舞蛇人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/snake_charmer.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家：如果你选中了恶魔，你和他交换角色和阵营，然后他中毒。"
+          },
+          {
+            "id": "6_fenzenengceng",
+            "name": "博学者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/savant.png",
+            "ability": "每个白天，你可以私下询问说书人以得知两条信息：一个是正确的，一个是错误的。"
+          },
+          {
+            "id": "7_fenzenengceng",
+            "name": "哲学家",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/philosopher.png",
+            "ability": "每局游戏限一次，在夜晚时，你可以选择一个善良角色：你获得该角色的能力。如果这个角色在场，他醉酒。"
+          },
+          {
+            "id": "8_fenzenengceng",
+            "name": "气球驾驶员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/balloonist.png",
+            "ability": "每个夜晚，你会得知一名与上个夜晚得知的玩家角色类型不同的玩家。[+0~1外来者]"
+          },
+          {
+            "id": "9_fenzenengceng",
+            "name": "半兽人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lycanthrope.png",
+            "ability": "每个夜晚*，你要选择一名存活玩家：如果他是善良的，他死亡，并且当晚恶魔不会造成死亡。会有一名善良玩家始终被当作邪恶阵营。"
+          },
+          {
+            "id": "10_fenzenengceng",
+            "name": "食人族",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/cannibal.png",
+            "ability": "你拥有上个死于处决的玩家的能力。如果该玩家属于邪恶阵营，你中毒直到下个善良玩家死于处决。"
+          },
+          {
+            "id": "11_fenzenengceng",
+            "name": "女祭司",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/high_priestess.png",
+            "ability": "每个夜晚，你会得知一名说书人认为你最应该与其交流的玩家。"
+          },
+          {
+            "id": "12_fenzenengceng",
+            "name": "戏法师",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/d/d6/Alsaahir.png",
+            "ability": "'每个白天，你可以公开进行一次谁是爪牙，谁是恶魔的猜测。如果你猜对，善良阵营获胜。"
+          },
+          {
+            "id": "13_fenzenengceng",
+            "name": "酒鬼",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/drunk.png",
+            "ability": "你不知道你是酒鬼。你以为你是一个镇民角色，但其实你不是。"
+          },
+          {
+            "id": "14_fenzenengceng",
+            "name": "陌客",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/recluse.png",
+            "ability": "你可能会被当作邪恶阵营、爪牙角色或恶魔角色，即使你已死亡。"
+          },
+          {
+            "id": "15_fenzenengceng",
+            "name": "修补匠",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/tinker.png",
+            "ability": "你随时可能死亡。"
+          },
+          {
+            "id": "16_fenzenengceng",
+            "name": "魔像",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/golem.png",
+            "ability": "每局游戏你只能发起提名一次。当你发起提名时，如果被你提名的玩家不是恶魔，他死亡。"
+          },
+          {
+            "id": "17_fenzenengceng",
+            "name": "教父",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/godfather.png",
+            "ability": "在你的首个夜晚，你会得知有哪些外来者角色在场。如果有外来者在白天死亡，你会在当晚被唤醒并且你要选择一名玩家：他死亡。[-1或+1外来者]"
+          },
+          {
+            "id": "18_fenzenengceng",
+            "name": "魔鬼代言人",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/devils_advocate.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家（与上个夜晚不同）：如果明天白天他被处决，他不会死亡。"
+          },
+          {
+            "id": "19_fenzenengceng",
+            "name": "麻脸巫婆",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/pit-hag.png",
+            "ability": "每个夜晚*，你要选择一名玩家和一个角色，如果该角色不在场，他变成该角色。如果因此创造了一个恶魔，当晚的死亡由说书人决定。"
+          },
+          {
+            "id": "20_fenzenengceng",
+            "name": "精神病患者",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/psychopath.png",
+            "ability": "每个白天，在提名开始前，你可以公开选择一名玩家：他死亡。如果你被处决，提名你的玩家需要和你猜拳，只有你输了你才会死亡。"
+          },
+          {
+            "id": "21_fenzenengceng",
+            "name": "涡流",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/vortox.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。镇民玩家的能力都会产生错误信息。如果白天没人被处决，邪恶阵营获胜。"
+          },
+          {
+            "id": "22_fenzenengceng",
+            "name": "痢蛭",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lleech.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。在你的首个夜晚，你要选择一名存活的玩家：他中毒，只有当他处于死亡状态时你才会立即死亡。"
+          },
+          {
+            "id": "23_fenzenengceng",
+            "name": "奥赫",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ojo.png",
+            "ability": "每个夜晚*，你要选择一个角色：他死亡。如果该角色不在场，则由说书人来决定谁会被你杀死。"
+          },
+          {
+            "id": "24_fenzenengceng",
+            "name": "牙噶巴卜",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yaggababble.png",
+            "ability": "在你的首个夜晚，你会得知一段秘密短语。每次你在白天公开说出这段短语，当天便可能会有一名玩家在这之后死亡。"
+          }
+        ],
+        "special_entries_preserved": 1,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1108075131170717697",
+      "name_zh_tw": "復仇者集結",
+      "metadata": "reports\\bilibili-scripts\\1108075131170717697.json",
+      "script_json": "reports\\bilibili-script-json\\復仇者集結.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "復仇者集結",
+        "entries_found": 34,
+        "roles_matched": 0,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 0,
+        "database_roles_missing": [],
+        "special_entries_preserved": 34,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1040874565334466563",
+      "name_zh_tw": "斗轉星移",
+      "metadata": "reports\\bilibili-scripts\\1040874565334466563.json",
+      "script_json": "reports\\bilibili-script-json\\斗轉星移.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "鬥轉星移",
+        "entries_found": 28,
+        "roles_matched": 24,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 24,
+        "database_roles_missing": [
+          {
+            "id": "qintianjiann",
+            "name": "钦天监",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/1/13/Qintianjian.png/120px-Qintianjian.png",
+            "ability": "在你的首个夜晚，你会得知离你最近的邪恶玩家位于你的哪一侧（左/右/相同）。如果与你邻近的玩家中有邪恶阵营，你会得知错误信息作为替代。"
+          },
+          {
+            "id": "yinyangshii",
+            "name": "阴阳师",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/d/d2/Yinyangshi.png/120px-Yinyangshi.png",
+            "ability": "在你的首个夜晚，你会得知两个善良角色和两个邪恶角色，其中有且只有两个角色在场。"
+          },
+          {
+            "id": "fenshuishii",
+            "name": "风水师",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/7/73/Fengshuishi.png/75px-Fengshuishi.png",
+            "ability": "在你的首个夜晚，你会得知一名玩家的角色类型。每个夜晚*，你会从他的顺时针方向得知下一名非旅行者玩家的角色类型。"
+          },
+          {
+            "id": "gelinggg",
+            "name": "歌伶",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/5/54/Geling.png/120px-Geling.png",
+            "ability": "每局游戏限一次，在白天时，你可以提议所有玩家观看你的演出，并从同意参加的玩家中选择你的观众。如果恶魔成为了观众，你会在当晚死亡。"
+          },
+          {
+            "id": "bingbi",
+            "name": "秉笔",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/2/2b/Bingbi.png",
+            "ability": "如果你在白天死亡，当晚你会得知一名善良玩家。如果你在夜晚死亡，当晚你会得知一名邪恶玩家。"
+          },
+          {
+            "id": "boxuezhe",
+            "name": "博学者",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/5/53/Savant.png/300px-Savant.png",
+            "ability": "每个白天，你可以私下询问说书人以得知两条信息：一个是正确的，一个是错误的。"
+          },
+          {
+            "id": "niubidegongqin",
+            "name": "共情者",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/4/4e/Empath.png/300px-Empath.png",
+            "ability": "每个夜晚，你会得知与你邻近的两名存活的玩家中邪恶玩家的数量。"
+          },
+          {
+            "id": "shiguan",
+            "name": "史官",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/8/8a/Shiguan.png/75px-Shiguan.png",
+            "ability": "每个夜晚*，如果今天白天有玩家死于处决，你会得知存活镇民的数量。"
+          },
+          {
+            "id": "chichier",
+            "name": "食人族",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/e/ed/Cannibal.png/300px-Cannibal.png",
+            "ability": "你拥有上个死于处决的玩家的能力。如果该玩家属于邪恶阵营，你中毒直到下个善良玩家死于处决。"
+          },
+          {
+            "id": "yinlurenn",
+            "name": "引路人",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/0/03/Yinluren.png/120px-Yinluren.png",
+            "ability": "每个夜晚，你要选择至多三名玩家：你会得知今晚是否有邪恶玩家的能力选择或影响了他们之中的玩家。"
+          },
+          {
+            "id": "shuxuejia",
+            "name": "数学家",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/0/06/Mathematician.png/300px-Mathematician.png",
+            "ability": "每个夜晚，你会得知有多少名玩家的能力因为其他角色的能力而未正常生效。（从上个黎明到你被唤醒时）"
+          },
+          {
+            "id": "gonggao",
+            "name": "城镇公告员",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/b/b7/Towncrier.png/300px-Towncrier.png",
+            "ability": "每个夜晚*，你会得知在今天白天时是否有爪牙发起过提名。"
+          },
+          {
+            "id": "shaxingg",
+            "name": "煞星",
+            "team": "outsider",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/b/b9/Shaxing.png/120px-Shaxing.png",
+            "ability": "如果你死亡，当晚与你邻近的存活玩家之一可能会死亡。"
+          },
+          {
+            "id": "mokee",
+            "name": "陌客",
+            "team": "outsider",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/0/02/Recluse.png/300px-Recluse.png",
+            "ability": "你可能会被当作邪恶阵营、爪牙角色或恶魔角色，即使你已死亡。"
+          },
+          {
+            "id": "zajiyanyuan",
+            "name": "杂技演员",
+            "team": "outsider",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/8/8f/Acrobat.png/300px-Acrobat.png",
+            "ability": "每个夜晚*，如果与你邻近的存活善良玩家之一醉酒或中毒，你死亡。"
+          },
+          {
+            "id": "jiubaoo",
+            "name": "酒保",
+            "team": "outsider",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/c/c2/Jiubao.png/50px-Jiubao.png",
+            "ability": "与你邻近的善良玩家之一醉酒，即使你已死亡。"
+          },
+          {
+            "id": "ciekee",
+            "name": "刺客",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/6/69/Assassin.png/300px-Assassin.png",
+            "ability": "每局游戏限一次，在夜晚时*，你可以选择一名玩家：他死亡，即使因为任何原因让他不会死亡。"
+          },
+          {
+            "id": "gudiaoo",
+            "name": "蛊雕",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/5/56/Gudiao.png/120px-Gudiao.png",
+            "ability": "每个夜晚，你要选择左或右：你得知该方向上的下一名存活善良玩家的角色，他中毒且其他善良玩家以为他是邪恶的蛊雕，直到下个黄昏。"
+          },
+          {
+            "id": "jinxiangshuangzi",
+            "name": "镜像双子",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/8/8e/Eviltwin.png/300px-Eviltwin.png",
+            "ability": "你与一名对立阵营的玩家互相知道对方是什么角色。如果其中善良玩家被处决，邪恶阵营获胜。如果你们都存活，善良阵营无法获胜。"
+          },
+          {
+            "id": "jiaofuu",
+            "name": "教父",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/d/dd/Godfather.png/300px-Godfather.png",
+            "ability": "在你的首个夜晚，你会得知有哪些外来者角色在场。如果有外来者在白天死亡，你会在当晚被唤醒并且你要选择一名玩家：他死亡。[-1或+1外来者]"
+          },
+          {
+            "id": "nuodashi",
+            "name": "诺-达鲺",
+            "team": "demon",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/1/16/Nodashii.png/300px-Nodashii.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。与你邻近的两名镇民中毒。"
+          },
+          {
+            "id": "guhuoniao",
+            "name": "姑获鸟",
+            "team": "demon",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/3/38/Guhuoniao.png/75px-Guhuoniao.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。你可能会拥有上一个死于处决的爪牙的能力。"
+          },
+          {
+            "id": "yaoshideshen",
+            "name": "亡骨魔",
+            "team": "demon",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/f/fc/Vigormortis.png/300px-Vigormortis.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。被你杀死的爪牙保留他的能力，且与他邻近的两名镇民之一中毒。[-1外来者]"
+          },
+          {
+            "id": "xiaoemoo",
+            "name": "小恶魔",
+            "team": "demon",
+            "image": "https://clocktower-wiki.gstonegames.com/images/thumb/b/b3/Imp.png/300px-Imp.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。如果你以这种方式自杀，一名爪牙会变成小恶魔。"
+          }
+        ],
+        "special_entries_preserved": 4,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1040460547632398353",
+      "name_zh_tw": "登車拔劍起",
+      "metadata": "reports\\bilibili-scripts\\1040460547632398353.json",
+      "script_json": "reports\\bilibili-script-json\\登車拔劍起.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "登車拔劍起",
+        "entries_found": 27,
+        "roles_matched": 24,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 24,
+        "database_roles_missing": [
+          {
+            "id": "qingtianjianbei111",
+            "name": "修行者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/shugenja.png",
+            "ability": "在你的首个夜晚，你会得知距离最近的邪恶玩家位于你的顺时针还是逆时针方向。如果两侧的邪恶玩家与你距离相等，你得知的信息由说书人决定。"
+          },
+          {
+            "id": "hebusiniyade111",
+            "name": "店小二",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/dianxiaoer.png",
+            "ability": "在你的首个夜晚，你会得知两名善良玩家。他们之中会有一人醉酒，即使你已死亡。"
+          },
+          {
+            "id": "fengshuisfgsetgshfsdf",
+            "name": "风水师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fengshuishi.png",
+            "ability": "在你的首个夜晚，你会得知一名玩家的角色类型。每个夜晚*，你会从他的顺时针方向得知下一名非旅行者玩家的角色类型。"
+          },
+          {
+            "id": "rangwokangkang111",
+            "name": "筑梦师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/dreamer.png",
+            "ability": "每个夜晚，你要选择除你及旅行者以外的一名玩家：你会得知一个善良角色和一个邪恶角色，该玩家是其中一个角色。"
+          },
+          {
+            "id": "gongwenbaozaren111",
+            "name": "驱魔人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/exorcist.png",
+            "ability": "每个夜晚*，你要选择一名玩家（与上个夜晚不同）：如果你选中了恶魔，他会得知你的角色，但他当晚不会因其自身能力而被唤醒。"
+          },
+          {
+            "id": "shiguanuwhaouhsoifhais",
+            "name": "史官",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/shiguan.png",
+            "ability": "每个夜晚*，如果今天白天有玩家死于处决，你会得知存活镇民的数量。"
+          },
+          {
+            "id": "xunchashaoihwronaklsndfkasnd",
+            "name": "巡察",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/xuncha.png",
+            "ability": "每个夜晚*，你要选择两个善良角色（与上个夜晚不同）：如果他们都存活，他们当晚不会死亡。"
+          },
+          {
+            "id": "chunzaoyaoa",
+            "name": "造谣者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/gossip.png",
+            "ability": "每个白天，你可以公开发表一个声明。在当晚，如果该声明是正确的，会有一名玩家死亡。"
+          },
+          {
+            "id": "huojin111",
+            "name": "博学者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/savant.png",
+            "ability": "每个白天，你可以私下询问说书人以得知两条信息：一个是正确的，一个是错误的。"
+          },
+          {
+            "id": "zhenaosheajwiejp214ui90-japtu90q23j5t",
+            "name": "鸩",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/zhen.png",
+            "ability": "每局游戏限一次，在夜晚时*，你可以选择一个镇民角色：如果他在场，他中毒并死亡。"
+          },
+          {
+            "id": "biubiubiu111",
+            "name": "猎手",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/slayer.png",
+            "ability": "每局游戏限一次，你可以在白天时公开选择一名玩家：如果他是恶魔，他死亡。"
+          },
+          {
+            "id": "yanshisadsadasdasdad",
+            "name": "偃师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yanshi.png",
+            "ability": "如果你在夜晚死亡，你与一名存活爪牙玩家交换角色。"
+          },
+          {
+            "id": "yongjiangsaohdawjroij4u901qhwrfi13048",
+            "name": "俑匠",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yongjiang.png",
+            "ability": "如果已死亡玩家中没有邪恶玩家，你只会死于处决。"
+          },
+          {
+            "id": "zhshutongoashoiahokrtoaiwjsjfn8qh13rfbnoihc-9j",
+            "name": "书童",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/shutong.png",
+            "ability": "在你的首个夜晚，你要选择除你以外的一名玩家：除首个夜晚以外，当他被邪恶玩家的能力选择或影响时，你会在当晚死亡。"
+          },
+          {
+            "id": "wuwusidehaocan111",
+            "name": "心上人",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/sweetheart.png",
+            "ability": "当你死亡时，会有一名玩家开始醉酒。"
+          },
+          {
+            "id": "kangtuiyige111",
+            "name": "逆臣",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/nichen.png",
+            "ability": "在你的首个夜晚，你要选择除你以外的一名玩家：如果他先死于处决，你会在当晚转变为邪恶；如果你先死于处决，他会在当晚转变为邪恶。"
+          },
+          {
+            "id": "jiandieeeeeee111",
+            "name": "间谍",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/spy.png",
+            "ability": "每个夜晚，你能查看魔典。你可能会被当作善良阵营、镇民角色或外来者角色，即使你已死亡。"
+          },
+          {
+            "id": "baonijuhua111",
+            "name": "刺客",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/assassin.png",
+            "ability": "每局游戏限一次，在夜晚时*，你可以选择一名玩家：他死亡，即使因为任何原因让他不会死亡。"
+          },
+          {
+            "id": "zheshigeyizi111",
+            "name": "主谋",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/mastermind.png",
+            "ability": "如果恶魔因为死于处决而因此导致游戏结束时，再额外进行一个夜晚和一个白天。在那个白天如果有玩家被处决，他的阵营落败。"
+          },
+          {
+            "id": "gebulinaaaaaaa111111",
+            "name": "哥布林",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/goblin.png",
+            "ability": "如果你在被提名后公开声明自己是哥布林且在那个白天被处决，你的阵营获胜。"
+          },
+          {
+            "id": "tousioahsdoasidhas",
+            "name": "限",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/b/b9/Xaan.png",
+            "ability": "在等同于初始外来者数量的夜晚，所有镇民玩家中毒直到下个黄昏。[外来者数量任意]"
+          },
+          {
+            "id": "oeeroeeerooooeeeeee1111111",
+            "name": "奥赫",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ojo.png",
+            "ability": "每个夜晚*，你要选择一个角色：他死亡。如果该角色不在场，则由说书人来决定谁会被你杀死。"
+          },
+          {
+            "id": "opppppppppp1111",
+            "name": "珀",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/po.png",
+            "ability": "每个夜晚*，你可以选择一名玩家：他死亡。如果你上次选择时没有选择任何玩家，当晚你要选择三名玩家：他们死亡。"
+          },
+          {
+            "id": "dianyuzhangaowhorahwpru903qu5rpiqhnrf",
+            "name": "典狱长",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/dianyuzhang.png",
+            "ability": "每个夜晚，你要选择至多三名玩家：如果明天白天他们之一死于处决，上次被你选择的其他玩家会在当晚死亡。否则，当晚他们之中会有一名玩家死亡。"
+          }
+        ],
+        "special_entries_preserved": 3,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1093094139196604418",
+      "name_zh_tw": "阿茲卡班",
+      "metadata": "reports\\bilibili-scripts\\1093094139196604418.json",
+      "script_json": "reports\\bilibili-script-json\\阿茲卡班.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "阿茲卡班",
+        "entries_found": 25,
+        "roles_matched": 25,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 25,
+        "database_roles_missing": [
+          {
+            "id": "shugenja",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "amnesiac",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "alchemist",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "artist",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "gossip",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "flowergirl",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "tea_lady",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "savant",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "nightwatchman",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "lycanthrope",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "oracle",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "virgin",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "fisherman",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "drunk",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "politician",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "hatter",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "plague_doctor",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "wizard",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "witch",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "pit-hag",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "boffin",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "lil_monsta",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "yaggababble",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "zombuul",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "imp",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          }
+        ],
+        "special_entries_preserved": 0,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1077848774825476101",
+      "name_zh_tw": "赤子之心",
+      "metadata": "reports\\bilibili-scripts\\1077848774825476101.json",
+      "script_json": "reports\\bilibili-script-json\\赤子之心.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "赤子之心",
+        "entries_found": 23,
+        "roles_matched": 23,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 23,
+        "database_roles_missing": [
+          {
+            "id": "dianxiaoer",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "seamstress",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "nightwatchman",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "tixingguan",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "wudaozhe",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "xizi_new",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "xionghaizi",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "yishi",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "fortune_teller",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "philosopher",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "zhifu",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "bingbi",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "daoshi",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "librarian",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "hermit",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "goblin",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "scarlet_woman",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "poisoner",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "wraith",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "witch",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "fang_gu",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "hundun",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "vigormortis",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          }
+        ],
+        "special_entries_preserved": 0,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1044208967471857681",
+      "name_zh_tw": "奇異人生",
+      "metadata": "reports\\bilibili-scripts\\1044208967471857681.json",
+      "script_json": "reports\\bilibili-script-json\\奇異人生.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "奇異人生",
+        "entries_found": 27,
+        "roles_matched": 24,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 24,
+        "database_roles_missing": [
+          {
+            "id": "fe1f2e21",
+            "name": "小精靈",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/pixie_600w.webp",
+            "ability": "在你的首個夜晚，你會得知一個在場的鎮民角色。如果你“瘋狂”地證明你是該角色，當他死亡時你獲得該角色的能力。"
+          },
+          {
+            "id": "4fa61c56",
+            "name": "舞蛇人",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/snakeCharmer_600w.webp",
+            "ability": "每個夜晚，你要選擇一名存活的玩家：如果你選中了惡魔，你和他交換角色和陣營，然後他中毒。"
+          },
+          {
+            "id": "d4f30628",
+            "name": "築夢師",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/dreamer_600w.webp",
+            "ability": "每個夜晚，你要選擇除你及旅行者以外的一名玩家：你會得知一個善良角色和一個邪惡角色，該玩家是其中一個角色。"
+          },
+          {
+            "id": "8820a48f",
+            "name": "異教領袖",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/cultLeader_600w.webp",
+            "ability": "每個夜晚，你會轉變為與你鄰近的一名存活的玩家的陣營。每個白天，你可以提議所有玩家加入你的教派，如果所有善良玩家同意加入，你的陣營獲勝。"
+          },
+          {
+            "id": "5404760f",
+            "name": "半獸人",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/lycanthrope_600w.webp",
+            "ability": "每個夜晚*，你要選擇一名存活玩家：如果他是善良的，他死亡，並且當晚惡魔不會造成死亡。會有一名善良玩家始終被當作邪惡陣營。"
+          },
+          {
+            "id": "ed521424",
+            "name": "博學者",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/savant_600w.webp",
+            "ability": "每個白天，你可以私下詢問說書人以得知兩條信息：一個是正確的，一個是錯誤的。"
+          },
+          {
+            "id": "208f3fa4",
+            "name": "侍臣",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/courtier_600w.webp",
+            "ability": "每局遊戲限一次，在夜晚時，你可以選擇一個角色：如果該角色在場，該角色之一從當晚開始醉酒三天三夜。"
+          },
+          {
+            "id": "4d703616",
+            "name": "哲學家",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/philosopher_600w.webp",
+            "ability": "每局遊戲限一次，在夜晚時，你可以選擇一個善良角色：你獲得該角色的能力。如果這個角色在場，他醉酒。"
+          },
+          {
+            "id": "6c100d1d",
+            "name": "煉金術士",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/alchemist_600w.webp",
+            "ability": "你擁有一個爪牙角色的能力。當你使用能力時，說書人可能會要求你更換選擇。"
+          },
+          {
+            "id": "64053a1f",
+            "name": "食人族",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/cannibal_600w.webp",
+            "ability": "你擁有上個死於處決的玩家的能力。如果該玩家屬於邪惡陣營，你中毒直到下個善良玩家死於處決。"
+          },
+          {
+            "id": "2e60f157",
+            "name": "報喪女妖",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/banshee_600w.webp",
+            "ability": "如果惡魔殺死了你，所有玩家都會得知此事。從現在開始，你每天可以發起兩次提名，每次投票時可以投兩票。"
+          },
+          {
+            "id": "cd9e83a2",
+            "name": "罌粟種植者",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/poppyGrower_600w.webp",
+            "ability": "爪牙和惡魔互相不認識。如果你死亡，當晚他們會互相認識。"
+          },
+          {
+            "id": "8342c540",
+            "name": "無神論者",
+            "team": "townsfolk",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/atheist_600w.webp",
+            "ability": "說書人可以打破遊戲規則，如果說書人被處決，善良陣營獲勝，即使你已死亡。[無邪惡角色在場]"
+          },
+          {
+            "id": "d5b526da",
+            "name": "酒鬼",
+            "team": "outsider",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/drunk_600w.webp",
+            "ability": "你不知道你是酒鬼。你以為你是一個鎮民角色，但其實你不是。"
+          },
+          {
+            "id": "3cc25e09",
+            "name": "陌客",
+            "team": "outsider",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/recluse_600w.webp",
+            "ability": "你可能會被當作邪惡陣營、爪牙角色或惡魔角色，即使你已死亡。"
+          },
+          {
+            "id": "0212061b",
+            "name": "聖徒",
+            "team": "outsider",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/saint_600w.webp",
+            "ability": "如果你死於處決，你的陣營落敗。"
+          },
+          {
+            "id": "2abb26c6",
+            "name": "異端分子",
+            "team": "outsider",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/heretic_600w.webp",
+            "ability": "對調勝負結果，即使你已死亡。"
+          },
+          {
+            "id": "a8b3c52b",
+            "name": "魔像",
+            "team": "outsider",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/golem_600w.webp",
+            "ability": "每局遊戲你只能發起提名一次。當你發起提名時，如果被你提名的玩家不是惡魔，他死亡。"
+          },
+          {
+            "id": "862e22e7",
+            "name": "投毒者",
+            "team": "minion",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/poisoner_600w.webp",
+            "ability": "每個夜晚，你要選擇一名玩家：他在當晚和明天白天中毒。"
+          },
+          {
+            "id": "685be2fc",
+            "name": "精神病患者",
+            "team": "minion",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/psychopath_600w.webp",
+            "ability": "每個白天，在提名開始前，你可以公開選擇一名玩家：他死亡。如果你被處決，提名你的玩家需要和你猜拳，只有你輸了你才會死亡。"
+          },
+          {
+            "id": "0ca74730",
+            "name": "哥布林",
+            "team": "minion",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/goblin_600w.webp",
+            "ability": "如果你在被提名後公開聲明自己是哥布林且在那個白天被處決，你的陣營獲勝。"
+          },
+          {
+            "id": "c42d6547",
+            "name": "紅唇女郎",
+            "team": "minion",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/scarletWoman_600w.webp",
+            "ability": "如果大於等於五名玩家存活時（旅行者不計算在內）惡魔死亡，你變成那個惡魔。"
+          },
+          {
+            "id": "ca4e3001",
+            "name": "牙噶巴卜",
+            "team": "demon",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/yaggababble_600w.webp",
+            "ability": "在你的首個夜晚，你會得知一段秘密短語。每次你在白天公開說出這段短語，當天便可能會有一名玩家在這之後死亡。"
+          },
+          {
+            "id": "bdc32304",
+            "name": "方古",
+            "team": "demon",
+            "image": "https://tachyondungeon.xyz/botc/image/characters/fangGu_600w.webp",
+            "ability": "每個夜晚*，你要選擇一名玩家：他死亡。被該能力殺死的外來者改為變成邪惡的方古且你代替他死亡，但每局遊戲僅能成功轉化一次。[+1外來者]"
+          }
+        ],
+        "special_entries_preserved": 3,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "735177545161375745",
+      "name_zh_tw": "夜半狂歡",
+      "metadata": "reports\\bilibili-scripts\\735177545161375745.json",
+      "script_json": "reports\\bilibili-script-json\\夜半狂歡.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "夜半狂歡",
+        "entries_found": 30,
+        "roles_matched": 27,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 27,
+        "database_roles_missing": [
+          {
+            "id": "3_87",
+            "name": "怪咖",
+            "team": "traveler",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/deviant.png",
+            "ability": "如果你表現得很有趣，當天你不能被流放。"
+          },
+          {
+            "id": "2_91",
+            "name": "法官",
+            "team": "traveler",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/judge.png",
+            "ability": "每局遊戲限一次，如果其他玩家發起了提名，你可以選擇讓本次提名直接執行處決或讓投票無效。"
+          },
+          {
+            "id": "3_90",
+            "name": "流鶯",
+            "team": "traveler",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/harlot.png",
+            "ability": "每個夜晚*，你要選擇一名存活的玩家：如果他同意，你會得知他的角色，但是你們兩個可能同時死亡。"
+          },
+          {
+            "id": "1_85",
+            "name": "官員",
+            "team": "traveler",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/bureaucrat.png",
+            "ability": "每個夜晚，你要選擇除你以外的一名玩家：明天白天，他的投票算作三票。"
+          },
+          {
+            "id": "20003_122",
+            "name": "貴族",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/noble.png",
+            "ability": "在你的首個夜晚，你會得知三名玩家：其中有且只有一名玩家是邪惡的。"
+          },
+          {
+            "id": "20003_73",
+            "name": "氣球駕駛員",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/balloonist.png",
+            "ability": "每個夜晚，你會得知一名與上個夜晚得知的玩家角色類型不同的玩家。[+0~+1 外來者]"
+          },
+          {
+            "id": "20003_70",
+            "name": "舞蛇人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/snake_charmer.png",
+            "ability": "每個夜晚，你要選擇一名存活的玩家：如果你選中了惡魔，你和他交換角色和陣營，然後他中毒。"
+          },
+          {
+            "id": "20003_65",
+            "name": "博學者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/savant.png",
+            "ability": "每個白天，你可以私下詢問說書人以得知兩條信息：一個是正確的，一個是錯誤的。"
+          },
+          {
+            "id": "20003_74",
+            "name": "失憶者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/amnesiac.png",
+            "ability": "你不知道你的能力是什麽。每個白天你可以找說書人猜測一次，你會得知你的猜測有多準確。"
+          },
+          {
+            "id": "20003_114",
+            "name": "工程師",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/engineer.png",
+            "ability": "每局遊戲限一次，在夜晚時，你可以選擇讓惡魔變成你選擇的惡魔角色，或讓所有爪牙變成你選擇的爪牙角色。"
+          },
+          {
+            "id": "20003_117",
+            "name": "巡山人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/huntsman.png",
+            "ability": "每局遊戲限一次，在夜晚時，你可以選擇一名存活的玩家：如果你選中了落難少女，她會變成一個不在場的鎮民角色。[+落難少女]"
+          },
+          {
+            "id": "20003_45",
+            "name": "教授",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/professor.png",
+            "ability": "每局遊戲限一次，在夜晚時*，你可以選擇一名死亡的玩家：如果他是鎮民，你會將他起死回生。"
+          },
+          {
+            "id": "20003_75",
+            "name": "漁夫",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/fisherman.png",
+            "ability": "每局遊戲限一次，在白天時，你可以讓說書人給你一些能幫助你的陣營獲勝的建議。"
+          },
+          {
+            "id": "20003_115",
+            "name": "農夫",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/farmer.png",
+            "ability": "如果你在夜晚死亡，一名存活的善良玩家會變成農夫。"
+          },
+          {
+            "id": "20003_124",
+            "name": "罌粟種植者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/poppy_grower.png",
+            "ability": "爪牙和惡魔互相不認識。如果你死亡，當晚他們會互相認識。"
+          },
+          {
+            "id": "20003_76",
+            "name": "食人族",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/cannibal.png",
+            "ability": "你擁有上個死於處決的玩家的能力。如果該玩家屬於邪惡陣營，你中毒直到下個善良玩家死於處決。"
+          },
+          {
+            "id": "20003_110",
+            "name": "無神論者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/atheist.png",
+            "ability": "說書人可以打破遊戲規則。如果說書人被處決，善良陣營獲勝，即使你已死亡。[無邪惡角色在場]"
+          },
+          {
+            "id": "damselbutton",
+            "name": "落難少女",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/damsel.png",
+            "ability": "所有爪牙都知道落難少女在場。每局遊戲限一次，任意爪牙可以公開猜測你是落難少女，如果猜對，你的陣營落敗。"
+          },
+          {
+            "id": "20003_8",
+            "name": "酒鬼",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/drunk.png",
+            "ability": "你不知道你是酒鬼。你以為你是一個鎮民角色，但其實你不是。"
+          },
+          {
+            "id": "20003_128",
+            "name": "魔像",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/golem.png",
+            "ability": "每局遊戲你只能發起提名一次。當你發起提名時，如果被你提名的玩家不是惡魔，他死亡。"
+          },
+          {
+            "id": "20003_57",
+            "name": "理發師",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/barber.png",
+            "ability": "如果你死亡，在當晚惡魔可以選擇兩名玩家（不能選擇其他惡魔）交換角色。"
+          },
+          {
+            "id": "20003_136",
+            "name": "靈言師",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/mezepheles.png",
+            "ability": "在你的首個夜晚，你會得知一個關鍵詞。首個說出該關鍵詞的善良玩家會在當晚轉變為邪惡陣營。"
+          },
+          {
+            "id": "20003_5",
+            "name": "投毒者",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/poisoner.png",
+            "ability": "每個夜晚，你要選擇一名玩家：他在當晚和明天白天中毒。"
+          },
+          {
+            "id": "pithagbutton",
+            "name": "麻臉巫婆",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/pit-hag.png",
+            "ability": "每個夜晚*，你要選擇一名玩家和一個角色，如果該角色不在場，他變成該角色。如果因此創造了一個惡魔，當晚的死亡由說書人決定。"
+          },
+          {
+            "id": "20003_137",
+            "name": "精神病患者",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/psychopath.png",
+            "ability": "每個白天，在提名開始前，你可以公開選擇一名玩家：他死亡。如果你被處決，提名你的玩家需要和你猜拳，只有你輸了你才會死亡。"
+          },
+          {
+            "id": "20003_138",
+            "name": "哈迪寂亞",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/al-hadikhia.png",
+            "ability": "每個夜晚*，你要選擇三名玩家（所有玩家都會得知你選了誰）：他們分別秘密決定自己的生死，然後如果他們都存活則都死亡。"
+          },
+          {
+            "id": "20003_50",
+            "name": "亡骨魔",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/vigormortis.png",
+            "ability": "每個夜晚*，你要選擇一名玩家：他死亡。被你殺死的爪牙保留他的能力，且與他鄰近的兩名鎮民之一中毒。[-1外來者]"
+          }
+        ],
+        "special_entries_preserved": 3,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "993306995058540599",
+      "name_zh_tw": "瓶中小人",
+      "metadata": "reports\\bilibili-scripts\\993306995058540599.json",
+      "script_json": "reports\\bilibili-script-json\\瓶中小人.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "瓶中小人",
+        "entries_found": 25,
+        "roles_matched": 25,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 25,
+        "database_roles_missing": [
+          {
+            "id": "woshininainai111",
+            "name": "祖母",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/grandmother.png",
+            "ability": "在你的首個夜晚，你會得知一名善良玩家和他的角色。如果惡魔殺死了他，你也會死亡。"
+          },
+          {
+            "id": "jingcaisanxuanyi111",
+            "name": "貴族",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/noble.png",
+            "ability": "在你的首個夜晚，你會得知三名玩家：其中有且只有一名玩家是邪惡的。"
+          },
+          {
+            "id": "daokeeeeeeekekekekekekeke12123123123",
+            "name": "刀客",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/daoke.png",
+            "ability": "在你的首個夜晚，你會得知一個在場的爪牙角色。每局遊戲限一次，你可以在白天公開選擇一名玩家：如果他是你得知的角色，他死亡。"
+          },
+          {
+            "id": "ainiii11111",
+            "name": "共情者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/empath.png",
+            "ability": "每個夜晚，你會得知與你鄰近的兩名存活的玩家中邪惡玩家的數量。"
+          },
+          {
+            "id": "mofashuijingqiu111",
+            "name": "占卜師",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fortune_teller.png",
+            "ability": "每個夜晚，你要選擇兩名玩家：你會得知他們之中是否有惡魔。會有一名善良玩家始終被你的能力當作惡魔。"
+          },
+          {
+            "id": "yinlureanrlfasrfiaojwrn2k31j95u09uasj",
+            "name": "引路人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yinluren.png",
+            "ability": "每個夜晚，你要選擇至多三名玩家：你會得知今晚是否有邪惡玩家的能力選擇或影響了他們之中的玩家。"
+          },
+          {
+            "id": "tiepigu111",
+            "name": "貞潔者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/virgin.png",
+            "ability": "當你首次被提名時，如果提名你的玩家是鎮民，他立刻被處決。"
+          },
+          {
+            "id": "furryhaoye111",
+            "name": "半獸人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lycanthrope.png",
+            "ability": "每個夜晚*，你要選擇一名存活的玩家，如果他是善良的，他死亡，並且當晚不會再有其他玩家死亡。"
+          },
+          {
+            "id": "zhengdanideyanjing111",
+            "name": "神諭者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/oracle.png",
+            "ability": "每個夜晚*，你會得知有多少名死亡的玩家是邪惡的。"
+          },
+          {
+            "id": "wolaishouhunidemama111",
+            "name": "守夜人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/nightwatchman.png",
+            "ability": "每局遊戲限一次，在夜晚時，你可以選擇一名玩家：他會得知你是守夜人。"
+          },
+          {
+            "id": "zhenaosheajwiejp214ui90-japtu90q23j5t",
+            "name": "鴆",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/zhen.png",
+            "ability": "每局遊戲限一次，在夜晚時*，你可以選擇一個鎮民角色：如果他在場，他醉酒並死亡。"
+          },
+          {
+            "id": "huojin111",
+            "name": "博學者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/savant.png",
+            "ability": "每個白天，你可以私下詢問說書人以得知兩條信息：一個是正確的，一個是錯誤的。"
+          },
+          {
+            "id": "chaojibianbianbian111",
+            "name": "變臉師",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/bianlianshi.png",
+            "ability": "每個白天，如果你“瘋狂”地證明自己是一個善良角色（與之前不同），你可能會在當晚獲得那個角色的能力，直到下個黃昏。"
+          },
+          {
+            "id": "chichichichichichichi111",
+            "name": "食人族",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/cannibal.png",
+            "ability": "你擁有上個死於處決的玩家的能力。如果該玩家屬於邪惡陣營，你中毒直到下個善良玩家死於處決。"
+          },
+          {
+            "id": "zhegeshimonk111",
+            "name": "陌客",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/recluse.png",
+            "ability": "你可能會被當作邪惡陣營、爪牙角色或惡魔角色，即使你已死亡。"
+          },
+          {
+            "id": "wuwusidehaocan111",
+            "name": "心上人",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/sweetheart.png",
+            "ability": "當你死亡時，會有一名玩家開始醉酒。"
+          },
+          {
+            "id": "zabusini111",
+            "name": "魔像",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/golem.png",
+            "ability": "每局遊戲你只能發起提名一次。當你發起提名時，如果被你提名的玩家不是惡魔，他死亡。"
+          },
+          {
+            "id": "haochiaichi111",
+            "name": "食人魔",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ogre.png",
+            "ability": "在你的首個夜晚，你要選擇除你以外的一名玩家：你轉變為他的陣營，即使你已醉酒或中毒，但你不知道你轉變後的陣營。"
+          },
+          {
+            "id": "weishenmebushilianjinshushi111",
+            "name": "科學怪人",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/f/f1/Boffin.png",
+            "ability": "惡魔擁有一個不在場的善良角色的能力，即使他醉酒或中毒。你和他都知道他獲得了什麽能力。"
+          },
+          {
+            "id": "yingyingying111",
+            "name": "鷹身女妖",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/harpy.png",
+            "ability": "每個夜晚，你要選擇兩名玩家：明天第一名玩家需要“瘋狂”地證明第二名玩家是邪惡的，否則他們職中可能會有人死亡。"
+          },
+          {
+            "id": "zhijiagedaziji111",
+            "name": "教父",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/godfather.png",
+            "ability": "在你的首個夜晚，你會得知有哪些外來者角色在場。如果有外來者在白天死亡，你會在當晚被喚醒並且你要選擇一名玩家：他死亡。[-1或+1外來者]"
+          },
+          {
+            "id": "jiandieeeeeee111",
+            "name": "間諜",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/spy.png",
+            "ability": "每個夜晚，你能查看魔典。你可能會被當作善良陣營、鎮民角色或外來者角色，即使你已死亡。"
+          },
+          {
+            "id": "gudiaoxieedeniaoekukufei",
+            "name": "蠱雕",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/gudiao.png",
+            "ability": "每個夜晚，你要選擇左或右：你得知該方向上的下一名存活善良玩家的角色，他中毒且其他善良玩家以為他是邪惡的蠱雕，直到下個黃昏。"
+          },
+          {
+            "id": "zheyeshigejiugui111",
+            "name": "提線木偶",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/marionette.png",
+            "ability": "你以為你是一個善良角色，但其實你不是。惡魔會知道你是提線木偶。[提線木偶會與惡魔鄰座]"
+          },
+          {
+            "id": "xiaoshabi111111",
+            "name": "小怪寶",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lil_monsta.png",
+            "ability": "每個夜晚，所有爪牙要秘密決定由哪名玩家來照看小怪寶並且“是惡魔”。每個夜晚*，可能會有一名玩家死亡。[+1爪牙]"
+          }
+        ],
+        "special_entries_preserved": 0,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1049053226713743384",
+      "name_zh_tw": "上帝出席",
+      "metadata": "reports\\bilibili-scripts\\1049053226713743384.json",
+      "script_json": "reports\\bilibili-script-json\\上帝出席.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "上帝出席",
+        "entries_found": 28,
+        "roles_matched": 25,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 25,
+        "database_roles_missing": [
+          {
+            "id": "jingcaisanxuanyi111",
+            "name": "貴族",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/noble.png",
+            "ability": "在你的首個夜晚，你會得知三名玩家：其中有且只有一名玩家是邪惡的。"
+          },
+          {
+            "id": "diaoshangyizhengtiandeyu111",
+            "name": "漁夫",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fisherman.png",
+            "ability": "每局遊戲限一次，在白天時，你可以讓說書人給你一些能幫助你的陣營獲勝的建議。"
+          },
+          {
+            "id": "jiushigebaichi111",
+            "name": "村夫",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/village_idiot.png",
+            "ability": "每個夜晚，你要選擇一名玩家：你會得知他的陣營。[+0~2村夫，覆數村夫中有一人醉酒]"
+          },
+          {
+            "id": "zhuijidelaoda111",
+            "name": "氣球駕駛員",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/balloonist.png",
+            "ability": "每個夜晚，你會得知一名與上個夜晚得知的玩家角色類型不同的玩家。[+0~1外來者]"
+          },
+          {
+            "id": "yeshimeishengmeyongdejuese111",
+            "name": "女祭司",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/high_priestess.png",
+            "ability": "每個夜晚，你會得知一名說書人認為你最應該與其交流的玩家。"
+          },
+          {
+            "id": "wuxingshangjiang111",
+            "name": "將軍",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/general.png",
+            "ability": "每個夜晚，你會得知說書人認為哪個陣營當前更有優勢（善良/邪惡/均勢）。"
+          },
+          {
+            "id": "huojin111",
+            "name": "博學者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/savant.png",
+            "ability": "每個白天，你可以私下詢問說書人以得知兩條信息：一個是正確的，一個是錯誤的。"
+          },
+          {
+            "id": "caibuduide111",
+            "name": "雜耍藝人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/juggler.png",
+            "ability": "在你的首個白天，你可以公開猜測任意玩家的角色最多五次。在當晚，你會得知猜測正確的角色數量。"
+          },
+          {
+            "id": "xinjide111",
+            "name": "煉金術士",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/alchemist.png",
+            "ability": "你擁有一個爪牙角色的能力。當你使用能力時，說書人可能會要求你更換選擇。"
+          },
+          {
+            "id": "chichichichichichichi111",
+            "name": "食人族",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/cannibal.png",
+            "ability": "你擁有上個死於處決的玩家的能力。如果該玩家屬於邪惡陣營，你中毒直到下個善良玩家死於處決。"
+          },
+          {
+            "id": "wofuhuolawoshijiangbu111",
+            "name": "報喪女妖",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/banshee.png",
+            "ability": "如果惡魔殺死了你，所有玩家都會得知此事。從現在開始，你每天可以發起兩次提名，每次投票時可以投兩票。"
+          },
+          {
+            "id": "zhongdayande111",
+            "name": "罌粟種植者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/poppy_grower.png",
+            "ability": "爪牙和惡魔互相不認識。如果你死亡，當晚他們會互相認識。"
+          },
+          {
+            "id": "chuangsishuoshuren111",
+            "name": "無神論者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/atheist.png",
+            "ability": "說書人可以打破遊戲規則。如果說書人被處決，善良陣營獲勝，即使你已死亡。[無邪惡角色在場]"
+          },
+          {
+            "id": "woheduolema111",
+            "name": "酒鬼",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/drunk.png",
+            "ability": "你不知道你是酒鬼。你以為你是一個鎮民角色，但其實你不是。"
+          },
+          {
+            "id": "abaaba111",
+            "name": "告密者",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/snitch.png",
+            "ability": "爪牙會在其首個夜晚得知三個不在場的善良角色。"
+          },
+          {
+            "id": "scp-049049049",
+            "name": "瘟疫醫生",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/plague_doctor.png",
+            "ability": "當你死亡時，說書人會獲得一個爪牙能力。"
+          },
+          {
+            "id": "fengmaoziyuailisi111",
+            "name": "帽匠",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/hatter.png",
+            "ability": "如果你死亡，當晚爪牙和惡魔玩家可以選擇變成新的爪牙和惡魔角色。"
+          },
+          {
+            "id": "jinweijiunuansoeoqiepi213123123",
+            "name": "禁衛軍",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/jinweijun.png",
+            "ability": "在你的首個夜晚，你要選擇存活或死亡。“瘋狂”地想要這樣做的玩家可能會立即被處決。"
+          },
+          {
+            "id": "tiehuaibi11111",
+            "name": "維齊爾",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/vizier.png",
+            "ability": "所有玩家都知道你是維齊爾。你在白天時不會死亡。如果一次提名中有善良玩家投票，你可以讓被提名者立即被處決。"
+          },
+          {
+            "id": "shabihouzi122211",
+            "name": "街頭風琴手",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/f/ff/Organgrinder.png",
+            "ability": "所有玩家在投票時閉眼，且票數會秘密統計。每個夜晚，你要選擇自己是否醉酒，直到你下次選擇。"
+          },
+          {
+            "id": "noita111",
+            "name": "女巫",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/witch.png",
+            "ability": "每個夜晚，你要選擇一名玩家：如果他明天白天發起提名，他死亡。如果只有三名存活的玩家，你失去此能力。"
+          },
+          {
+            "id": "xixi111111111111",
+            "name": "洗腦師",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/cerenovus.png",
+            "ability": "每個夜晚，你要選擇一名玩家和一個善良角色。他明天白天和夜晚需要“瘋狂”地證明自己是這個角色，不然他可能被處決。"
+          },
+          {
+            "id": "yingyingying111",
+            "name": "鷹身女妖",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/harpy.png",
+            "ability": "每個夜晚，你要選擇兩名玩家：明天第一名玩家需要“瘋狂”地證明第二名玩家是邪惡的，否則他們之中可能會有人死亡。"
+          },
+          {
+            "id": "weishenmebushilianjinshushi111",
+            "name": "科學怪人",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/f/f1/Boffin.png",
+            "ability": "惡魔擁有一個不在場的善良角色的能力，即使他醉酒或中毒。你和他都知道他獲得了什麽能力。"
+          },
+          {
+            "id": "xiaoemo1111111eee111eee111",
+            "name": "小惡魔",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/imp.png",
+            "ability": "每個夜晚*，你要選擇一名玩家：他死亡。如果你以這種方式自殺，一名爪牙會變成小惡魔。"
+          }
+        ],
+        "special_entries_preserved": 1,
+        "roles_missing": [],
+        "duplicate_entries_ignored": [
+          {
+            "id": "organgrinder",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          },
+          {
+            "id": "banshee",
+            "name": "",
+            "team": "",
+            "image": "",
+            "ability": ""
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1060058479105933312",
+      "name_zh_tw": "雛鳳清聲",
+      "metadata": "reports\\bilibili-scripts\\1060058479105933312.json",
+      "script_json": "reports\\bilibili-script-json\\雛鳳清聲.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "雛鳳清聲",
+        "entries_found": 27,
+        "roles_matched": 25,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 25,
+        "database_roles_missing": [
+          {
+            "id": "wocaishichushen111",
+            "name": "廚師",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/chef.png",
+            "ability": "在你的首個夜晚，你會得知場上鄰座的邪惡玩家有多少對。"
+          },
+          {
+            "id": "daokeeeeeeekekekekekekeke12123123123",
+            "name": "刀客",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/daoke.png",
+            "ability": "在你的首個夜晚，你會得知一個在場的爪牙角色。每局遊戲限一次，你可以在白天公開選擇一名玩家：如果他是你得知的角色，他死亡。"
+          },
+          {
+            "id": "ainiii11111",
+            "name": "共情者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/empath.png",
+            "ability": "每個夜晚，你會得知與你鄰近的兩名存活的玩家中邪惡玩家的數量。"
+          },
+          {
+            "id": "mofashuijingqiu111",
+            "name": "占卜師",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fortune_teller.png",
+            "ability": "每個夜晚，你要選擇兩名玩家：你會得知他們之中是否有惡魔。會有一名善良玩家始終被你的能力當作惡魔。"
+          },
+          {
+            "id": "wocaishiemo1223322323232323",
+            "name": "舞蛇人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/snake_charmer.png",
+            "ability": "每個夜晚，你要選擇一名存活的玩家：如果你選中了惡魔，你和他交換角色和陣營，然後他中毒。"
+          },
+          {
+            "id": "jiushigebaichi111",
+            "name": "村夫",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/village_idiot.png",
+            "ability": "每個夜晚，你要選擇一名玩家：你會得知他的陣營。[+0~2村夫，覆數村夫中有一人醉酒]"
+          },
+          {
+            "id": "wanizufen111",
+            "name": "送葬者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/undertaker.png",
+            "ability": "每個夜晚*，你會得知今天白天死於處決的玩家的角色。"
+          },
+          {
+            "id": "weishenmesenglvjiaomoke111",
+            "name": "僧侶",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/monk.png",
+            "ability": "每個夜晚*，你要選擇除你以外的一名玩家：當晚惡魔的負面能力對他無效。"
+          },
+          {
+            "id": "xixifafashishishishishishishi",
+            "name": "戲法師",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/d/d6/Alsaahir.png",
+            "ability": "每個白天，你可以公開進行一次誰是爪牙，誰是惡魔的猜測。如果你猜對，善良陣營獲勝。"
+          },
+          {
+            "id": "shiyizhezhezhezhe",
+            "name": "失憶者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/amnesiac.png",
+            "ability": "你不知道你的能力是什麽。每個白天你可以找說書人猜測一次，你會得知你的猜測有多準確。"
+          },
+          {
+            "id": "biubiubiu111",
+            "name": "獵手",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/slayer.png",
+            "ability": "每局遊戲限一次，你可以在白天時公開選擇一名玩家：如果他是惡魔，他死亡。"
+          },
+          {
+            "id": "hahaxiaochou111",
+            "name": "弄臣",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fool.png",
+            "ability": "當你首次將要死亡時，你不會死亡。"
+          },
+          {
+            "id": "shanliangdeniaoer111",
+            "name": "守鴉人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ravenkeeper.png",
+            "ability": "如果你在夜晚死亡，你會被喚醒，然後你要選擇一名玩家：你會得知他的角色。"
+          },
+          {
+            "id": "haochiaichi111",
+            "name": "食人魔",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ogre.png",
+            "ability": "在你的首個夜晚，你要選擇除你以外的一名玩家：你轉變為他的陣營，即使你已醉酒或中毒，但你不知道你轉變後的陣營。"
+          },
+          {
+            "id": "tougexiangxian111",
+            "name": "政客",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/politician.png",
+            "ability": "如果你是對你的陣營落敗負最大責任的人，你轉變陣營並獲勝，即使你已死亡。"
+          },
+          {
+            "id": "zabusini111",
+            "name": "魔像",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/golem.png",
+            "ability": "每局遊戲你只能發起提名一次。當你發起提名時，如果被你提名的玩家不是惡魔，他死亡。"
+          },
+          {
+            "id": "woheduolema111",
+            "name": "酒鬼",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/drunk.png",
+            "ability": "你不知道你是酒鬼。你以為你是一個鎮民角色，但其實你不是。"
+          },
+          {
+            "id": "zmengpiosaoidhaoiwheoi2913o1u3h131",
+            "name": "孟婆",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/mengpo.png",
+            "ability": "每個夜晚*，你要選擇一名玩家：如果他存活，那麽他要選擇讓自己失去能力，或死亡並保留能力直到下個黃昏。"
+          },
+          {
+            "id": "hongchunnvlangaaaaaaaa111",
+            "name": "紅唇女郎",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/scarlet_woman.png",
+            "ability": "如果大於等於五名玩家存活時（旅行者不計算在內）惡魔死亡，你變成那個惡魔。"
+          },
+          {
+            "id": "chukouchengzhang",
+            "name": "靈言師",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/mezepheles.png",
+            "ability": "在你的首個夜晚，你會得知一個關鍵詞。首個說出該關鍵詞的善良玩家會在當晚轉變為邪惡陣營。"
+          },
+          {
+            "id": "dafutoufeiguolaila111",
+            "name": "精神病患者",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/psychopath.png",
+            "ability": "每個白天，在提名開始前，你可以公開選擇一名玩家：他死亡。如果你被處決，提名你的玩家需要和你猜拳，只有你輸了你才會死亡。"
+          },
+          {
+            "id": "xiaoemo1111111eee111eee111",
+            "name": "小惡魔",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/imp.png",
+            "ability": "每個夜晚*，你要選擇一名玩家：他死亡。如果你以這種方式自殺，一名爪牙會變成小惡魔。"
+          },
+          {
+            "id": "xiaoweibaxiliuxiliu111",
+            "name": "普卡",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/pukka.png",
+            "ability": "每個夜晚，你要選擇一名玩家：他中毒。上個因你的能力中毒的玩家會死亡並恢覆健康。"
+          },
+          {
+            "id": "lizhiiiiii111111111",
+            "name": "痢蛭",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lleech.png",
+            "ability": "每個夜晚*，你要選擇一名玩家：他死亡。在你的首個夜晚，你要選擇一名存活的玩家：他中毒，只有當他處於死亡狀態時你才會立即死亡。"
+          },
+          {
+            "id": "kakakakkakakakakakakakaakakak111",
+            "name": "卡紮力",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/kazali.png",
+            "ability": "每個夜晚*，你要選擇一名玩家：他死亡。[由你決定誰是什麽爪牙，-或+任意數量外來者]"
+          }
+        ],
+        "special_entries_preserved": 2,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1052754702584774681",
+      "name_zh_tw": "移宮換羽",
+      "metadata": "reports\\bilibili-scripts\\1052754702584774681.json",
+      "script_json": "reports\\bilibili-script-json\\移宮換羽.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "移宮換羽",
+        "entries_found": 31,
+        "roles_matched": 22,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 22,
+        "database_roles_missing": [
+          {
+            "id": "yinyangshiqidong111",
+            "name": "阴阳师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yinyangshi.png",
+            "ability": "在你的首个夜晚，你会得知两个善良角色和两个邪恶角色。其中有且只有两个角色在场。"
+          },
+          {
+            "id": "fengshuisfgsetgshfsdf",
+            "name": "风水师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fengshuishi.png",
+            "ability": "在你的首个夜晚，你会得知一名玩家的角色类型。每个夜晚*，你会从他的顺时针方向得知下一名非旅行者玩家的角色类型。"
+          },
+          {
+            "id": "tashuofengyuzhongzhediantongsuanshenme111",
+            "name": "水手",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/sailor.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家：你或他之一会醉酒直到下个黄昏。你不会死亡。"
+          },
+          {
+            "id": "wocaishiemo1223322323232323",
+            "name": "舞蛇人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/snake_charmer.png",
+            "ability": "每个夜晚，你要选择一名存活的玩家：如果你选中了恶魔，你和他交换角色和阵营，然后他中毒。"
+          },
+          {
+            "id": "jiushigebaichi111",
+            "name": "村夫",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/village_idiot.png",
+            "ability": "每个夜晚，你要选择一名玩家：你会得知他的阵营。[+0~2村夫，复数村夫中有一人醉酒]"
+          },
+          {
+            "id": "yinlureanrlfasrfiaojwrn2k31j95u09uasj",
+            "name": "引路人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yinluren.png",
+            "ability": "每个夜晚，你要选择至多三名玩家：你会得知今晚是否有邪恶玩家的能力选择或影响了他们之中的玩家。"
+          },
+          {
+            "id": "chaojibianbianbian111",
+            "name": "变脸师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/bianlianshi.png",
+            "ability": "每个白天，如果你“疯狂”地证明自己是一个善良角色（与之前不同），你可能会在当晚获得那个角色的能力，直到下个黄昏。"
+          },
+          {
+            "id": "shanliangdeniaoer111",
+            "name": "守鸦人",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ravenkeeper.png",
+            "ability": "如果你在夜晚死亡，你会被唤醒，然后你要选择一名玩家：你会得知他的角色。"
+          },
+          {
+            "id": "bingbibibibibibibibiibibibibibibibibiiiiihbbibibib",
+            "name": "秉笔",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/bingbi.png",
+            "ability": "如果你在白天死亡，当晚你会得知一名善良玩家。如果你在夜晚死亡，当晚你会得知一名邪恶玩家。"
+          },
+          {
+            "id": "zz111",
+            "name": "镇长",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/mayor.png",
+            "ability": "如果只有三名玩家存活且白天没有人被处决，你的阵营获胜。如果你在夜晚死亡，可能会有一名其他玩家代替你死亡。"
+          },
+          {
+            "id": "shanliangdeniaoer2222",
+            "name": "和平主义者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/pacifist.png",
+            "ability": "被处决的善良玩家可能不会死亡。"
+          },
+          {
+            "id": "guaililuanshen111",
+            "name": "半仙",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/banxian.png",
+            "ability": "任何在夜晚使用自身能力选择你的其他玩家，会改为选中另一名邪恶玩家作为替代。"
+          },
+          {
+            "id": "fengmaoziyuailisi111",
+            "name": "帽匠",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/hatter.png",
+            "ability": "如果你死亡，当晚爪牙和恶魔玩家可以选择变成新的爪牙和恶魔角色。"
+          },
+          {
+            "id": "zrulianshihsihsihsihishisihc-9j",
+            "name": "入殓师",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/rulianshi.png",
+            "ability": "如果你提名了恶魔且他死于这次处决，你会变成邪恶的恶魔。当剩余存活玩家小于等于四人时（旅行者除外），你失去能力。"
+          },
+          {
+            "id": "shuiganshawo111",
+            "name": "圣徒",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/saint.png",
+            "ability": "如果你死于处决，你的阵营落败。"
+          },
+          {
+            "id": "wushihsihsihsihsihsihsish",
+            "name": "巫师",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/archive/c/c7/20250103031516%21Wizard.png",
+            "ability": "每局游戏限一次，你可以向说书人许愿。如果愿望被实现，可能会伴随着代价和线索。"
+          },
+          {
+            "id": "gudiaoxieedeniaoekukufei",
+            "name": "蛊雕",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/gudiao.png",
+            "ability": "每个夜晚，你要选择左或右：你得知该方向上的下一名存活善良玩家的角色，他中毒且其他善良玩家以为他是邪恶的蛊雕，直到下个黄昏。"
+          },
+          {
+            "id": "chukouchengzhang",
+            "name": "灵言师",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/mezepheles.png",
+            "ability": "在你的首个夜晚，你会得知一个关键词。首个说出该关键词的善良玩家会在当晚转变为邪恶阵营。"
+          },
+          {
+            "id": "lllllllllllllllllllllll11111111",
+            "name": "麻脸巫婆",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/pit-hag.png",
+            "ability": "每个夜晚*，你要选择一名玩家和一个角色，如果该角色不在场，他变成该角色。如果因此创造了一个恶魔，当晚的死亡由说书人决定。"
+          },
+          {
+            "id": "guhuoniaoiasod0pap2u490rjqawpf9ru389",
+            "name": "姑获鸟",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/guhuoniao.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。你可能会拥有上一个死于处决的爪牙的能力。"
+          },
+          {
+            "id": "taowuuuuuuuuuuuu11111111",
+            "name": "梼杌",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/taowu.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。当你将要死亡时，改为一名存活且具有能力的爪牙失去能力。你不会得知恶魔信息。"
+          },
+          {
+            "id": "wangguuuuuuuu111111",
+            "name": "亡骨魔",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/vigormortis.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。被你杀死的爪牙保留他的能力，且与他邻近的两名镇民之一中毒。[-1外来者]"
+          }
+        ],
+        "special_entries_preserved": 9,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    },
+    {
+      "external_id": "1085891354530152453",
+      "name_zh_tw": "意氣用事",
+      "metadata": "reports\\bilibili-scripts\\1085891354530152453.json",
+      "script_json": "reports\\bilibili-script-json\\意氣用事.json",
+      "status": "previewed",
+      "result": {
+        "mode": "preview",
+        "script": "意氣用事",
+        "entries_found": 25,
+        "roles_matched": 25,
+        "database_roles_matched": 0,
+        "catalog_roles_matched": 25,
+        "database_roles_missing": [
+          {
+            "id": "daerduotutu111",
+            "name": "图书管理员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/librarian.png",
+            "ability": "在你的首个夜晚，你会得知两名玩家和一个外来者角色：这两名玩家之一是该角色（或者你会得知没有外来者在场）。"
+          },
+          {
+            "id": "qingtianjianbei111",
+            "name": "修行者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/shugenja.png",
+            "ability": "在你的首个夜晚，你会得知距离最近的邪恶玩家位于你的顺时针还是逆时针方向。如果两侧的邪恶玩家与你距离相等，你得知的信息由说书人决定。"
+          },
+          {
+            "id": "jingcaisanxuanyi111",
+            "name": "贵族",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/noble.png",
+            "ability": "在你的首个夜晚，你会得知三名玩家：其中有且只有一名玩家是邪恶的。"
+          },
+          {
+            "id": "yeshimeishengmeyongdejuese111",
+            "name": "女祭司",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/high_priestess.png",
+            "ability": "每个夜晚，你会得知一名说书人认为你最应该与其交流的玩家。"
+          },
+          {
+            "id": "mofashuijingqiu111",
+            "name": "占卜师",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fortune_teller.png",
+            "ability": "每个夜晚，你要选择两名玩家：你会得知他们之中是否有恶魔。会有一名善良玩家始终被你的能力当作恶魔。"
+          },
+          {
+            "id": "zhuijidelaoda111",
+            "name": "气球驾驶员",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/balloonist.png",
+            "ability": "每个夜晚，你会得知一名与上个夜晚得知的玩家角色类型不同的玩家。[+0~1外来者]"
+          },
+          {
+            "id": "wofuhuolawoshijiangbu111",
+            "name": "报丧女妖",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/banshee.png",
+            "ability": "如果恶魔杀死了你，所有玩家都会得知此事。从现在开始，你每天可以发起两次提名，每次投票时可以投两票。"
+          },
+          {
+            "id": "weishenmesenglvjiaomoke111",
+            "name": "僧侣",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/monk.png",
+            "ability": "每个夜晚*，你要选择除你以外的一名玩家：当晚恶魔的负面能力对他无效。"
+          },
+          {
+            "id": "zhengdanideyanjing111",
+            "name": "神谕者",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/oracle.png",
+            "ability": "每个夜晚*，你会得知有多少名死亡的玩家是邪恶的。"
+          },
+          {
+            "id": "xixifafashishishishishishishi",
+            "name": "戏法师",
+            "team": "townsfolk",
+            "image": "https://clocktower-wiki.gstonegames.com/images/d/d6/Alsaahir.png",
+            "ability": "每个白天，你可以公开进行一次谁是爪牙，谁是恶魔的猜测。如果你猜对，善良阵营获胜。"
+          },
+          {
+            "id": "village_idiot22",
+            "name": "村夫",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/village_idiot.png",
+            "ability": "每个夜晚，你要选择一名玩家：你会得知他的阵营。[+0~2村夫，复数村夫中有一人醉酒]"
+          },
+          {
+            "id": "lingluowawa111",
+            "name": "女裁缝",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/seamstress.png",
+            "ability": "每局游戏限一次，在夜晚时，你可以选择除你以外的两名玩家：你会得知他们是否为同一阵营。"
+          },
+          {
+            "id": "chichichichichichichi111",
+            "name": "食人族",
+            "team": "townsfolk",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/cannibal.png",
+            "ability": "你拥有上个死于处决的玩家的能力。如果该玩家属于邪恶阵营，你中毒直到下个善良玩家死于处决。"
+          },
+          {
+            "id": "zhadiaole111",
+            "name": "畸形秀演员",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/mutant.png",
+            "ability": "如果你“疯狂”地证明自己是外来者，你可能被处决。"
+          },
+          {
+            "id": "yinshishihsihsihsihsihsissssssss",
+            "name": "隐士",
+            "team": "outsider",
+            "image": "https://clocktower-wiki.gstonegames.com/images/1/1e/Hermit.png",
+            "ability": "你拥有所有外来者能力。[-0~1外来者]"
+          },
+          {
+            "id": "moluotuofujiweijiu11111",
+            "name": "狂热者",
+            "team": "outsider",
+            "image": "https://clocktower-wiki.gstonegames.com/images/1/1a/Zealot.png",
+            "ability": "如果有大于等于五名玩家存活，你必须在所有提名中投票。"
+          },
+          {
+            "id": "wudidejiemidashi111",
+            "name": "解谜大师",
+            "team": "outsider",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/puzzlemaster.png",
+            "ability": "一名玩家醉酒，即使你已死亡。每局游戏限一次，你可以猜测谁是那个醉酒的玩家，如果猜对了，你会得知谁是恶魔，但如果猜错了，你会得知错误的“谁是恶魔”信息。"
+          },
+          {
+            "id": "xixi111111111111",
+            "name": "洗脑师",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/cerenovus.png",
+            "ability": "每个夜晚，你要选择一名玩家和一个善良角色。他明天白天和夜晚需要“疯狂”地证明自己是这个角色，不然他可能被处决。"
+          },
+          {
+            "id": "noita111",
+            "name": "女巫",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/witch.png",
+            "ability": "每个夜晚，你要选择一名玩家：如果他明天白天发起提名，他死亡。如果只有三名存活的玩家，你失去此能力。"
+          },
+          {
+            "id": "touduzheeeeeeee111",
+            "name": "投毒者",
+            "team": "minion",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/poisoner.png",
+            "ability": "每个夜晚，你要选择一名玩家：他在当晚和明天白天中毒。"
+          },
+          {
+            "id": "wushihsihsihsihsihsihsish",
+            "name": "巫师",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/archive/c/c7/20250103031516%21Wizard.png",
+            "ability": "每局游戏限一次，你可以向说书人许愿。如果愿望被实现，可能会伴随着代价和线索。"
+          },
+          {
+            "id": "wanghun",
+            "name": "亡魂",
+            "team": "minion",
+            "image": "https://clocktower-wiki.gstonegames.com/images/7/7c/Wraith.png",
+            "ability": "你可以在夜晚睁眼。当其他邪恶玩家被唤醒时，你也会被唤醒。"
+          },
+          {
+            "id": "wangguuuuuuuu111111",
+            "name": "亡骨魔",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/vigormortis.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。被你杀死的爪牙保留他的能力，且与他邻近的两名镇民之一中毒。[-1外来者]"
+          },
+          {
+            "id": "fangguuuuuuuuuuuuuu111",
+            "name": "方古",
+            "team": "demon",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fang_gu.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。被该能力杀死的外来者变成邪恶的方古且你代替他死亡，但每局游戏仅能成功转化一次。[+1外来者]"
+          },
+          {
+            "id": "tifeng11zhishou11111111",
+            "name": "堤丰之首",
+            "team": "demon",
+            "image": "https://clocktower-wiki.gstonegames.com/images/1/18/Lordoftyphon.png",
+            "ability": "每个夜晚*，你要选择一名玩家：他死亡。[邪恶玩家全部邻座，你位于正中，+1爪牙，-或+任意数量外来者]"
+          }
+        ],
+        "special_entries_preserved": 0,
+        "roles_missing": [],
+        "duplicate_entries_ignored": []
+      },
+      "error": ""
+    }
+  ]
+}
