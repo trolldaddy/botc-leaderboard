@@ -1,4 +1,4 @@
-﻿{
+{
     "source_platform":  "bilibili",
     "items":  [
                   {
@@ -38,7 +38,8 @@
                   },
                   {
                       "external_id":  "1204264175028666453",
-                      "name_zh_tw":  "真魘相愛"
+                      "name_zh_tw":  "真贗相愛",
+                      "script_json":  "reports/bilibili-script-json/真贗相愛.json"
                   },
                   {
                       "external_id":  "1136625986425585670",

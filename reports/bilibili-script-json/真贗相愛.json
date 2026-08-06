@@ -1,0 +1,170 @@
+[
+    {
+        "id":  "_meta",
+        "name":  "真贗相愛",
+        "author":  "星火樂、天天"
+    },
+    {
+        "id":  "shugenja",
+        "name":  "修行者",
+        "team":  "townsfolk"
+    },
+    {
+        "id":  "fengshuishi",
+        "name":  "風水師",
+        "team":  "townsfolk"
+    },
+    {
+        "id":  "zhenyan_scout",
+        "name":  "偵察兵",
+        "team":  "townsfolk",
+        "ability":  "在你的首個夜晚，你會得知一個在場的爪牙。每個夜晚*，你會得知有幾名邪惡玩家存活。"
+    },
+    {
+        "id":  "dreamer",
+        "name":  "築夢師",
+        "team":  "townsfolk"
+    },
+    {
+        "id":  "town_crier",
+        "name":  "城鎮公告員",
+        "team":  "townsfolk"
+    },
+    {
+        "id":  "village_idiot",
+        "name":  "村夫",
+        "team":  "townsfolk"
+    },
+    {
+        "id":  "huntsman",
+        "name":  "巡山人",
+        "team":  "townsfolk"
+    },
+    {
+        "id":  "qianke",
+        "name":  "掮客",
+        "team":  "townsfolk"
+    },
+    {
+        "id":  "zhenyan_huashan",
+        "name":  "華山",
+        "team":  "townsfolk",
+        "ability":  "每個夜晚，你可以選擇三名玩家：你會得知他們均不為某種角色類型；或可以選擇三個善良角色：你會得知其中一個角色對應的玩家。"
+    },
+    {
+        "id":  "zhenyan_cat_legion",
+        "name":  "貓貓軍團",
+        "team":  "townsfolk",
+        "ability":  "你順時針方向距離最近的貓貓軍團是你的同伴。每個夜晚，你會得知同伴鄰近的兩名存活玩家中是否有邪惡玩家。[+0～2 貓貓軍團]"
+    },
+    {
+        "id":  "zhenyan_zero",
+        "name":  "零",
+        "team":  "townsfolk",
+        "ability":  "每個夜晚*，你要選擇一名玩家：他和與他互動的角色不會受到「互動干擾」類型能力的影響，直到下個黃昏。"
+    },
+    {
+        "id":  "philosopher",
+        "name":  "哲學家",
+        "team":  "townsfolk"
+    },
+    {
+        "id":  "zhenyan_covenant_wing",
+        "name":  "聖約之翼",
+        "team":  "townsfolk",
+        "ability":  "每局遊戲限一次，在夜晚時，你可以選擇任意名存活玩家：如果他們均為善良，在等同於你選擇玩家數量的白天結束前，他們不會死亡。"
+    },
+    {
+        "id":  "farmer",
+        "name":  "農夫",
+        "team":  "townsfolk"
+    },
+    {
+        "id":  "zhenyan_paper_bride",
+        "name":  "紙嫁衣",
+        "team":  "outsider",
+        "ability":  "擁有你的玩家被鎮民提名時：你轉移至提名者。擁有你的鎮民中毒、被視為紙嫁衣。[+1 擁有你的鎮民]"
+    },
+    {
+        "id":  "damsel",
+        "name":  "落難少女",
+        "team":  "outsider"
+    },
+    {
+        "id":  "zhenyan_snowman",
+        "name":  "雪人",
+        "team":  "outsider",
+        "ability":  "在你的首個夜晚，你會得知說書人建議你偽裝成什麼角色。你可能被當作邪惡陣營、爪牙角色。如果你存活，善良陣營無法獲勝。當小於等於四名玩家存活時，你單獨獲勝。你的陣營不會改變。"
+    },
+    {
+        "id":  "plague_doctor",
+        "name":  "瘟疫醫生",
+        "team":  "outsider"
+    },
+    {
+        "id":  "zhenyan_mechanical_master",
+        "name":  "機械大師",
+        "team":  "minion",
+        "ability":  "每個夜晚，你要選擇一名玩家和一個角色（玩家與上個夜晚不同）：他被當作那個角色和對應的陣營，直到下個黃昏。"
+    },
+    {
+        "id":  "zhenyan_gugugu",
+        "name":  "蠱孤菇",
+        "team":  "minion",
+        "ability":  "與你鄰近的玩家會被其他角色的能力當作錯誤的陣營與角色。"
+    },
+    {
+        "id":  "zhenyan_serpent_emissary",
+        "name":  "蛇神使",
+        "team":  "minion",
+        "ability":  "你可能會被當作善良陣營。被你提名的玩家會被當作他對立的陣營直到下個黎明；如果他是鎮民，他還會中毒直到下個黎明。"
+    },
+    {
+        "id":  "zhenyan_counterfeit",
+        "name":  "贗品",
+        "team":  "minion",
+        "ability":  "你擁有一個在場的爪牙能力。如果沒有其他爪牙在場，在你的首個夜晚，你要選擇一個爪牙角色：你變成該爪牙角色。"
+    },
+    {
+        "id":  "zhenyan_paper_lady",
+        "name":  "紙夫人",
+        "team":  "demon",
+        "ability":  "每個夜晚*，你要選擇一名玩家：他死亡。你知曉誰擁有紙嫁衣，如果你在夜間死亡，他和你交換角色並轉變為邪惡陣營。[+1 紙嫁衣]"
+    },
+    {
+        "id":  "zhenyan_yuan",
+        "name":  "鴛",
+        "team":  "demon",
+        "ability":  "你以為你是巡山人。如果你選擇了鴦，邪惡陣營獲勝。如果鴦死亡或離場，善良陣營獲勝。說書人擁有爪牙能力。[無爪牙在場，+鴦]"
+    },
+    {
+        "id":  "zhenyan_e_duo",
+        "name":  "惡墮",
+        "team":  "demon",
+        "ability":  "每個夜晚*，你要選擇一名玩家：他死亡，即使因為任何原因讓他不會死亡。死亡的外來者勝負條件反轉，即使你已死亡。[固定2名外來者]"
+    },
+    {
+        "id":  "zhenyan_kukapa",
+        "name":  "骷咔啪",
+        "team":  "demon",
+        "ability":  "每個夜晚*，你要選擇一名玩家：他死亡。第一名提名你的其他玩家「是惡魔」而不是你，即使你已死亡。"
+    },
+    {
+        "id":  "zhenyan_yang",
+        "name":  "鴦",
+        "team":  "demon",
+        "ability":  "你是且以為自己是落難少女。爪牙會得知三個偽裝。每個夜晚*，會有一名玩家死亡。每名玩家限一次，首個公開聲稱自己是爪牙並猜測你是落難少女的玩家會轉變為邪惡陣營。[-落難少女，-1邪惡玩家]"
+    },
+    {
+        "id":  "zhenyan_lightbulb",
+        "name":  "電燈泡",
+        "team":  "fabled",
+        "ability":  "說書人視為坐在某兩名玩家中間（他不可以真的坐在那裡）。說書人沒有陣營且不會被選擇。"
+    },
+    {
+        "id":  "zhenyan_godel",
+        "name":  "哥德爾",
+        "team":  "fabled",
+        "ability":  "每個夜晚，會有一名玩家得知有多少名玩家的能力因為其他角色的能力而未正常生效（從上個黎明到你被喚醒時）。"
+    }
+]
