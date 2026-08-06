@@ -78,6 +78,8 @@ def test_admin_update_round_trips_rich_text_and_custom_role():
         {
             **rich_fields,
             "author_name": "測試作者",
+            "category": "\u90e8\u5206\u539f\u5275",
+            "is_laplace_owned": True,
             "custom_roles": [{
                 "id": custom_id,
                 "name_zh_tw": "自創先知・改",
@@ -96,6 +98,8 @@ def test_admin_update_round_trips_rich_text_and_custom_role():
     for field, expected in rich_fields.items():
         assert detail[field] == expected
     assert detail["author_name"] == "測試作者"
+    assert detail["category"] == "\u90e8\u5206\u539f\u5275"
+    assert detail["is_laplace_owned"] is True
     assert detail["custom_roles"] == [{
         "id": custom_id,
         "external_id": "custom-oracle",
@@ -109,6 +113,15 @@ def test_admin_update_round_trips_rich_text_and_custom_role():
     persisted = db.query(ScriptEntry).filter_by(id=script_id).one()
     assert serialize_admin_script(persisted, detail=True)["storyteller_guide"] == rich_fields["storyteller_guide"]
 
+
+def test_admin_rejects_unknown_script_category():
+    db = make_session()
+    script_id = seed_script(db)
+    try:
+        update_script(script_id, {"category": "legacy-category"}, db=db, admin=SimpleNamespace())
+        raise AssertionError("unknown category should be rejected")
+    except HTTPException as exc:
+        assert exc.status_code == 400
 
 def test_role_json_apply_replaces_stale_custom_clockmaker_with_official_role():
     db = make_session()
@@ -180,9 +193,11 @@ def test_public_payload_and_storyteller_login_gate():
     script = db.query(ScriptEntry).filter_by(id=script_id).one()
     script.player_guide = "<p>所有人可看的玩家攻略</p>"
     script.storyteller_guide = "<p>登入後可看的說書人攻略</p>"
+    script.is_laplace_owned = True
     db.commit()
 
     anonymous = serialize_public_script(script, include_roles=True, account=None)
+    assert anonymous["is_laplace_owned"] is True
     assert anonymous["guides"]["player"] == {
         "content": "<p>所有人可看的玩家攻略</p>",
         "available": True,
@@ -268,8 +283,9 @@ def test_new_manual_import_creates_internal_draft_and_local_artwork():
 
 if __name__ == "__main__":
     test_admin_update_round_trips_rich_text_and_custom_role()
+    test_admin_rejects_unknown_script_category()
     test_role_json_apply_replaces_stale_custom_clockmaker_with_official_role()
     test_admin_can_create_classify_and_delete_special_entries()
     test_public_payload_and_storyteller_login_gate()
     test_new_manual_import_creates_internal_draft_and_local_artwork()
-    print({"status": "ok", "tests": 5})
+    print({"status": "ok", "tests": 6})

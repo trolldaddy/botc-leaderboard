@@ -43,6 +43,7 @@ def serialize_script(script, include_roles=False, knowledge_slugs=None, account=
         "source_url": script.source_url, "source_platform": script.source_platform,
         "published_at": script.published_at.isoformat() if script.published_at else None,
         "needs_review": bool(script.needs_review),
+        "is_laplace_owned": bool(script.is_laplace_owned),
         "images": [{"url": image.image_url, "alt": image.alt_text or script.name_zh_tw}
                    for image in sorted(script.images, key=lambda item: (item.sort_order, item.id))],
         "role_count": len(script.roles),

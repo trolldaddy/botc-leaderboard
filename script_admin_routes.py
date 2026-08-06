@@ -21,6 +21,7 @@ from scripts.import_bilibili_script import (
 )
 
 router = APIRouter(prefix="/scripts", tags=["script-admin"])
+SCRIPT_CATEGORIES = {"\u5b98\u65b9\u5287\u672c", "\u5b98\u6df7\u5287\u672c", "\u90e8\u5206\u539f\u5275", "\u5b8c\u5168\u539f\u5275"}
 
 
 def load_options():
@@ -48,6 +49,7 @@ def serialize_script(script, detail=False):
         "tagline": script.tagline, "tags": parse_tags(script.tags), "source_url": script.source_url,
         "source_platform": script.source_platform, "source_external_id": script.source_external_id,
         "is_public": bool(script.is_public), "needs_review": bool(script.needs_review),
+        "is_laplace_owned": bool(script.is_laplace_owned),
         "role_count": len(script.roles), "custom_role_count": len(script.supplements),
     }
     if detail:
@@ -118,6 +120,8 @@ def role_json_report(official, supplements, missing, duplicates):
     }
 
 def script_import_result(db, data):
+    if data.get("category") not in SCRIPT_CATEGORIES:
+        raise HTTPException(status_code=400, detail="\u8acb\u9078\u64c7\u6709\u6548\u7684\u5287\u672c\u5206\u985e")
     if len(data.get("images") or []) > 2:
         raise HTTPException(status_code=400, detail="正面與背面最多上傳兩張圖片")
     try:
@@ -190,10 +194,12 @@ def update_script(
     script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
     if not script:
         raise HTTPException(status_code=404, detail="找不到劇本")
+    if "category" in data and data.get("category") not in SCRIPT_CATEGORIES:
+        raise HTTPException(status_code=400, detail="\u8acb\u9078\u64c7\u6709\u6548\u7684\u5287\u672c\u5206\u985e")
     editable = (
         "name_zh_tw", "version", "category", "introduction", "author_name", "tagline",
         "background_introduction", "gameplay_overview", "author_note", "production_updates",
-        "player_guide", "storyteller_guide", "source_url", "is_public", "needs_review",
+        "player_guide", "storyteller_guide", "source_url", "is_public", "needs_review", "is_laplace_owned",
     )
     for field in editable:
         if field in data:

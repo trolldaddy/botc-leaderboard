@@ -35,6 +35,11 @@ def test_special_entry_categories_and_admin_controls_are_explicit():
     assert "data-custom-team" in admin_js
     assert "script-custom-add" in admin_js
     assert "data-custom-delete" in admin_js
+    for category in ("\\u5b98\\u65b9\\u5287\\u672c", "\\u5b98\\u6df7\\u5287\\u672c", "\\u90e8\\u5206\\u539f\\u5275", "\\u5b8c\\u5168\\u539f\\u5275"):
+        assert category in admin_js
+    assert "sam-laplace" in admin_js
+    assert "si-laplace" in admin_js
+    assert "is_laplace_owned" in admin_js
 
 
 if __name__ == "__main__":

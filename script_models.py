@@ -29,6 +29,7 @@ class ScriptEntry(Base):
     published_at = Column(DateTime, nullable=True)
     is_public = Column(Boolean, nullable=False, default=False, index=True)
     needs_review = Column(Boolean, nullable=False, default=True, index=True)
+    is_laplace_owned = Column(Boolean, nullable=False, default=False, index=True)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     updated_at = Column(DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
     images = relationship("ScriptImage", back_populates="script", cascade="all, delete-orphan")

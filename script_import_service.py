@@ -136,7 +136,8 @@ def create_script(db, data, official, supplements, metadata):
         author_note=metadata.get("author_note") or None, production_updates=metadata.get("production_updates") or None,
         player_guide=metadata.get("player_guide") or None, storyteller_guide=metadata.get("storyteller_guide") or None,
         source_url=metadata.get("source_url") or None, source_platform=metadata.get("source_platform") or "manual",
-        source_external_id=metadata.get("source_external_id") or None, is_public=False, needs_review=True)
+        source_external_id=metadata.get("source_external_id") or None, is_public=False, needs_review=True,
+        is_laplace_owned=bool(data.get("is_laplace_owned")))
     db.add(script)
     db.flush()
     for index, url in enumerate(save_artwork(script, data.get("images") or [], metadata.get("remote_images") or [])):
