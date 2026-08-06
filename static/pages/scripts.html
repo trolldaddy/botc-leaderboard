@@ -1,10 +1,20 @@
 <header class="top-header script-browser-header"><div><div class="script-kicker">拉普拉斯劇本資料庫</div><h2>劇本瀏覽</h2><p>從劇本圖、創作介紹到角色構成，快速掌握一套劇本的推理風格。</p></div></header>
-<section class="card script-toolbar"><input id="script-search" class="form-control dark-input" placeholder="搜尋劇本名稱"><span id="script-count">正在載入劇本...</span></section>
+<section class="card script-toolbar">
+  <div class="script-search-row"><input id="script-search" class="form-control dark-input" placeholder="&#25628;&#23563;&#21127;&#26412;&#21517;&#31281;&#12289;&#20316;&#32773;&#25110;&#35282;&#33394;"><span id="script-count">&#27491;&#22312;&#36617;&#20837;&#21127;&#26412;...</span></div>
+  <div id="script-category-filters" class="script-category-filters" role="group" aria-label="&#21127;&#26412;&#20998;&#39006;&#31721;&#36984;">
+    <button class="active" type="button" data-script-category="" aria-pressed="true">&#20840;&#37096;</button>
+    <button type="button" data-script-category="laplace" aria-pressed="false">&#25289;&#26222;&#25289;&#26031;</button>
+    <button type="button" data-script-category="&#23448;&#26041;&#21127;&#26412;" aria-pressed="false">&#23448;&#26041;&#21127;&#26412;</button>
+    <button type="button" data-script-category="&#23448;&#28151;&#21127;&#26412;" aria-pressed="false">&#23448;&#28151;&#21127;&#26412;</button>
+    <button type="button" data-script-category="&#37096;&#20998;&#21407;&#21109;" aria-pressed="false">&#37096;&#20998;&#21407;&#21109;</button>
+    <button type="button" data-script-category="&#23436;&#20840;&#21407;&#21109;" aria-pressed="false">&#23436;&#20840;&#21407;&#21109;</button>
+  </div>
+</section>
 <section class="script-carousel-shell" aria-label="劇本切換">
   <button id="script-carousel-prev" class="script-carousel-arrow previous" type="button" aria-label="上一套劇本"><i class="fa-solid fa-chevron-left"></i></button>
   <div id="script-carousel" class="script-carousel" tabindex="0"><div class="script-empty">正在載入劇本圖...</div></div>
   <button id="script-carousel-next" class="script-carousel-arrow next" type="button" aria-label="下一套劇本"><i class="fa-solid fa-chevron-right"></i></button>
 </section>
 <main id="script-detail" class="script-detail card"><div class="script-empty"><i class="fa-solid fa-map"></i><h3>選擇一套劇本</h3><p>左右滑動劇本圖切換劇本，使用圖片下方按鈕翻面或全螢幕查看。</p></div></main>
-<link rel="stylesheet" href="/css/scripts.css?v=20260806q">
-<script src="/js/scripts.js?v=20260806q"></script>
+<link rel="stylesheet" href="/css/scripts.css?v=20260806r">
+<script src="/js/scripts.js?v=20260806r"></script>

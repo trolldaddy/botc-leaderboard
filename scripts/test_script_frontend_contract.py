@@ -42,8 +42,20 @@ def test_special_entry_categories_and_admin_controls_are_explicit():
     assert "is_laplace_owned" in admin_js
 
 
+
+def test_public_script_catalog_filters_and_role_search_are_available():
+    page = (ROOT / "static/pages/scripts.html").read_text(encoding="utf-8")
+    javascript = (ROOT / "static/js/scripts.js").read_text(encoding="utf-8")
+    assert 'id="script-category-filters"' in page
+    assert page.count("data-script-category=") == 6
+    assert "item.is_laplace_owned" in javascript
+    assert "role.name_zh_tw" in javascript
+    assert "entry.name_zh_tw" in javascript
+    assert "categoryMatches" in javascript
+
 if __name__ == "__main__":
     test_public_script_page_renders_sanitized_rich_text()
     test_custom_script_entries_are_cards_not_links_and_show_ability()
     test_special_entry_categories_and_admin_controls_are_explicit()
-    print({"status": "ok", "tests": 3})
+    test_public_script_catalog_filters_and_role_search_are_available()
+    print({"status": "ok", "tests": 4})

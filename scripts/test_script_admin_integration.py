@@ -17,7 +17,7 @@ from script_admin_routes import serialize_script as serialize_admin_script
 from script_admin_routes import update_script
 from script_models import ScriptEntry, ScriptRole, ScriptSupplement
 import script_import_service
-from script_public_routes import get_storyteller_guide, serialize_script as serialize_public_script
+from script_public_routes import get_storyteller_guide, list_scripts, serialize_script as serialize_public_script
 
 
 def make_session():
@@ -187,6 +187,27 @@ def test_admin_can_create_classify_and_delete_special_entries():
     assert db.query(ScriptSupplement).filter_by(script_id=script_id).count() == 0
 
 
+def test_public_script_list_searches_roles_and_combines_catalog_filters():
+    db = make_session()
+    script_id = seed_script(db)
+    script = db.query(ScriptEntry).filter_by(id=script_id).one()
+    script.category = "官混劇本"
+    script.is_laplace_owned = True
+    script.author_name = "測試作者"
+    db.commit()
+
+    by_role = list_scripts(q="洗衣婦", category="", laplace=False, db=db)
+    assert [item["slug"] for item in by_role["items"]] == ["integration-script"]
+
+    by_category = list_scripts(q="", category="官混劇本", laplace=False, db=db)
+    assert by_category["total"] == 1
+
+    by_laplace_and_author = list_scripts(q="測試作者", category="", laplace=True, db=db)
+    assert by_laplace_and_author["total"] == 1
+
+    excluded = list_scripts(q="洗衣婦", category="完全原創", laplace=False, db=db)
+    assert excluded["total"] == 0
+
 def test_public_payload_and_storyteller_login_gate():
     db = make_session()
     script_id = seed_script(db)
@@ -286,6 +307,7 @@ if __name__ == "__main__":
     test_admin_rejects_unknown_script_category()
     test_role_json_apply_replaces_stale_custom_clockmaker_with_official_role()
     test_admin_can_create_classify_and_delete_special_entries()
+    test_public_script_list_searches_roles_and_combines_catalog_filters()
     test_public_payload_and_storyteller_login_gate()
     test_new_manual_import_creates_internal_draft_and_local_artwork()
-    print({"status": "ok", "tests": 6})
+    print({"status": "ok", "tests": 7})

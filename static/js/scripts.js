@@ -6,8 +6,9 @@
   const detail = document.getElementById('script-detail');
   const search = document.getElementById('script-search');
   const count = document.getElementById('script-count');
+  const categoryFilters = [...document.querySelectorAll('[data-script-category]')];
   let scripts = [];
-  let visibleScripts = [], activeSlug = '', scrollTimer = null;
+  let visibleScripts = [], activeSlug = '', activeCategory = '', scrollTimer = null;
   const escapeHtml = value => String(value || '').replace(/[&<>"]/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
 
   function richText(value, fallback = '') {
@@ -230,9 +231,21 @@
     carousel.scrollTo({ left: Math.max(0, left), behavior });
   }
 
+  function scriptMatchesFilters(item, keyword) {
+    const categoryMatches = !activeCategory
+      || (activeCategory === 'laplace' ? item.is_laplace_owned : item.category === activeCategory);
+    if (!categoryMatches) return false;
+    if (!keyword) return true;
+    const searchable = [
+      item.name_zh_tw, item.author_name, item.tagline, item.category,
+      ...(item.roles || []).flatMap(role => [role.name_zh_tw, role.name_en, role.canonical_key]),
+      ...(item.special_entries || []).flatMap(entry => [entry.name_zh_tw, entry.external_id, entry.ability]),
+    ].filter(Boolean).join('\n').toLocaleLowerCase('zh-Hant');
+    return searchable.includes(keyword);
+  }
   function renderCarousel() {
-    const keyword = search.value.trim().toLowerCase();
-    visibleScripts = scripts.filter(item => item.name_zh_tw.toLowerCase().includes(keyword));
+    const keyword = search.value.trim().toLocaleLowerCase('zh-Hant');
+    visibleScripts = scripts.filter(item => scriptMatchesFilters(item, keyword));
     count.textContent = `\u5171 ${visibleScripts.length} \u5957\u5287\u672c`;
     carousel.innerHTML = visibleScripts.length ? visibleScripts.map(carouselSlideMarkup).join('') : '<div class="script-empty">\u627e\u4e0d\u5230\u5287\u672c\u3002</div>';
     carousel.querySelectorAll('[data-script-slide]').forEach((slide, index) => bindSlideGallery(slide, visibleScripts[index]));
@@ -370,5 +383,15 @@
       carousel.innerHTML = '<div class="script-empty">\u76ee\u524d\u7121\u6cd5\u8b80\u53d6\u5287\u672c\u3002</div>';
     }
   }
-  search.addEventListener('input', renderCarousel); init();
+  search.addEventListener('input', renderCarousel);
+  categoryFilters.forEach(button => button.addEventListener('click', () => {
+    activeCategory = button.dataset.scriptCategory || '';
+    categoryFilters.forEach(filter => {
+      const active = filter === button;
+      filter.classList.toggle('active', active);
+      filter.setAttribute('aria-pressed', String(active));
+    });
+    renderCarousel();
+  }));
+  init();
 })();

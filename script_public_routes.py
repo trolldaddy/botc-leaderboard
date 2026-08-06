@@ -1,6 +1,7 @@
 import json
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
 from account_binding_routes import get_optional_account
@@ -8,8 +9,8 @@ import models
 from database import get_db
 from knowledge_models import KnowledgeNode
 from role_public_routes import role_card
-from role_models import RoleKnowledgeLink
-from script_models import ScriptEntry, ScriptRole
+from role_models import Role, RoleKnowledgeLink
+from script_models import ScriptEntry, ScriptRole, ScriptSupplement
 
 router = APIRouter(prefix="/api/scripts", tags=["scripts-public"])
 
@@ -79,16 +80,45 @@ def script_load_options(include_role_records=False):
 
 
 @router.get("")
-def list_scripts(q: str = Query(default="", max_length=120), db: Session = Depends(get_db)):
+def list_scripts(
+    q: str = Query(default="", max_length=120),
+    category: str = Query(default="", max_length=120),
+    laplace: bool = Query(default=False),
+    db: Session = Depends(get_db),
+):
     query = db.query(ScriptEntry).options(*script_load_options()).filter(
         ScriptEntry.is_public == True  # noqa: E712
     )
     keyword = q.strip()
+    selected_category = category.strip()
+    if selected_category:
+        query = query.filter(ScriptEntry.category == selected_category)
+    if laplace:
+        query = query.filter(ScriptEntry.is_laplace_owned == True)  # noqa: E712
     if keyword:
-        query = query.filter(ScriptEntry.name_zh_tw.ilike(f"%{keyword}%"))
+        pattern = f"%{keyword}%"
+        query = query.filter(or_(
+            ScriptEntry.name_zh_tw.ilike(pattern),
+            ScriptEntry.author_name.ilike(pattern),
+            ScriptEntry.tagline.ilike(pattern),
+            ScriptEntry.roles.any(ScriptRole.role.has(or_(
+                Role.name_zh_tw.ilike(pattern),
+                Role.name_en.ilike(pattern),
+                Role.canonical_key.ilike(pattern),
+            ))),
+            ScriptEntry.supplements.any(or_(
+                ScriptSupplement.name_zh_tw.ilike(pattern),
+                ScriptSupplement.external_id.ilike(pattern),
+            )),
+        ))
     items = query.order_by(ScriptEntry.updated_at.desc(), ScriptEntry.name_zh_tw).all()
-    return {"query": keyword, "total": len(items), "items": [serialize_script(item) for item in items]}
-
+    return {
+        "query": keyword,
+        "category": selected_category,
+        "laplace": laplace,
+        "total": len(items),
+        "items": [serialize_script(item) for item in items],
+    }
 
 @router.get("/{slug}")
 def get_script(
