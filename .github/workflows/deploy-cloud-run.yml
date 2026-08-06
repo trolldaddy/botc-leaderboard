@@ -6,6 +6,12 @@ on:
       - feature/town-checkin
   workflow_dispatch:
     inputs:
+      operation:
+        description: "Operation to run from the selected feature ref"
+        required: true
+        default: "deploy"
+        type: choice
+        options: [deploy, preview-reviewed-scripts, write-reviewed-scripts]
       deploy_ref:
         description: "Branch, tag, or commit to deploy"
         required: true
@@ -32,6 +38,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.event_name == 'push' || inputs.operation == 'deploy'
     runs-on: ubuntu-latest
     environment: production
 
@@ -145,3 +152,48 @@ jobs:
           path: openapi.json
           if-no-files-found: ignore
           retention-days: 7
+
+  reviewed-script-import:
+    if: github.event_name == 'workflow_dispatch' && (inputs.operation == 'preview-reviewed-scripts' || inputs.operation == 'write-reviewed-scripts')
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout selected feature source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.deploy_ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Validate database configuration
+        shell: bash
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$DATABASE_URL" || { echo "Missing repository secret: DATABASE_URL"; exit 1; }
+
+      - name: Import all reviewed scripts
+        shell: bash
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          args=(--require-complete --report reports/bilibili-script-audit.json)
+          if [ "${{ inputs.operation }}" = "write-reviewed-scripts" ]; then args+=(--write); fi
+          python scripts/import_bilibili_scripts.py "${args[@]}"
+
+      - name: Upload reviewed script audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bilibili-script-audit-${{ inputs.operation }}
+          path: reports/bilibili-script-audit.json
+          if-no-files-found: warn
+          retention-days: 14
