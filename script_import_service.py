@@ -1,5 +1,6 @@
 import base64
 import hashlib
+import io
 import json
 import re
 import uuid
@@ -8,6 +9,7 @@ from urllib.parse import urlparse
 
 import requests
 from fastapi import HTTPException
+from PIL import Image
 
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 from scripts.crawl_bilibili_scripts import IMAGE_RE, TITLE_RE, author_from_markdown, extracted_fields, slugify
@@ -70,6 +72,19 @@ def unique_slug(db, name, external_id=""):
     return candidate
 
 
+def rank_remote_artwork(candidates, limit=2):
+    """Prefer the two portrait script faces over logos and article banners."""
+    def priority(item):
+        width, height = item.get("width", 0), item.get("height", 0)
+        if not width or not height:
+            return (3, 99, 0, item.get("index", 0))
+        ratio = width / height
+        portrait_tier = 0 if height > width and 0.45 <= ratio <= 0.90 else (1 if height > width else 2)
+        return (portrait_tier, abs(ratio - 0.68), -(width * height), item.get("index", 0))
+
+    return sorted(candidates, key=priority)[:limit]
+
+
 def save_artwork(script, uploads, remote_urls):
     folder = IMAGE_ROOT / script.slug
     folder.mkdir(parents=True, exist_ok=True)
@@ -82,17 +97,26 @@ def save_artwork(script, uploads, remote_urls):
         return saved
     session = requests.Session()
     session.headers.update({"User-Agent": "Mozilla/5.0 (compatible; botc-leaderboard/1.0)", "Referer": "https://www.bilibili.com/"})
+    candidates = []
     for index, url in enumerate(remote_urls[:12], 1):
         try:
             response = session.get(url, timeout=45)
             response.raise_for_status()
-            if not response.headers.get("Content-Type", "").lower().startswith("image/"):
+            content_type = response.headers.get("Content-Type", "")
+            if not content_type.lower().startswith("image/"):
                 continue
-            target = folder / f"{index:02d}{extension(urlparse(url).path, response.headers.get('Content-Type'))}"
-            target.write_bytes(response.content)
-            saved.append(f"/static/script-images/uploads/{script.slug}/{target.name}")
-        except requests.RequestException:
+            with Image.open(io.BytesIO(response.content)) as image:
+                width, height = image.size
+            candidates.append({
+                "index": index, "url": url, "content": response.content,
+                "content_type": content_type, "width": width, "height": height,
+            })
+        except (requests.RequestException, OSError, ValueError):
             continue
+    for output_index, item in enumerate(rank_remote_artwork(candidates), 1):
+        target = folder / f"{output_index:02d}{extension(urlparse(item['url']).path, item['content_type'])}"
+        target.write_bytes(item["content"])
+        saved.append(f"/static/script-images/uploads/{script.slug}/{target.name}")
     return saved
 
 

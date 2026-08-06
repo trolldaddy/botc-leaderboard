@@ -260,6 +260,16 @@ def test_public_payload_and_storyteller_login_gate():
 
 
 
+def test_remote_artwork_prefers_two_portrait_faces_over_logo():
+    candidates = [
+        {"index": 1, "width": 1600, "height": 500, "name": "logo"},
+        {"index": 2, "width": 1080, "height": 1600, "name": "front"},
+        {"index": 3, "width": 1100, "height": 1650, "name": "back"},
+        {"index": 4, "width": 1200, "height": 1200, "name": "avatar"},
+    ]
+    selected = script_import_service.rank_remote_artwork(candidates)
+    assert [item["name"] for item in selected] == ["front", "back"]
+
 def test_new_manual_import_creates_internal_draft_and_local_artwork():
     db = make_session()
     roles = []
@@ -310,4 +320,5 @@ if __name__ == "__main__":
     test_public_script_list_searches_roles_and_combines_catalog_filters()
     test_public_payload_and_storyteller_login_gate()
     test_new_manual_import_creates_internal_draft_and_local_artwork()
-    print({"status": "ok", "tests": 7})
+    test_remote_artwork_prefers_two_portrait_faces_over_logo()
+    print({"status": "ok", "tests": 8})
