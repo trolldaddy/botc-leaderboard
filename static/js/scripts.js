@@ -77,7 +77,7 @@
       const navigationBottom = navigation ? Math.ceil(navigation.getBoundingClientRect().bottom) : 0;
       // Keep the viewer above the fixed navigation in stacking order while
       // reserving enough vertical room for its title bar and the close action.
-      viewer.style.setProperty('--script-viewer-top', `${Math.max(76, navigationBottom + 16)}px`);
+      viewer.style.setProperty('--script-viewer-top', `${Math.max(88, navigationBottom + 24)}px`);
     };
     positionBelowNavigation();
     const desktopSpread = images.length > 1 && window.matchMedia('(min-width: 800px) and (orientation: landscape)').matches;
@@ -242,7 +242,7 @@
   carousel.addEventListener('pointercancel', finishDrag);
   let touchStartX = 0, touchStartY = 0, touchStartScroll = 0, touchStartSlug = '', touchDragging = false, touchHorizontal = false;
   carousel.addEventListener('touchstart', event => {
-    if (event.target.closest('button, a') || event.touches.length !== 1) return;
+    if (event.target.closest('.script-carousel-controls, .script-carousel-title a') || event.touches.length !== 1) return;
     const touch = event.touches[0];
     touchStartX = touch.clientX; touchStartY = touch.clientY; touchStartScroll = carousel.scrollLeft; touchStartSlug = activeSlug;
     touchDragging = true; touchHorizontal = false; carousel.classList.add('is-touching');
