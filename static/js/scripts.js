@@ -77,7 +77,7 @@
       const navigationBottom = navigation ? Math.ceil(navigation.getBoundingClientRect().bottom) : 0;
       // Keep the viewer above the fixed navigation in stacking order while
       // reserving enough vertical room for its title bar and the close action.
-      viewer.style.setProperty('--script-viewer-top', `${Math.max(88, navigationBottom + 24)}px`);
+      viewer.style.setProperty('--script-viewer-top', `${Math.max(76, navigationBottom + 12)}px`);
     };
     positionBelowNavigation();
     const desktopSpread = images.length > 1 && window.matchMedia('(min-width: 800px) and (orientation: landscape)').matches;
@@ -251,22 +251,22 @@
     if (!touchDragging || event.touches.length !== 1) return;
     const touch = event.touches[0], deltaX = touch.clientX - touchStartX, deltaY = touch.clientY - touchStartY;
     const horizontalDistance = Math.abs(deltaX), verticalDistance = Math.abs(deltaY);
-    if (!touchHorizontal && horizontalDistance > 0.5) {
-      if (verticalDistance > 14 && horizontalDistance < verticalDistance * 0.3) {
+    if (!touchHorizontal && horizontalDistance > 0.25) {
+      if (verticalDistance > 18 && horizontalDistance < verticalDistance * 0.2) {
         touchDragging = false;
         carousel.classList.remove('is-touching');
         return;
       }
-      if (horizontalDistance >= verticalDistance * 0.3) touchHorizontal = true;
+      if (horizontalDistance >= Math.max(0.25, verticalDistance * 0.2)) touchHorizontal = true;
     }
     if (!touchHorizontal) return;
     event.preventDefault();
-    carousel.scrollLeft = touchStartScroll - (deltaX * 1.7);
+    carousel.scrollLeft = touchStartScroll - (deltaX * 2.35);
   }, { passive: false });
   carousel.addEventListener('touchend', () => {
     if (touchHorizontal) {
       const delta = carousel.scrollLeft - touchStartScroll;
-      if (Math.abs(delta) > 4) {
+      if (Math.abs(delta) > 2) {
         const start = Math.max(0, visibleScripts.findIndex(item => item.slug === touchStartSlug));
         const next = (start + (delta > 0 ? 1 : -1) + visibleScripts.length) % visibleScripts.length;
         selectScript(visibleScripts[next].slug);
