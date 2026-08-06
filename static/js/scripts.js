@@ -73,11 +73,16 @@
     viewer.setAttribute('aria-modal', 'true');
     viewer.setAttribute('aria-label', '\u5287\u672c\u5716\u5168\u87a2\u5e55\u6aa2\u8996');
     const positionBelowNavigation = () => {
-      const navigation = document.querySelector('.sidebar');
-      const navigationBottom = navigation ? Math.ceil(navigation.getBoundingClientRect().bottom) : 0;
+      const navigationCandidates = [...document.querySelectorAll('.sidebar, .top-nav, .navbar, [data-site-navigation]')];
+      const navigationBottom = navigationCandidates.reduce((bottom, navigation) => {
+        const rect = navigation.getBoundingClientRect();
+        const style = window.getComputedStyle(navigation);
+        const isTopBar = rect.height > 0 && rect.top <= 1 && (style.position === 'fixed' || style.position === 'sticky');
+        return isTopBar ? Math.max(bottom, Math.ceil(rect.bottom)) : bottom;
+      }, 0);
       // Keep the viewer above the fixed navigation in stacking order while
       // reserving enough vertical room for its title bar and the close action.
-      viewer.style.setProperty('--script-viewer-top', `${Math.max(76, navigationBottom + 12)}px`);
+      viewer.style.setProperty('--script-viewer-top', `${Math.max(76, navigationBottom + 10)}px`);
     };
     positionBelowNavigation();
     const desktopSpread = images.length > 1 && window.matchMedia('(min-width: 800px) and (orientation: landscape)').matches;
@@ -240,33 +245,38 @@
   };
   carousel.addEventListener('pointerup', finishDrag);
   carousel.addEventListener('pointercancel', finishDrag);
-  let touchStartX = 0, touchStartY = 0, touchStartScroll = 0, touchStartSlug = '', touchDragging = false, touchHorizontal = false;
+  let touchStartX = 0, touchStartY = 0, touchStartScroll = 0, touchStartSlug = '', touchStartTime = 0;
+  let touchLastX = 0, touchLastTime = 0, touchDragging = false, touchHorizontal = false;
   carousel.addEventListener('touchstart', event => {
     if (event.target.closest('.script-carousel-controls, .script-carousel-title a') || event.touches.length !== 1) return;
     const touch = event.touches[0];
     touchStartX = touch.clientX; touchStartY = touch.clientY; touchStartScroll = carousel.scrollLeft; touchStartSlug = activeSlug;
+    touchLastX = touch.clientX; touchStartTime = touchLastTime = performance.now();
     touchDragging = true; touchHorizontal = false; carousel.classList.add('is-touching');
   }, { passive: true });
   carousel.addEventListener('touchmove', event => {
     if (!touchDragging || event.touches.length !== 1) return;
     const touch = event.touches[0], deltaX = touch.clientX - touchStartX, deltaY = touch.clientY - touchStartY;
     const horizontalDistance = Math.abs(deltaX), verticalDistance = Math.abs(deltaY);
-    if (!touchHorizontal && horizontalDistance > 0.25) {
-      if (verticalDistance > 18 && horizontalDistance < verticalDistance * 0.2) {
+    if (!touchHorizontal && horizontalDistance >= 3) {
+      if (verticalDistance > 14 && horizontalDistance < verticalDistance * 0.65) {
         touchDragging = false;
         carousel.classList.remove('is-touching');
         return;
       }
-      if (horizontalDistance >= Math.max(0.25, verticalDistance * 0.2)) touchHorizontal = true;
+      if (horizontalDistance >= verticalDistance * 0.65) touchHorizontal = true;
     }
     if (!touchHorizontal) return;
     event.preventDefault();
-    carousel.scrollLeft = touchStartScroll - (deltaX * 2.35);
+    touchLastX = touch.clientX; touchLastTime = performance.now();
+    carousel.scrollLeft = touchStartScroll - deltaX;
   }, { passive: false });
   carousel.addEventListener('touchend', () => {
     if (touchHorizontal) {
       const delta = carousel.scrollLeft - touchStartScroll;
-      if (Math.abs(delta) > 2) {
+      const elapsed = Math.max(1, touchLastTime - touchStartTime);
+      const velocity = Math.abs(touchLastX - touchStartX) / elapsed;
+      if (Math.abs(delta) >= 24 || velocity >= 0.22) {
         const start = Math.max(0, visibleScripts.findIndex(item => item.slug === touchStartSlug));
         const next = (start + (delta > 0 ? 1 : -1) + visibleScripts.length) % visibleScripts.length;
         selectScript(visibleScripts[next].slug);
