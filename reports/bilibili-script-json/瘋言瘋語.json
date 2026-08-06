@@ -12,7 +12,7 @@
     "remindersGlobal": [],
     "setup": false,
     "firstNightReminder": "以任意顺序指向三名玩家，其中一名邪恶。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/noble.png"
+    "image": "/static/script-role-icons/reviewed/7e51cddf4e1ffe13a8f4d09d.png"
   },
   {
     "id": "pixie1",
@@ -28,7 +28,7 @@
     "remindersGlobal": [],
     "setup": false,
     "firstNightReminder": "对小精灵展示一个在场的镇民角色。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/pixie.png"
+    "image": "/static/script-role-icons/reviewed/bc01e95227a528135685ecdc.png"
   },
   {
     "id": "daoke1",
@@ -44,7 +44,7 @@
     "remindersGlobal": [],
     "setup": false,
     "firstNightReminder": "在为首个夜晚做准备时，将刀客的“追杀”标记放置在一个爪牙角色标记旁。\n在首个夜晚，唤醒刀客。对他展示标记了“追杀”的爪牙角色标记。让刀客重新入睡。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202403/c_5751437760171_79dd1401.jpg"
+    "image": "/static/script-role-icons/reviewed/2a753b0f530a0629548c290e.png"
   },
   {
     "id": "fortune_teller1",
@@ -60,7 +60,7 @@
     "setup": false,
     "firstNightReminder": "让占卜师选择两名玩家。如果其中有恶魔或“干扰项”，点头示意，否则摇头。",
     "otherNightReminder": "让占卜师选择两名玩家。如果其中有恶魔或“干扰项”，点头示意，否则摇头。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/fortune_teller.png"
+    "image": "/static/script-role-icons/reviewed/743a3703802de53b6497d39d.png"
   },
   {
     "id": "yaggababble1",
@@ -76,7 +76,7 @@
     "setup": false,
     "firstNightReminder": "在为首个夜晚做准备时，用纸条或手机便签或其他便捷的设备写下一段短语。\n在首个夜晚，唤醒牙噶巴卜，对他展示这段短语，然后让他重新入睡。\n",
     "otherNightReminder": "每当牙噶巴卜在白天公开说出这段短语时，将一枚“死亡”提示标记放入魔典左侧的中央位置，用以提示你需要在今晚放置这个标记。\n每个夜晚，你需要选择是否将放入魔典中央的“死亡”提示标记放置在一名玩家的角色标记旁。如果你这么做，那么同时为放置了提示标记的角色标记上再放置帷幕标记。这些玩家死亡。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202402/c_9719440568071_03aa8062.jpg"
+    "image": "/static/script-role-icons/reviewed/1386c84292a66f8dcffb7f95.png"
   },
   {
     "id": "dreamer1",
@@ -90,7 +90,7 @@
     "setup": false,
     "firstNightReminder": "让筑梦师指向一名玩家。对他展示善良和邪恶的角色标记各一个，其中一个是属于该玩家的角色。",
     "otherNightReminder": "让筑梦师指向一名玩家。对他展示善良和邪恶的角色标记各一个，其中一个是属于该玩家的角色。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/dreamer.png"
+    "image": "/static/script-role-icons/reviewed/03feba9b60ae101898b34cf7.png"
   },
   {
     "id": "mathematician1",
@@ -106,7 +106,7 @@
     "setup": false,
     "firstNightReminder": "给他展示数字手势来告诉他在首个夜晚里有多少玩家的角色能力受他人影响而未正常生效。",
     "otherNightReminder": "给他展示数字手势来告诉他从上个黎明到数学家醒来前有多少玩家的角色能力受他人影响而未正常生效。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/mathematician.png"
+    "image": "/static/script-role-icons/reviewed/447f795008217265ebc62f3b.png"
   },
   {
     "id": "balloonist1",
@@ -122,7 +122,7 @@
     "setup": true,
     "firstNightReminder": "唤醒气球驾驶员，指向一名玩家，在其角色标记旁放置“得知”提示标记。",
     "otherNightReminder": "唤醒气球驾驶员，指向一名与放置“得知”角色标记玩家角色类型不同的玩家，在其角色标记旁放置“得知”提示标记。移除上一晚放置的“得知”角色标记。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202410/c_7787277188271_9eba6446.jpg"
+    "image": "/static/script-role-icons/reviewed/32cc523620f3ed87f0778a32.png"
   },
   {
     "id": "village_idiot1",
@@ -138,7 +138,7 @@
     "setup": true,
     "firstNightReminder": "唤醒任意一名村夫。让村夫指向一名玩家，对他给出拇指向上或向下的手势代表那名玩家的阵营。重复这个操作，直到所有村夫玩家都进行了夜晚行动。",
     "otherNightReminder": "唤醒任意一名村夫。让村夫指向一名玩家，对他给出拇指向上或向下的手势代表那名玩家的阵营。重复这个操作，直到所有村夫玩家都进行了夜晚行动。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202401/c_2996546816071_b144d82c.jpg"
+    "image": "/static/script-role-icons/reviewed/2dbda130a0c765316a82b00d.png"
   },
   {
     "id": "exorcist1",
@@ -153,7 +153,7 @@
     "remindersGlobal": [],
     "setup": false,
     "otherNightReminder": "让驱魔人选择一名玩家，不能是上一夜他选择过的玩家。让驱魔人重新入睡。如果驱魔人选中了恶魔：唤醒恶魔。展示“该角色的能力对你生效”信息标记和驱魔人角色标记。指向驱魔人玩家。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/exorcist.png"
+    "image": "/static/script-role-icons/reviewed/3d9d6663ed9224ff8bf97697.png"
   },
   {
     "id": "juggler1",
@@ -168,7 +168,7 @@
     "remindersGlobal": [],
     "setup": false,
     "otherNightReminder": "给他展示数字手势来告诉他他当天白天猜测正确的次数。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/juggler.png"
+    "image": "/static/script-role-icons/reviewed/3255136af23255e9e522b64a.png"
   },
   {
     "id": "bianlianshi1",
@@ -184,7 +184,7 @@
       "是变脸师"
     ],
     "setup": false,
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202310/c_2669745308961_3cd6048e.jpg"
+    "image": "/static/script-role-icons/reviewed/7fa6cf57ddd248c33c5e49c5.png"
   },
   {
     "id": "magician1",
@@ -197,7 +197,7 @@
     "remindersGlobal": [],
     "setup": false,
     "firstNightReminder": "如果魔术师在场，则需要对爪牙信息环节和恶魔信息环节的相关内容进行调整。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/magician.png"
+    "image": "/static/script-role-icons/reviewed/3d80a055a841aa73ddd71943.png"
   },
   {
     "id": "wudaozhe1",
@@ -211,7 +211,7 @@
       "是悟道者"
     ],
     "setup": false,
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202310/c_9233465308961_9aa67828.jpg"
+    "image": "/static/script-role-icons/reviewed/9875d6707aef2e09747ee934.png"
   },
   {
     "id": "lunatic1",
@@ -228,7 +228,7 @@
     "setup": false,
     "firstNightReminder": "如果有七名或更多玩家，唤醒疯子：展示“他们是你的爪牙”信息标记。指向任意对应数量的玩家。展示“这些角色不在场”信息标记。展示三个善良角色。让疯子重新入睡。唤醒恶魔。展示“你是”信息标记和恶魔角色标记。展示“这名玩家是”信息标记和疯子角色标记，然后指向疯子玩家。",
     "otherNightReminder": "做任何需要做的事情来模拟一位恶魔的行动。让疯子重新入睡。唤醒恶魔。对恶魔展示疯子角色标记，并指向疯子玩家，随后是疯子的攻击目标。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/lunatic.png"
+    "image": "/static/script-role-icons/reviewed/a70851a77d9b73263b3e47d4.png"
   },
   {
     "id": "recluse1",
@@ -240,7 +240,7 @@
     "reminders": [],
     "remindersGlobal": [],
     "setup": false,
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/recluse.png"
+    "image": "/static/script-role-icons/reviewed/0a990d6b79017e79cb14f4a7.png"
   },
   {
     "id": "politician1",
@@ -252,7 +252,7 @@
     "reminders": [],
     "remindersGlobal": [],
     "setup": false,
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/politician.png"
+    "image": "/static/script-role-icons/reviewed/4ff44d1f1d3c812ffec2e6b5.png"
   },
   {
     "id": "hermit1",
@@ -268,7 +268,7 @@
     ],
     "remindersGlobal": [],
     "setup": true,
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202506/c_6131437679471_8c370f0a.jpg"
+    "image": "/static/script-role-icons/reviewed/7ee94ab2e274badccb0aead7.png"
   },
   {
     "id": "scarlet_woman1",
@@ -283,7 +283,7 @@
     ],
     "setup": false,
     "otherNightReminder": "如果红唇女郎今天变成了小恶魔，对她展示“你是”信息标记，和小恶魔角色标记。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/scarlet_woman.png"
+    "image": "/static/script-role-icons/reviewed/e363b4d8f2adaeef76633f48.png"
   },
   {
     "id": "xaan1",
@@ -302,7 +302,7 @@
     "setup": true,
     "firstNightReminder": "如果初始外来者的数量等于1，则标记大限将至。",
     "otherNightReminder": "如果初始外来者的数量等于当前游戏的夜晚数，则标记大限将至。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202411/c_7860002933371_9c39e151.jpg"
+    "image": "/static/script-role-icons/reviewed/7880c7ed057f4b9ef214a060.png"
   },
   {
     "id": "goblin1",
@@ -316,7 +316,7 @@
     ],
     "remindersGlobal": [],
     "setup": false,
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/goblin.png"
+    "image": "/static/script-role-icons/reviewed/4ad4afb4a5e8b3505cef0993.png"
   },
   {
     "id": "gudiao1",
@@ -332,7 +332,7 @@
     "setup": false,
     "firstNightReminder": "唤醒蛊雕，让其选择一个方向。将他的“中毒”标记移动至那个方向上的下一个存活玩家的角色标记旁。随后对他指向那名玩家，并展示“他是”提示标记和该玩家的角色标记。",
     "otherNightReminder": "唤醒蛊雕，让其选择一个方向。将他的“中毒”标记移动至那个方向上的下一个存活玩家的角色标记旁。随后对他指向那名玩家，并展示“他是”提示标记和该玩家的角色标记。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202301/c_4078497694761_5c6ddcce.jpg"
+    "image": "/static/script-role-icons/reviewed/2f36c706c3b0560d79c6afee.png"
   },
   {
     "id": "marionette1",
@@ -347,7 +347,7 @@
     ],
     "setup": true,
     "firstNightReminder": "如果提线木偶在场，对恶魔展示提线木偶角色标记并指向提线木偶玩家。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/marionette.png"
+    "image": "/static/script-role-icons/reviewed/b95c5fc0ac2f7d82f4e090cc.png"
   },
   {
     "id": "legion1",
@@ -363,7 +363,7 @@
     "remindersGlobal": [],
     "setup": true,
     "otherNightReminder": "由说书人决定，让哪一名玩家死亡。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/legion.png"
+    "image": "/static/script-role-icons/reviewed/83af788acf75c84e91e7fc8f.png"
   },
   {
     "id": "riot1",
@@ -375,6 +375,6 @@
     "reminders": [],
     "remindersGlobal": [],
     "setup": true,
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/riot.png"
+    "image": "/static/script-role-icons/reviewed/b95d0a798d5f1bc500bbd092.png"
   }
 ]

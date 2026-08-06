@@ -1,1 +1,94 @@
-[{"id":"dianxiaoer"},{"id":"seamstress"},{"id":"nightwatchman"},{"id":"tixingguan"},{"id":"wudaozhe"},{"id":"xizi_new"},{"id":"xionghaizi"},{"id":"yishi"},{"id":"fortune_teller"},{"id":"philosopher"},{"id":"zhifu"},{"id":"bingbi"},{"id":"daoshi"},{"id":"librarian"},{"id":"hermit"},{"id":"goblin"},{"id":"scarlet_woman"},{"id":"poisoner"},{"id":"wraith"},{"id":"witch"},{"id":"fang_gu"},{"id":"hundun"},{"id":"vigormortis"}]
+[
+  {
+    "id": "dianxiaoer",
+    "image": "/static/script-role-icons/reviewed/4628b054835e348385785630.png"
+  },
+  {
+    "id": "seamstress",
+    "image": "/static/script-role-icons/reviewed/444e73cdbd524925f19b8daa.png"
+  },
+  {
+    "id": "nightwatchman",
+    "image": "/static/script-role-icons/reviewed/0b5bb717a3acfe4dac72268c.png"
+  },
+  {
+    "id": "tixingguan",
+    "image": "/static/script-role-icons/reviewed/859d8f3ac0286173dbcdc5b0.png"
+  },
+  {
+    "id": "wudaozhe",
+    "image": "/static/script-role-icons/reviewed/9875d6707aef2e09747ee934.png"
+  },
+  {
+    "id": "xizi_new",
+    "image": "/static/script-role-icons/reviewed/0101dac667cefb287c3f26ff.png"
+  },
+  {
+    "id": "xionghaizi",
+    "image": "/static/script-role-icons/reviewed/06c21364da16299fb539825b.png"
+  },
+  {
+    "id": "yishi",
+    "image": "/static/script-role-icons/reviewed/4d5de33540960900665def27.png"
+  },
+  {
+    "id": "fortune_teller",
+    "image": "/static/script-role-icons/reviewed/743a3703802de53b6497d39d.png"
+  },
+  {
+    "id": "philosopher",
+    "image": "/static/script-role-icons/reviewed/092fe7b98a83694d8b933545.png"
+  },
+  {
+    "id": "zhifu",
+    "image": "/static/script-role-icons/reviewed/7a5d1fdb4b36562165329294.png"
+  },
+  {
+    "id": "bingbi",
+    "image": "/static/script-role-icons/reviewed/c5050859349043b1eddc0cf8.png"
+  },
+  {
+    "id": "daoshi",
+    "image": "/static/script-role-icons/reviewed/b8bf1b398b76ddea421caeb8.png"
+  },
+  {
+    "id": "librarian",
+    "image": "/static/script-role-icons/reviewed/1828f5b79d39d334356465dc.png"
+  },
+  {
+    "id": "hermit",
+    "image": "/static/script-role-icons/reviewed/7ee94ab2e274badccb0aead7.png"
+  },
+  {
+    "id": "goblin",
+    "image": "/static/script-role-icons/reviewed/4ad4afb4a5e8b3505cef0993.png"
+  },
+  {
+    "id": "scarlet_woman",
+    "image": "/static/script-role-icons/reviewed/e363b4d8f2adaeef76633f48.png"
+  },
+  {
+    "id": "poisoner",
+    "image": "/static/script-role-icons/reviewed/f5f038927f5ef388dab5b2b6.png"
+  },
+  {
+    "id": "wraith",
+    "image": "/static/script-role-icons/reviewed/c3b89da7b25c05ffe38e5a28.png"
+  },
+  {
+    "id": "witch",
+    "image": "/static/script-role-icons/reviewed/2f35eae15feb2a9e8ec15bb2.png"
+  },
+  {
+    "id": "fang_gu",
+    "image": "/static/script-role-icons/reviewed/3d8a183086d27a630afb178c.png"
+  },
+  {
+    "id": "hundun",
+    "image": "/static/script-role-icons/reviewed/95a5c2e688c7d5830967bb3c.png"
+  },
+  {
+    "id": "vigormortis",
+    "image": "/static/script-role-icons/reviewed/8014b67fcaa36f21e75bd384.png"
+  }
+]

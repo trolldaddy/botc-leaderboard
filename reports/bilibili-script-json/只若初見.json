@@ -8,7 +8,7 @@
   },
   {
     "id": "_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/05/a5613uupc0bffr0sg9egfotdaofup1e.png",
+    "image": "/static/script-role-icons/reviewed/319c892a38a24029482db5e6.png",
     "firstNightReminder": "唤醒调查员，对他指向两名玩家，并展示一个爪牙角色标记。这两名玩家其中之一是这个爪牙。",
     "reminders": [
       "爪牙",
@@ -21,7 +21,7 @@
   },
   {
     "id": "1_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/9/91/04je4dg5ituw4nymx4f0x0b80p6gntg.png",
+    "image": "/static/script-role-icons/reviewed/743a3703802de53b6497d39d.png",
     "firstNightReminder": "唤醒占卜师，让他选择两名玩家。以点头或摇头告知他是否选中了恶魔。",
     "otherNightReminder": "唤醒占卜师，让他选择两名玩家。以点头或摇头告知他是否选中了恶魔。",
     "reminders": [
@@ -35,7 +35,7 @@
   },
   {
     "id": "2_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/a3/nxckynoy8mshn7pwnsnnraceso4zx2p.png",
+    "image": "/static/script-role-icons/reviewed/942de4ef6f4612e96704ddf2.png",
     "otherNightReminder": "唤醒僧侣，让他选择除自己以外的一名玩家，那名玩家今晚免受恶魔负面效果影响。",
     "reminders": [
       "保护"
@@ -47,7 +47,7 @@
   },
   {
     "id": "3_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/df/cud437aq02j4lnizdmdyxp1dcc5lojm.png",
+    "image": "/static/script-role-icons/reviewed/b541793bff3ef4662b075aa7.png",
     "firstNightReminder": "唤醒祖母，对她指向一名善良玩家，并展示该玩家的角色标记。",
     "otherNightReminder": "如果恶魔杀死了孙子，祖母死亡。",
     "reminders": [
@@ -62,7 +62,7 @@
   },
   {
     "id": "4_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/9/90/bt7yvbzi61ftut2iqheqrgznkdohslh.png",
+    "image": "/static/script-role-icons/reviewed/31deb7235026ab3b8d2db220.png",
     "firstNightReminder": "唤醒水手，让他选择一名玩家。决定他俩其中谁因为水手能力醉酒。",
     "otherNightReminder": "唤醒水手，让他选择一名玩家。决定他俩其中谁因为水手能力醉酒。",
     "reminders": [
@@ -76,7 +76,7 @@
   },
   {
     "id": "5_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/4/48/0d9uthaidhlal5rz0zjx2tvzzrviqdo.png",
+    "image": "/static/script-role-icons/reviewed/286f8ed34ad7cbb81d6a7ce3.png",
     "firstNightReminder": "唤醒侍女，让她选择两名除自己以外的存活玩家。用手势比划数字来告知她这些玩家中因自己能力而唤醒的玩家数量。",
     "otherNightReminder": "唤醒侍女，让她选择两名除自己以外的存活玩家。用手势比划数字来告知她这些玩家中因自己能力而唤醒的玩家数量。",
     "name": "侍女",
@@ -87,7 +87,7 @@
   },
   {
     "id": "6_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/0a/55q4nfyb9gftn9jiujtt49ti2qa33h6.png",
+    "image": "/static/script-role-icons/reviewed/7e8996cae7d16dd672a2eb8f.png",
     "otherNightReminder": "唤醒赌徒，让他进行猜测。如果猜测错误，他死亡。",
     "reminders": [
       "死亡"
@@ -99,7 +99,7 @@
   },
   {
     "id": "7_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/a4/t8h7diw8bpav612k1e3t62b10hlbizz.png",
+    "image": "/static/script-role-icons/reviewed/6d358a90a8da446511ca3a2e.png",
     "reminders": [
       "不会死亡"
     ],
@@ -109,7 +109,7 @@
   },
   {
     "id": "8_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/aa/0khyidxxipwitzqjs9iryheur62zkrj.png",
+    "image": "/static/script-role-icons/reviewed/444e73cdbd524925f19b8daa.png",
     "firstNightReminder": "唤醒女裁缝，她可以摇头不使用能力，或选择除自己以外的两名玩家。以点头或摇头告知她选择的玩家是否为同一阵营。",
     "otherNightReminder": "如果女裁缝未曾使用能力，唤醒女裁缝，她可以摇头不使用能力，或选择除自己以外的两名玩家。以点头或摇头告知她选择的玩家是否为同一阵营。",
     "reminders": [
@@ -123,7 +123,7 @@
   },
   {
     "id": "9_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/4/44/bio3bf3g3vunctpnldg6lsct4u4jt81.png",
+    "image": "/static/script-role-icons/reviewed/5a8640a96d69f1773885952d.png",
     "reminders": [
       "失去能力"
     ],
@@ -133,7 +133,7 @@
   },
   {
     "id": "10_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/4/41/a5jfldz9g39nkh59frnwinbwrzevfi4.png",
+    "image": "/static/script-role-icons/reviewed/6a88f4b36be925ad16b571da.png",
     "otherNightReminder": "如果农夫死于夜晚，唤醒一名存活的善良玩家告知他角色变化。",
     "name": "农夫",
     "team": "townsfolk",
@@ -142,14 +142,14 @@
   },
   {
     "id": "11_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/b/bf/0wf6zizpzk61n1txjo233fembq7utl3.png",
+    "image": "/static/script-role-icons/reviewed/0b292bc29d7e9cfd5f13fca5.png",
     "name": "戏法师",
     "team": "townsfolk",
     "ability": "'每个白天，你可以公开进行一次谁是爪牙，谁是恶魔的猜测。如果你猜对，善良阵营获胜。"
   },
   {
     "id": "12_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/b/b5/rdpsq1wjpsq66ah5y3f4p2wyuzl8wuk.png",
+    "image": "/static/script-role-icons/reviewed/0a7051241a51504bcd0ed0aa.png",
     "reminders": [
       "不会死亡"
     ],
@@ -159,14 +159,14 @@
   },
   {
     "id": "13_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/5/5e/dw5z7fnz58ia54bw160d1numjsjay8f.png",
+    "image": "/static/script-role-icons/reviewed/0a990d6b79017e79cb14f4a7.png",
     "name": "陌客",
     "team": "outsider",
     "ability": "你可能会被当作邪恶阵营、爪牙角色或恶魔角色，即使你已死亡。"
   },
   {
     "id": "14_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/3/3c/hulwpl4c71z09ixgyg3dlkeega2a3an.png",
+    "image": "/static/script-role-icons/reviewed/cd3c40a9b6a421361bda2864.png",
     "otherNightReminder": "如果月之子在今天白天的时候使用自己的能力选择了一名善良玩家，那名玩家死亡。",
     "reminders": [
       "死亡"
@@ -178,7 +178,7 @@
   },
   {
     "id": "15_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/5/59/ns2ifb3z40ukn4xa61a460473sm6lhq.png",
+    "image": "/static/script-role-icons/reviewed/f9ee080e6f5970b2faacbcd5.png",
     "reminders": [
       "醉酒",
       "已猜测"
@@ -189,7 +189,7 @@
   },
   {
     "id": "16_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/7/73/pgakqxxr1gostnluw2xkp4cnudn3z7a.png",
+    "image": "/static/script-role-icons/reviewed/12f79fd840c7f09554418776.png",
     "firstNightReminder": "唤醒食人魔，让他选择一名玩家。如果他选择了邪恶玩家，将他的角色标记在魔典中倒置以表示他转变为邪恶阵营。",
     "reminders": [
       "挚友"
@@ -201,7 +201,7 @@
   },
   {
     "id": "17_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/2/2f/fbxp1pzgxjfs4vsrb0l30otb078m84e.png",
+    "image": "/static/script-role-icons/reviewed/6dde09b972b025ee7e26be5d.png",
     "firstNightReminder": "唤醒魔鬼代言人，让他选择一名玩家，那名玩家处决不死。",
     "otherNightReminder": "唤醒魔鬼代言人，让他选择一名与上一晚不同的玩家，那名玩家处决不死。",
     "reminders": [
@@ -215,7 +215,7 @@
   },
   {
     "id": "18_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/d0/ftyh3tzzolrzec1njghipdcbmk7opuf.png",
+    "image": "/static/script-role-icons/reviewed/ae72586fc72e129f5f5548a9.png",
     "otherNightReminder": "如果刺客未曾使用能力，唤醒刺客，他可以摇头不使用能力，或选择攻击一名玩家。",
     "reminders": [
       "死亡",
@@ -228,14 +228,14 @@
   },
   {
     "id": "19_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/d7/msb759ew0f2hudkvxhsz15jnxsqqpy9.png",
+    "image": "/static/script-role-icons/reviewed/7d2fc590efc9e80f5fd6a42c.png",
     "name": "精神病患者",
     "team": "minion",
     "ability": "每个白天，在提名开始前，你可以公开选择一名玩家：他死亡。如果你被处决，提名你的玩家需要和你猜拳，只有你输了你才会死亡。"
   },
   {
     "id": "20_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e5/el29kr1dznrpaa089tayj3chd444s6k.png",
+    "image": "/static/script-role-icons/reviewed/b95c5fc0ac2f7d82f4e090cc.png",
     "firstNightReminder": "如果提线木偶在场，对恶魔展示提线木偶角色标记并指向提线木偶玩家。",
     "remindersGlobal": [
       "是提线木偶"
@@ -248,7 +248,7 @@
   },
   {
     "id": "21_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/0d/f64m0fvt72762oey33lurp4wez01hcp.png",
+    "image": "/static/script-role-icons/reviewed/7880c7ed057f4b9ef214a060.png",
     "firstNightReminder": "如果夜晚天数等于初始外来者数量，所有镇民玩家中毒到下个黄昏。",
     "otherNightReminder": "如果夜晚天数等于初始外来者数量，所有镇民玩家中毒到下个黄昏。",
     "reminders": [
@@ -267,7 +267,7 @@
   },
   {
     "id": "22_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/03/1trck24gi8o05kklsg93al4co09nakb.png",
+    "image": "/static/script-role-icons/reviewed/bb221a03a1fc019f2b667c1f.png",
     "otherNightReminder": "唤醒小恶魔，让他攻击一名玩家。如果他成功自杀，则在他入睡后通知一名爪牙角色变化。",
     "reminders": [
       "死亡"
@@ -279,7 +279,7 @@
   },
   {
     "id": "23_zhiruochujian",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e7/i3bse7nern4raiqwjpmzrpzjfa0vrq4.png",
+    "image": "/static/script-role-icons/reviewed/6a07f45c7d8911ecbf177aee.png",
     "firstNightReminder": "唤醒痢蛭，让他选择一名玩家以寄生。",
     "otherNightReminder": "唤醒痢蛭，让他攻击一名玩家。",
     "reminders": [
@@ -296,6 +296,7 @@
     "id": "24_zhiruochujian",
     "name": "食人族&陌客",
     "team": "a jinxed",
-    "ability": "如果陌客被食人魔当作邪恶阵营，食人魔会得知自己转变为邪恶。"
+    "ability": "如果陌客被食人魔当作邪恶阵营，食人魔会得知自己转变为邪恶。",
+    "image": "/static/script-role-icons/reviewed/djinn.png"
   }
 ]

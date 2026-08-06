@@ -1,1 +1,102 @@
-[{"id":"shugenja"},{"id":"amnesiac"},{"id":"alchemist"},{"id":"artist"},{"id":"gossip"},{"id":"flowergirl"},{"id":"tea_lady"},{"id":"savant"},{"id":"nightwatchman"},{"id":"lycanthrope"},{"id":"oracle"},{"id":"virgin"},{"id":"fisherman"},{"id":"drunk"},{"id":"politician"},{"id":"hatter"},{"id":"plague_doctor"},{"id":"wizard"},{"id":"witch"},{"id":"pit-hag"},{"id":"boffin"},{"id":"lil_monsta"},{"id":"yaggababble"},{"id":"zombuul"},{"id":"imp"}]
+[
+  {
+    "id": "shugenja",
+    "image": "/static/script-role-icons/reviewed/c03c2ad86ea9655531749132.png"
+  },
+  {
+    "id": "amnesiac",
+    "image": "/static/script-role-icons/reviewed/ed48ae31e7e4e7fc4ce51e35.png"
+  },
+  {
+    "id": "alchemist",
+    "image": "/static/script-role-icons/reviewed/31d5e35abf3e09b31a15f846.png"
+  },
+  {
+    "id": "artist",
+    "image": "/static/script-role-icons/reviewed/3a88398c44d9eebfc4efa122.png"
+  },
+  {
+    "id": "gossip",
+    "image": "/static/script-role-icons/reviewed/0fe558776fbf0e8feb0cc36d.png"
+  },
+  {
+    "id": "flowergirl",
+    "image": "/static/script-role-icons/reviewed/464d3557ed905781a0abde34.png"
+  },
+  {
+    "id": "tea_lady",
+    "image": "/static/script-role-icons/reviewed/6d358a90a8da446511ca3a2e.png"
+  },
+  {
+    "id": "savant",
+    "image": "/static/script-role-icons/reviewed/38f851256c41dd235c8e787d.png"
+  },
+  {
+    "id": "nightwatchman",
+    "image": "/static/script-role-icons/reviewed/0b5bb717a3acfe4dac72268c.png"
+  },
+  {
+    "id": "lycanthrope",
+    "image": "/static/script-role-icons/reviewed/7e7d5982be7732623de13806.png"
+  },
+  {
+    "id": "oracle",
+    "image": "/static/script-role-icons/reviewed/52fcad7717d16af410f5937f.png"
+  },
+  {
+    "id": "virgin",
+    "image": "/static/script-role-icons/reviewed/f87ac8bdd6224e9c4d3e6322.png"
+  },
+  {
+    "id": "fisherman",
+    "image": "/static/script-role-icons/reviewed/5a8640a96d69f1773885952d.png"
+  },
+  {
+    "id": "drunk",
+    "image": "/static/script-role-icons/reviewed/aac27a37f2f385dfdbaa9fc2.png"
+  },
+  {
+    "id": "politician",
+    "image": "/static/script-role-icons/reviewed/4ff44d1f1d3c812ffec2e6b5.png"
+  },
+  {
+    "id": "hatter",
+    "image": "/static/script-role-icons/reviewed/ca607db810e464ef74b455c7.png"
+  },
+  {
+    "id": "plague_doctor",
+    "image": "/static/script-role-icons/reviewed/924c85abf416cd1c11f7b7a7.png"
+  },
+  {
+    "id": "wizard",
+    "image": "/static/script-role-icons/reviewed/0ee60fc1efa898c2e6d76cf1.png"
+  },
+  {
+    "id": "witch",
+    "image": "/static/script-role-icons/reviewed/2f35eae15feb2a9e8ec15bb2.png"
+  },
+  {
+    "id": "pit-hag",
+    "image": "/static/script-role-icons/reviewed/297fb5ca1ba9bdf5598ceb64.png"
+  },
+  {
+    "id": "boffin",
+    "image": "/static/script-role-icons/reviewed/91ec4bf8bb5e44ce8efbb872.png"
+  },
+  {
+    "id": "lil_monsta",
+    "image": "/static/script-role-icons/reviewed/a80be630b8c704776cddf98c.png"
+  },
+  {
+    "id": "yaggababble",
+    "image": "/static/script-role-icons/reviewed/1386c84292a66f8dcffb7f95.png"
+  },
+  {
+    "id": "zombuul",
+    "image": "/static/script-role-icons/reviewed/6f640f7e7c55fc3592dfa9ab.png"
+  },
+  {
+    "id": "imp",
+    "image": "/static/script-role-icons/reviewed/bb221a03a1fc019f2b667c1f.png"
+  }
+]

@@ -20,7 +20,7 @@
     "setup": false,
     "firstNightReminder": "指向她的孙子玩家，并展示该玩家的角色标记。",
     "otherNightReminder": "如果孙子被恶魔杀死，祖母也会一同死亡。标记祖母死亡。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/df/cud437aq02j4lnizdmdyxp1dcc5lojm.png"
+    "image": "/static/script-role-icons/reviewed/b541793bff3ef4662b075aa7.png"
   },
   {
     "id": "2_hongshengti",
@@ -35,7 +35,7 @@
     "setup": false,
     "firstNightReminder": "工程师选择不使用能力，或在剧本列表中选择恶魔或爪牙角色。如果他选择爪牙角色，则需要选择对应数量的爪牙。然后将这些玩家依次唤醒，并告知他们变成了什么角色。",
     "otherNightReminder": "工程师选择不使用能力，或在剧本列表中选择恶魔或爪牙角色。如果他选择爪牙角色，则需要选择对应数量的爪牙。然后将这些玩家依次唤醒，并告知他们变成了什么角色。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/2/28/owc8naw8kwx5z1om04qs6j8aqs5djru.png"
+    "image": "/static/script-role-icons/reviewed/c477a4b0a8120ad904b276ce.png"
   },
   {
     "id": "4_hongshengti",
@@ -50,7 +50,7 @@
     "setup": true,
     "firstNightReminder": "唤醒任意一名村夫。让村夫指向一名玩家，对他给出拇指向上或向下的手势代表那名玩家的阵营。重复这个操作，直到所有村夫玩家都进行了夜晚行动。",
     "otherNightReminder": "唤醒任意一名村夫。让村夫指向一名玩家，对他给出拇指向上或向下的手势代表那名玩家的阵营。重复这个操作，直到所有村夫玩家都进行了夜晚行动。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/7/72/gyk4euf2w6acfyevvmeke03zvv8r1ln.png"
+    "image": "/static/script-role-icons/reviewed/2dbda130a0c765316a82b00d.png"
   },
   {
     "id": "5_hongshengti",
@@ -64,7 +64,7 @@
     ],
     "setup": false,
     "otherNightReminder": "对她点头或摇头来示意今天白天是否有恶魔投过票。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/8/89/qd1r9ozv96l6aftj402m46irjynbrem.png"
+    "image": "/static/script-role-icons/reviewed/464d3557ed905781a0abde34.png"
   },
   {
     "id": "6_hongshengti",
@@ -78,7 +78,7 @@
     ],
     "setup": false,
     "otherNightReminder": "对他点头或摇头示意今天白天是否有爪牙发起过提名。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/ed/8gb1ezkhqkc865jead15pevypmc72g9.png"
+    "image": "/static/script-role-icons/reviewed/f0f6f21909b8289ba11a1ca4.png"
   },
   {
     "id": "7_hongshengti",
@@ -90,7 +90,7 @@
     "setup": false,
     "firstNightReminder": "让筑梦师指向一名玩家。对他展示善良和邪恶的角色标记各一个，其中一个是属于该玩家的角色。",
     "otherNightReminder": "让筑梦师指向一名玩家。对他展示善良和邪恶的角色标记各一个，其中一个是属于该玩家的角色。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e8/qjwy9igjkubwnqrk2p4sd2fs4vj59mo.png"
+    "image": "/static/script-role-icons/reviewed/03feba9b60ae101898b34cf7.png"
   },
   {
     "id": "10_hongshengti",
@@ -105,7 +105,7 @@
     "setup": false,
     "firstNightReminder": "传教士选择一名玩家。如果选中了爪牙，则唤醒并告知他被传教士选中。",
     "otherNightReminder": "传教士选择一名玩家。如果选中了爪牙，则唤醒并告知他被传教士选中。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/6/6f/oi460mqpnxwd7zgyboe78patdo8amc5.png"
+    "image": "/static/script-role-icons/reviewed/c1bddaa5ed5c2a35ca25051e.png"
   },
   {
     "id": "11_hongshengti",
@@ -117,7 +117,7 @@
       "中毒"
     ],
     "setup": false,
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/c/c1/ga80xr3gx817rh5wiqq18d9hv8b6xje.png"
+    "image": "/static/script-role-icons/reviewed/daed1a6b2e583a80d95ba8fc.png"
   },
   {
     "id": "investigator",
@@ -135,7 +135,7 @@
     "edition": "tb",
     "flavor": "“这真是个散步的好夜晚，您说呢，莫罗佐夫先生？\n\n还是我应该称呼您为……莫罗佐夫男爵？”",
     "firstNightReminder": "展示那个爪牙角色标记。指向被你标记“爪牙”和“错误”的两名玩家。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/investigator.png",
+    "image": "/static/script-role-icons/reviewed/319c892a38a24029482db5e6.png",
     "isOfficial": true,
     "display": 1
   },
@@ -153,7 +153,7 @@
     "setup": false,
     "edition": "snv",
     "flavor": "“天啊！多么美妙的作品！我的作品……用你们的话怎么说来着……对，璀璨夺目！栩栩如生！没错！”",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/artist.png",
+    "image": "/static/script-role-icons/reviewed/3a88398c44d9eebfc4efa122.png",
     "isOfficial": true,
     "display": 1
   },
@@ -170,7 +170,7 @@
     "edition": "snv",
     "flavor": "“唯有受选者才能凝视面纱之外的光景。亡者躁动不安……他们的每一根僵硬的手指都指向了刺骨的北地。”",
     "otherNightReminder": "给他展示数字手势来告诉他当前已死亡的玩家中有多少玩家是邪恶的。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/oracle.png",
+    "image": "/static/script-role-icons/reviewed/52fcad7717d16af410f5937f.png",
     "isOfficial": true,
     "display": 1
   },
@@ -188,7 +188,7 @@
     "flavor": "“我的皮肤有些刺痛。\n\n这有些不太对劲。我能感觉得到。”",
     "firstNightReminder": "给他展示数字手势来告诉他与他邻近的存活玩家有几人是邪恶的。",
     "otherNightReminder": "给他展示数字手势来告诉他与他邻近的存活玩家有几人是邪恶的。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/empath.png",
+    "image": "/static/script-role-icons/reviewed/1e1211e7265703016840ee78.png",
     "isOfficial": true,
     "display": 1
   },
@@ -204,7 +204,7 @@
     "setup": false,
     "edition": "snv",
     "flavor": "“地上有七十二根火柴……今天的太阳落得更早，月亮还是按时升起……一块破布……庄园里的邪恶之物……三个又三个……我们相信的事物和他真正看到的不一样……绿光代表镁……残留物，但是图案不太对……地上有七十二根火柴……”",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/savant.png",
+    "image": "/static/script-role-icons/reviewed/38f851256c41dd235c8e787d.png",
     "isOfficial": true,
     "display": 1
   },
@@ -216,7 +216,7 @@
     "firstNight": 19,
     "setup": false,
     "firstNightReminder": "如果告密者在场，对爪牙展示三个不在场的善良角色标记。 ",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/6/67/q7r2sg4xzntxj5df6j7qepczuoer09p.png"
+    "image": "/static/script-role-icons/reviewed/9f32928a41a6da09cdb5023d.png"
   },
   {
     "id": "17_hongshengti",
@@ -229,7 +229,7 @@
     ],
     "setup": false,
     "otherNightReminder": "在当晚，一同唤醒所有爪牙和恶魔。对他们展示“该角色的能力对你生效”信息标记，然后展示帽匠角色标记。每名以此被唤醒的玩家可以选择摇头或指向角色列表上与自己当前角色类型相同的一个角色。如果一名玩家在做出自己的选择后会使得自己的角色与一名其他玩家选择的角色相同，对他摇头示意他重新选择。在选择完成后让他重新入睡。移除“今晚茶会”提示标记。根据这些玩家的选择，在魔典上执行相应的角色变化操作。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/c/c8/5x5dl09pjvag87d6gspfnq79hdiz72h.png"
+    "image": "/static/script-role-icons/reviewed/ca607db810e464ef74b455c7.png"
   },
   {
     "id": "goon",
@@ -245,7 +245,7 @@
     "setup": false,
     "edition": "bmr",
     "flavor": "“是的，老大。我跟那个家伙好好解释过了。他不愿意再听我解释一遍。不不，老大，我不需要医生——只是刀伤而已。明天早上就好了。”",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/goon.png",
+    "image": "/static/script-role-icons/reviewed/d3c3190b1b9f5375e590dbbe.png",
     "isOfficial": true,
     "display": 1
   },
@@ -261,7 +261,7 @@
     "setup": false,
     "edition": "tb",
     "flavor": "“侬康康窝咦锅惹，咋锅就怼窝恁锅粗暴。介样叭行。麻绳添酒嘿料，泥滴燕绳恨舔没，窝这哈圆酿泥料！侬晓得伐！窝叭象载康岛泥鸟，辣过饿魔阔能揍载窝家边乱晃。呔！窝揍斯弄个以斯！”",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/recluse.png",
+    "image": "/static/script-role-icons/reviewed/0a990d6b79017e79cb14f4a7.png",
     "isOfficial": true,
     "display": 1
   },
@@ -277,7 +277,7 @@
     ],
     "setup": false,
     "otherNightReminder": "刺客可以选择一名玩家。如果他这么做了，标记那名玩家死亡，且刺客失去能力，之后的夜晚无需再唤醒刺客。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/d0/ftyh3tzzolrzec1njghipdcbmk7opuf.png"
+    "image": "/static/script-role-icons/reviewed/ae72586fc72e129f5f5548a9.png"
   },
   {
     "id": "19_hongshengti",
@@ -293,7 +293,7 @@
     "setup": true,
     "firstNightReminder": "对他展示所有在场的外来者标记。",
     "otherNightReminder": "如果有外来者在今天白天死亡，让教父选择一名玩家。标记那名玩家死亡。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/a8/cp4tivyy734ut9fus8od0zub508qx8y.png"
+    "image": "/static/script-role-icons/reviewed/414db58c5bc541c008a63279.png"
   },
   {
     "id": "20_hongshengti",
@@ -309,7 +309,7 @@
     ],
     "setup": false,
     "firstNightReminder": "向寡妇展示魔典，她想看多久就看多久。在她查看完毕后让她选择一名玩家，标记那名玩家中毒。随后如果寡妇未醉酒中毒，唤醒一名善良玩家，对他展示寡妇角色标记。 ",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/1/1c/9jir4i7ci8p8onrf70xvm49jx5t5l72.png"
+    "image": "/static/script-role-icons/reviewed/d52524882a495b7f79a93feb.png"
   },
   {
     "id": "21_hongshengti",
@@ -325,7 +325,7 @@
     ],
     "setup": false,
     "otherNightReminder": "如果红唇女郎今天变成了小恶魔，对她展示“你是”信息标记，和小恶魔角色标记。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/9/9a/39mexl68b71eyydru1jkze79qhwlfib.png"
+    "image": "/static/script-role-icons/reviewed/e363b4d8f2adaeef76633f48.png"
   },
   {
     "id": "22_hongshengti",
@@ -339,7 +339,7 @@
     ],
     "setup": true,
     "firstNightReminder": "如果提线木偶在场，对恶魔展示提线木偶角色标记并指向提线木偶玩家。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e5/el29kr1dznrpaa089tayj3chd444s6k.png"
+    "image": "/static/script-role-icons/reviewed/b95c5fc0ac2f7d82f4e090cc.png"
   },
   {
     "id": "xaan",
@@ -360,7 +360,7 @@
     "flavor": "“他们接连倒下。一个，又一个。两个，三个，五个。”",
     "firstNightReminder": "如果初始外来者的数量等于1，则标记大限将至。",
     "otherNightReminder": "如果初始外来者的数量等于当前游戏的夜晚数，则标记大限将至。",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202411/c_7860002933371_9c39e151.jpg",
+    "image": "/static/script-role-icons/reviewed/7880c7ed057f4b9ef214a060.png",
     "isOfficial": true,
     "display": 1
   },
@@ -378,7 +378,7 @@
     "setup": true,
     "firstNightReminder": "唤醒所有爪牙，允许他们以指向的方式决定谁照看小怪宝，但不能产生其他交流，否则会有非常糟糕的事情发生。",
     "otherNightReminder": "唤醒所有爪牙，允许他们以指向的方式决定谁照看小怪宝，但不能产生其他交流，否则会有非常糟糕的事情发生。说书人选择一名玩家，那名玩家死亡。",
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/8/8f/8hdy40avvq6iiq66v8dnhf4hpl3ad3b.png"
+    "image": "/static/script-role-icons/reviewed/a80be630b8c704776cddf98c.png"
   },
   {
     "id": "_hongshengti",
@@ -393,6 +393,6 @@
       "傀儡"
     ],
     "setup": false,
-    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/2/23/9fmohn9ldebl3ntosy95ho1wt1vmrng.png"
+    "image": "/static/script-role-icons/reviewed/e66b4361178086a913914b0b.png"
   }
 ]

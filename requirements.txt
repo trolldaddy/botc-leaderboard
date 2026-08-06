@@ -7,3 +7,4 @@ requests
 aiofiles
 opencc-python-reimplemented
 beautifulsoup4
+Pillow

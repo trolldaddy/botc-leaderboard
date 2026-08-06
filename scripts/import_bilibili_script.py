@@ -23,10 +23,12 @@ ENTRY_TYPE_ALIASES = {
     "jinxed": "jinx", "a jinxed": "jinx", "special": "special", "other": "special",
 }
 OFFICIAL_ICON_CANONICAL_IDS = {
+    "300px-clockmaker.png": "clockmaker",
     "limao.png": "limao",
     "barber.png": "barber",
     "kazali.png": "kazali",
 }
+DEFAULT_JINX_IMAGE_URL = "/static/script-role-icons/reviewed/djinn.png"
 ROLE_CATALOG_PATH = Path(__file__).resolve().parents[1] / "static" / "js" / "roles_db.js"
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -39,6 +41,12 @@ def normalized_role_name(value):
     converted = TO_TRADITIONAL.convert(str(value or "").strip())
     return re.sub(r"^[^0-9a-zA-Z\u4e00-\u9fff]+", "", converted).casefold()
 
+
+OFFICIAL_NAME_CANONICAL_IDS = {
+    normalized_role_name("鐘錶匠"): "clockmaker",
+    normalized_role_name("鐘表匠"): "clockmaker",
+    normalized_role_name("钟表匠"): "clockmaker",
+}
 
 def normalized_role_id(value):
     """Compare common BOTC IDs regardless of separators or letter case."""
@@ -86,6 +94,9 @@ def find_catalog_role(reference):
         role = OFFICIAL_ROLE_CATALOG["by_name"].get(normalized_role_name(candidate))
         if role:
             return role
+        canonical_id = OFFICIAL_NAME_CANONICAL_IDS.get(normalized_role_name(candidate))
+        if canonical_id:
+            return OFFICIAL_ROLE_CATALOG["by_id"].get(canonical_id)
     filename = image_filename(reference.get("image"))
     role = OFFICIAL_ROLE_CATALOG["by_image"].get(filename)
     if role:
@@ -259,7 +270,9 @@ def main():
                 external_id=item["id"],
                 name_zh_tw=TO_TRADITIONAL.convert(item.get("name") or item["id"]),
                 entry_type=normalized_entry_type(item.get("team")),
-                image_url=item.get("image") or None,
+                image_url=item.get("image") or (
+                    DEFAULT_JINX_IMAGE_URL if normalized_entry_type(item.get("team")) == "jinx" else None
+                ),
                 ability=TO_TRADITIONAL.convert(item.get("ability") or "") or None,
                 sort_order=index,
             ))

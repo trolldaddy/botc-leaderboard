@@ -68,6 +68,16 @@ def test_find_role_uses_official_icon_filename_for_custom_ids():
             assert catalog_role["id"] == canonical_id
         assert normalized_entry_type("a jinxed") == "jinx"
         assert normalized_entry_type("unknown type") == "special"
+        assert find_catalog_role({"name": "\u9418\u9336\u5320"})["id"] == "clockmaker"
+        assert find_catalog_role({"name": "\u9418\u8868\u5320"})["id"] == "clockmaker"
+        assert find_catalog_role({"name": "\u949f\u8868\u5320"})["id"] == "clockmaker"
+        clockmaker = Role(canonical_key="clockmaker", name_zh_tw="鐘錶匠", team="townsfolk")
+        session.add(clockmaker)
+        session.commit()
+        assert find_role(session, {
+            "id": "legacy-clockmaker", "name": "钟表匠",
+            "image": "https://example.test/300px-Clockmaker.png",
+        }).id == clockmaker.id
     finally:
         session.close()
 

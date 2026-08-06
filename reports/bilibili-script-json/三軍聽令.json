@@ -18,7 +18,7 @@
   },
   {
     "id": "xsg_cq1",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0e854c1b8.png",
+    "image": "/static/script-role-icons/reviewed/76c2f7b2dcad51983ca4c376.png",
     "name": "天意修正",
     "team": "fabled",
     "firstNightReminder": "編輯天意魔典。",
@@ -26,12 +26,11 @@
     "firstNight": 5003,
     "otherNight": 94555555,
     "ability": "首個夜晚，惡魔玩家準備一份備用魔典，決定每名玩家的生死狀態及角色（魔典上存活玩家數不得小於4或大於8，且只能有一個惡魔）。該魔典會在第n天的黎明時（n為天意魔典死亡玩家數），由說書人宣布替換當前魔典。魔典修正不會更改玩家陣營。說書人可能會修改一處魔典並告知惡魔。",
-    "reminders": [
-    ]
+    "reminders": []
   },
   {
     "id": "xsg_cq2",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0e8553b94.png",
+    "image": "/static/script-role-icons/reviewed/cf8aa2b1fef43970ab323bfa.png",
     "name": "玉璽",
     "team": "fabled",
     "firstNightReminder": "",
@@ -45,7 +44,7 @@
   },
   {
     "ability": "每個白天限一次，你可以加入僅有兩人的私聊頻道。",
-    "image": "https://free.picui.cn/free/2025/12/05/69329706358f0.png",
+    "image": "/static/script-role-icons/reviewed/b31ce55323c17bbd3baad015.png",
     "edition": "custom",
     "id": "sjtllxz_1",
     "firstNightReminder": "",
@@ -60,7 +59,7 @@
   },
   {
     "ability": "每個白天，你可以公開選擇一名玩家：如果他清醒且健康，他醉酒至下一天黎明；否則他恢覆清醒健康。",
-    "image": "https://free.picui.cn/free/2025/12/14/693eb92c64176.png",
+    "image": "/static/script-role-icons/reviewed/e5cc9c74c6a79a56b042685e.png",
     "edition": "custom",
     "id": "sjtllxz_2",
     "firstNightReminder": "",
@@ -77,7 +76,7 @@
   },
   {
     "ability": "每個白天，如果當天已經發起過三次提名，當有玩家發起提名時，你可以立刻處決提名者。",
-    "image": "https://free.picui.cn/free/2025/12/14/693eb92ca19b2.png",
+    "image": "/static/script-role-icons/reviewed/39ff630d71730c80b9e24345.png",
     "edition": "custom",
     "id": "sjtllxz_3",
     "firstNightReminder": "",
@@ -96,7 +95,7 @@
   },
   {
     "ability": "你沒有初始陣營。每個夜晚，選擇一名玩家（與上一晚不同），你轉變為他的陣營。如果下個白天他被提名，提名者可能會死亡。",
-    "image": "https://free.picui.cn/free/2025/12/14/693eb92d077da.png",
+    "image": "/static/script-role-icons/reviewed/7d95b027455d9497937296ec.png",
     "edition": "custom",
     "flavor": "",
     "id": "sjtllxz_4",
@@ -114,7 +113,7 @@
   },
   {
     "ability": "每個黎明，你要選擇一名玩家：他今天白天和夜晚只能以兩個字一斷句的方式發言。",
-    "image": "https://free.picui.cn/free/2025/12/14/693eb92ccf928.png",
+    "image": "/static/script-role-icons/reviewed/830cc65f6951591ca67469db.png",
     "edition": "custom",
     "flavor": "",
     "id": "sjtllxz_5",
@@ -132,7 +131,7 @@
   },
   {
     "ability": "首個夜晚，你選擇一個鎮民角色和一個爪牙角色：如果他們其中一人死亡，另一人會在下一個夜晚死亡。若你選擇的角色不全部在場，改為由說書人選擇一名善良玩家和一名邪惡玩家。",
-    "image": "https://free.picui.cn/free/2026/02/05/6983fa6288e42.png",
+    "image": "/static/script-role-icons/reviewed/7fce2887cba99fca57c00fec.png",
     "edition": "custom",
     "flavor": "",
     "id": "sjtllxz_6",
@@ -150,7 +149,7 @@
   },
   {
     "ability": "在你的首個夜晚，你會得知三名玩家與其中之一的角色。每局遊戲限一次，在白天時，你可以私下向說書人猜測其中哪名玩家是該角色。若猜測正確，你會在當晚額外得知三名玩家與其中之一的角色。[+0~1外來者]",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0db5cab7b.png",
+    "image": "/static/script-role-icons/reviewed/9502f87ce1028501d91109e6.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm3",
@@ -170,7 +169,7 @@
   },
   {
     "ability": "每個白天，你可以私下詢問說書人以得知兩條信息：一個對應與你距離最近的存活玩家，一個對應與你距離最遠的存活玩家。如果與你鄰近的存活玩家中有邪惡的，你可能會得知錯誤信息。你可能會在首個夜晚得知“本局被天意侵蝕”。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0db5bf1c7.png",
+    "image": "/static/script-role-icons/reviewed/41be79caf2e76806fda7a229.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm4",
@@ -179,15 +178,14 @@
     "name": "袁紹",
     "otherNight": 0,
     "setup": false,
-    "reminders": [
-    ],
+    "reminders": [],
     "remindersGlobal": [],
     "team": "townsfolk",
     "firstNight": 13001
   },
   {
     "ability": "在你的首個夜晚，你要選擇一個數字。你會在對應數字的夜晚得知一名玩家與他的角色。若你死於對應數字的夜晚，你可以選擇至多三名玩家，得知他們的角色。 ",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d37f24f2.png",
+    "image": "/static/script-role-icons/reviewed/2737bfde058f39b2f3d5da2b.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm6",
@@ -209,7 +207,7 @@
   },
   {
     "ability": "遊戲開始時，你獲得“玉璽”。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d396e550.png",
+    "image": "/static/script-role-icons/reviewed/e13ed7475b4f814efc20963d.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm7",
@@ -218,14 +216,13 @@
     "name": "孫策",
     "otherNight": 0,
     "setup": false,
-    "reminders": [
-    ],
+    "reminders": [],
     "team": "townsfolk",
     "firstNight": 4998
   },
   {
     "ability": "每個夜晚，你要選擇一名玩家（與上一晚不同）：若他的相鄰存活玩家中有爪牙，直到下個黃昏，他不會死亡。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0db63510c.png",
+    "image": "/static/script-role-icons/reviewed/81e11761e6bd3caaeee732ad.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm11",
@@ -243,7 +240,7 @@
   },
   {
     "ability": "每個夜晚，你要選擇一名玩家：你會得知他與你上一夜所選玩家的一個共同特點。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d3d91a38.png",
+    "image": "/static/script-role-icons/reviewed/6ab4ba1f565d81c56b523f57.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm13",
@@ -261,7 +258,7 @@
   },
   {
     "ability": "每個夜晚，你要選擇兩名玩家。你會得知他們其中一人在天意修正後的角色及陣營。如果你選中惡魔，當晚你醉酒。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d38d22c2.png",
+    "image": "/static/script-role-icons/reviewed/8ba6bd00777c540ed95f14d3.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm15",
@@ -279,7 +276,7 @@
   },
   {
     "ability": "每個夜晚*，你要選擇一名玩家：直到下個黃昏，他不會死亡。被你選擇過的玩家隨時可能死亡。天意修正後，你一定處於死亡狀態。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d469e729.png",
+    "image": "/static/script-role-icons/reviewed/d13aaba7cc25ece8c8228826.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm5",
@@ -298,7 +295,7 @@
   },
   {
     "ability": "每局遊戲限一次，你可以在你的第1/2/3個白天拜訪說書人，查看六分之一/四分之一/三分之一的天意魔典（無陣營標識）。若你以此法看到惡魔，當你瘋狂證明該玩家“是邪惡”時，你轉換陣營，即使你已死亡。你可能會在首個夜晚得知“本局被天意侵蝕”。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d420fca2.png",
+    "image": "/static/script-role-icons/reviewed/6f1f64f3cc178111cde6abbf.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm1",
@@ -317,7 +314,7 @@
   },
   {
     "ability": "每個白天，你可以公開辱罵一名玩家：當晚你會得知該玩家是否為邪惡陣營。始終會有一名善良玩家被你的能力當作邪惡陣營。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d4730a6a.png",
+    "image": "/static/script-role-icons/reviewed/7e64fde2518b87d959bb0356.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm10",
@@ -336,7 +333,7 @@
   },
   {
     "ability": "每個白天，你可以拜訪說書人並選擇一個未選擇過的善良角色:你獲得他的能力直到下一天黃昏。如果該角色在場，你醉酒。你不會被天意侵蝕。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d38a32b2.png",
+    "image": "/static/script-role-icons/reviewed/d473c278845b67afa979b631.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm2",
@@ -356,7 +353,7 @@
   },
   {
     "ability": "如果你在白天被提名過，當晚你會得知當天有多少名邪惡玩家給你投票。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d444c4e4.png",
+    "image": "/static/script-role-icons/reviewed/4a6710f05da896a020df0779.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm8",
@@ -372,7 +369,7 @@
   },
   {
     "ability": "每個白天，如果你公開對一名死亡的玩家道喜：你可以私下詢問說書人以得知一條關於他的正確信息。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0db5299ab.png",
+    "image": "/static/script-role-icons/reviewed/8852b248e2a8e0927a6229b9.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm9",
@@ -390,7 +387,7 @@
   },
   {
     "ability": "若你在白天沒有進行投票及提名，當晚選擇你的能力可能會改為選擇與你鄰近的存活玩家作為替代，然後你會得知今晚你的能力發動了幾次。你可能會在首個夜晚得知“本局被天意侵蝕”。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0db8e34d2.png",
+    "image": "/static/script-role-icons/reviewed/8ff28972e158a73bd80ff6cc.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm14",
@@ -408,7 +405,7 @@
   },
   {
     "ability": "你可以在白天公開宣稱“你不就是想要許攸這顆頭嗎？”。當晚如果惡魔沒有選擇你，他的能力可能會失效至黎明，並得知你是許攸。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0d38d2f2f.png",
+    "image": "/static/script-role-icons/reviewed/95bdce0bc46632ff24459fbe.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm16",
@@ -426,7 +423,7 @@
   },
   {
     "ability": "你首次死亡時會被當作仍然存活。每局遊戲限一次，如果你在被當作仍然存活時的白天拜訪了說書人，你得知你的能力被觸發，然後你覆活並醉酒。",
-    "image": "https://free.picui.cn/free/2025/12/03/692f0db5c7b08.png",
+    "image": "/static/script-role-icons/reviewed/5102b1b2a36d9ef7f4e4b51f.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zm12",
@@ -445,7 +442,7 @@
   },
   {
     "ability": "你以為你是一個在場的鎮民角色。你擁有他的能力。每個夜晚，你們其中一人醉酒直到下個黃昏。",
-    "image": "https://free.picui.cn/free/2025/11/26/69266070127e0.png",
+    "image": "/static/script-role-icons/reviewed/cf5d18b6b764336ed494647f.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_wl1",
@@ -454,8 +451,7 @@
     "name": "關羽",
     "otherNight": 11,
     "setup": true,
-    "reminders": [
-    ],
+    "reminders": [],
     "remindersGlobal": [
       "是關羽",
       "醉酒"
@@ -465,7 +461,7 @@
   },
   {
     "ability": "在你的首個夜晚，你得知一名善良玩家與一名邪惡玩家。如果他們之一死亡，你在當晚轉換陣營，即使你已死亡。",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0ceb4518f.png",
+    "image": "/static/script-role-icons/reviewed/f5a00ebadeb9587a5861e5b7.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_wl2",
@@ -485,7 +481,7 @@
   },
   {
     "ability": "惡魔知道劉協在場。當你死亡時，天意修正會在下一個黎明到來，然後所有玩家都會知道哪些玩家是邪惡的。你不會被天意侵蝕。",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0ceb1f41f.png",
+    "image": "/static/script-role-icons/reviewed/4c195d1448547b0e409cd57d.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_wl3",
@@ -501,7 +497,7 @@
   },
   {
     "ability": "呂布在因自身能力選擇目標時，可能會改為選中你。呂布死亡後你隨時可能死亡。[+呂布]",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0ceb373c9.png",
+    "image": "/static/script-role-icons/reviewed/2d6e7a6280f35d8e5b19ae5b.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_wl4",
@@ -519,7 +515,7 @@
   },
   {
     "ability": "你不參與邪惡互認。每局遊戲限一次，在夜晚時*，你可以選擇一名玩家，若他不是惡魔，他轉變為邪惡的在場惡魔角色；然後原惡魔死亡，即使因為任何原因讓他不會死亡。",
-    "image": "https://free.picui.cn/free/2025/11/26/692660701cf87.png",
+    "image": "/static/script-role-icons/reviewed/369dbf01dda3d4638061f284.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zy1",
@@ -539,7 +535,7 @@
   },
   {
     "ability": "所有玩家都知道你是張飛。爪牙與惡魔不會互相認識，你只能參加兩人以上的私聊且不會死於處決。每個白天，你要選擇除你以外的一名存活玩家：他死亡。當惡魔因此死亡而導致遊戲結束時，再額外進行一個夜晚和一個白天，你選擇的下一個玩家的陣營獲勝。天意修正後，你一定處於死亡狀態。",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0c86673ee.png",
+    "image": "/static/script-role-icons/reviewed/61f7ce92e2b6d161d3a8c2d4.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zy2",
@@ -557,7 +553,7 @@
   },
   {
     "ability": "每個夜晚，你要選擇一名存活玩家並編造一條信息：他明天白天和夜晚需要瘋狂地證明這條信息是正確的，否則他可能會被處決。",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0c876f929.png",
+    "image": "/static/script-role-icons/reviewed/bf21224e0f3840e863fbf864.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zy3",
@@ -575,7 +571,7 @@
   },
   {
     "ability": "每個夜晚，你要選擇一名玩家：他中毒直到下個黃昏，如果他上個夜晚被你選擇過，他死亡，然後你中毒。",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0c8f290b0.png",
+    "image": "/static/script-role-icons/reviewed/24c9336fcaa7dabe1e594cd5.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zy4",
@@ -594,7 +590,7 @@
   },
   {
     "ability": "每個夜晚，你要選擇一名玩家：如果他在當晚選擇了你，那麼他會在白天代替其他玩家被處決。如果白天沒人被處決，邪惡陣營獲勝。",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0c8f56f20.png",
+    "image": "/static/script-role-icons/reviewed/eb539bdd6598d36f1de36c5f.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_zy5",
@@ -612,7 +608,7 @@
   },
   {
     "ability": "：說書人決定天意魔典（至多有半數玩家存活）且具有一名爪牙的能力。首個夜晚，等同於初始邪惡玩家數的善良玩家被天意侵蝕（加入邪惡）並互認，隨後一名善良玩家得知本局被天意侵蝕。每個夜晚*，可能會有一名玩家死亡。當天意修正到來時，邪惡陣營獲勝。只有處決說書人善良陣營才能獲勝。[外來者數量任意，無惡魔爪牙在場]",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0c8796878.png",
+    "image": "/static/script-role-icons/reviewed/64e52ccbb33a87d5adee3f89.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_em1",
@@ -621,8 +617,7 @@
     "name": "天意",
     "otherNight": 8001,
     "setup": true,
-    "reminders": [
-    ],
+    "reminders": [],
     "remindersGlobal": [
       "天意侵蝕",
       "被知曉",
@@ -633,7 +628,7 @@
   },
   {
     "ability": "每個夜晚，你要選擇一名玩家：他會被當作邪惡的曹操，且在下一個夜晚死亡。你可能會被當作任何陣營和任何角色。[-1外來者]",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0c8cd9f8d.png",
+    "image": "/static/script-role-icons/reviewed/5617a3c80654c9d0a7373230.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_em2",
@@ -652,7 +647,7 @@
   },
   {
     "ability": "每個夜晚*，你要選擇一名玩家。你每晚可以行動兩次。當一名玩家再次被你選中時，他死亡。如果你殺死自己，會有一名被你選擇過一次的玩家變成邪惡的劉備，但每局遊戲僅能成功轉化一次。",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0c900a99b.png",
+    "image": "/static/script-role-icons/reviewed/9635151836ba9cca966cb270.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_em3",
@@ -672,7 +667,7 @@
   },
   {
     "ability": "每個夜晚*，你要選擇一名玩家：他可能死亡。如果只有一名邪惡玩家存活，你變成江東之主：每個夜晚*，你要選擇一名玩家，他中毒且在黎明時死亡。[所有邪惡玩家都是孫權]",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0c853f4bb.png",
+    "image": "/static/script-role-icons/reviewed/31314025f1f0b9d24961b0b7.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_em4",
@@ -692,7 +687,7 @@
   },
   {
     "ability": "說書人決定天意魔典並告知你。每個夜晚*，你要選擇一個角色：他死亡。如果該角色不在場，可能會有一名玩家死亡。天意修正前，你不會死亡。",
-    "image": "https://free.picui.cn/free/2025/12/02/692f0c900b24f.png",
+    "image": "/static/script-role-icons/reviewed/b8d87a1f3edfc6e67427bd47.png",
     "edition": "custom",
     "flavor": "",
     "id": "xsg_em5",

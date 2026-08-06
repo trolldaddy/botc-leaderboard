@@ -1,1 +1,451 @@
-[{"id":"_meta","name":"The Chamber of Secrets","author":"JJ and Mas","logo":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/_meta.png","almanac":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/almanac.html"},{"id":"hagrid_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/hagrid_hp2_2.png","firstNightReminder":"Wake Hagrid and point at a player who is a Gryffindor","reminders":["Gryffindor",""],"name":"Hagrid","team":"townsfolk","ability":"You start knowing a player is Ron, Hermione, Harry or Neville.","flavor":"\"There's A Storm Coming Harry, We'd All Best Be Ready When She Does\"","firstNight":20},{"id":"ronweasley_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/ronweasley_hp2_2.png","firstNightReminder":"Wake and tell them a player who was chosen by the evil team tonight.","otherNightReminder":"Wake and tell them a player who was chosen by the evil team tonight.","reminders":["Check"],"name":"Ron Weasley","team":"townsfolk","ability":"Each night learn a player who was selected by the evil team tonight","flavor":"Well, White moves first. And then... We play.","firstNight":22,"otherNight":20},{"id":"mcgonagall_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/mcgonagall_hp2_2.png","firstNightReminder":"Wake and ask if they would like to use ability. If so ask them to choose a character. Mark any chosen in play character as 'Detention'.","otherNightReminder":"Wake and ask if they would like to use ability. If so ask them to choose a character. Mark any chosen in play character as 'Detention'.","reminders":["Detention","Detention","Detention","Detention","Detention"],"name":"McGonagall","team":"townsfolk","ability":"Each Night, you may choose a Townsfolk character. You gain their ability for one night. If they are in play they are drunk until you die. (You may not choose the same character twice)","flavor":"No, you heard me correctly, Mr. Malfoy. You see, honourable as your intentions were, you too were out of bed after hours. You will join your classmates in detention.","firstNight":14,"otherNight":2},{"id":"hermione_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/hermione_hp2_2.png","firstNightReminder":"Wake and ask which player to pick, show character type.","otherNightReminder":"If they corrected someone: Wake and ask which player to pick, show character type.","reminders":["Corrected someone"],"name":"Hermione","team":"townsfolk","ability":"On the fist night, pick a player. You learn their character type. (The Dark Lord will register as Townsfolk). If you publicly correct someone today, the Storyteller might let you act again tonight.","flavor":"Now if you two don\u2019t mind, I\u2019m going to bed before either of you come up with another clever idea to get us killed - or worse, expelled.","firstNight":21,"otherNight":14},{"id":"snape_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/snape_hp2_2.png","firstNightReminder":"Wake them to choose a player","otherNightReminder":"Wake them to choose a player","reminders":["Defended"],"name":"Snape","team":"townsfolk","ability":"Each night, choose a player (Not Yourself). The chosen player is safe from Minion abilities during the night and the following day. ","flavor":"The Dark Arts are many, varied, ever-changing and eternal. Fighting them is like fighting a many-headed monster, which, each time a neck is severed, sprouts a head even fiercer and cleverer than before","firstNight":15,"otherNight":3},{"id":"siriusblack_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/siriusblack_hp2_2.png","firstNightReminder":"Wake and ask if they would like to switch form. ","otherNightReminder":"Wake and ask if they would like to switch form. If they died in the night while human, wake to tell them to choose 2 players. Show them a 0, 1 or 2 based on if the players are evil or are horcruxes.","reminders":["Animagus form"],"setup":true,"name":"Sirius Black","team":"townsfolk","ability":"Each night, choose to turn into your Animagus form. In Animagus form, you can only die by execution. If you die at night, choose 2 players you learn how many are evil.","flavor":"You Don't Understand \u2014 There Are Things Worth Dying For!","firstNight":19,"otherNight":16},{"id":"remuslupin_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/remuslupin_hp2_2.png","otherNightReminder":"Wake to make choose a player, the previously chosen player dies if good. They are the only player that can die tonight.","reminders":["Dead","Drunk"],"name":"Remus Lupin","team":"townsfolk","ability":"Each night*, choose an alive player: if good, they die. If Evil you are drunk permanently. if a player dies by your ability they are the only player that can die tonight.","flavor":"People Are Disappearing Daily. If We Start Fighting Amongst Ourselves, We're Doomed.","otherNight":6},{"id":"neville_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/neville_hp2_2.png","reminders":["Ability used"],"name":"Neville","team":"townsfolk","ability":"Once per game, during the day, publicly choose a player: if they are a Minion, they die.","flavor":"\"People die everyday... but they're still with us... in here\""},{"id":"lunalovegood_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/lunalovegood_hp2_2.png","otherNightReminder":"Mark the grimoire with a spirited token ","reminders":["Spirited"],"name":"Luna Lovegood","team":"townsfolk","ability":"Each day, visit the storyteller to learn 2 players, 1 is the player who the storyteller feels had the most positive effect for the good team yesterday.","flavor":"I sleepwalk, you see. That\u2019s why I wear shoes to bed.","otherNight":19},{"id":"madeyemoody_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/madeyemoody_hp2_2.png","otherNightReminder":"Wake if they have satisfied madness and tell the targeted players alignment ","reminders":["Mad-Eye's gaze"],"name":"Mad-Eye Moody","team":"townsfolk","ability":"Each day, if you are mad that a different player is evil, that night you may learn their alignment.","flavor":"Nothing like a night time stroll to give you... ideas.","otherNight":13},{"id":"harrypotter_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/harrypotter_hp2_2.png","reminders":["Lived","Dark Lord Weakened"],"setup":true,"name":"Harry Potter","team":"townsfolk","ability":"You are a Horcrux. The first time you are killed by the dark lord, you are not and all evil characters are drunk until tommorow.","flavor":"The boy who lived."},{"id":"dumbledore_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/dumbledore_hp2_2.png","otherNightReminder":"Wake if killed and ask to pick a player","reminders":["Died Today"],"remindersGlobal":["Drunk"],"name":"Dumbledore","team":"townsfolk","ability":"If you are killed at night, pick a player. They learn who you were. If they are evil, they are drunk the following day and next night. ","flavor":"Curiosity is not a sin. But we should exercise caution with our curiosity... yes, indeed.","otherNight":18},{"id":"fawkes_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/fawkes_hp2_2.png","otherNightReminder":"Wake if killed, show them the character type who killed them. Resurrect them the following night.","reminders":["Resurrects tonight","Risen"],"name":"Fawkes","team":"townsfolk","ability":"Your Neighbours cannot be poisoned. When you die at night, learn the character type of the player that killed you and resurrect at the beginning of the following night. After resurrecting you no longer have an ability.","flavor":"He's been looking dreadful for days; I've been telling him to get a move on.","otherNight":17},{"id":"dracomalfoy_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/dracomalfoy_hp2_2.png","firstNightReminder":"Wake the Good Recruiter (If Alive) and show them the Draco Malfoy character token, ask them to choose a player. Wake the Evil Recruiter (If Alive) and show them the Draco Malfoy character token, ask them to choose a player, even if Draco has been successfully guessed.","otherNightReminder":"Wake the Good Recruiter (If Alive) and show them the Draco Malfoy character token, ask them to choose a player. Wake the Evil Recruiter (If Alive) and show them the Draco Malfoy character token, ask them to choose a player, even if Draco has been successfully guessed.","reminders":["Recruited","Recruiter","Recruiter"],"setup":true,"name":"Draco Malfoy","team":"outsider","ability":"Each night, both an evil player (Lucius if in play) and a good player, may guess who you are. You permanently turn the alignment of whoever correctly guesses you first. (Good guesses first)","flavor":"Didn't mummy ever tell you it was rude to eavesdrop, Potter?","firstNight":18,"otherNight":5},{"id":"scabbers_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/scabbers_hp2_2.png","reminders":["Betrayed","Drunk"],"name":"Scabbers","team":"outsider","ability":"Each day you must publicly guess the good role of one living player (Not yourself). If wrong, that player may be drunk tonight. This ability continues even if dead. ","flavor":"I solemnly swear that I am up to no good"},{"id":"dobby_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/dobby_hp2_2.png","firstNightReminder":"Wake and ask to pick a player as Master","otherNightReminder":"Wake Dobby if they are free","reminders":["Master","Free"],"name":"Dobby","team":"outsider","ability":"On Night 1, choose a player to be your Master. If your Master would die, you die instead. Your master may approach the storyteller to free you from service, you may then use this ability at anytime.","flavor":"Master has given Dobby a sock, Dobby is a free elf!","firstNight":16,"otherNight":15},{"id":"lockhart_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/lockhart_hp2_2.png","remindersGlobal":["Is Lockhart"],"setup":true,"name":"Lockhart","team":"outsider","ability":"You think you are a townsfolk but you are not. Any time you claim to have used or attempt to use an ability that you were not shown, something bad might happen.","flavor":"Uh, the point is, uh, you can no longer feel any pain. And, very clearly, the bones are not broken."},{"id":"nagini_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/nagini_hp2_2.png","firstNightReminder":"Choose who to poison first.","otherNightReminder":"Choose who to poison. Potentially inform Neville he was chosen by Nagini (He is still poisoned) ","name":"Nagini","team":"minion","ability":"You are a Horcrux. Each night, choose a player: they are poisoned tonight and tomorrow day. If you choose Neville this way, Neville learns this.","flavor":"You know Voldemort's snake, Neville? He's got a huge snake... Calls it Nagini... It's got to be killed.","firstNight":13,"otherNight":7},{"id":"basilisk_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/basilisk_hp2_2.png","otherNightReminder":"Wake and ask to pick a player","reminders":["Petrified","Dies"],"name":"Basilisk","team":"minion","ability":"Each night*, choose a player. If they would awake that night due to their own ability, they die. If they did not wake, they can no longer wake while you live. Whenever they would wake they learn this. If the chosen player is Harry Potter, you die instead.","flavor":"The Basilisk has a murderous stare, and all who are fixed with the beam of its eye shall suffer instant death.","otherNight":8},{"id":"grindelwald_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/grindelwald_hp2_2.png","otherNightReminder":"Wake and ask them to choose a dead player","reminders":["Ability Taken","Was Grindelwald"],"name":"Grindelwald","team":"minion","ability":"Each night* choose a dead player, you may use their ability. If The Dark Lord was to die, you become the new Dark Lord and deaths are arbitrary. [-1 Outsider]","flavor":"Magic blooms... only in rare souls. Still, we must skulk in shadows. But the old ways serve us no longer.","otherNight":4},{"id":"bellatrix_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/bellatrix_hp2_2.png","name":"Bellatrix","team":"minion","ability":"After night 2, before nominations you may claim Bellatrix, If you do a good player dies, even if for some reason they could not. If you are executed, you do not die unless an evil player voted.","flavor":"I killed Sirius Black!"},{"id":"luciusmalfoy_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/luciusmalfoy_hp2_2.png","setup":true,"name":"Lucius Malfoy","team":"minion","ability":"You may register falsely to all abilities [+1 Outsider and +Draco Malfoy]","flavor":"Now, now Draco. Play nicely"},{"id":"lordvoldemort_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/lordvoldemort_hp2_2.png","firstNightReminder":"Wake and tell them all players who possess a horcrux. ","otherNightReminder":"Wake to make them kill someone","reminders":["Horcrux","Horcrux","Horcrux","Dead"],"setup":true,"name":"Lord Voldemort","team":"demon","ability":"Each night*, choose a player: they die. You die if and only if all horcruxes are dead. You learn which players are horcruxes. A player possessing a horcrux registers as a minion. [3 players are Horcruxes, + Nagini] ","flavor":"I, who have gone further than anybody along the path that leads to immortality....","firstNight":11,"otherNight":10},{"id":"thedeatheaters_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/thedeatheaters_hp2_2.png","otherNightReminder":"Wake all Minions and ask them to vote on a player to kill.","reminders":["Dead"],"setup":true,"name":"The Deatheaters","team":"demon","ability":"Each night*, alive minions point at a player to kill. The game ends when all minions are dead. [- 1 demon, 1 Townsfolk is evil]","special":[{"name":"pointing","type":"ability","time":"day"}],"flavor":"You know he can control people so that they do terrible things without being able to stop themselves.","otherNight":9},{"id":"tomriddle_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/tomriddle_hp2_2.png","otherNightReminder":"Wake to make them kill someone","reminders":["Dead Outsider","Dead"],"name":"Tom Riddle","team":"demon","ability":"Each night*, choose a player: they die. If an Outsider is chosen, you may choose again. [+1 Outsider]","flavor":"I can make bad things happen to people who are mean to me. I can make them hurt, if I want.","otherNight":11},{"id":"youknowwho_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/youknowwho_hp2_2.png","firstNightReminder":"Wake and tell Secret word","otherNightReminder":"Wake to make them kill someone","reminders":["Said The Word","Dead"],"setup":true,"name":"You-Know-Who","team":"demon","ability":"Each night*, choose a player: they die. If you kill yourself this way, a Minion becomes The Dark Lord. You start knowing a secret word. Any good player that says the word might die.","flavor":" Yes. You see what I've become? See what I must do to survive? Live off another, a mere parasite!","firstNight":12,"otherNight":12},{"id":"newtscamander_hp2_2","image":"https:\/\/www.bloodstar.xyz\/p\/sc911\/HP2_2\/newtscamander_hp2_2.png","firstNightReminder":"If Newt would wake due to their ability wake them now","otherNightReminder":"If Newt would wake due to their ability wake them now","setup":true,"name":"Newt Scamander","team":"traveller","ability":"During your arrival approach the storyteller to discuss a magical beast. The storyteller will give you an ability based on this magical beast.","flavor":"The unicorn\u2019s horn, blood and hair all have highly magical properties.","firstNight":17,"otherNight":21}]
+[
+  {
+    "id": "_meta",
+    "name": "??????",
+    "author": "JJ and Mas",
+    "logo": "https://www.bloodstar.xyz/p/sc911/HP2_2/_meta.png",
+    "almanac": "https://www.bloodstar.xyz/p/sc911/HP2_2/almanac.html",
+    "name_en": "The Chamber of Secrets"
+  },
+  {
+    "id": "hagrid_hp2_2",
+    "image": "/static/script-role-icons/reviewed/c46d6607a0661d6bce19dd32.png",
+    "firstNightReminder": "Wake Hagrid and point at a player who is a Gryffindor",
+    "reminders": [
+      "Gryffindor",
+      ""
+    ],
+    "name": "??",
+    "team": "townsfolk",
+    "ability": "?????????????????????????",
+    "flavor": "\"There's A Storm Coming Harry, We'd All Best Be Ready When She Does\"",
+    "firstNight": 20,
+    "name_en": "Hagrid",
+    "ability_en": "You start knowing a player is Ron, Hermione, Harry or Neville."
+  },
+  {
+    "id": "ronweasley_hp2_2",
+    "image": "/static/script-role-icons/reviewed/13c8c8c6b8f8d27557c58756.png",
+    "firstNightReminder": "Wake and tell them a player who was chosen by the evil team tonight.",
+    "otherNightReminder": "Wake and tell them a player who was chosen by the evil team tonight.",
+    "reminders": [
+      "Check"
+    ],
+    "name": "??????",
+    "team": "townsfolk",
+    "ability": "????????????????????????",
+    "flavor": "Well, White moves first. And then... We play.",
+    "firstNight": 22,
+    "otherNight": 20,
+    "name_en": "Ron Weasley",
+    "ability_en": "Each night learn a player who was selected by the evil team tonight"
+  },
+  {
+    "id": "mcgonagall_hp2_2",
+    "image": "/static/script-role-icons/reviewed/b529d0bbb061595bfde16ef5.png",
+    "firstNightReminder": "Wake and ask if they would like to use ability. If so ask them to choose a character. Mark any chosen in play character as 'Detention'.",
+    "otherNightReminder": "Wake and ask if they would like to use ability. If so ask them to choose a character. Mark any chosen in play character as 'Detention'.",
+    "reminders": [
+      "Detention",
+      "Detention",
+      "Detention",
+      "Detention",
+      "Detention"
+    ],
+    "name": "???",
+    "team": "townsfolk",
+    "ability": "??????????????????????????????????????????????????????????",
+    "flavor": "No, you heard me correctly, Mr. Malfoy. You see, honourable as your intentions were, you too were out of bed after hours. You will join your classmates in detention.",
+    "firstNight": 14,
+    "otherNight": 2,
+    "name_en": "McGonagall",
+    "ability_en": "Each Night, you may choose a Townsfolk character. You gain their ability for one night. If they are in play they are drunk until you die. (You may not choose the same character twice)"
+  },
+  {
+    "id": "hermione_hp2_2",
+    "image": "/static/script-role-icons/reviewed/8cebf8de344b12a7b3e2948c.png",
+    "firstNightReminder": "Wake and ask which player to pick, show character type.",
+    "otherNightReminder": "If they corrected someone: Wake and ask which player to pick, show character type.",
+    "reminders": [
+      "Corrected someone"
+    ],
+    "name": "??????",
+    "team": "townsfolk",
+    "ability": "???????????????????????????????????????????????????????",
+    "flavor": "Now if you two don’t mind, I’m going to bed before either of you come up with another clever idea to get us killed - or worse, expelled.",
+    "firstNight": 21,
+    "otherNight": 14,
+    "name_en": "Hermione",
+    "ability_en": "On the fist night, pick a player. You learn their character type. (The Dark Lord will register as Townsfolk). If you publicly correct someone today, the Storyteller might let you act again tonight."
+  },
+  {
+    "id": "snape_hp2_2",
+    "image": "/static/script-role-icons/reviewed/1ffb2fe53f8571e995723162.png",
+    "firstNightReminder": "Wake them to choose a player",
+    "otherNightReminder": "Wake them to choose a player",
+    "reminders": [
+      "Defended"
+    ],
+    "name": "???",
+    "team": "townsfolk",
+    "ability": "?????????????????????????????",
+    "flavor": "The Dark Arts are many, varied, ever-changing and eternal. Fighting them is like fighting a many-headed monster, which, each time a neck is severed, sprouts a head even fiercer and cleverer than before",
+    "firstNight": 15,
+    "otherNight": 3,
+    "name_en": "Snape",
+    "ability_en": "Each night, choose a player (Not Yourself). The chosen player is safe from Minion abilities during the night and the following day. "
+  },
+  {
+    "id": "siriusblack_hp2_2",
+    "image": "/static/script-role-icons/reviewed/b75ab0a011b36b785007c587.png",
+    "firstNightReminder": "Wake and ask if they would like to switch form. ",
+    "otherNightReminder": "Wake and ask if they would like to switch form. If they died in the night while human, wake to tell them to choose 2 players. Show them a 0, 1 or 2 based on if the players are evil or are horcruxes.",
+    "reminders": [
+      "Animagus form"
+    ],
+    "setup": true,
+    "name": "???????",
+    "team": "townsfolk",
+    "ability": "???????????????????????????????????????????????????????????",
+    "flavor": "You Don't Understand — There Are Things Worth Dying For!",
+    "firstNight": 19,
+    "otherNight": 16,
+    "name_en": "Sirius Black",
+    "ability_en": "Each night, choose to turn into your Animagus form. In Animagus form, you can only die by execution. If you die at night, choose 2 players you learn how many are evil."
+  },
+  {
+    "id": "remuslupin_hp2_2",
+    "image": "/static/script-role-icons/reviewed/2008404280135095e8d96f37.png",
+    "otherNightReminder": "Wake to make choose a player, the previously chosen player dies if good. They are the only player that can die tonight.",
+    "reminders": [
+      "Dead",
+      "Drunk"
+    ],
+    "name": "??????",
+    "team": "townsfolk",
+    "ability": "????*???????????????????????????????????????????????????????",
+    "flavor": "People Are Disappearing Daily. If We Start Fighting Amongst Ourselves, We're Doomed.",
+    "otherNight": 6,
+    "name_en": "Remus Lupin",
+    "ability_en": "Each night*, choose an alive player: if good, they die. If Evil you are drunk permanently. if a player dies by your ability they are the only player that can die tonight."
+  },
+  {
+    "id": "neville_hp2_2",
+    "image": "/static/script-role-icons/reviewed/8b6c613ecf051ac746082069.png",
+    "reminders": [
+      "Ability used"
+    ],
+    "name": "??????",
+    "team": "townsfolk",
+    "ability": "?????????????????????????????",
+    "flavor": "\"People die everyday... but they're still with us... in here\"",
+    "name_en": "Neville",
+    "ability_en": "Once per game, during the day, publicly choose a player: if they are a Minion, they die."
+  },
+  {
+    "id": "lunalovegood_hp2_2",
+    "image": "/static/script-role-icons/reviewed/ce9af03d12db93b199c4ac70.png",
+    "otherNightReminder": "Mark the grimoire with a spirited token ",
+    "reminders": [
+      "Spirited"
+    ],
+    "name": "??????",
+    "team": "townsfolk",
+    "ability": "??????????????????????????????????????",
+    "flavor": "I sleepwalk, you see. That’s why I wear shoes to bed.",
+    "otherNight": 19,
+    "name_en": "Luna Lovegood",
+    "ability_en": "Each day, visit the storyteller to learn 2 players, 1 is the player who the storyteller feels had the most positive effect for the good team yesterday."
+  },
+  {
+    "id": "madeyemoody_hp2_2",
+    "image": "/static/script-role-icons/reviewed/0daa752abfc05dcc35eb9549.png",
+    "otherNightReminder": "Wake if they have satisfied madness and tell the targeted players alignment ",
+    "reminders": [
+      "Mad-Eye's gaze"
+    ],
+    "name": "????",
+    "team": "townsfolk",
+    "ability": "??????????????????????????????????",
+    "flavor": "Nothing like a night time stroll to give you... ideas.",
+    "otherNight": 13,
+    "name_en": "Mad-Eye Moody",
+    "ability_en": "Each day, if you are mad that a different player is evil, that night you may learn their alignment."
+  },
+  {
+    "id": "harrypotter_hp2_2",
+    "image": "/static/script-role-icons/reviewed/1e8306cee47a84b4d6396d10.png",
+    "reminders": [
+      "Lived",
+      "Dark Lord Weakened"
+    ],
+    "setup": true,
+    "name": "?????",
+    "team": "townsfolk",
+    "ability": "????????????????????????????????????",
+    "flavor": "The boy who lived.",
+    "name_en": "Harry Potter",
+    "ability_en": "You are a Horcrux. The first time you are killed by the dark lord, you are not and all evil characters are drunk until tommorow."
+  },
+  {
+    "id": "dumbledore_hp2_2",
+    "image": "/static/script-role-icons/reviewed/d7f8d9d01ef1e1012ad7c20b.png",
+    "otherNightReminder": "Wake if killed and ask to pick a player",
+    "reminders": [
+      "Died Today"
+    ],
+    "remindersGlobal": [
+      "Drunk"
+    ],
+    "name": "????",
+    "team": "townsfolk",
+    "ability": "???????????????????????????????????????????",
+    "flavor": "Curiosity is not a sin. But we should exercise caution with our curiosity... yes, indeed.",
+    "otherNight": 18,
+    "name_en": "Dumbledore",
+    "ability_en": "If you are killed at night, pick a player. They learn who you were. If they are evil, they are drunk the following day and next night. "
+  },
+  {
+    "id": "fawkes_hp2_2",
+    "image": "/static/script-role-icons/reviewed/dad260ec3c9d93e2a52d910e.png",
+    "otherNightReminder": "Wake if killed, show them the character type who killed them. Resurrect them the following night.",
+    "reminders": [
+      "Resurrects tonight",
+      "Risen"
+    ],
+    "name": "???",
+    "team": "townsfolk",
+    "ability": "?????????????????????????????????????????????????????",
+    "flavor": "He's been looking dreadful for days; I've been telling him to get a move on.",
+    "otherNight": 17,
+    "name_en": "Fawkes",
+    "ability_en": "Your Neighbours cannot be poisoned. When you die at night, learn the character type of the player that killed you and resurrect at the beginning of the following night. After resurrecting you no longer have an ability."
+  },
+  {
+    "id": "dracomalfoy_hp2_2",
+    "image": "/static/script-role-icons/reviewed/6dbaa7124c027ad528f877d5.png",
+    "firstNightReminder": "Wake the Good Recruiter (If Alive) and show them the Draco Malfoy character token, ask them to choose a player. Wake the Evil Recruiter (If Alive) and show them the Draco Malfoy character token, ask them to choose a player, even if Draco has been successfully guessed.",
+    "otherNightReminder": "Wake the Good Recruiter (If Alive) and show them the Draco Malfoy character token, ask them to choose a player. Wake the Evil Recruiter (If Alive) and show them the Draco Malfoy character token, ask them to choose a player, even if Draco has been successfully guessed.",
+    "reminders": [
+      "Recruited",
+      "Recruiter",
+      "Recruiter"
+    ],
+    "setup": true,
+    "name": "?????",
+    "team": "outsider",
+    "ability": "????????????????????????????????????????????????????????????",
+    "flavor": "Didn't mummy ever tell you it was rude to eavesdrop, Potter?",
+    "firstNight": 18,
+    "otherNight": 5,
+    "name_en": "Draco Malfoy",
+    "ability_en": "Each night, both an evil player (Lucius if in play) and a good player, may guess who you are. You permanently turn the alignment of whoever correctly guesses you first. (Good guesses first)"
+  },
+  {
+    "id": "scabbers_hp2_2",
+    "image": "/static/script-role-icons/reviewed/fac58d90793889eeb21df4a2.png",
+    "reminders": [
+      "Betrayed",
+      "Drunk"
+    ],
+    "name": "??",
+    "team": "outsider",
+    "ability": "????????????????????????????????????????????????",
+    "flavor": "I solemnly swear that I am up to no good",
+    "name_en": "Scabbers",
+    "ability_en": "Each day you must publicly guess the good role of one living player (Not yourself). If wrong, that player may be drunk tonight. This ability continues even if dead. "
+  },
+  {
+    "id": "dobby_hp2_2",
+    "image": "/static/script-role-icons/reviewed/b01032243f02c93acfc4b677.png",
+    "firstNightReminder": "Wake and ask to pick a player as Master",
+    "otherNightReminder": "Wake Dobby if they are free",
+    "reminders": [
+      "Master",
+      "Free"
+    ],
+    "name": "??",
+    "team": "outsider",
+    "ability": "??????????????????????????????????????????????????????????????",
+    "flavor": "Master has given Dobby a sock, Dobby is a free elf!",
+    "firstNight": 16,
+    "otherNight": 15,
+    "name_en": "Dobby",
+    "ability_en": "On Night 1, choose a player to be your Master. If your Master would die, you die instead. Your master may approach the storyteller to free you from service, you may then use this ability at anytime."
+  },
+  {
+    "id": "lockhart_hp2_2",
+    "image": "/static/script-role-icons/reviewed/12c597e7e2f30888f690e985.png",
+    "remindersGlobal": [
+      "Is Lockhart"
+    ],
+    "setup": true,
+    "name": "??",
+    "team": "outsider",
+    "ability": "??????????????????????????????????????????????",
+    "flavor": "Uh, the point is, uh, you can no longer feel any pain. And, very clearly, the bones are not broken.",
+    "name_en": "Lockhart",
+    "ability_en": "You think you are a townsfolk but you are not. Any time you claim to have used or attempt to use an ability that you were not shown, something bad might happen."
+  },
+  {
+    "id": "nagini_hp2_2",
+    "image": "/static/script-role-icons/reviewed/d291949752f4cbe6b888fb12.png",
+    "firstNightReminder": "Choose who to poison first.",
+    "otherNightReminder": "Choose who to poison. Potentially inform Neville he was chosen by Nagini (He is still poisoned) ",
+    "name": "???",
+    "team": "minion",
+    "ability": "????????????????????????????????????????????????????",
+    "flavor": "You know Voldemort's snake, Neville? He's got a huge snake... Calls it Nagini... It's got to be killed.",
+    "firstNight": 13,
+    "otherNight": 7,
+    "name_en": "Nagini",
+    "ability_en": "You are a Horcrux. Each night, choose a player: they are poisoned tonight and tomorrow day. If you choose Neville this way, Neville learns this."
+  },
+  {
+    "id": "basilisk_hp2_2",
+    "image": "/static/script-role-icons/reviewed/bfbce0d33faa423cfa2f6847.png",
+    "otherNightReminder": "Wake and ask to pick a player",
+    "reminders": [
+      "Petrified",
+      "Dies"
+    ],
+    "name": "??",
+    "team": "minion",
+    "ability": "????*??????????????????????????????????????????????????????????????????????????????",
+    "flavor": "The Basilisk has a murderous stare, and all who are fixed with the beam of its eye shall suffer instant death.",
+    "otherNight": 8,
+    "name_en": "Basilisk",
+    "ability_en": "Each night*, choose a player. If they would awake that night due to their own ability, they die. If they did not wake, they can no longer wake while you live. Whenever they would wake they learn this. If the chosen player is Harry Potter, you die instead."
+  },
+  {
+    "id": "grindelwald_hp2_2",
+    "image": "/static/script-role-icons/reviewed/095818e37923ab8b456e50ad.png",
+    "otherNightReminder": "Wake and ask them to choose a dead player",
+    "reminders": [
+      "Ability Taken",
+      "Was Grindelwald"
+    ],
+    "name": "?????",
+    "team": "minion",
+    "ability": "????*??????????????????????????????????????????????[-1 ???]",
+    "flavor": "Magic blooms... only in rare souls. Still, we must skulk in shadows. But the old ways serve us no longer.",
+    "otherNight": 4,
+    "name_en": "Grindelwald",
+    "ability_en": "Each night* choose a dead player, you may use their ability. If The Dark Lord was to die, you become the new Dark Lord and deaths are arbitrary. [-1 Outsider]"
+  },
+  {
+    "id": "bellatrix_hp2_2",
+    "image": "/static/script-role-icons/reviewed/79161e529fe8e32155740d45.png",
+    "name": "??????",
+    "team": "minion",
+    "ability": "?????????????????????????????????????????????????????????????????????",
+    "flavor": "I killed Sirius Black!",
+    "name_en": "Bellatrix",
+    "ability_en": "After night 2, before nominations you may claim Bellatrix, If you do a good player dies, even if for some reason they could not. If you are executed, you do not die unless an evil player voted."
+  },
+  {
+    "id": "luciusmalfoy_hp2_2",
+    "image": "/static/script-role-icons/reviewed/1b0a96379bfa7478447e116b.png",
+    "setup": true,
+    "name": "??????",
+    "team": "minion",
+    "ability": "?????????????[+1 ????+?????]",
+    "flavor": "Now, now Draco. Play nicely",
+    "name_en": "Lucius Malfoy",
+    "ability_en": "You may register falsely to all abilities [+1 Outsider and +Draco Malfoy]"
+  },
+  {
+    "id": "lordvoldemort_hp2_2",
+    "image": "/static/script-role-icons/reviewed/6d029d5cd3f52977a93d260b.png",
+    "firstNightReminder": "Wake and tell them all players who possess a horcrux. ",
+    "otherNightReminder": "Wake to make them kill someone",
+    "reminders": [
+      "Horcrux",
+      "Horcrux",
+      "Horcrux",
+      "Dead"
+    ],
+    "setup": true,
+    "name": "???",
+    "team": "demon",
+    "ability": "????*?????????????????????????????????????????????????????????[3 ?????????+???]",
+    "flavor": "I, who have gone further than anybody along the path that leads to immortality....",
+    "firstNight": 11,
+    "otherNight": 10,
+    "name_en": "Lord Voldemort",
+    "ability_en": "Each night*, choose a player: they die. You die if and only if all horcruxes are dead. You learn which players are horcruxes. A player possessing a horcrux registers as a minion. [3 players are Horcruxes, + Nagini] "
+  },
+  {
+    "id": "thedeatheaters_hp2_2",
+    "image": "/static/script-role-icons/reviewed/565518273236c5c3023ce855.png",
+    "otherNightReminder": "Wake all Minions and ask them to vote on a player to kill.",
+    "reminders": [
+      "Dead"
+    ],
+    "setup": true,
+    "name": "???",
+    "team": "demon",
+    "ability": "????*????????????????????????????????[-1 ???1 ??????]",
+    "special": [
+      {
+        "name": "pointing",
+        "type": "ability",
+        "time": "day"
+      }
+    ],
+    "flavor": "You know he can control people so that they do terrible things without being able to stop themselves.",
+    "otherNight": 9,
+    "name_en": "The Deatheaters",
+    "ability_en": "Each night*, alive minions point at a player to kill. The game ends when all minions are dead. [- 1 demon, 1 Townsfolk is evil]"
+  },
+  {
+    "id": "tomriddle_hp2_2",
+    "image": "/static/script-role-icons/reviewed/6ed4fbc3cd3ae3bb060b4bc1.png",
+    "otherNightReminder": "Wake to make them kill someone",
+    "reminders": [
+      "Dead Outsider",
+      "Dead"
+    ],
+    "name": "?????",
+    "team": "demon",
+    "ability": "????*????????????????????????????[+1 ???]",
+    "flavor": "I can make bad things happen to people who are mean to me. I can make them hurt, if I want.",
+    "otherNight": 11,
+    "name_en": "Tom Riddle",
+    "ability_en": "Each night*, choose a player: they die. If an Outsider is chosen, you may choose again. [+1 Outsider]"
+  },
+  {
+    "id": "youknowwho_hp2_2",
+    "image": "/static/script-role-icons/reviewed/ef9b85417d4d3d84e27e7acf.png",
+    "firstNightReminder": "Wake and tell Secret word",
+    "otherNightReminder": "Wake to make them kill someone",
+    "reminders": [
+      "Said The Word",
+      "Dead"
+    ],
+    "setup": true,
+    "name": "???",
+    "team": "demon",
+    "ability": "????*??????????????????????????????????????????????????????????",
+    "flavor": " Yes. You see what I've become? See what I must do to survive? Live off another, a mere parasite!",
+    "firstNight": 12,
+    "otherNight": 12,
+    "name_en": "You-Know-Who",
+    "ability_en": "Each night*, choose a player: they die. If you kill yourself this way, a Minion becomes The Dark Lord. You start knowing a secret word. Any good player that says the word might die."
+  },
+  {
+    "id": "newtscamander_hp2_2",
+    "image": "/static/script-role-icons/reviewed/51b3254464dc037eedbb0682.png",
+    "firstNightReminder": "If Newt would wake due to their ability wake them now",
+    "otherNightReminder": "If Newt would wake due to their ability wake them now",
+    "setup": true,
+    "name": "???????",
+    "team": "traveller",
+    "ability": "????????????????????????????????????",
+    "flavor": "The unicorn’s horn, blood and hair all have highly magical properties.",
+    "firstNight": 17,
+    "otherNight": 21,
+    "name_en": "Newt Scamander",
+    "ability_en": "During your arrival approach the storyteller to discuss a magical beast. The storyteller will give you an ability based on this magical beast."
+  }
+]

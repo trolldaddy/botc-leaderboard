@@ -1,26 +1,98 @@
-﻿[
-  {"id": "noble"},
-  {"id": "cannibal"},
-  {"id": "chambermaid"},
-  {"id": "mathematician"},
-  {"id": "philosopher"},
-  {"id": "town_crier"},
-  {"id": "flowergirl"},
-  {"id": "shiguan"},
-  {"id": "gossip"},
-  {"id": "fisherman"},
-  {"id": "tixingguan"},
-  {"id": "ranfangfangzhu"},
-  {"id": "sweetheart"},
-  {"id": "hatter"},
-  {"id": "barber"},
-  {"id": "drunk"},
-  {"id": "godfather"},
-  {"id": "assassin"},
-  {"id": "boffin"},
-  {"id": "marionette"},
-  {"id": "kazali"},
-  {"id": "vortox"},
-  {"id": "jianning"},
-  {"id": "no_dashii"}
+[
+  {
+    "id": "noble",
+    "image": "/static/script-role-icons/reviewed/7e51cddf4e1ffe13a8f4d09d.png"
+  },
+  {
+    "id": "cannibal",
+    "image": "/static/script-role-icons/reviewed/daed1a6b2e583a80d95ba8fc.png"
+  },
+  {
+    "id": "chambermaid",
+    "image": "/static/script-role-icons/reviewed/286f8ed34ad7cbb81d6a7ce3.png"
+  },
+  {
+    "id": "mathematician",
+    "image": "/static/script-role-icons/reviewed/447f795008217265ebc62f3b.png"
+  },
+  {
+    "id": "philosopher",
+    "image": "/static/script-role-icons/reviewed/092fe7b98a83694d8b933545.png"
+  },
+  {
+    "id": "town_crier",
+    "image": "/static/script-role-icons/reviewed/f0f6f21909b8289ba11a1ca4.png"
+  },
+  {
+    "id": "flowergirl",
+    "image": "/static/script-role-icons/reviewed/464d3557ed905781a0abde34.png"
+  },
+  {
+    "id": "shiguan",
+    "image": "/static/script-role-icons/reviewed/89c77dfac2b59c9b697cf79c.png"
+  },
+  {
+    "id": "gossip",
+    "image": "/static/script-role-icons/reviewed/0fe558776fbf0e8feb0cc36d.png"
+  },
+  {
+    "id": "fisherman",
+    "image": "/static/script-role-icons/reviewed/5a8640a96d69f1773885952d.png"
+  },
+  {
+    "id": "tixingguan",
+    "image": "/static/script-role-icons/reviewed/859d8f3ac0286173dbcdc5b0.png"
+  },
+  {
+    "id": "ranfangfangzhu",
+    "image": "/static/script-role-icons/reviewed/8a23d5617f4e6389c6241253.png"
+  },
+  {
+    "id": "sweetheart",
+    "image": "/static/script-role-icons/reviewed/1d5638cc842fbac5eaf47431.png"
+  },
+  {
+    "id": "hatter",
+    "image": "/static/script-role-icons/reviewed/ca607db810e464ef74b455c7.png"
+  },
+  {
+    "id": "barber",
+    "image": "/static/script-role-icons/reviewed/fab0885a3b20b9d2fadb809e.png"
+  },
+  {
+    "id": "drunk",
+    "image": "/static/script-role-icons/reviewed/aac27a37f2f385dfdbaa9fc2.png"
+  },
+  {
+    "id": "godfather",
+    "image": "/static/script-role-icons/reviewed/414db58c5bc541c008a63279.png"
+  },
+  {
+    "id": "assassin",
+    "image": "/static/script-role-icons/reviewed/ae72586fc72e129f5f5548a9.png"
+  },
+  {
+    "id": "boffin",
+    "image": "/static/script-role-icons/reviewed/91ec4bf8bb5e44ce8efbb872.png"
+  },
+  {
+    "id": "marionette",
+    "image": "/static/script-role-icons/reviewed/b95c5fc0ac2f7d82f4e090cc.png"
+  },
+  {
+    "id": "kazali",
+    "image": "/static/script-role-icons/reviewed/a8bc6b86b7eb858164fa94e4.png"
+  },
+  {
+    "id": "vortox",
+    "image": "/static/script-role-icons/reviewed/caa82bdd377104e476d4e858.png"
+  },
+  {
+    "id": "jianning",
+    "image": "/static/script-role-icons/reviewed/a6434b2cbc487040663f77aa.png"
+  },
+  {
+    "id": "no_dashii",
+    "image": "/static/script-role-icons/reviewed/866c77b757a769eb22f177da.png"
+  }
 ]

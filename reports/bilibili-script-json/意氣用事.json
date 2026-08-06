@@ -18,7 +18,7 @@
   },
   {
     "id": "daerduotutu111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/librarian.png",
+    "image": "/static/script-role-icons/reviewed/1828f5b79d39d334356465dc.png",
     "edition": "custom",
     "name": "图书管理员",
     "ability": "在你的首个夜晚，你会得知两名玩家和一个外来者角色：这两名玩家之一是该角色（或者你会得知没有外来者在场）。",
@@ -35,7 +35,7 @@
   },
   {
     "id": "qingtianjianbei111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/shugenja.png",
+    "image": "/static/script-role-icons/reviewed/c03c2ad86ea9655531749132.png",
     "edition": "custom",
     "name": "修行者",
     "ability": "在你的首个夜晚，你会得知距离最近的邪恶玩家位于你的顺时针还是逆时针方向。如果两侧的邪恶玩家与你距离相等，你得知的信息由说书人决定。",
@@ -49,7 +49,7 @@
   },
   {
     "id": "jingcaisanxuanyi111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/noble.png",
+    "image": "/static/script-role-icons/reviewed/7e51cddf4e1ffe13a8f4d09d.png",
     "edition": "custom",
     "name": "贵族",
     "ability": "在你的首个夜晚，你会得知三名玩家：其中有且只有一名玩家是邪恶的。",
@@ -67,7 +67,7 @@
   },
   {
     "id": "yeshimeishengmeyongdejuese111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/high_priestess.png",
+    "image": "/static/script-role-icons/reviewed/1b79013bffbcfae727f4953a.png",
     "edition": "custom",
     "name": "女祭司",
     "ability": "每个夜晚，你会得知一名说书人认为你最应该与其交流的玩家。",
@@ -81,7 +81,7 @@
   },
   {
     "id": "mofashuijingqiu111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fortune_teller.png",
+    "image": "/static/script-role-icons/reviewed/743a3703802de53b6497d39d.png",
     "edition": "custom",
     "name": "占卜师",
     "ability": "每个夜晚，你要选择两名玩家：你会得知他们之中是否有恶魔。会有一名善良玩家始终被你的能力当作恶魔。",
@@ -97,7 +97,7 @@
   },
   {
     "id": "zhuijidelaoda111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/balloonist.png",
+    "image": "/static/script-role-icons/reviewed/32cc523620f3ed87f0778a32.png",
     "edition": "custom",
     "name": "气球驾驶员",
     "ability": "每个夜晚，你会得知一名与上个夜晚得知的玩家角色类型不同的玩家。[+0~1外来者]",
@@ -119,7 +119,7 @@
   },
   {
     "id": "wofuhuolawoshijiangbu111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/banshee.png",
+    "image": "/static/script-role-icons/reviewed/88ea9d3305bddbea5cfd882f.png",
     "edition": "custom",
     "name": "报丧女妖",
     "ability": "如果恶魔杀死了你，所有玩家都会得知此事。从现在开始，你每天可以发起两次提名，每次投票时可以投两票。",
@@ -134,7 +134,7 @@
   },
   {
     "id": "weishenmesenglvjiaomoke111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/monk.png",
+    "image": "/static/script-role-icons/reviewed/942de4ef6f4612e96704ddf2.png",
     "edition": "custom",
     "name": "僧侣",
     "ability": "每个夜晚*，你要选择除你以外的一名玩家：当晚恶魔的负面能力对他无效。",
@@ -150,7 +150,7 @@
   },
   {
     "id": "zhengdanideyanjing111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/oracle.png",
+    "image": "/static/script-role-icons/reviewed/52fcad7717d16af410f5937f.png",
     "edition": "custom",
     "name": "神谕者",
     "ability": "每个夜晚*，你会得知有多少名死亡的玩家是邪恶的。",
@@ -164,7 +164,7 @@
   },
   {
     "id": "xixifafashishishishishishishi",
-    "image": "https://clocktower-wiki.gstonegames.com/images/d/d6/Alsaahir.png",
+    "image": "/static/script-role-icons/reviewed/0b292bc29d7e9cfd5f13fca5.png",
     "edition": "custom",
     "name": "戏法师",
     "ability": "每个白天，你可以公开进行一次谁是爪牙，谁是恶魔的猜测。如果你猜对，善良阵营获胜。",
@@ -178,7 +178,7 @@
   },
   {
     "id": "village_idiot22",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/village_idiot.png",
+    "image": "/static/script-role-icons/reviewed/2dbda130a0c765316a82b00d.png",
     "edition": "custom",
     "name": "村夫",
     "ability": "每个夜晚，你要选择一名玩家：你会得知他的阵营。[+0~2村夫，复数村夫中有一人醉酒]",
@@ -200,7 +200,7 @@
   },
   {
     "id": "lingluowawa111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/seamstress.png",
+    "image": "/static/script-role-icons/reviewed/444e73cdbd524925f19b8daa.png",
     "edition": "custom",
     "name": "女裁缝",
     "ability": "每局游戏限一次，在夜晚时，你可以选择除你以外的两名玩家：你会得知他们是否为同一阵营。",
@@ -216,7 +216,7 @@
   },
   {
     "id": "chichichichichichichi111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/cannibal.png",
+    "image": "/static/script-role-icons/reviewed/daed1a6b2e583a80d95ba8fc.png",
     "edition": "custom",
     "name": "食人族",
     "ability": "你拥有上个死于处决的玩家的能力。如果该玩家属于邪恶阵营，你中毒直到下个善良玩家死于处决。",
@@ -233,7 +233,7 @@
   },
   {
     "id": "zhadiaole111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/mutant.png",
+    "image": "/static/script-role-icons/reviewed/c109377894aaf36e69a5c9a6.png",
     "edition": "custom",
     "name": "畸形秀演员",
     "ability": "如果你“疯狂”地证明自己是外来者，你可能被处决。",
@@ -247,7 +247,7 @@
   },
   {
     "id": "yinshishihsihsihsihsihsissssssss",
-    "image": "https://clocktower-wiki.gstonegames.com/images/1/1e/Hermit.png",
+    "image": "/static/script-role-icons/reviewed/7ee94ab2e274badccb0aead7.png",
     "edition": "custom",
     "name": "隐士",
     "ability": "你拥有所有外来者能力。[-0~1外来者]",
@@ -264,7 +264,7 @@
   },
   {
     "id": "moluotuofujiweijiu11111",
-    "image": "https://clocktower-wiki.gstonegames.com/images/1/1a/Zealot.png",
+    "image": "/static/script-role-icons/reviewed/81a887c4b87361fa5fd4bc15.png",
     "edition": "custom",
     "name": "狂热者",
     "ability": "如果有大于等于五名玩家存活，你必须在所有提名中投票。",
@@ -278,7 +278,7 @@
   },
   {
     "id": "wudidejiemidashi111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/puzzlemaster.png",
+    "image": "/static/script-role-icons/reviewed/f9ee080e6f5970b2faacbcd5.png",
     "edition": "custom",
     "name": "解谜大师",
     "ability": "一名玩家醉酒，即使你已死亡。每局游戏限一次，你可以猜测谁是那个醉酒的玩家，如果猜对了，你会得知谁是恶魔，但如果猜错了，你会得知错误的“谁是恶魔”信息。",
@@ -295,7 +295,7 @@
   },
   {
     "id": "xixi111111111111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/cerenovus.png",
+    "image": "/static/script-role-icons/reviewed/a6446de54be8841eeb6c2b58.png",
     "edition": "custom",
     "name": "洗脑师",
     "ability": "每个夜晚，你要选择一名玩家和一个善良角色。他明天白天和夜晚需要“疯狂”地证明自己是这个角色，不然他可能被处决。",
@@ -311,7 +311,7 @@
   },
   {
     "id": "noita111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/witch.png",
+    "image": "/static/script-role-icons/reviewed/2f35eae15feb2a9e8ec15bb2.png",
     "edition": "custom",
     "name": "女巫",
     "ability": "每个夜晚，你要选择一名玩家：如果他明天白天发起提名，他死亡。如果只有三名存活的玩家，你失去此能力。",
@@ -327,7 +327,7 @@
   },
   {
     "id": "touduzheeeeeeee111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/poisoner.png",
+    "image": "/static/script-role-icons/reviewed/f5f038927f5ef388dab5b2b6.png",
     "edition": "custom",
     "name": "投毒者",
     "ability": "每个夜晚，你要选择一名玩家：他在当晚和明天白天中毒。",
@@ -343,7 +343,7 @@
   },
   {
     "id": "wushihsihsihsihsihsihsish",
-    "image": "https://clocktower-wiki.gstonegames.com/images/archive/c/c7/20250103031516%21Wizard.png",
+    "image": "/static/script-role-icons/reviewed/0ee60fc1efa898c2e6d76cf1.png",
     "edition": "custom",
     "name": "巫师",
     "ability": "每局游戏限一次，你可以向说书人许愿。如果愿望被实现，可能会伴随着代价和线索。",
@@ -363,24 +363,24 @@
     ],
     "setup": false
   },
-{
-        "id": "wanghun",
-        "image": "https://clocktower-wiki.gstonegames.com/images/7/7c/Wraith.png",
-        "edition": "custom",
-        "name": "亡魂",
-        "ability": "你可以在夜晚睁眼。当其他邪恶玩家被唤醒时，你也会被唤醒。",
-        "team": "minion",
-        "sch_team": "爪牙",
-        "firstNight": 0,
-        "otherNight": 0,
-        "firstNightReminder": "",
-        "otherNightReminder": "",
-        "reminders": [],
-        "setup": false
-    },
+  {
+    "id": "wanghun",
+    "image": "/static/script-role-icons/reviewed/c3b89da7b25c05ffe38e5a28.png",
+    "edition": "custom",
+    "name": "亡魂",
+    "ability": "你可以在夜晚睁眼。当其他邪恶玩家被唤醒时，你也会被唤醒。",
+    "team": "minion",
+    "sch_team": "爪牙",
+    "firstNight": 0,
+    "otherNight": 0,
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [],
+    "setup": false
+  },
   {
     "id": "wangguuuuuuuu111111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/vigormortis.png",
+    "image": "/static/script-role-icons/reviewed/8014b67fcaa36f21e75bd384.png",
     "edition": "custom",
     "name": "亡骨魔",
     "ability": "每个夜晚*，你要选择一名玩家：他死亡。被你杀死的爪牙保留他的能力，且与他邻近的两名镇民之一中毒。[-1外来者]",
@@ -398,7 +398,7 @@
   },
   {
     "id": "fangguuuuuuuuuuuuuu111",
-    "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/fang_gu.png",
+    "image": "/static/script-role-icons/reviewed/3d8a183086d27a630afb178c.png",
     "edition": "custom",
     "name": "方古",
     "ability": "每个夜晚*，你要选择一名玩家：他死亡。被该能力杀死的外来者变成邪恶的方古且你代替他死亡，但每局游戏仅能成功转化一次。[+1外来者]",
@@ -414,7 +414,7 @@
   },
   {
     "id": "tifeng11zhishou11111111",
-    "image": "https://clocktower-wiki.gstonegames.com/images/1/18/Lordoftyphon.png",
+    "image": "/static/script-role-icons/reviewed/4a18c0051d938a158e8bc635.png",
     "edition": "custom",
     "name": "堤丰之首",
     "ability": "每个夜晚*，你要选择一名玩家：他死亡。[邪恶玩家全部邻座，你位于正中，+1爪牙，-或+任意数量外来者]",
