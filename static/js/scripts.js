@@ -50,11 +50,12 @@
     return `<a class="script-role-card" href="${href}">${icon}<span><strong>${escapeHtml(role.name_zh_tw)}</strong><small>${escapeHtml(role.team)}</small></span></a>`;
   }
 
-  const groupOrder = ['townsfolk', 'outsider', 'minion', 'demon', 'traveler', 'traveller', 'fabled', 'jinx', 'loric', 'special'];
+  const groupOrder = ['townsfolk', 'outsider', 'minion', 'demon', 'traveller', 'loric', 'fabled', 'jinx', 'special'];
+  const normalizeGroup = value => ({traveler:'traveller',jinxed:'jinx','a jinxed':'jinx',other:'special'}[String(value||'').toLowerCase()] || String(value||'special').toLowerCase());
   const groupLabels = {
     townsfolk: '鎮民', outsider: '外來者', minion: '爪牙', demon: '惡魔',
     traveler: '旅行者', traveller: '旅行者', fabled: '傳奇角色',
-    jinx: '相剋／奇遇規則', loric: '規則修正標記', special: '其他劇本標記',
+    jinx: '相剋規則', loric: '奇遇角色', special: '其他',
   };
 
   function specialCard(item) {
@@ -65,12 +66,12 @@
   function groupedRosterMarkup(roles, specialEntries) {
     const groups = new Map();
     roles.forEach(role => {
-      const key = String(role.team || 'special').toLowerCase();
+      const key = normalizeGroup(role.team);
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push({ kind: 'role', value: role });
     });
     specialEntries.forEach(item => {
-      const key = String(item.team || 'special').toLowerCase();
+      const key = normalizeGroup(item.team);
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key).push({ kind: 'special', value: item });
     });

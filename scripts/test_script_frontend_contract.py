@@ -25,7 +25,20 @@ def test_custom_script_entries_are_cards_not_links_and_show_ability():
     assert "richText(item.ability)" in special_card
 
 
+def test_special_entry_categories_and_admin_controls_are_explicit():
+    public_js = (ROOT / "static/js/scripts.js").read_text(encoding="utf-8")
+    admin_js = (ROOT / "static/js/script_admin.js").read_text(encoding="utf-8")
+    assert "'a jinxed':'jinx'" in public_js
+    assert "\u76f8\u524b\u898f\u5247" in public_js
+    for category in ("townsfolk", "outsider", "minion", "demon", "traveller", "loric", "fabled", "jinx", "special"):
+        assert f"'{category}'" in admin_js
+    assert "data-custom-team" in admin_js
+    assert "script-custom-add" in admin_js
+    assert "data-custom-delete" in admin_js
+
+
 if __name__ == "__main__":
     test_public_script_page_renders_sanitized_rich_text()
     test_custom_script_entries_are_cards_not_links_and_show_ability()
-    print({"status": "ok", "tests": 2})
+    test_special_entry_categories_and_admin_controls_are_explicit()
+    print({"status": "ok", "tests": 3})

@@ -7,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 from database import Base
 from role_models import Role, RoleAlias
-from scripts.import_bilibili_script import find_role, role_ids_from_json, role_references_from_json
+from scripts.import_bilibili_script import (find_catalog_role, find_role, normalized_entry_type, role_ids_from_json, role_references_from_json)
 
 
 def test_script_json_ignores_meta_and_keeps_names():
@@ -49,8 +49,32 @@ def test_find_role_normalizes_symbols_traditional_names_and_aliases():
         session.close()
 
 
+def test_find_role_uses_official_icon_filename_for_custom_ids():
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(bind=engine)
+    session = sessionmaker(bind=engine)()
+    try:
+        barber = Role(canonical_key="barber", name_zh_tw="Barber", team="outsider")
+        session.add(barber)
+        session.commit()
+        matched = find_role(session, {
+            "id": "biezaizhelifadian111",
+            "name": "Legacy Barber",
+            "image": "https://oss.gstonegames.com/data_file/clocktower/web/icons/barber.png",
+        })
+        assert matched.id == barber.id
+        for filename, canonical_id in (("limao.png", "limao"), ("barber.png", "barber"), ("kazali.png", "kazali")):
+            catalog_role = find_catalog_role({"id": "legacy-custom-id", "name": "legacy", "image": f"https://example.test/{filename}"})
+            assert catalog_role["id"] == canonical_id
+        assert normalized_entry_type("a jinxed") == "jinx"
+        assert normalized_entry_type("unknown type") == "special"
+    finally:
+        session.close()
+
+
 if __name__ == "__main__":
     test_script_json_ignores_meta_and_keeps_names()
     test_script_json_preserves_fabled_metadata()
     test_find_role_normalizes_symbols_traditional_names_and_aliases()
+    test_find_role_uses_official_icon_filename_for_custom_ids()
     print({"status": "ok"})

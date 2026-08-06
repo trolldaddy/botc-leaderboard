@@ -5,6 +5,7 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from sqlalchemy import func, or_  # noqa: E402
@@ -15,6 +16,17 @@ from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 
 TO_TRADITIONAL = OpenCC("s2twp")
 SPECIAL_ENTRY_TYPES = {"fabled", "jinx", "loric", "special"}
+ENTRY_TYPE_ALIASES = {
+    "townsfolk": "townsfolk", "outsider": "outsider", "minion": "minion",
+    "demon": "demon", "traveler": "traveller", "traveller": "traveller",
+    "fabled": "fabled", "loric": "loric", "jinx": "jinx",
+    "jinxed": "jinx", "a jinxed": "jinx", "special": "special", "other": "special",
+}
+OFFICIAL_ICON_CANONICAL_IDS = {
+    "limao.png": "limao",
+    "barber.png": "barber",
+    "kazali.png": "kazali",
+}
 ROLE_CATALOG_PATH = Path(__file__).resolve().parents[1] / "static" / "js" / "roles_db.js"
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -33,9 +45,17 @@ def normalized_role_id(value):
     return re.sub(r"[^0-9a-z]+", "", str(value or "").strip().casefold())
 
 
+def normalized_entry_type(value):
+    return ENTRY_TYPE_ALIASES.get(str(value or "").strip().casefold(), "special")
+
+
+def image_filename(value):
+    return Path(urlparse(str(value or "")).path).name.casefold()
+
+
 def load_official_role_catalog(path=ROLE_CATALOG_PATH):
     """Read the browser's authoritative built-in role list without executing JS."""
-    by_id, by_name = {}, {}
+    by_id, by_name, by_image = {}, {}, {}
     for line in Path(path).read_text(encoding="utf-8").splitlines():
         if "{id:" not in line:
             continue
@@ -50,7 +70,9 @@ def load_official_role_catalog(path=ROLE_CATALOG_PATH):
         }
         by_id[normalized_role_id(item["id"])] = item
         by_name[normalized_role_name(item["name"])] = item
-    return {"by_id": by_id, "by_name": by_name}
+        if image_filename(item["image"]):
+            by_image[image_filename(item["image"])] = item
+    return {"by_id": by_id, "by_name": by_name, "by_image": by_image}
 
 
 OFFICIAL_ROLE_CATALOG = load_official_role_catalog()
@@ -64,7 +86,12 @@ def find_catalog_role(reference):
         role = OFFICIAL_ROLE_CATALOG["by_name"].get(normalized_role_name(candidate))
         if role:
             return role
-    return None
+    filename = image_filename(reference.get("image"))
+    role = OFFICIAL_ROLE_CATALOG["by_image"].get(filename)
+    if role:
+        return role
+    canonical_id = OFFICIAL_ICON_CANONICAL_IDS.get(filename)
+    return OFFICIAL_ROLE_CATALOG["by_id"].get(canonical_id) if canonical_id else None
 
 
 def text_field(value):
@@ -133,6 +160,9 @@ def find_role(db, reference):
                       if normalized_role_name(item.external_name) == normalized_name), None)
         if alias:
             return db.query(Role).filter(Role.id == alias.role_id).first()
+    catalog_role = find_catalog_role(reference)
+    if catalog_role:
+        return db.query(Role).filter(func.lower(Role.canonical_key) == catalog_role["id"].lower()).first()
     return None
 
 
@@ -228,7 +258,7 @@ def main():
             script.supplements.append(ScriptSupplement(
                 external_id=item["id"],
                 name_zh_tw=TO_TRADITIONAL.convert(item.get("name") or item["id"]),
-                entry_type=item.get("team") or "special",
+                entry_type=normalized_entry_type(item.get("team")),
                 image_url=item.get("image") or None,
                 ability=TO_TRADITIONAL.convert(item.get("ability") or "") or None,
                 sort_order=index,

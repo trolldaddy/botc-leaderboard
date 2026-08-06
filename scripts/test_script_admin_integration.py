@@ -79,7 +79,7 @@ def test_admin_update_round_trips_rich_text_and_custom_role():
                 "team": "outsider",
                 "image_url": "https://example.test/custom-v2.png",
                 "ability": '<p><strong>可編輯能力</strong></p>',
-                "sort_order": 7,
+                "sort_order": 0,
             }],
         },
         db=db,
@@ -98,11 +98,33 @@ def test_admin_update_round_trips_rich_text_and_custom_role():
         "team": "outsider",
         "image_url": "https://example.test/custom-v2.png",
         "ability": '<p><strong>可編輯能力</strong></p>',
-        "sort_order": 7,
+        "sort_order": 0,
     }]
 
     persisted = db.query(ScriptEntry).filter_by(id=script_id).one()
     assert serialize_admin_script(persisted, detail=True)["storyteller_guide"] == rich_fields["storyteller_guide"]
+
+
+def test_admin_can_create_classify_and_delete_special_entries():
+    db = make_session()
+    script_id = seed_script(db)
+    result = update_script(script_id, {
+        "custom_roles": [{
+            "id": None,
+            "name_zh_tw": "Jinx entry",
+            "team": "a jinxed",
+            "image_url": "",
+            "ability": "Jinx ability",
+        }],
+    }, db=db, admin=SimpleNamespace())
+    custom = result["script"]["custom_roles"]
+    assert len(custom) == 1
+    assert custom[0]["name_zh_tw"] == "Jinx entry"
+    assert custom[0]["team"] == "jinx"
+    assert custom[0]["external_id"].startswith("manual-")
+
+    update_script(script_id, {"custom_roles": []}, db=db, admin=SimpleNamespace())
+    assert db.query(ScriptSupplement).filter_by(script_id=script_id).count() == 0
 
 
 def test_public_payload_and_storyteller_login_gate():
@@ -156,5 +178,6 @@ def test_public_payload_and_storyteller_login_gate():
 
 if __name__ == "__main__":
     test_admin_update_round_trips_rich_text_and_custom_role()
+    test_admin_can_create_classify_and_delete_special_entries()
     test_public_payload_and_storyteller_login_gate()
-    print({"status": "ok", "tests": 2})
+    print({"status": "ok", "tests": 3})

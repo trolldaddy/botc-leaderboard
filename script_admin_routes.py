@@ -1,4 +1,5 @@
 import json
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import or_
@@ -12,6 +13,7 @@ from scripts.import_bilibili_script import (
     TO_TRADITIONAL,
     find_catalog_role,
     find_role,
+    normalized_entry_type,
     normalized_role_id,
     normalized_role_name,
     role_references_from_payload,
@@ -164,16 +166,28 @@ def update_script(
             setattr(script, field, data[field])
     if "tags" in data:
         script.tags = json.dumps(data.get("tags") or [], ensure_ascii=False)
-    by_id = {item.id: item for item in script.supplements}
-    for incoming in data.get("custom_roles") or []:
-        item = by_id.get(incoming.get("id"))
-        if not item:
-            continue
-        for field, target in (("name_zh_tw", "name_zh_tw"), ("team", "entry_type"),
-                              ("image_url", "image_url"), ("ability", "ability"),
-                              ("sort_order", "sort_order")):
-            if field in incoming:
-                setattr(item, target, incoming[field])
+    if "custom_roles" in data:
+        by_id = {item.id: item for item in script.supplements}
+        retained_ids = set()
+        for index, incoming in enumerate(data.get("custom_roles") or []):
+            try:
+                incoming_id = int(incoming.get("id")) if incoming.get("id") else None
+            except (TypeError, ValueError):
+                incoming_id = None
+            item = by_id.get(incoming_id)
+            if not item:
+                item = ScriptSupplement(script_id=script.id, external_id=f"manual-{uuid.uuid4().hex}", name_zh_tw="???", entry_type="special", sort_order=index)
+                db.add(item)
+                db.flush()
+            retained_ids.add(item.id)
+            incoming["sort_order"] = index
+            incoming["team"] = normalized_entry_type(incoming.get("team"))
+            for field, target in (("name_zh_tw", "name_zh_tw"), ("team", "entry_type"), ("image_url", "image_url"), ("ability", "ability"), ("sort_order", "sort_order")):
+                if field in incoming:
+                    setattr(item, target, incoming[field])
+        for existing_id, item in by_id.items():
+            if existing_id not in retained_ids:
+                db.delete(item)
     db.commit()
     script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
     return {"status": "success", "script": serialize_script(script, detail=True)}
@@ -221,7 +235,7 @@ def apply_role_json(
         script.supplements.append(ScriptSupplement(
             external_id=item["id"],
             name_zh_tw=TO_TRADITIONAL.convert(item.get("name") or item["id"]),
-            entry_type=item.get("team") or "special",
+            entry_type=normalized_entry_type(item.get("team")),
             image_url=item.get("image") or None,
             ability=TO_TRADITIONAL.convert(item.get("ability") or "") or None,
             sort_order=index,
