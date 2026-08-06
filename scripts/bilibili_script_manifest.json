@@ -1,4 +1,4 @@
-﻿{
+{
     "source_platform":  "bilibili",
     "items":  [
                   {
@@ -15,7 +15,8 @@
                   },
                   {
                       "external_id":  "1160738963605946387",
-                      "name_zh_tw":  "共生體"
+                      "name_zh_tw":  "共生體",
+                      "script_json":  "reports/bilibili-script-json/共生體.json"
                   },
                   {
                       "external_id":  "1165559914068705281",
@@ -45,15 +46,18 @@
                   },
                   {
                       "external_id":  "965782207528435718",
-                      "name_zh_tw":  "小二上酒"
+                      "name_zh_tw":  "小二上酒",
+                      "script_json":  "reports/bilibili-script-json/小二上酒.json"
                   },
                   {
                       "external_id":  "1118803757644120069",
-                      "name_zh_tw":  "魚躍龍門"
+                      "name_zh_tw":  "魚躍龍門",
+                      "script_json":  "reports/bilibili-script-json/魚躍龍門.json"
                   },
                   {
                       "external_id":  "1109911706420641811",
-                      "name_zh_tw":  "鴉木裝配車間"
+                      "name_zh_tw":  "鴉木裝配車間",
+                      "script_json":  "reports/bilibili-script-json/鴉木裝配車間.json"
                   },
                   {
                       "external_id":  "1141822914004254729",
@@ -61,7 +65,8 @@
                   },
                   {
                       "external_id":  "1108075131170717697",
-                      "name_zh_tw":  "復仇者集結"
+                      "name_zh_tw":  "復仇者集結",
+                      "script_json":  "reports/bilibili-script-json/復仇者集結.json"
                   },
                   {
                       "external_id":  "1040874565334466563",
@@ -73,7 +78,8 @@
                   },
                   {
                       "external_id":  "1093094139196604418",
-                      "name_zh_tw":  "阿茲卡班"
+                      "name_zh_tw":  "阿茲卡班",
+                      "script_json":  "reports/bilibili-script-json/阿茲卡班.json"
                   },
                   {
                       "external_id":  "1077848774825476101",
@@ -81,23 +87,28 @@
                   },
                   {
                       "external_id":  "1044208967471857681",
-                      "name_zh_tw":  "奇異人生"
+                      "name_zh_tw":  "奇異人生",
+                      "script_json":  "reports/bilibili-script-json/奇異人生.json"
                   },
                   {
                       "external_id":  "735177545161375745",
-                      "name_zh_tw":  "夜半狂歡"
+                      "name_zh_tw":  "夜半狂歡",
+                      "script_json":  "reports/bilibili-script-json/夜半狂歡.json"
                   },
                   {
                       "external_id":  "993306995058540599",
-                      "name_zh_tw":  "瓶中小人"
+                      "name_zh_tw":  "瓶中小人",
+                      "script_json":  "reports/bilibili-script-json/瓶中小人.json"
                   },
                   {
                       "external_id":  "1049053226713743384",
-                      "name_zh_tw":  "上帝出席"
+                      "name_zh_tw":  "上帝出席",
+                      "script_json":  "reports/bilibili-script-json/上帝出席.json"
                   },
                   {
                       "external_id":  "1060058479105933312",
-                      "name_zh_tw":  "雛鳳清聲"
+                      "name_zh_tw":  "雛鳳清聲",
+                      "script_json":  "reports/bilibili-script-json/雛鳳清聲.json"
                   },
                   {
                       "external_id":  "1052754702584774681",
@@ -105,7 +116,8 @@
                   },
                   {
                       "external_id":  "1085891354530152453",
-                      "name_zh_tw":  "意氣用事"
+                      "name_zh_tw":  "意氣用事",
+                      "script_json":  "reports/bilibili-script-json/意氣用事.json"
                   }
               ]
 }

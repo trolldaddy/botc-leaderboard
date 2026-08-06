@@ -1,0 +1,377 @@
+[
+  {
+    "hint": "線上魔典支持直接輸入劇本的URL。不必將此文件保存到你的電腦。",
+    "id": "_meta",
+    "name": "奇異人生",
+    "author": "海霧&奇異人生推理館"
+  },
+  {
+    "id": "fe1f2e21",
+    "team": "townsfolk",
+    "name": "小精靈",
+    "ability": "在你的首個夜晚，你會得知一個在場的鎮民角色。如果你“瘋狂”地證明你是該角色，當他死亡時你獲得該角色的能力。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/pixie_600w.webp",
+    "setup": false,
+    "reminders": [
+      "瘋狂",
+      "獲得能力"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 3040,
+    "otherNight": 0
+  },
+  {
+    "id": "4fa61c56",
+    "team": "townsfolk",
+    "name": "舞蛇人",
+    "ability": "每個夜晚，你要選擇一名存活的玩家：如果你選中了惡魔，你和他交換角色和陣營，然後他中毒。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/snakeCharmer_600w.webp",
+    "setup": false,
+    "reminders": [
+      "中毒"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 3022,
+    "otherNight": 33
+  },
+  {
+    "id": "d4f30628",
+    "team": "townsfolk",
+    "name": "築夢師",
+    "ability": "每個夜晚，你要選擇除你及旅行者以外的一名玩家：你會得知一個善良角色和一個邪惡角色，該玩家是其中一個角色。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/dreamer_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [],
+    "firstNight": 3052,
+    "otherNight": 101
+  },
+  {
+    "id": "8820a48f",
+    "team": "townsfolk",
+    "name": "異教領袖",
+    "ability": "每個夜晚，你會轉變為與你鄰近的一名存活的玩家的陣營。每個白天，你可以提議所有玩家加入你的教派，如果所有善良玩家同意加入，你的陣營獲勝。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/cultLeader_600w.webp",
+    "setup": false,
+    "reminders": [
+      "同一陣營"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 3067,
+    "otherNight": 116
+  },
+  {
+    "id": "5404760f",
+    "team": "townsfolk",
+    "name": "半獸人",
+    "ability": "每個夜晚*，你要選擇一名存活玩家：如果他是善良的，他死亡，並且當晚惡魔不會造成死亡。會有一名善良玩家始終被當作邪惡陣營。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/lycanthrope_600w.webp",
+    "setup": false,
+    "reminders": [
+      "死亡",
+      "假爪"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 50
+  },
+  {
+    "id": "ed521424",
+    "team": "townsfolk",
+    "name": "博學者",
+    "ability": "每個白天，你可以私下詢問說書人以得知兩條信息：一個是正確的，一個是錯誤的。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/savant_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "208f3fa4",
+    "team": "townsfolk",
+    "name": "侍臣",
+    "ability": "每局遊戲限一次，在夜晚時，你可以選擇一個角色：如果該角色在場，該角色之一從當晚開始醉酒三天三夜。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/courtier_600w.webp",
+    "setup": false,
+    "reminders": [
+      "醉酒1",
+      "醉酒2",
+      "醉酒3",
+      "失去能力"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 3020,
+    "otherNight": 25
+  },
+  {
+    "id": "4d703616",
+    "team": "townsfolk",
+    "name": "哲學家",
+    "ability": "每局遊戲限一次，在夜晚時，你可以選擇一個善良角色：你獲得該角色的能力。如果這個角色在場，他醉酒。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/philosopher_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [
+      "醉酒",
+      "是哲學家"
+    ],
+    "firstNight": 11,
+    "otherNight": 13
+  },
+  {
+    "id": "6c100d1d",
+    "team": "townsfolk",
+    "name": "煉金術士",
+    "ability": "你擁有一個爪牙角色的能力。當你使用能力時，說書人可能會要求你更換選擇。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/alchemist_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [
+      "是煉金術士"
+    ],
+    "firstNight": 12,
+    "otherNight": 0
+  },
+  {
+    "id": "64053a1f",
+    "team": "townsfolk",
+    "name": "食人族",
+    "ability": "你擁有上個死於處決的玩家的能力。如果該玩家屬於邪惡陣營，你中毒直到下個善良玩家死於處決。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/cannibal_600w.webp",
+    "setup": false,
+    "reminders": [
+      "中毒",
+      "便餐"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "2e60f157",
+    "team": "townsfolk",
+    "name": "報喪女妖",
+    "ability": "如果惡魔殺死了你，所有玩家都會得知此事。從現在開始，你每天可以發起兩次提名，每次投票時可以投兩票。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/banshee_600w.webp",
+    "setup": false,
+    "reminders": [
+      "具有能力"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "cd9e83a2",
+    "team": "townsfolk",
+    "name": "罌粟種植者",
+    "ability": "爪牙和惡魔互相不認識。如果你死亡，當晚他們會互相認識。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/poppyGrower_600w.webp",
+    "setup": false,
+    "reminders": [
+      "喚醒邪惡"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 13,
+    "otherNight": 15
+  },
+  {
+    "id": "8342c540",
+    "team": "townsfolk",
+    "name": "無神論者",
+    "ability": "說書人可以打破遊戲規則，如果說書人被處決，善良陣營獲勝，即使你已死亡。[無邪惡角色在場]",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/atheist_600w.webp",
+    "setup": true,
+    "reminders": [],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "d5b526da",
+    "team": "outsider",
+    "name": "酒鬼",
+    "ability": "你不知道你是酒鬼。你以為你是一個鎮民角色，但其實你不是。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/drunk_600w.webp",
+    "setup": true,
+    "reminders": [],
+    "remindersGlobal": [
+      "是酒鬼"
+    ],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "3cc25e09",
+    "team": "outsider",
+    "name": "陌客",
+    "ability": "你可能會被當作邪惡陣營、爪牙角色或惡魔角色，即使你已死亡。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/recluse_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "0212061b",
+    "team": "outsider",
+    "name": "聖徒",
+    "ability": "如果你死於處決，你的陣營落敗。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/saint_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "2abb26c6",
+    "team": "outsider",
+    "name": "異端分子",
+    "ability": "對調勝負結果，即使你已死亡。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/heretic_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "a8b3c52b",
+    "team": "outsider",
+    "name": "魔像",
+    "ability": "每局遊戲你只能發起提名一次。當你發起提名時，如果被你提名的玩家不是惡魔，他死亡。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/golem_600w.webp",
+    "setup": false,
+    "reminders": [
+      "無法提名"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "862e22e7",
+    "team": "minion",
+    "name": "投毒者",
+    "ability": "每個夜晚，你要選擇一名玩家：他在當晚和明天白天中毒。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/poisoner_600w.webp",
+    "setup": false,
+    "reminders": [
+      "中毒"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 3016,
+    "otherNight": 22
+  },
+  {
+    "id": "685be2fc",
+    "team": "minion",
+    "name": "精神病患者",
+    "ability": "每個白天，在提名開始前，你可以公開選擇一名玩家：他死亡。如果你被處決，提名你的玩家需要和你猜拳，只有你輸了你才會死亡。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/psychopath_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "0ca74730",
+    "team": "minion",
+    "name": "哥布林",
+    "ability": "如果你在被提名後公開聲明自己是哥布林且在那個白天被處決，你的陣營獲勝。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/goblin_600w.webp",
+    "setup": false,
+    "reminders": [
+      "已公開聲明"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "c42d6547",
+    "team": "minion",
+    "name": "紅唇女郎",
+    "ability": "如果大於等於五名玩家存活時（旅行者不計算在內）惡魔死亡，你變成那個惡魔。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/scarletWoman_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [
+      "是惡魔"
+    ],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "ca4e3001",
+    "team": "demon",
+    "name": "牙噶巴卜",
+    "ability": "在你的首個夜晚，你會得知一段秘密短語。每次你在白天公開說出這段短語，當天便可能會有一名玩家在這之後死亡。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/yaggababble_600w.webp",
+    "setup": false,
+    "reminders": [
+      "死亡"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 3036,
+    "otherNight": 67
+  },
+  {
+    "id": "b1441e30",
+    "team": "demon",
+    "name": "老窮奇",
+    "ability": "每個夜晚*，你要選擇一名玩家：他死亡。所有的外來者都可能會被當作邪惡陣營、爪牙角色或惡魔角色。",
+    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202301/c_3749208694761_610b7c97.jpg",
+    "setup": false,
+    "reminders": [
+      "死亡"
+    ],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 59
+  },
+  {
+    "id": "bdc32304",
+    "team": "demon",
+    "name": "方古",
+    "ability": "每個夜晚*，你要選擇一名玩家：他死亡。被該能力殺死的外來者改為變成邪惡的方古且你代替他死亡，但每局遊戲僅能成功轉化一次。[+1外來者]",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/fangGu_600w.webp",
+    "setup": true,
+    "reminders": [
+      "死亡"
+    ],
+    "remindersGlobal": [
+      "限一次"
+    ],
+    "firstNight": 0,
+    "otherNight": 58
+  },
+  {
+    "id": "bbee8cf3",
+    "team": "fabled",
+    "name": "第七十一次循環",
+    "ability": "說書人可能會做出一些可以但不建議的行為。",
+    "image": "https://clocktower-wiki.gstonegames.com/images/thumb/9/97/Bootlegger.png/200px-Bootlegger.png",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  },
+  {
+    "id": "79edb9ed",
+    "team": "fabled",
+    "name": "哨兵",
+    "ability": "在初始設置時，可能會額外增加或減少一個外來者。",
+    "image": "https://tachyondungeon.xyz/botc/image/characters/sentinel_600w.webp",
+    "setup": false,
+    "reminders": [],
+    "remindersGlobal": [],
+    "firstNight": 0,
+    "otherNight": 0
+  }
+]
