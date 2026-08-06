@@ -32,8 +32,24 @@ def test_ambiguous_partial_match_is_rejected():
     assert best_json("未來之主", candidates) is None
 
 
+def test_batch_write_requires_complete_preview():
+    source = Path(__file__).with_name("import_bilibili_scripts.py").read_text(encoding="utf-8")
+    preview_gate = source.index("if args.write and not failed:")
+    write_flag = source.index('row["metadata"], row["script_json"], "--write"', preview_gate)
+    assert preview_gate < write_flag
+
+
+def test_workflow_imports_the_complete_manifest():
+    workflow = (Path(__file__).resolve().parents[1] / ".github/workflows/seed-bilibili-script.yml").read_text(encoding="utf-8")
+    assert "scripts/import_bilibili_scripts.py" in workflow
+    assert "--require-complete" in workflow
+    assert "bilibili-script-audit.json" in workflow
+
+
 if __name__ == "__main__":
     test_normalized_matches_simplified_and_traditional_names()
     test_discovery_reads_meta_name_and_exact_match()
     test_ambiguous_partial_match_is_rejected()
+    test_batch_write_requires_complete_preview()
+    test_workflow_imports_the_complete_manifest()
     print({"status": "ok"})

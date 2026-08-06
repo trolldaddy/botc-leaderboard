@@ -1,18 +1,10 @@
-name: Seed Bilibili Script
+name: Seed Reviewed Bilibili Scripts
 
 on:
   workflow_dispatch:
     inputs:
-      script:
-        description: Reviewed script to import
-        required: true
-        default: wafuleiming
-        type: choice
-        options:
-          - wafuleiming
-          - gongshengti
       mode:
-        description: Preview validates matching; write updates the database
+        description: Preview validates all 26 scripts; write updates the database only after a complete preview
         required: true
         default: preview
         type: choice
@@ -35,24 +27,17 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: test -n "$DATABASE_URL"
-      - name: Import reviewed script
+      - name: Import reviewed scripts
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
-          case "${{ inputs.script }}" in
-            wafuleiming)
-              metadata=data/scripts/wafuleiming.json
-              script_json=data/scripts/wafuleiming-script.json
-              ;;
-            gongshengti)
-              metadata=data/scripts/gongshengti.json
-              script_json=data/scripts/gongshengti-script.json
-              ;;
-            *) echo "Unsupported script: ${{ inputs.script }}"; exit 1 ;;
-          esac
-          args=()
+          args=(--require-complete --report reports/bilibili-script-audit.json)
           if [ "${{ inputs.mode }}" = "write" ]; then args+=(--write); fi
-          python scripts/import_bilibili_script.py \
-            "$metadata" \
-            "$script_json" \
-            "${args[@]}"
+          python scripts/import_bilibili_scripts.py "${args[@]}"
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bilibili-script-audit-${{ inputs.mode }}
+          path: reports/bilibili-script-audit.json
+          if-no-files-found: warn

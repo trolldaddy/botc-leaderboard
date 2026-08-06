@@ -111,12 +111,10 @@ def main():
             report.append(row)
             continue
         command = [sys.executable, "scripts/import_bilibili_script.py", str(metadata_path), str(match["path"])]
-        if args.write:
-            command.append("--write")
         if args.require_complete:
             command.append("--require-complete")
         result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
-        row["status"] = "imported" if args.write and result.returncode == 0 else "previewed" if result.returncode == 0 else "failed"
+        row["status"] = "previewed" if result.returncode == 0 else "failed"
         raw_output = (result.stdout or "").strip()
         try:
             row["result"] = json.loads(raw_output) if raw_output else None
@@ -126,6 +124,26 @@ def main():
         if result.returncode:
             failed = True
         report.append(row)
+    # Write only after every manifest item has passed the complete preview. This
+    # prevents a missing or invalid late item from leaving a partial production import.
+    if args.write and not failed:
+        for row in report:
+            command = [
+                sys.executable, "scripts/import_bilibili_script.py",
+                row["metadata"], row["script_json"], "--write",
+            ]
+            if args.require_complete:
+                command.append("--require-complete")
+            result = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
+            row["status"] = "imported" if result.returncode == 0 else "failed"
+            raw_output = (result.stdout or "").strip()
+            try:
+                row["result"] = json.loads(raw_output) if raw_output else None
+            except json.JSONDecodeError:
+                row["output"] = raw_output
+            row["error"] = (result.stderr or "").strip()
+            if result.returncode:
+                failed = True
     statuses = {}
     for row in report:
         statuses[row["status"]] = statuses.get(row["status"], 0) + 1
