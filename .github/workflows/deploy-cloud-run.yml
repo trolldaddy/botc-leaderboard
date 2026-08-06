@@ -154,7 +154,7 @@ jobs:
           retention-days: 7
 
   reviewed-script-import:
-    if: github.event_name == 'workflow_dispatch' && (inputs.operation == 'preview-reviewed-scripts' || inputs.operation == 'write-reviewed-scripts')
+    if: (github.event_name == 'push' && contains(github.event.head_commit.message, '[seed-reviewed-scripts]')) || (github.event_name == 'workflow_dispatch' && (inputs.operation == 'preview-reviewed-scripts' || inputs.operation == 'write-reviewed-scripts'))
     runs-on: ubuntu-latest
     environment: production
 
@@ -186,7 +186,7 @@ jobs:
         run: |
           set -euo pipefail
           args=(--require-complete --report reports/bilibili-script-audit.json)
-          if [ "${{ inputs.operation }}" = "write-reviewed-scripts" ]; then args+=(--write); fi
+          if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.operation }}" = "write-reviewed-scripts" ]; then args+=(--write); fi
           python scripts/import_bilibili_scripts.py "${args[@]}"
 
       - name: Upload reviewed script audit
