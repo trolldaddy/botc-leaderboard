@@ -7,7 +7,15 @@ from sqlalchemy.orm import Session, joinedload
 import models
 from account_binding_routes import require_admin_account
 from database import get_db
-from script_models import ScriptEntry, ScriptRole
+from script_models import ScriptEntry, ScriptRole, ScriptSupplement
+from scripts.import_bilibili_script import (
+    TO_TRADITIONAL,
+    find_catalog_role,
+    find_role,
+    normalized_role_id,
+    normalized_role_name,
+    role_references_from_payload,
+)
 
 router = APIRouter(prefix="/scripts", tags=["script-admin"])
 
@@ -62,6 +70,49 @@ def serialize_script(script, detail=False):
         } for item in sorted(script.supplements, key=lambda value: (value.sort_order, value.id))]
     return data
 
+
+def match_role_payload(db, payload):
+    references = role_references_from_payload(payload)
+    official, supplements, missing, duplicates = [], [], [], []
+    seen_official, seen_supplements = set(), set()
+    for reference in references:
+        role = find_role(db, reference)
+        if role:
+            identity = normalized_role_id(role.canonical_key) or f"db:{role.id}"
+            if identity in seen_official:
+                duplicates.append(reference)
+                continue
+            seen_official.add(identity)
+            official.append(role)
+            continue
+        catalog_role = find_catalog_role(reference)
+        if catalog_role:
+            missing.append({**reference, "reason": "official_role_missing_from_database"})
+            continue
+        if reference.get("team"):
+            identity = normalized_role_id(reference.get("id")) or normalized_role_name(reference.get("name"))
+            if identity and identity in seen_supplements:
+                duplicates.append(reference)
+                continue
+            if identity:
+                seen_supplements.add(identity)
+            supplements.append(reference)
+        else:
+            missing.append({**reference, "reason": "unmatched_entry"})
+    return official, supplements, missing, duplicates
+
+
+def role_json_report(official, supplements, missing, duplicates):
+    return {
+        "entries_found": len(official) + len(supplements) + len(missing) + len(duplicates),
+        "roles_matched": len(official),
+        "special_entries_preserved": len(supplements),
+        "roles_missing": missing,
+        "duplicate_entries_ignored": duplicates,
+        "official_roles": [{"id": item.id, "name": item.name_zh_tw, "team": item.team} for item in official],
+        "special_entries": supplements,
+        "can_apply": not missing and len(official) + len(supplements) >= 5,
+    }
 
 @router.get("")
 def list_scripts(
@@ -126,3 +177,55 @@ def update_script(
     db.commit()
     script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
     return {"status": "success", "script": serialize_script(script, detail=True)}
+@router.post("/{script_id}/role-json/preview")
+def preview_role_json(
+    script_id: int,
+    data: dict,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    if not db.query(ScriptEntry.id).filter(ScriptEntry.id == script_id).first():
+        raise HTTPException(status_code=404, detail="找不到劇本")
+    try:
+        payload = json.loads(str(data.get("content") or ""))
+        result = match_role_payload(db, payload)
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=400, detail=f"無法讀取劇本 JSON：{exc}") from exc
+    return {"filename": data.get("filename") or "", **role_json_report(*result)}
+
+
+@router.post("/{script_id}/role-json/apply")
+def apply_role_json(
+    script_id: int,
+    data: dict,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
+    if not script:
+        raise HTTPException(status_code=404, detail="找不到劇本")
+    try:
+        payload = json.loads(str(data.get("content") or ""))
+        official, supplements, missing, duplicates = match_role_payload(db, payload)
+    except (TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise HTTPException(status_code=400, detail=f"無法讀取劇本 JSON：{exc}") from exc
+    report = role_json_report(official, supplements, missing, duplicates)
+    if not report["can_apply"]:
+        raise HTTPException(status_code=409, detail="JSON 仍有無法辨識的條目，已拒絕覆蓋角色構成")
+    db.query(ScriptRole).filter(ScriptRole.script_id == script.id).delete(synchronize_session=False)
+    db.query(ScriptSupplement).filter(ScriptSupplement.script_id == script.id).delete(synchronize_session=False)
+    db.flush()
+    for index, role in enumerate(official):
+        script.roles.append(ScriptRole(role_id=role.id, sort_order=index))
+    for index, item in enumerate(supplements):
+        script.supplements.append(ScriptSupplement(
+            external_id=item["id"],
+            name_zh_tw=TO_TRADITIONAL.convert(item.get("name") or item["id"]),
+            entry_type=item.get("team") or "special",
+            image_url=item.get("image") or None,
+            ability=TO_TRADITIONAL.convert(item.get("ability") or "") or None,
+            sort_order=index,
+        ))
+    script.needs_review = True
+    db.commit()
+    return {"status": "success", **report}

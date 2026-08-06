@@ -42,6 +42,17 @@ def test_script_admin_api_persists_required_fields_and_custom_abilities():
     assert "setattr(item, target, incoming[field])" in routes
 
 
+def test_script_admin_role_json_import_is_preview_first():
+    html = (ROOT / "static/pages/role_admin.html").read_text(encoding="utf-8")
+    javascript = (ROOT / "static/js/script_admin.js").read_text(encoding="utf-8")
+    routes = (ROOT / "script_admin_routes.py").read_text(encoding="utf-8")
+    assert "script-json-import" in html
+    assert "script-role-json-preview" in javascript
+    assert "script-role-json-apply" in javascript
+    assert 'role-json/preview' in routes
+    assert 'role-json/apply' in routes
+    assert 'if not report["can_apply"]' in routes
+
 if __name__ == "__main__":
     test_script_admin_has_third_mode_and_editor_mount()
     test_script_admin_exposes_all_required_rich_text_fields()

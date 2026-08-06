@@ -73,8 +73,7 @@ def text_field(value):
     return str(value or "").strip() if not isinstance(value, dict) else ""
 
 
-def role_references_from_json(path):
-    payload = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+def role_references_from_payload(payload):
     if not isinstance(payload, list):
         raise ValueError("劇本 JSON 必須是陣列")
     result = []
@@ -89,6 +88,11 @@ def role_references_from_json(path):
                 "ability": text_field(item.get("ability")) if isinstance(item, dict) else "",
             })
     return result
+
+
+def role_references_from_json(path):
+    payload = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    return role_references_from_payload(payload)
 
 
 def role_ids_from_json(path):
