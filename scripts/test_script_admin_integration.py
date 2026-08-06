@@ -13,9 +13,10 @@ import role_models  # noqa: F401 - register role tables on shared metadata
 from database import Base
 from role_models import Role
 from script_admin_routes import apply_role_json
+from script_admin_routes import delete_script
 from script_admin_routes import serialize_script as serialize_admin_script
 from script_admin_routes import update_script
-from script_models import ScriptEntry, ScriptRole, ScriptSupplement
+from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 import script_import_service
 from script_public_routes import get_storyteller_guide, list_scripts, serialize_script as serialize_public_script
 
@@ -270,6 +271,30 @@ def test_remote_artwork_prefers_two_portrait_faces_over_logo():
     selected = script_import_service.rank_remote_artwork(candidates)
     assert [item["name"] for item in selected] == ["front", "back"]
 
+def test_admin_can_delete_script_and_cascade_children():
+    db = make_session()
+    script_id = seed_script(db)
+    script = db.query(ScriptEntry).filter_by(id=script_id).one()
+    script.images.append(ScriptImage(
+        image_url="/static/script-images/uploads/integration-script/front.png",
+        alt_text="front",
+        sort_order=0,
+    ))
+    db.commit()
+    deleted_name = script.name_zh_tw
+
+    result = delete_script(script_id, db=db, admin=SimpleNamespace())
+
+    assert result == {
+        "status": "success",
+        "deleted_id": script_id,
+        "deleted_name": deleted_name,
+    }
+    assert db.query(ScriptEntry).filter_by(id=script_id).count() == 0
+    assert db.query(ScriptImage).filter_by(script_id=script_id).count() == 0
+    assert db.query(ScriptRole).filter_by(script_id=script_id).count() == 0
+    assert db.query(ScriptSupplement).filter_by(script_id=script_id).count() == 0
+
 def test_new_manual_import_creates_internal_draft_and_local_artwork():
     db = make_session()
     roles = []
@@ -319,6 +344,7 @@ if __name__ == "__main__":
     test_admin_can_create_classify_and_delete_special_entries()
     test_public_script_list_searches_roles_and_combines_catalog_filters()
     test_public_payload_and_storyteller_login_gate()
+    test_admin_can_delete_script_and_cascade_children()
     test_new_manual_import_creates_internal_draft_and_local_artwork()
     test_remote_artwork_prefers_two_portrait_faces_over_logo()
-    print({"status": "ok", "tests": 8})
+    print({"status": "ok", "tests": 9})

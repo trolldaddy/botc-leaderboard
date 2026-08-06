@@ -72,8 +72,21 @@ def test_script_admin_new_import_is_preview_first_and_local_only():
     assert "needs_review=True" in service
     assert "沒有成功保存任何劇本圖片" in service
 
+def test_script_admin_compacts_flags_and_supports_confirmed_delete():
+    html = (ROOT / "static/pages/role_admin.html").read_text(encoding="utf-8")
+    javascript = (ROOT / "static/js/script_admin.js").read_text(encoding="utf-8")
+    routes = (ROOT / "script_admin_routes.py").read_text(encoding="utf-8")
+    assert "script-admin-flags" in html
+    assert 'id="script-admin-delete"' in javascript
+    assert "async function deleteScript()" in javascript
+    assert "window.confirm" in javascript
+    assert "window.prompt" in javascript
+    assert '@router.delete("/{script_id}")' in routes
+    assert "db.delete(script)" in routes
+
 if __name__ == "__main__":
     test_script_admin_has_third_mode_and_editor_mount()
     test_script_admin_exposes_all_required_rich_text_fields()
     test_script_admin_api_persists_required_fields_and_custom_abilities()
+    test_script_admin_compacts_flags_and_supports_confirmed_delete()
     print({"status": "ok"})

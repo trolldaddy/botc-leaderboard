@@ -231,6 +231,28 @@ def update_script(
     db.commit()
     script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
     return {"status": "success", "script": serialize_script(script, detail=True)}
+
+
+@router.delete("/{script_id}")
+def delete_script(
+    script_id: int,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    script = db.query(ScriptEntry).filter(ScriptEntry.id == script_id).first()
+    if not script:
+        raise HTTPException(status_code=404, detail="Script not found")
+
+    deleted_name = script.name_zh_tw
+    db.delete(script)
+    db.commit()
+    return {
+        "status": "success",
+        "deleted_id": script_id,
+        "deleted_name": deleted_name,
+    }
+
+
 @router.post("/{script_id}/role-json/preview")
 def preview_role_json(
     script_id: int,
