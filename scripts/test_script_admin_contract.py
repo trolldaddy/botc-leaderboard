@@ -83,6 +83,11 @@ def test_script_admin_compacts_flags_and_supports_confirmed_delete():
     assert "window.prompt" in javascript
     assert '@router.delete("/{script_id}")' in routes
     assert "db.delete(script)" in routes
+    assert 'id="script-images-save"' in javascript
+    assert "data-script-image-file" in javascript
+    assert "async function saveImages()" in javascript
+    assert '@router.post("/{script_id}/images")' in routes
+    assert "save_artwork_slot" in routes
 
 if __name__ == "__main__":
     test_script_admin_has_third_mode_and_editor_mount()

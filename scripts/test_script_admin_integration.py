@@ -16,6 +16,7 @@ from script_admin_routes import apply_role_json
 from script_admin_routes import delete_script
 from script_admin_routes import serialize_script as serialize_admin_script
 from script_admin_routes import update_script
+from script_admin_routes import update_script_images
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 import script_import_service
 from script_public_routes import get_storyteller_guide, list_scripts, serialize_script as serialize_public_script
@@ -295,6 +296,48 @@ def test_admin_can_delete_script_and_cascade_children():
     assert db.query(ScriptRole).filter_by(script_id=script_id).count() == 0
     assert db.query(ScriptSupplement).filter_by(script_id=script_id).count() == 0
 
+def test_admin_can_replace_or_add_script_faces():
+    db = make_session()
+    script_id = seed_script(db)
+    script = db.query(ScriptEntry).filter_by(id=script_id).one()
+    script.images.append(ScriptImage(
+        image_url="/static/script-images/uploads/integration-script/01.jpg",
+        alt_text="舊正面",
+        sort_order=0,
+    ))
+    db.commit()
+    with tempfile.TemporaryDirectory() as folder:
+        previous = script_import_service.IMAGE_ROOT
+        script_import_service.IMAGE_ROOT = Path(folder)
+        try:
+            result = update_script_images(
+                script_id,
+                {"images": [
+                    {
+                        "slot": 0,
+                        "filename": "front.png",
+                        "content_type": "image/png",
+                        "content": base64.b64encode(b"new-front").decode("ascii"),
+                    },
+                    {
+                        "slot": 1,
+                        "filename": "back.jpg",
+                        "content_type": "image/jpeg",
+                        "content": base64.b64encode(b"new-back").decode("ascii"),
+                    },
+                ]},
+                db=db,
+                admin=SimpleNamespace(),
+            )
+            assert (Path(folder) / "integration-script" / "01.png").read_bytes() == b"new-front"
+            assert (Path(folder) / "integration-script" / "02.jpg").read_bytes() == b"new-back"
+        finally:
+            script_import_service.IMAGE_ROOT = previous
+    assert [image["sort_order"] for image in result["script"]["images"]] == [0, 1]
+    assert result["script"]["images"][0]["url"].endswith("/01.png")
+    assert result["script"]["images"][1]["url"].endswith("/02.jpg")
+
+
 def test_new_manual_import_creates_internal_draft_and_local_artwork():
     db = make_session()
     roles = []
@@ -345,6 +388,7 @@ if __name__ == "__main__":
     test_public_script_list_searches_roles_and_combines_catalog_filters()
     test_public_payload_and_storyteller_login_gate()
     test_admin_can_delete_script_and_cascade_children()
+    test_admin_can_replace_or_add_script_faces()
     test_new_manual_import_creates_internal_draft_and_local_artwork()
     test_remote_artwork_prefers_two_portrait_faces_over_logo()
-    print({"status": "ok", "tests": 9})
+    print({"status": "ok", "tests": 10})

@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session, joinedload
 import models
 from account_binding_routes import require_admin_account
 from database import get_db
-from script_models import ScriptEntry, ScriptRole, ScriptSupplement
-from script_import_service import create_script, museum_metadata
+from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
+from script_import_service import create_script, museum_metadata, save_artwork_slot
 from scripts.import_bilibili_script import (
     TO_TRADITIONAL,
     find_catalog_role,
@@ -251,6 +251,46 @@ def delete_script(
         "deleted_id": script_id,
         "deleted_name": deleted_name,
     }
+
+
+@router.post("/{script_id}/images")
+def update_script_images(
+    script_id: int,
+    data: dict,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
+    if not script:
+        raise HTTPException(status_code=404, detail="找不到劇本")
+    uploads = data.get("images") or []
+    if not uploads or len(uploads) > 2:
+        raise HTTPException(status_code=400, detail="請選擇一至兩張正反面圖片")
+    by_slot = {item.sort_order: item for item in script.images if item.sort_order in (0, 1)}
+    seen = set()
+    for incoming in uploads:
+        try:
+            slot = int(incoming.get("slot"))
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=400, detail="劇本圖片位置不正確")
+        if slot not in (0, 1) or slot in seen:
+            raise HTTPException(status_code=400, detail="劇本圖片位置不正確或重複")
+        seen.add(slot)
+        url = save_artwork_slot(script, incoming, slot)
+        image = by_slot.get(slot)
+        if image:
+            image.image_url = url
+            image.alt_text = f"{script.name_zh_tw}{'正面' if slot == 0 else '背面'}"
+        else:
+            script.images.append(ScriptImage(
+                image_url=url,
+                alt_text=f"{script.name_zh_tw}{'正面' if slot == 0 else '背面'}",
+                sort_order=slot,
+            ))
+    db.commit()
+    db.expire_all()
+    refreshed = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
+    return {"status": "success", "script": serialize_script(refreshed, detail=True)}
 
 
 @router.post("/{script_id}/role-json/preview")

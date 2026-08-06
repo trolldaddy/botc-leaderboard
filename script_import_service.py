@@ -120,6 +120,20 @@ def save_artwork(script, uploads, remote_urls):
     return saved
 
 
+def save_artwork_slot(script, item, slot):
+    """Persist one edited script face and return its stable public URL."""
+    if slot not in (0, 1):
+        raise HTTPException(400, "劇本圖片位置只能是正面或背面")
+    folder = IMAGE_ROOT / script.slug
+    folder.mkdir(parents=True, exist_ok=True)
+    suffix = extension(item.get("filename"), item.get("content_type"))
+    for existing in folder.glob(f"{slot + 1:02d}.*"):
+        existing.unlink(missing_ok=True)
+    target = folder / f"{slot + 1:02d}{suffix}"
+    target.write_bytes(uploaded_bytes(item))
+    return f"/static/script-images/uploads/{script.slug}/{target.name}"
+
+
 def local_icon(script, item):
     source = str(item.get("image") or "").strip()
     if normalized_entry_type(item.get("team")) == "jinx" and not source:
