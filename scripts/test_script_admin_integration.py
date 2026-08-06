@@ -12,6 +12,7 @@ import models  # noqa: F401 - register account tables on shared metadata
 import role_models  # noqa: F401 - register role tables on shared metadata
 from database import Base
 from role_models import Role
+from script_admin_routes import apply_role_json
 from script_admin_routes import serialize_script as serialize_admin_script
 from script_admin_routes import update_script
 from script_models import ScriptEntry, ScriptRole, ScriptSupplement
@@ -108,6 +109,48 @@ def test_admin_update_round_trips_rich_text_and_custom_role():
     persisted = db.query(ScriptEntry).filter_by(id=script_id).one()
     assert serialize_admin_script(persisted, detail=True)["storyteller_guide"] == rich_fields["storyteller_guide"]
 
+
+def test_role_json_apply_replaces_stale_custom_clockmaker_with_official_role():
+    db = make_session()
+    official = []
+    for key, name in (
+        ("clockmaker", "鐘錶匠"),
+        ("washerwoman", "洗衣婦"),
+        ("librarian", "圖書管理員"),
+        ("investigator", "調查員"),
+        ("chef", "廚師"),
+    ):
+        role = Role(canonical_key=key, name_zh_tw=name, team="townsfolk", is_official=True, is_active=True)
+        db.add(role)
+        official.append(role)
+    script = ScriptEntry(slug="clockmaker-replace", name_zh_tw="斗轉星移")
+    script.roles.append(ScriptRole(role=official[1], sort_order=0))
+    script.supplements.append(ScriptSupplement(
+        external_id="legacy-clockmaker", name_zh_tw="鐘錶匠", entry_type="townsfolk",
+        image_url="https://clocktower-wiki.gstonegames.com/images/thumb/7/74/Clockmaker.png/300px-Clockmaker.png",
+        sort_order=0,
+    ))
+    db.add(script)
+    db.commit()
+
+    payload = [
+        {"id": "legacy-clockmaker", "name": "钟表匠", "team": "townsfolk", "image": "https://clocktower-wiki.gstonegames.com/images/thumb/7/74/Clockmaker.png/300px-Clockmaker.png"},
+        {"id": "washerwoman"}, {"id": "librarian"}, {"id": "investigator"}, {"id": "chef"},
+    ]
+    result = apply_role_json(
+        script.id,
+        {"filename": "roles.json", "content": __import__("json").dumps(payload)},
+        db=db,
+        admin=SimpleNamespace(),
+    )
+
+    assert result["status"] == "success"
+    assert result["roles_matched"] == 5
+    assert result["special_entries_preserved"] == 0
+    assert len(result["script"]["roles"]) == 5
+    assert result["script"]["custom_roles"] == []
+    assert {item["role_id"] for item in result["script"]["roles"]} == {role.id for role in official}
+    assert db.query(ScriptSupplement).filter_by(script_id=script.id).count() == 0
 
 def test_admin_can_create_classify_and_delete_special_entries():
     db = make_session()
@@ -225,7 +268,8 @@ def test_new_manual_import_creates_internal_draft_and_local_artwork():
 
 if __name__ == "__main__":
     test_admin_update_round_trips_rich_text_and_custom_role()
+    test_role_json_apply_replaces_stale_custom_clockmaker_with_official_role()
     test_admin_can_create_classify_and_delete_special_entries()
     test_public_payload_and_storyteller_login_gate()
     test_new_manual_import_creates_internal_draft_and_local_artwork()
-    print({"status": "ok", "tests": 4})
+    print({"status": "ok", "tests": 5})

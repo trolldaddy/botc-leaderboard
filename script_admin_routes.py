@@ -260,8 +260,10 @@ def apply_role_json(
     report = role_json_report(official, supplements, missing, duplicates)
     if not report["can_apply"]:
         raise HTTPException(status_code=409, detail="JSON 仍有無法辨識的條目，已拒絕覆蓋角色構成")
-    db.query(ScriptRole).filter(ScriptRole.script_id == script.id).delete(synchronize_session=False)
-    db.query(ScriptSupplement).filter(ScriptSupplement.script_id == script.id).delete(synchronize_session=False)
+    # Replace through the loaded relationships so the ORM identity map cannot
+    # retain stale supplements (for example, a formerly custom Clockmaker).
+    script.roles.clear()
+    script.supplements.clear()
     db.flush()
     for index, role in enumerate(official):
         script.roles.append(ScriptRole(role_id=role.id, sort_order=index))
@@ -276,4 +278,6 @@ def apply_role_json(
         ))
     script.needs_review = True
     db.commit()
-    return {"status": "success", **report}
+    db.expire_all()
+    refreshed = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
+    return {"status": "success", **report, "script": serialize_script(refreshed, detail=True)}
