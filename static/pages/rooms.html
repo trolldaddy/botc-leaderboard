@@ -174,11 +174,11 @@
   .profile-name { color:#fff; font-size:1.05rem; font-weight:800; }
   .profile-state { color:var(--text-muted); font-size:.85rem; margin-top:.2rem; }
   .active-room-summary { position:relative; min-height:180px; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.22); border-radius:16px; padding:1rem calc(50% + .75rem) 1rem 1rem; margin-top:1rem; }
-  .room-script-library-link { position:absolute; inset:1rem 1rem 1rem 50%; display:block; overflow:hidden; color:inherit; text-decoration:none; border:1px solid rgba(246,190,45,.28); border-radius:12px; background:rgba(246,190,45,.07); transition:border-color .18s ease, transform .18s ease; }
+  .room-script-library-link { position:absolute; z-index:2; inset:1rem 1rem 1rem 50%; display:block; overflow:hidden; color:inherit; text-decoration:none; cursor:pointer; border:1px solid rgba(246,190,45,.28); border-radius:12px; background:rgba(246,190,45,.07); transition:border-color .18s ease, transform .18s ease; }
   .room-script-library-link:hover { border-color:rgba(246,190,45,.7); transform:translateY(-1px); }
   .room-script-library-logo { width:100%; height:100%; display:grid; place-items:center; overflow:hidden; background:rgba(255,255,255,.04); font-size:2rem; }
   .room-script-library-logo img { width:100%; height:100%; object-fit:contain; }
-  .room-script-library-logo.is-front-fallback img { object-fit:cover; object-position:center; }
+  .room-script-library-logo.is-front-fallback img { object-fit:cover; object-position:center 58%; }
   .room-script-library-copy { position:absolute; right:.45rem; bottom:.4rem; left:.45rem; min-width:0; display:flex; flex-direction:column; gap:.05rem; padding:.35rem .5rem; border-radius:8px; background:linear-gradient(90deg,rgba(8,7,13,.92),rgba(8,7,13,.68)); }
   .room-script-library-copy small { color:var(--accent-gold); font-size:.7rem; font-weight:700; }
   .room-script-library-copy strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -206,6 +206,8 @@
   .town-table th, .town-table td { padding:.75rem; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; vertical-align:middle; }
   .town-table th { color:var(--accent-gold); font-size:.75rem; letter-spacing:1px; text-transform:uppercase; }
   .town-table input, .town-table select { max-width:120px; }
+  .town-table select, .profile-seat-select { color-scheme:dark; cursor:pointer; }
+  .town-table select option, .profile-seat-select option { color:#fff; background:#171421; }
   .empty-row { color:var(--text-muted); text-align:center!important; padding:2rem!important; }
   .player-avatar { width:30px; height:30px; border-radius:999px; object-fit:cover; background:rgba(255,255,255,.08); vertical-align:middle; margin-right:.5rem; }
   .player-avatar-placeholder { display:inline-flex; align-items:center; justify-content:center; color:var(--text-muted); flex:0 0 30px; }

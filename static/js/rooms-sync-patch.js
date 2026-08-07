@@ -1,6 +1,6 @@
 (() => {
   const STORAGE_KEY = 'botc_town_checkin_room';
-  const ACTIVE_INTERVAL_MS = 3000;
+  const ACTIVE_INTERVAL_MS = 1500;
   const HIDDEN_INTERVAL_MS = 12000;
   let timer = null;
   let syncing = false;

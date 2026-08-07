@@ -109,6 +109,11 @@
     else card.appendChild(control);
 
     control.querySelector('#profile-seat-save')?.addEventListener('click', saveSeat);
+    control.querySelector('#profile-seat-select')?.addEventListener('change', (event) => {
+      const seat = event.currentTarget.value;
+      const status = control.querySelector('#profile-seat-status');
+      if (status) status.textContent = seat ? `將改為 ${seat} 號` : '將清除座位';
+    });
     return control;
   };
 

@@ -52,6 +52,10 @@
     link.className = 'room-script-library-link';
     link.href = `/#scripts/${encodeURIComponent(script.slug)}`;
     link.setAttribute('aria-label', `前往劇本庫查看${script.name_zh_tw || script.name || script.slug}`);
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.location.assign(link.href);
+    });
 
     const logo = document.createElement('span');
     logo.className = 'room-script-library-logo';

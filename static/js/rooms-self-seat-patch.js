@@ -114,9 +114,10 @@
     if (installed) return true;
     installed = true;
     window.TownCheckin.updateSeat = (id, value) => {
-      updateSeatDirect(id, value).catch((err) => {
+      return updateSeatDirect(id, value).catch((err) => {
         console.error(err);
         alert('座號更新時發生錯誤，請重新整理後再試。');
+        throw err;
       });
     };
     observer = new MutationObserver(scheduleDecorate);

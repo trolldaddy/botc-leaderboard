@@ -75,11 +75,15 @@ def test_room_script_summary_uses_logo_link_and_same_page_room_state():
     page = (ROOT / "static/pages/rooms.html").read_text(encoding="utf-8")
     rooms = (ROOT / "static/js/rooms.js").read_text(encoding="utf-8")
     summary = (ROOT / "static/js/rooms-script-summary-patch.js").read_text(encoding="utf-8")
+    self_seat = (ROOT / "static/js/rooms-self-seat-patch.js").read_text(encoding="utf-8")
+    seat_select = (ROOT / "static/js/rooms-seat-select-patch.js").read_text(encoding="utf-8")
+    room_sync = (ROOT / "static/js/rooms-sync-patch.js").read_text(encoding="utf-8")
     assert "botc:town-room-changed" in rooms
     assert "getCurrentRoom" in rooms
     assert "script.logo_image_url" in summary
     assert "script.images?.[0]?.url" in summary
     assert "is-front-fallback" in summary
+    assert "window.location.assign(link.href)" in summary
     assert "window.TownCheckin?.getCurrentRoom?.()" in summary
     assert "botc:town-room-changed" in summary
     assert "/#scripts/${encodeURIComponent(script.slug)}" in summary
@@ -89,6 +93,9 @@ def test_room_script_summary_uses_logo_link_and_same_page_room_state():
     assert '<th>暱稱</th>' in page
     assert 'room-player-nickname' in rooms
     assert 'p.player_name || p.display_name' in rooms
+    assert "return updateSeatDirect(id, value).catch" in self_seat
+    assert "await window.TownCheckin?.updateSeat" in seat_select
+    assert "const ACTIVE_INTERVAL_MS = 1500" in room_sync
 
 if __name__ == "__main__":
     test_public_script_page_renders_sanitized_rich_text()

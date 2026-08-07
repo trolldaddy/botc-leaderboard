@@ -80,9 +80,19 @@
         select.dataset.seatSelector = 'true';
         select.dataset.playerId = playerId;
         buildOptions(select, currentValue, tbody);
-        select.addEventListener('change', () => {
-          window.TownCheckin?.updateSeat(playerId, select.value);
-          window.setTimeout(refreshAllSeatOptions, 0);
+        select.addEventListener('change', async () => {
+          const selectedValue = select.value;
+          select.disabled = true;
+          select.setAttribute('aria-busy', 'true');
+          try {
+            await window.TownCheckin?.updateSeat(playerId, selectedValue);
+          } catch (_) {
+            // updateSeat 已顯示錯誤訊息並回復伺服器狀態。
+          } finally {
+            select.removeAttribute('aria-busy');
+            window.TownCheckinSelfSeat?.refresh?.();
+            window.setTimeout(refreshAllSeatOptions, 0);
+          }
         });
         input.replaceWith(select);
       });
