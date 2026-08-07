@@ -6,6 +6,15 @@
   let scripts = [];
   let renderQueued = false;
 
+  const onScriptLinkClick = (event) => {
+    const link = event.target.closest?.('#active-room-summary .room-script-library-link');
+    if (!link) return;
+    event.preventDefault();
+    event.stopPropagation();
+    window.location.href = link.href;
+  };
+  document.addEventListener('click', onScriptLinkClick, true);
+
   const normalize = (value) => String(value || '')
     .toLocaleLowerCase('zh-Hant')
     .replace(/[\s\-—–·・:：,，.。()（）《》〈〉【】\[\]]+/g, '');
@@ -52,10 +61,6 @@
     link.className = 'room-script-library-link';
     link.href = `/#scripts/${encodeURIComponent(script.slug)}`;
     link.setAttribute('aria-label', `前往劇本庫查看${script.name_zh_tw || script.name || script.slug}`);
-    link.addEventListener('click', (event) => {
-      event.preventDefault();
-      window.location.assign(link.href);
-    });
 
     const logo = document.createElement('span');
     logo.className = 'room-script-library-logo';
@@ -65,7 +70,11 @@
       const image = document.createElement('img');
       image.src = artworkUrl;
       image.alt = '';
-      if (!script.logo_image_url) logo.classList.add('is-front-fallback');
+      if (!script.logo_image_url) {
+        logo.classList.add('is-front-fallback');
+        image.style.objectFit = 'cover';
+        image.style.objectPosition = 'center 55%';
+      }
       image.addEventListener('error', () => { logo.textContent = '📜'; }, { once: true });
       logo.appendChild(image);
     } else {
@@ -128,6 +137,7 @@
   window.__roomsScriptSummaryPatchDestroy = () => {
     stopped = true;
     observer.disconnect();
+    document.removeEventListener('click', onScriptLinkClick, true);
     window.removeEventListener('storage', onStorage);
     window.removeEventListener('botc:town-room-changed', queueRender);
     document.querySelector('#active-room-summary .room-script-library-link')?.remove();

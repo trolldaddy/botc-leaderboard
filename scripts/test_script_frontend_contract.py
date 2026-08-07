@@ -83,7 +83,9 @@ def test_room_script_summary_uses_logo_link_and_same_page_room_state():
     assert "script.logo_image_url" in summary
     assert "script.images?.[0]?.url" in summary
     assert "is-front-fallback" in summary
-    assert "window.location.assign(link.href)" in summary
+    assert "document.addEventListener('click', onScriptLinkClick, true)" in summary
+    assert "window.location.href = link.href" in summary
+    assert "image.style.objectPosition = 'center 55%'" in summary
     assert "window.TownCheckin?.getCurrentRoom?.()" in summary
     assert "botc:town-room-changed" in summary
     assert "/#scripts/${encodeURIComponent(script.slug)}" in summary
