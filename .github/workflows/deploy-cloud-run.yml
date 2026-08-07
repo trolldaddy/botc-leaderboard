@@ -112,13 +112,18 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Connect approved script seed to Cloud SQL
+        if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[seed-script]') || contains(github.event.head_commit.message, '[seed-gongshengti]'))
+        uses: ./.github/actions/setup-cloud-sql
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
       - name: Seed approved reviewed script
         if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[seed-script]') || contains(github.event.head_commit.message, '[seed-gongshengti]'))
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           set -euo pipefail
-          test -n "$DATABASE_URL" || { echo "Missing repository secret: DATABASE_URL"; exit 1; }
+          test -n "$DATABASE_URL" || { echo "Cloud SQL Proxy did not provide DATABASE_URL"; exit 1; }
           pip install -r requirements.txt
           if [[ "${{ github.event.head_commit.message }}" == *"[seed-gongshengti]"* ]]; then
             metadata=data/scripts/gongshengti.json
@@ -178,6 +183,12 @@ jobs:
         with:
           ref: ${{ inputs.deploy_ref }}
 
+      - name: Connect to Cloud SQL
+        uses: ./.github/actions/setup-cloud-sql
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -187,16 +198,12 @@ jobs:
 
       - name: Validate database configuration
         shell: bash
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           set -euo pipefail
-          test -n "$DATABASE_URL" || { echo "Missing repository secret: DATABASE_URL"; exit 1; }
+          test -n "$DATABASE_URL" || { echo "Cloud SQL Proxy did not provide DATABASE_URL"; exit 1; }
 
       - name: Import all reviewed scripts
         shell: bash
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           set -euo pipefail
           args=(--require-complete --report reports/bilibili-script-audit.json)

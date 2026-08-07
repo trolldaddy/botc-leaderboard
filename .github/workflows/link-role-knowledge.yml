@@ -24,6 +24,12 @@ jobs:
         with:
           ref: feature/town-checkin
 
+      - name: Connect to Cloud SQL
+        uses: ./.github/actions/setup-cloud-sql
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -33,8 +39,6 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Link roles and import GStone supplemental blocks
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         shell: bash
         run: |
           set -euo pipefail

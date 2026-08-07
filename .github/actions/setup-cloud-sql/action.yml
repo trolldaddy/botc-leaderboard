@@ -1,0 +1,84 @@
+name: Set up Cloud SQL database connection
+description: Authenticate to Google Cloud, start Cloud SQL Auth Proxy, and expose DATABASE_URL.
+
+inputs:
+  project_id:
+    description: Google Cloud project ID
+    required: true
+  credentials_json:
+    description: Google Cloud service account JSON
+    required: true
+  instance:
+    description: Cloud SQL instance name
+    required: false
+    default: botc-leaderboard-db
+  database_secret:
+    description: Secret Manager secret containing the Cloud Run DATABASE_URL
+    required: false
+    default: botc-database-url
+
+runs:
+  using: composite
+  steps:
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ inputs.credentials_json }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ inputs.project_id }}
+
+    - name: Start Cloud SQL Auth Proxy
+      shell: bash
+      env:
+        GCP_PROJECT_ID: ${{ inputs.project_id }}
+        SQL_INSTANCE: ${{ inputs.instance }}
+        DATABASE_SECRET: ${{ inputs.database_secret }}
+      run: |
+        set -euo pipefail
+        connection="$(gcloud sql instances describe "$SQL_INSTANCE" --project "$GCP_PROJECT_ID" --format='value(connectionName)')"
+        test -n "$connection"
+
+        proxy="$RUNNER_TEMP/cloud-sql-proxy"
+        curl --fail --silent --show-error --location \
+          --output "$proxy" \
+          https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.18.2/cloud-sql-proxy.linux.amd64
+        chmod +x "$proxy"
+        "$proxy" "$connection" --address 127.0.0.1 --port 5432 \
+          >"$RUNNER_TEMP/cloud-sql-proxy.log" 2>&1 &
+
+        ready=false
+        for attempt in {1..30}; do
+          if (echo >/dev/tcp/127.0.0.1/5432) >/dev/null 2>&1; then
+            ready=true
+            break
+          fi
+          sleep 1
+        done
+        if [ "$ready" != true ]; then
+          cat "$RUNNER_TEMP/cloud-sql-proxy.log"
+          exit 1
+        fi
+
+        cloud_database_url="$(gcloud secrets versions access latest --secret "$DATABASE_SECRET" --project "$GCP_PROJECT_ID")"
+        echo "::add-mask::$cloud_database_url"
+        CLOUD_DATABASE_URL="$cloud_database_url" python3 - <<'PY'
+        import os
+        from urllib.parse import quote, urlsplit, urlunsplit
+
+        source = urlsplit(os.environ["CLOUD_DATABASE_URL"])
+        username = quote(source.username or "", safe="")
+        password = quote(source.password or "", safe="")
+        auth = username
+        if password:
+            auth += f":{password}"
+        local_url = urlunsplit((source.scheme, f"{auth}@127.0.0.1:5432", source.path, "", ""))
+        print(f"::add-mask::{local_url}")
+        delimiter = "CLOUD_SQL_DATABASE_URL"
+        with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+            env_file.write(f"DATABASE_URL<<{delimiter}\n{local_url}\n{delimiter}\n")
+            env_file.write(f"GCS_BUCKET={os.environ['GCP_PROJECT_ID']}-botc-assets\n")
+            env_file.write("RUN_SCHEMA_MIGRATIONS=0\n")
+        PY

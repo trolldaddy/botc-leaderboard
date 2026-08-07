@@ -32,12 +32,15 @@ jobs:
     permissions:
       contents: read
 
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
     steps:
       - name: Checkout selected branch
         uses: actions/checkout@v4
+
+      - name: Connect to Cloud SQL
+        uses: ./.github/actions/setup-cloud-sql
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -70,7 +73,7 @@ jobs:
         shell: bash
         run: |
           if [[ -z "$DATABASE_URL" ]]; then
-            echo "::error::write 模式需要在 Repository Secrets 設定 DATABASE_URL。"
+            echo "::error::Cloud SQL Proxy did not provide DATABASE_URL."
             exit 1
           fi
 
