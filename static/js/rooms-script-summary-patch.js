@@ -6,15 +6,6 @@
   let scripts = [];
   let renderQueued = false;
 
-  const onScriptLinkClick = (event) => {
-    const link = event.target.closest?.('#active-room-summary .room-script-library-link');
-    if (!link) return;
-    event.preventDefault();
-    event.stopPropagation();
-    window.location.href = link.href;
-  };
-  document.addEventListener('click', onScriptLinkClick, true);
-
   const normalize = (value) => String(value || '')
     .toLocaleLowerCase('zh-Hant')
     .replace(/[\s\-—–·・:：,，.。()（）《》〈〉【】\[\]]+/g, '');
@@ -59,24 +50,37 @@
 
     const link = document.createElement('a');
     link.className = 'room-script-library-link';
-    link.href = `/#scripts/${encodeURIComponent(script.slug)}`;
+    const scriptHash = `#scripts/${encodeURIComponent(script.slug)}`;
+    link.href = scriptHash;
     link.setAttribute('aria-label', `前往劇本庫查看${script.name_zh_tw || script.name || script.slug}`);
+    const navigateToScript = (event) => {
+      if (event.type === 'pointerdown' && event.button !== 0) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      window.location.hash = scriptHash;
+    };
+    link.addEventListener('pointerdown', navigateToScript);
+    link.addEventListener('click', navigateToScript);
 
     const logo = document.createElement('span');
     logo.className = 'room-script-library-logo';
     const frontImageUrl = script.images?.[0]?.url || '';
     const artworkUrl = script.logo_image_url || frontImageUrl;
     if (artworkUrl) {
-      const image = document.createElement('img');
-      image.src = artworkUrl;
-      image.alt = '';
       if (!script.logo_image_url) {
+        link.classList.add('is-front-fallback');
         logo.classList.add('is-front-fallback');
-        image.style.objectFit = 'cover';
-        image.style.objectPosition = 'center 55%';
+        logo.style.backgroundImage = `url(${JSON.stringify(artworkUrl)})`;
+        logo.style.backgroundSize = 'cover';
+        logo.style.backgroundPosition = 'center 55%';
+        logo.style.backgroundRepeat = 'no-repeat';
+      } else {
+        const image = document.createElement('img');
+        image.src = artworkUrl;
+        image.alt = '';
+        image.addEventListener('error', () => { logo.textContent = '📜'; }, { once: true });
+        logo.appendChild(image);
       }
-      image.addEventListener('error', () => { logo.textContent = '📜'; }, { once: true });
-      logo.appendChild(image);
     } else {
       logo.textContent = '📜';
     }
@@ -137,7 +141,6 @@
   window.__roomsScriptSummaryPatchDestroy = () => {
     stopped = true;
     observer.disconnect();
-    document.removeEventListener('click', onScriptLinkClick, true);
     window.removeEventListener('storage', onStorage);
     window.removeEventListener('botc:town-room-changed', queueRender);
     document.querySelector('#active-room-summary .room-script-library-link')?.remove();
