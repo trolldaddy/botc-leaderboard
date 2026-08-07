@@ -80,8 +80,11 @@
     link.append(logo, copy, arrow);
 
     const summaryTitle = summary.querySelector('.summary-title');
-    if (summaryTitle?.nextSibling) summary.insertBefore(link, summaryTitle.nextSibling);
-    else summary.prepend(link);
+    const titleBlock = summaryTitle
+      ? [...summary.children].find((child) => child === summaryTitle || child.contains(summaryTitle))
+      : null;
+    const insertionPoint = titleBlock?.nextSibling || summary.firstChild;
+    summary.insertBefore(link, insertionPoint);
   };
 
   const queueRender = () => {

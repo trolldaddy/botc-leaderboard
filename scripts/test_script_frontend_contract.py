@@ -80,6 +80,9 @@ def test_room_script_summary_uses_logo_link_and_same_page_room_state():
     assert "window.TownCheckin?.getCurrentRoom?.()" in summary
     assert "botc:town-room-changed" in summary
     assert "/#scripts/${encodeURIComponent(script.slug)}" in summary
+    assert "[...summary.children].find" in summary
+    assert "child.contains(summaryTitle)" in summary
+    assert "summaryTitle?.nextSibling" not in summary
 
 if __name__ == "__main__":
     test_public_script_page_renders_sanitized_rich_text()
