@@ -94,9 +94,17 @@ def test_script_admin_compacts_flags_and_supports_confirmed_delete():
     assert "local_artwork_payload" in routes
     assert "persisted_artwork_url" in routes
 
+
+def test_script_artwork_candidate_list_scrolls_inside_workbench():
+    html = (ROOT / "static/pages/role_admin.html").read_text(encoding="utf-8")
+    assert "height:clamp(480px,70vh,640px);overflow:hidden" in html
+    assert "overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain" in html
+    assert "scrollbar-gutter:stable" in html
+
 if __name__ == "__main__":
     test_script_admin_has_third_mode_and_editor_mount()
     test_script_admin_exposes_all_required_rich_text_fields()
     test_script_admin_api_persists_required_fields_and_custom_abilities()
     test_script_admin_compacts_flags_and_supports_confirmed_delete()
+    test_script_artwork_candidate_list_scrolls_inside_workbench()
     print({"status": "ok"})
