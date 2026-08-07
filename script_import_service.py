@@ -19,8 +19,10 @@ from scripts.import_bilibili_script import TO_TRADITIONAL, normalized_entry_type
 ROOT = Path(__file__).resolve().parent
 IMAGE_ROOT = ROOT / "static" / "script-images" / "uploads"
 ICON_ROOT = ROOT / "static" / "script-role-icons" / "uploads"
+CANDIDATE_ROOT = ROOT / "static" / "script-images" / "candidates"
 ALLOWED_HOSTS = {"www.bilibili.com", "bilibili.com"}
 EXTENSIONS = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif"}
+ARTWORK_SLOTS = {"front": 0, "back": 1, "logo": 100}
 
 
 def museum_metadata(source_url):
@@ -91,16 +93,77 @@ def rank_remote_artwork(candidates, limit=2):
     return select_script_faces(prepared, limit=limit)
 
 
-def save_artwork(script, uploads, remote_urls):
+def remote_artwork_candidates(remote_urls):
+    """Read article images for explicit admin review; never infer their role."""
+    session = requests.Session()
+    session.headers.update({"User-Agent": "Mozilla/5.0 (compatible; botc-leaderboard/1.0)", "Referer": "https://www.bilibili.com/"})
+    candidates = []
+    for index, url in enumerate(list(dict.fromkeys(remote_urls))[:24]):
+        try:
+            response = session.get(url, timeout=45)
+            response.raise_for_status()
+            content_type = response.headers.get("Content-Type", "")
+            if not content_type.lower().startswith("image/"):
+                continue
+            with Image.open(io.BytesIO(response.content)) as image:
+                width, height = image.size
+            candidate_id = hashlib.sha256(url.encode()).hexdigest()[:16]
+            CANDIDATE_ROOT.mkdir(parents=True, exist_ok=True)
+            target = CANDIDATE_ROOT / f"{candidate_id}{extension(urlparse(url).path, content_type)}"
+            target.write_bytes(response.content)
+            candidates.append({"id": candidate_id, "index": index,
+                               "url": f"/static/script-images/candidates/{target.name}", "source_url": url,
+                               "width": width, "height": height, "content_type": content_type})
+        except (requests.RequestException, OSError, ValueError):
+            continue
+    return candidates
+
+
+def _download_selected_artwork(script, selected, candidates):
+    by_id = {item["id"]: item for item in candidates}
+    chosen = {}
+    for kind, candidate_id in (selected or {}).items():
+        if kind not in ARTWORK_SLOTS or not candidate_id:
+            continue
+        if candidate_id not in by_id:
+            raise HTTPException(400, f"{kind} 圖片不在這篇文章的候選清單中")
+        if candidate_id in chosen.values():
+            raise HTTPException(400, "同一張圖片不能同時指定成多個用途")
+        chosen[kind] = candidate_id
     folder = IMAGE_ROOT / script.slug
     folder.mkdir(parents=True, exist_ok=True)
     saved = []
-    for index, item in enumerate(uploads, 1):
-        target = folder / f"{index:02d}{extension(item.get('filename'), item.get('content_type'))}"
+    session = requests.Session()
+    session.headers.update({"User-Agent": "Mozilla/5.0 (compatible; botc-leaderboard/1.0)", "Referer": "https://www.bilibili.com/"})
+    for kind, candidate_id in chosen.items():
+        item = by_id[candidate_id]
+        response = session.get(item.get("source_url") or item["url"], timeout=45)
+        response.raise_for_status()
+        target = folder / f"{kind}{extension(urlparse(item.get('source_url') or item['url']).path, response.headers.get('Content-Type', ''))}"
+        for existing in folder.glob(f"{kind}.*"):
+            existing.unlink(missing_ok=True)
+        target.write_bytes(response.content)
+        saved.append((ARTWORK_SLOTS[kind], f"/static/script-images/uploads/{script.slug}/{target.name}", kind))
+    return saved
+
+
+def save_artwork(script, uploads, remote_urls, artwork_selection=None):
+    folder = IMAGE_ROOT / script.slug
+    folder.mkdir(parents=True, exist_ok=True)
+    saved = []
+    for index, item in enumerate(uploads):
+        slot = int(item.get("slot", index))
+        kind = {0: "front", 1: "back", 100: "logo"}.get(slot)
+        if not kind:
+            raise HTTPException(400, "劇本圖片位置只能是正面、背面或 Logo")
+        target = folder / f"{kind}{extension(item.get('filename'), item.get('content_type'))}"
         target.write_bytes(uploaded_bytes(item))
-        saved.append(f"/static/script-images/uploads/{script.slug}/{target.name}")
+        saved.append((ARTWORK_SLOTS[kind], f"/static/script-images/uploads/{script.slug}/{target.name}", kind))
     if saved:
         return saved
+    candidates = remote_artwork_candidates(remote_urls)
+    if artwork_selection:
+        return _download_selected_artwork(script, artwork_selection, candidates)
     session = requests.Session()
     session.headers.update({"User-Agent": "Mozilla/5.0 (compatible; botc-leaderboard/1.0)", "Referer": "https://www.bilibili.com/"})
     candidates = []
@@ -120,24 +183,29 @@ def save_artwork(script, uploads, remote_urls):
         except (requests.RequestException, OSError, ValueError):
             continue
     for output_index, item in enumerate(rank_remote_artwork(candidates), 1):
-        target = folder / f"{output_index:02d}{extension(urlparse(item['url']).path, item['content_type'])}"
+        target = folder / f"{output_index:02d}{extension(urlparse(item.get('source_url') or item['url']).path, item['content_type'])}"
         target.write_bytes(item["content"])
-        saved.append(f"/static/script-images/uploads/{script.slug}/{target.name}")
+        saved.append((output_index - 1, f"/static/script-images/uploads/{script.slug}/{target.name}", "front" if output_index == 1 else "back"))
     return saved
 
 
 def save_artwork_slot(script, item, slot):
     """Persist one edited script face and return its stable public URL."""
-    if slot not in (0, 1):
-        raise HTTPException(400, "劇本圖片位置只能是正面或背面")
+    if slot not in (0, 1, 100):
+        raise HTTPException(400, "劇本圖片位置只能是正面、背面或 Logo")
     folder = IMAGE_ROOT / script.slug
     folder.mkdir(parents=True, exist_ok=True)
     suffix = extension(item.get("filename"), item.get("content_type"))
-    for existing in folder.glob(f"{slot + 1:02d}.*"):
+    stem = {0: "front", 1: "back", 100: "logo"}[slot]
+    for existing in folder.glob(f"{stem}.*"):
         existing.unlink(missing_ok=True)
-    target = folder / f"{slot + 1:02d}{suffix}"
+    target = folder / f"{stem}{suffix}"
     target.write_bytes(uploaded_bytes(item))
     return f"/static/script-images/uploads/{script.slug}/{target.name}"
+
+
+def save_selected_artwork(script, selection, remote_urls):
+    return _download_selected_artwork(script, selection, remote_artwork_candidates(remote_urls))
 
 
 def local_icon(script, item):
@@ -184,8 +252,11 @@ def create_script(db, data, official, supplements, metadata):
         is_laplace_owned=bool(data.get("is_laplace_owned")))
     db.add(script)
     db.flush()
-    for index, url in enumerate(save_artwork(script, data.get("images") or [], metadata.get("remote_images") or [])):
-        script.images.append(ScriptImage(image_url=url, alt_text=name, sort_order=index))
+    for slot, url, kind in save_artwork(
+        script, data.get("images") or [], metadata.get("remote_images") or [], data.get("artwork_selection") or {}
+    ):
+        suffix = {"front": "正面", "back": "背面", "logo": " Logo"}[kind]
+        script.images.append(ScriptImage(image_url=url, alt_text=f"{name}{suffix}", sort_order=slot))
     for index, role in enumerate(official):
         script.roles.append(ScriptRole(role_id=role.id, sort_order=index))
     for index, item in enumerate(supplements):

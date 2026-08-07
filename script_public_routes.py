@@ -46,7 +46,9 @@ def serialize_script(script, include_roles=False, knowledge_slugs=None, account=
         "needs_review": bool(script.needs_review),
         "is_laplace_owned": bool(script.is_laplace_owned),
         "images": [{"url": image.image_url, "alt": image.alt_text or script.name_zh_tw}
-                   for image in sorted(script.images, key=lambda item: (item.sort_order, item.id))],
+                   for image in sorted(script.images, key=lambda item: (item.sort_order, item.id))
+                   if image.sort_order in (0, 1)],
+        "logo_image_url": next((image.image_url for image in script.images if image.sort_order == 100), None),
         "role_count": len(script.roles),
         "special_entry_count": len(script.supplements),
     }

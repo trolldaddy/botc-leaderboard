@@ -323,7 +323,7 @@ def test_admin_can_replace_or_add_script_faces():
     script_id = seed_script(db)
     script = db.query(ScriptEntry).filter_by(id=script_id).one()
     script.images.append(ScriptImage(
-        image_url="/static/script-images/uploads/integration-script/01.jpg",
+        image_url="/static/script-images/uploads/integration-script/front.jpg",
         alt_text="舊正面",
         sort_order=0,
     ))
@@ -351,13 +351,13 @@ def test_admin_can_replace_or_add_script_faces():
                 db=db,
                 admin=SimpleNamespace(),
             )
-            assert (Path(folder) / "integration-script" / "01.png").read_bytes() == b"new-front"
-            assert (Path(folder) / "integration-script" / "02.jpg").read_bytes() == b"new-back"
+            assert (Path(folder) / "integration-script" / "front.png").read_bytes() == b"new-front"
+            assert (Path(folder) / "integration-script" / "back.jpg").read_bytes() == b"new-back"
         finally:
             script_import_service.IMAGE_ROOT = previous
     assert [image["sort_order"] for image in result["script"]["images"]] == [0, 1]
-    assert result["script"]["images"][0]["url"].endswith("/01.png")
-    assert result["script"]["images"][1]["url"].endswith("/02.jpg")
+    assert result["script"]["images"][0]["url"].endswith("/front.png")
+    assert result["script"]["images"][1]["url"].endswith("/back.jpg")
 
 
 def test_new_manual_import_creates_internal_draft_and_local_artwork():

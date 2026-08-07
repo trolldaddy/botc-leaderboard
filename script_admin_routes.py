@@ -9,7 +9,9 @@ import models
 from account_binding_routes import require_admin_account
 from database import get_db
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
-from script_import_service import create_script, museum_metadata, save_artwork_slot
+from script_import_service import (
+    create_script, museum_metadata, remote_artwork_candidates, save_artwork_slot, save_selected_artwork
+)
 from scripts.import_bilibili_script import (
     TO_TRADITIONAL,
     find_catalog_role,
@@ -61,6 +63,7 @@ def serialize_script(script, detail=False):
         data["images"] = [{
             "id": item.id, "url": item.image_url, "alt": item.alt_text or "",
             "sort_order": item.sort_order,
+            "kind": {0: "front", 1: "back", 100: "logo"}.get(item.sort_order),
         } for item in sorted(script.images, key=lambda value: (value.sort_order, value.id))]
         data["roles"] = [{
             "id": item.id, "role_id": item.role_id, "sort_order": item.sort_order,
@@ -122,8 +125,8 @@ def role_json_report(official, supplements, missing, duplicates):
 def script_import_result(db, data):
     if data.get("category") not in SCRIPT_CATEGORIES:
         raise HTTPException(status_code=400, detail="\u8acb\u9078\u64c7\u6709\u6548\u7684\u5287\u672c\u5206\u985e")
-    if len(data.get("images") or []) > 2:
-        raise HTTPException(status_code=400, detail="正面與背面最多上傳兩張圖片")
+    if len(data.get("images") or []) > 3:
+        raise HTTPException(status_code=400, detail="正面、背面與 Logo 最多上傳三張圖片")
     try:
         payload = json.loads(str(data.get("role_json") or ""))
         matched = match_role_payload(db, payload)
@@ -133,7 +136,9 @@ def script_import_result(db, data):
     report = role_json_report(*matched)
     report["metadata"] = metadata
     report["uploaded_images"] = len(data.get("images") or [])
-    report["remote_images"] = len(metadata.get("remote_images") or [])
+    candidates = remote_artwork_candidates(metadata.get("remote_images") or [])
+    report["remote_images"] = len(candidates)
+    report["artwork_candidates"] = candidates
     return report, matched, metadata
 
 
@@ -264,27 +269,27 @@ def update_script_images(
     if not script:
         raise HTTPException(status_code=404, detail="找不到劇本")
     uploads = data.get("images") or []
-    if not uploads or len(uploads) > 2:
-        raise HTTPException(status_code=400, detail="請選擇一至兩張正反面圖片")
-    by_slot = {item.sort_order: item for item in script.images if item.sort_order in (0, 1)}
+    if not uploads or len(uploads) > 3:
+        raise HTTPException(status_code=400, detail="請選擇一至三張正面、背面或 Logo 圖片")
+    by_slot = {item.sort_order: item for item in script.images if item.sort_order in (0, 1, 100)}
     seen = set()
     for incoming in uploads:
         try:
             slot = int(incoming.get("slot"))
         except (TypeError, ValueError):
             raise HTTPException(status_code=400, detail="劇本圖片位置不正確")
-        if slot not in (0, 1) or slot in seen:
+        if slot not in (0, 1, 100) or slot in seen:
             raise HTTPException(status_code=400, detail="劇本圖片位置不正確或重複")
         seen.add(slot)
         url = save_artwork_slot(script, incoming, slot)
         image = by_slot.get(slot)
         if image:
             image.image_url = url
-            image.alt_text = f"{script.name_zh_tw}{'正面' if slot == 0 else '背面'}"
+            image.alt_text = f"{script.name_zh_tw}{ {0: '正面', 1: '背面', 100: ' Logo'}[slot] }"
         else:
             script.images.append(ScriptImage(
                 image_url=url,
-                alt_text=f"{script.name_zh_tw}{'正面' if slot == 0 else '背面'}",
+                alt_text=f"{script.name_zh_tw}{ {0: '正面', 1: '背面', 100: ' Logo'}[slot] }",
                 sort_order=slot,
             ))
     db.commit()
@@ -292,6 +297,44 @@ def update_script_images(
     refreshed = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
     return {"status": "success", "script": serialize_script(refreshed, detail=True)}
 
+
+@router.post("/{script_id}/artwork-candidates")
+def list_artwork_candidates(
+    script_id: int,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    script = db.query(ScriptEntry).filter(ScriptEntry.id == script_id).first()
+    if not script:
+        raise HTTPException(status_code=404, detail="找不到劇本")
+    metadata = museum_metadata(script.source_url) if script.source_url else {}
+    return {"items": remote_artwork_candidates(metadata.get("remote_images") or [])}
+
+
+@router.post("/{script_id}/artwork-selection")
+def apply_artwork_selection(
+    script_id: int,
+    data: dict,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
+    if not script:
+        raise HTTPException(status_code=404, detail="找不到劇本")
+    metadata = museum_metadata(script.source_url) if script.source_url else {}
+    saved = save_selected_artwork(script, data.get("artwork_selection") or {}, metadata.get("remote_images") or [])
+    by_slot = {item.sort_order: item for item in script.images if item.sort_order in (0, 1, 100)}
+    for slot, url, kind in saved:
+        item = by_slot.get(slot)
+        suffix = {"front": "正面", "back": "背面", "logo": " Logo"}[kind]
+        if item:
+            item.image_url, item.alt_text = url, f"{script.name_zh_tw}{suffix}"
+        else:
+            script.images.append(ScriptImage(image_url=url, alt_text=f"{script.name_zh_tw}{suffix}", sort_order=slot))
+    db.commit()
+    db.expire_all()
+    refreshed = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
+    return {"status": "success", "script": serialize_script(refreshed, detail=True)}
 
 @router.post("/{script_id}/role-json/preview")
 def preview_role_json(
