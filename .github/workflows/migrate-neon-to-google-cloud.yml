@@ -1,0 +1,139 @@
+name: Migrate Neon to Google Cloud
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type MIGRATE to provision Cloud SQL/Storage and copy production data"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  migrate:
+    if: inputs.confirmation == 'MIGRATE'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 45
+    env:
+      REGION: asia-east1
+      SQL_INSTANCE: botc-leaderboard-db
+      SQL_DATABASE: botc
+      SQL_USER: botc_app
+      RUN_SERVICE: botc-twitch
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate source and install clients
+        env:
+          SOURCE_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          test -n "$SOURCE_DATABASE_URL" || { echo "Missing Neon DATABASE_URL secret"; exit 1; }
+          sudo apt-get update -qq
+          sudo apt-get install -y postgresql-client
+          pip install -r requirements.txt
+
+      - name: Enable Google APIs
+        run: |
+          set -euo pipefail
+          gcloud services enable sqladmin.googleapis.com storage.googleapis.com secretmanager.googleapis.com run.googleapis.com
+
+      - name: Provision Cloud SQL and Cloud Storage
+        id: provision
+        run: |
+          set -euo pipefail
+          PROJECT_ID="${{ secrets.GCP_PROJECT_ID }}"
+          BUCKET="${PROJECT_ID}-botc-assets"
+          if ! gcloud sql instances describe "$SQL_INSTANCE" --format='value(name)' >/dev/null 2>&1; then
+            gcloud sql instances create "$SQL_INSTANCE" --database-version=POSTGRES_15 --tier=db-f1-micro --region="$REGION" --storage-type=HDD --storage-size=10
+          fi
+          gcloud sql databases describe "$SQL_DATABASE" --instance="$SQL_INSTANCE" >/dev/null 2>&1 || gcloud sql databases create "$SQL_DATABASE" --instance="$SQL_INSTANCE"
+          if ! gcloud storage buckets describe "gs://$BUCKET" >/dev/null 2>&1; then
+            gcloud storage buckets create "gs://$BUCKET" --location="$REGION" --uniform-bucket-level-access
+          fi
+          gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --member=allUsers --role=roles/storage.objectViewer
+          echo "bucket=$BUCKET" >> "$GITHUB_OUTPUT"
+          echo "connection=$(gcloud sql instances describe "$SQL_INSTANCE" --format='value(connectionName)')" >> "$GITHUB_OUTPUT"
+
+      - name: Prepare destination credentials and proxy
+        id: database
+        run: |
+          set -euo pipefail
+          DB_PASSWORD="$(openssl rand -hex 24)"
+          if gcloud sql users list --instance="$SQL_INSTANCE" --filter="name=$SQL_USER" --format='value(name)' | grep -qx "$SQL_USER"; then
+            gcloud sql users set-password "$SQL_USER" --instance="$SQL_INSTANCE" --password="$DB_PASSWORD"
+          else
+            gcloud sql users create "$SQL_USER" --instance="$SQL_INSTANCE" --password="$DB_PASSWORD"
+          fi
+          curl -fsSL -o cloud-sql-proxy https://storage.googleapis.com/cloud-sql-connectors/cloud-sql-proxy/v2.18.2/cloud-sql-proxy.linux.amd64
+          chmod +x cloud-sql-proxy
+          ./cloud-sql-proxy --port 5433 "${{ steps.provision.outputs.connection }}" &
+          for attempt in {1..30}; do nc -z 127.0.0.1 5433 && break; sleep 1; done
+          TARGET_DATABASE_URL="postgresql://$SQL_USER:$DB_PASSWORD@127.0.0.1:5433/$SQL_DATABASE"
+          CLOUD_DATABASE_URL="postgresql://$SQL_USER:$DB_PASSWORD@/$SQL_DATABASE?host=/cloudsql/${{ steps.provision.outputs.connection }}"
+          echo "::add-mask::$DB_PASSWORD"
+          echo "::add-mask::$TARGET_DATABASE_URL"
+          echo "::add-mask::$CLOUD_DATABASE_URL"
+          echo "target_url=$TARGET_DATABASE_URL" >> "$GITHUB_OUTPUT"
+          echo "cloud_url=$CLOUD_DATABASE_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Copy every Neon table to Cloud SQL
+        env:
+          SOURCE_DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TARGET_DATABASE_URL: ${{ steps.database.outputs.target_url }}
+        run: |
+          set -euo pipefail
+          pg_dump "$SOURCE_DATABASE_URL" --format=custom --no-owner --no-acl -f neon.dump
+          pg_restore --dbname="$TARGET_DATABASE_URL" --clean --if-exists --no-owner --no-acl neon.dump
+          python scripts/compare_databases.py
+
+      - name: Move database-backed artwork to Cloud Storage
+        env:
+          DATABASE_URL: ${{ steps.database.outputs.target_url }}
+          GCS_BUCKET: ${{ steps.provision.outputs.bucket }}
+          RUN_SCHEMA_MIGRATIONS: "0"
+        run: python scripts/migrate_script_images_to_gcs.py --write
+
+      - name: Store connection secret and grant runtime access
+        run: |
+          set -euo pipefail
+          printf '%s' '${{ steps.database.outputs.cloud_url }}' > database-url.txt
+          if gcloud secrets describe botc-database-url >/dev/null 2>&1; then
+            gcloud secrets versions add botc-database-url --data-file=database-url.txt
+          else
+            gcloud secrets create botc-database-url --data-file=database-url.txt --replication-policy=automatic
+          fi
+          SERVICE_ACCOUNT="$(gcloud run services describe "$RUN_SERVICE" --region="$REGION" --format='value(spec.template.spec.serviceAccountName)')"
+          if [ -z "$SERVICE_ACCOUNT" ]; then
+            PROJECT_NUMBER="$(gcloud projects describe '${{ secrets.GCP_PROJECT_ID }}' --format='value(projectNumber)')"
+            SERVICE_ACCOUNT="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+          fi
+          gcloud projects add-iam-policy-binding '${{ secrets.GCP_PROJECT_ID }}' --member="serviceAccount:$SERVICE_ACCOUNT" --role=roles/cloudsql.client --condition=None
+          gcloud projects add-iam-policy-binding '${{ secrets.GCP_PROJECT_ID }}' --member="serviceAccount:$SERVICE_ACCOUNT" --role=roles/storage.objectUser --condition=None
+          gcloud secrets add-iam-policy-binding botc-database-url --member="serviceAccount:$SERVICE_ACCOUNT" --role=roles/secretmanager.secretAccessor
+
+      - name: Switch Cloud Run to Google services
+        run: |
+          set -euo pipefail
+          gcloud run deploy "$RUN_SERVICE" --source . --region="$REGION" --allow-unauthenticated --add-cloudsql-instances="${{ steps.provision.outputs.connection }}" --set-secrets=DATABASE_URL=botc-database-url:latest --set-env-vars="GCS_BUCKET=${{ steps.provision.outputs.bucket }},RUN_SCHEMA_MIGRATIONS=0,DB_CONNECT_TIMEOUT=10" --quiet
+          SERVICE_URL="$(gcloud run services describe "$RUN_SERVICE" --region="$REGION" --format='value(status.url)')"
+          curl --retry 10 --retry-delay 3 --fail --silent --show-error "$SERVICE_URL/openapi.json" >/dev/null
+          curl --retry 5 --retry-delay 2 --fail --silent --show-error "$SERVICE_URL/api/scripts" >/dev/null
+          echo "Migration and production switch completed: $SERVICE_URL"

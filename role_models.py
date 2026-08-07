@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text, UniqueConstraint, inspect, text
 from sqlalchemy.orm import relationship
 
-from database import Base, engine
+from database import Base, RUN_SCHEMA_MIGRATIONS, engine
 
 
 class Role(Base):
@@ -208,4 +208,5 @@ def ensure_role_schema():
         print(f"角色提示標記資料表補齊失敗: {exc}")
 
 
-ensure_role_schema()
+if RUN_SCHEMA_MIGRATIONS:
+    ensure_role_schema()

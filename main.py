@@ -18,7 +18,7 @@ from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session, joinedload
 
 import models
-from database import engine, get_db
+from database import RUN_SCHEMA_MIGRATIONS, engine, get_db
 
 app = FastAPI(title="BOTC Stats Leaderboard API")
 
@@ -36,10 +36,11 @@ LINE_NEXT_COOKIE = "botc_line_next"
 SESSION_MAX_AGE = 60 * 60 * 24 * 30
 DEFAULT_LOCATION_NAMES = ["拉普拉斯", "線上", "台北", "新北", "桃園", "台中", "台南", "高雄", "其他"]
 
-try:
-    models.Base.metadata.create_all(bind=engine)
-except Exception as e:
-    print(f"資料庫初始化失敗: {e}")
+if RUN_SCHEMA_MIGRATIONS:
+    try:
+        models.Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print(f"資料庫初始化失敗: {e}")
 
 
 def ensure_runtime_schema():
@@ -133,7 +134,8 @@ def ensure_runtime_schema():
         print(f"資料庫結構補齊失敗: {e}")
 
 
-ensure_runtime_schema()
+if RUN_SCHEMA_MIGRATIONS:
+    ensure_runtime_schema()
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 

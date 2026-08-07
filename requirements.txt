@@ -8,3 +8,4 @@ aiofiles
 opencc-python-reimplemented
 beautifulsoup4
 Pillow
+google-cloud-storage

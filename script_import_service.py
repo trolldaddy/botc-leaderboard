@@ -13,6 +13,7 @@ import requests
 from fastapi import HTTPException
 from PIL import Image
 from script_artwork_classifier import inspect_artwork, select_script_faces
+from object_storage import store_public_bytes, store_public_file
 
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 from scripts.crawl_bilibili_scripts import IMAGE_RE, TITLE_RE, author_from_markdown, extracted_fields, slugify
@@ -35,6 +36,22 @@ def local_artwork_payload(url):
     source = _safe_local_artwork_path(url)
     content_type = mimetypes.guess_type(source.name)[0] or "application/octet-stream"
     return base64.b64encode(source.read_bytes()).decode("ascii"), content_type
+
+
+def persist_artwork(script, slot, url):
+    source = _safe_local_artwork_path(url)
+    cloud_url, image_data, content_type = store_public_file(
+        source, f"script-artwork/{script.slug}/{slot}{source.suffix.lower()}"
+    )
+    return cloud_url or persisted_artwork_url(script, slot), image_data, content_type
+
+
+def persist_artwork_bytes(script, slot, data, content_type):
+    suffix = extension(content_type=content_type)
+    cloud_url, image_data, content_type = store_public_bytes(
+        data, f"script-artwork/{script.slug}/{slot}{suffix}", content_type
+    )
+    return cloud_url or persisted_artwork_url(script, slot), image_data, content_type
 
 
 def museum_metadata(source_url):
@@ -320,7 +337,8 @@ def local_icon(script, item):
         digest = hashlib.sha256(f"{script.slug}:{item.get('id')}".encode()).hexdigest()[:24]
         target = ICON_ROOT / f"{digest}{extension(urlparse(source).path, content_type)}"
         target.write_bytes(data)
-        return f"/static/script-role-icons/uploads/{target.name}"
+        cloud_url, _, _ = store_public_file(target, f"script-role-icons/{script.slug}/{target.name}")
+        return cloud_url or f"/static/script-role-icons/uploads/{target.name}"
     except Exception:
         return "/static/script-role-icons/reviewed/unknown.svg"
 
@@ -349,9 +367,9 @@ def create_script(db, data, official, supplements, metadata):
         script, data.get("images") or [], metadata.get("remote_images") or [], data.get("artwork_selection") or {}
     ):
         suffix = {"front": "正面", "back": "背面", "logo": " Logo"}[kind]
-        image_data, content_type = local_artwork_payload(url)
+        image_url, image_data, content_type = persist_artwork(script, slot, url)
         script.images.append(ScriptImage(
-            image_url=persisted_artwork_url(script, slot), image_data=image_data,
+            image_url=image_url, image_data=image_data,
             content_type=content_type, alt_text=f"{name}{suffix}", sort_order=slot,
         ))
     for index, role in enumerate(official):

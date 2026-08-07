@@ -91,6 +91,8 @@ LINE Developers 後台的 callback URL 必須和 `LINE_CALLBACK_URL` 完全一�
 | 變數 | 說明 | 預設值 |
 | --- | --- | --- |
 | `DATABASE_URL` | 資料庫連線字串。未設定時使用本機 SQLite。 | `sqlite:///./botc.db` |
+| `GCS_BUCKET` | 劇本圖片 Cloud Storage bucket；未設定時維持本機／Base64 相容模式。 | 空字串 |
+| `RUN_SCHEMA_MIGRATIONS` | 是否在程序載入時補齊 schema；Cloud Run 應設為 `0` 並改跑 `scripts/apply_schema.py`。 | SQLite 為 `1`，PostgreSQL 為 `0` |
 | `SESSION_SECRET` | 簽署登入 session cookie 的密鑰。正式環境務必設定為長隨機字串。 | `ADMIN_PASSWORD` |
 | `LINE_CHANNEL_ID` | LINE Login Channel ID。 | 無 |
 | `LINE_CHANNEL_SECRET` | LINE Login Channel Secret。不要提交到 GitHub。 | 無 |

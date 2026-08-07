@@ -6,6 +6,10 @@ import os
 # GitHub Actions 中未設定的 Secret 會展開成空字串，因此不能只依賴
 # os.environ.get(..., default)，需要把空字串也視為「未設定」。
 SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL") or "sqlite:///./botc.db"
+RUN_SCHEMA_MIGRATIONS = os.getenv(
+    "RUN_SCHEMA_MIGRATIONS",
+    "1" if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else "0",
+).lower() in {"1", "true", "yes"}
 
 # 如果使用的是 SQLite，需要特別聲明 check_same_thread=False。
 # 如果是雲端 PostgreSQL（通常以 postgresql:// 或 postgres:// 開頭），則不需要。
@@ -23,6 +27,9 @@ else:
         SQLALCHEMY_DATABASE_URL,
         pool_pre_ping=True,
         pool_recycle=300,
+        pool_size=int(os.getenv("DB_POOL_SIZE", "5")),
+        max_overflow=int(os.getenv("DB_MAX_OVERFLOW", "2")),
+        connect_args={"connect_timeout": int(os.getenv("DB_CONNECT_TIMEOUT", "10"))},
     )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

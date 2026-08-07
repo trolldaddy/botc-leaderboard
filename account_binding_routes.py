@@ -12,7 +12,7 @@ from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session, joinedload
 
 import models
-from database import engine, get_db
+from database import RUN_SCHEMA_MIGRATIONS, engine, get_db
 
 router = APIRouter(prefix="/api/admin/account-bindings", tags=["account-bindings"])
 
@@ -51,7 +51,8 @@ def ensure_binding_schema():
         print(f"帳號綁定資料庫欄位補齊失敗: {exc}")
 
 
-ensure_binding_schema()
+if RUN_SCHEMA_MIGRATIONS:
+    ensure_binding_schema()
 
 
 def _b64decode(data: str) -> bytes:
