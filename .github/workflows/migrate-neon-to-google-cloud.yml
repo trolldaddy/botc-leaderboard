@@ -1,9 +1,6 @@
 name: Migrate Neon to Google Cloud
 
 on:
-  push:
-    branches: [feature/town-checkin]
-    paths: [.github/migration-trigger]
   workflow_dispatch:
     inputs:
       confirmation:

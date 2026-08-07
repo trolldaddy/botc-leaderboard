@@ -80,6 +80,17 @@ jobs:
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+      - name: Resolve Google Cloud runtime resources
+        id: runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          connection="$(gcloud sql instances describe botc-leaderboard-db --project "${{ secrets.GCP_PROJECT_ID }}" --format='value(connectionName)')"
+          bucket="${{ secrets.GCP_PROJECT_ID }}-botc-assets"
+          test -n "$connection"
+          echo "connection=$connection" >> "$GITHUB_OUTPUT"
+          echo "bucket=$bucket" >> "$GITHUB_OUTPUT"
+
       - name: Deploy source to Cloud Run
         shell: bash
         run: |
@@ -90,6 +101,9 @@ jobs:
             --region "${{ steps.settings.outputs.region }}" \
             --platform managed \
             --allow-unauthenticated \
+            --add-cloudsql-instances "${{ steps.runtime.outputs.connection }}" \
+            --set-secrets "DATABASE_URL=botc-database-url:latest" \
+            --set-env-vars "GCS_BUCKET=${{ steps.runtime.outputs.bucket }},RUN_SCHEMA_MIGRATIONS=0,DB_CONNECT_TIMEOUT=10" \
             --quiet
 
       - name: Set up Python for approved script seed
