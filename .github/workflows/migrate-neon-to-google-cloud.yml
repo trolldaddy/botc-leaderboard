@@ -101,8 +101,10 @@ jobs:
           TARGET_DATABASE_URL: ${{ steps.database.outputs.target_url }}
         run: |
           set -euo pipefail
-          docker run --rm --network host -v "$PWD:/work" postgres:17 pg_dump "$SOURCE_DATABASE_URL" --format=custom --no-owner --no-acl -f /work/neon.dump
-          docker run --rm --network host -v "$PWD:/work" postgres:17 pg_restore --dbname="$TARGET_DATABASE_URL" --clean --if-exists --no-owner --no-acl /work/neon.dump
+          docker run --rm --network host -v "$PWD:/work" postgres:17 pg_dump "$SOURCE_DATABASE_URL" --format=plain --clean --if-exists --no-owner --no-acl -f /work/neon.sql
+          sed -i '/^SET transaction_timeout = 0;$/d' neon.sql
+          docker run --rm --network host postgres:17 psql "$TARGET_DATABASE_URL" --set=ON_ERROR_STOP=1 --command='DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public;'
+          docker run --rm --network host -v "$PWD:/work" postgres:17 psql "$TARGET_DATABASE_URL" --set=ON_ERROR_STOP=1 --file=/work/neon.sql
           python scripts/compare_databases.py
 
       - name: Move database-backed artwork to Cloud Storage
