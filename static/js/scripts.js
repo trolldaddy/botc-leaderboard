@@ -374,14 +374,36 @@
       const response = await fetch(`${apiBase}/api/scripts`);
       if (!response.ok) throw new Error('\u5287\u672c\u7d22\u5f15\u8f09\u5165\u5931\u6557');
       const summaries = (await response.json()).items || [];
-      scripts = await Promise.all(summaries.map(async summary => {
+      const requested = decodeURIComponent(window.location.hash.replace(/^#scripts\/?/, ''));
+      const requestedSummary = summaries.find(item => item.slug === requested);
+      const initialSummary = requestedSummary || summaries[0];
+      if (!initialSummary) {
+        scripts = [];
+        renderCarousel();
+        return;
+      }
+      const fetchDetail = async summary => {
         const detailResponse = await fetch(`${apiBase}/api/scripts/${encodeURIComponent(summary.slug)}`);
         return detailResponse.ok ? detailResponse.json() : summary;
-      }));
-      const requested = decodeURIComponent(window.location.hash.replace(/^#scripts\/?/, ''));
-      activeSlug = scripts.some(item => item.slug === requested) ? requested : (scripts[0]?.slug || '');
+      };
+      const initialScript = await fetchDetail(initialSummary);
+      scripts = [initialScript];
+      activeSlug = initialScript.slug;
+      if (requestedSummary) search.value = initialScript.name_zh_tw || initialScript.name || requested;
       renderCarousel();
       if (activeSlug) selectScript(activeSlug, { syncCarousel: false });
+
+      const loadRemaining = async () => {
+        const remaining = summaries.filter(item => item.slug !== initialScript.slug);
+        const details = await Promise.all(remaining.map(fetchDetail));
+        if (!document.contains(carousel)) return;
+        scripts = [initialScript, ...details];
+        renderCarousel();
+        selectScript(activeSlug, { syncCarousel: false });
+      };
+      const scheduleRemaining = () => loadRemaining().catch(error => console.warn('[scripts] \u80cc\u666f\u8f09\u5165\u5931\u6557', error));
+      if ('requestIdleCallback' in window) window.requestIdleCallback(scheduleRemaining, { timeout: 1600 });
+      else window.setTimeout(scheduleRemaining, 800);
     } catch (error) {
       count.textContent = error.message;
       carousel.innerHTML = '<div class="script-empty">\u76ee\u524d\u7121\u6cd5\u8b80\u53d6\u5287\u672c\u3002</div>';

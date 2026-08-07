@@ -69,6 +69,8 @@ def test_public_script_catalog_filters_and_role_search_are_available():
     assert "role.name_zh_tw" in javascript
     assert "entry.name_zh_tw" in javascript
     assert "categoryMatches" in javascript
+    assert "const initialScript = await fetchDetail(initialSummary)" in javascript
+    assert "requestIdleCallback" in javascript
 
 
 def test_room_script_summary_uses_logo_link_and_same_page_room_state():

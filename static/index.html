@@ -119,10 +119,15 @@
                     });
                     if (src) {
                         if (oldScript.hasAttribute('data-page-scope')) {
-                            const scriptUrl = `${src}${src.includes('?') ? '&' : '?'}v=${new Date().getTime()}`;
-                            const scriptResp = await fetch(scriptUrl);
-                            if (!scriptResp.ok) throw new Error(`腳本載入失敗：${src}`);
-                            const sourceCode = await scriptResp.text();
+                            const sourceCache = window.__pageScriptSourceCache || (window.__pageScriptSourceCache = new Map());
+                            let sourceCode = sourceCache.get(src);
+                            if (!sourceCode) {
+                                const scriptUrl = `${src}${src.includes('?') ? '&' : '?'}v=${new Date().getTime()}`;
+                                const scriptResp = await fetch(scriptUrl);
+                                if (!scriptResp.ok) throw new Error(`腳本載入失敗：${src}`);
+                                sourceCode = await scriptResp.text();
+                                sourceCache.set(src, sourceCode);
+                            }
                             newScript.textContent = `(() => {\n${sourceCode}\n})();\n//# sourceURL=${src}`;
                             document.body.appendChild(newScript);
                             continue;
