@@ -360,6 +360,45 @@ def test_admin_can_replace_or_add_script_faces():
     assert result["script"]["images"][1]["url"].endswith("/back.jpg")
 
 
+def test_general_script_save_persists_selected_front_back_and_logo():
+    db = make_session()
+    script_id = seed_script(db)
+    with tempfile.TemporaryDirectory() as folder:
+        root = Path(folder)
+        previous_image_root = script_import_service.IMAGE_ROOT
+        previous_candidate_root = script_import_service.CANDIDATE_ROOT
+        script_import_service.IMAGE_ROOT = root / "uploads"
+        script_import_service.CANDIDATE_ROOT = root / "candidates"
+        script_import_service.CANDIDATE_ROOT.mkdir(parents=True)
+        candidates = []
+        try:
+            for index, kind in enumerate(("front", "back", "logo")):
+                source = script_import_service.CANDIDATE_ROOT / f"{kind}.png"
+                source.write_bytes(f"{kind}-image".encode())
+                candidates.append({
+                    "id": kind,
+                    "url": f"/static/script-images/candidates/{source.name}",
+                })
+            result = update_script(
+                script_id,
+                {
+                    "name_zh_tw": "一般儲存含圖片",
+                    "artwork_selection": {"front": "front", "back": "back", "logo": "logo"},
+                    "artwork_candidates": candidates,
+                },
+                db=db,
+                admin=SimpleNamespace(),
+            )
+        finally:
+            script_import_service.IMAGE_ROOT = previous_image_root
+            script_import_service.CANDIDATE_ROOT = previous_candidate_root
+
+    assert [image["sort_order"] for image in result["script"]["images"]] == [0, 1, 100]
+    assert [Path(image["url"]).stem for image in result["script"]["images"]] == ["front", "back", "logo"]
+    public = serialize_public_script(db.query(ScriptEntry).filter_by(id=script_id).one())
+    assert public["logo_image_url"].endswith("/logo.png")
+
+
 def test_new_manual_import_creates_internal_draft_and_local_artwork():
     db = make_session()
     roles = []
@@ -411,7 +450,8 @@ if __name__ == "__main__":
     test_public_payload_and_storyteller_login_gate()
     test_admin_can_delete_script_and_cascade_children()
     test_admin_can_replace_or_add_script_faces()
+    test_general_script_save_persists_selected_front_back_and_logo()
     test_new_manual_import_creates_internal_draft_and_local_artwork()
     test_remote_artwork_prefers_two_portrait_faces_over_logo()
     test_reviewed_artwork_uses_pixels_not_metadata_order()
-    print({"status": "ok", "tests": 11})
+    print({"status": "ok", "tests": 12})

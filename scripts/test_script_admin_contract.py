@@ -88,6 +88,8 @@ def test_script_admin_compacts_flags_and_supports_confirmed_delete():
     assert "artwork_candidates:state.artworkCandidates" in javascript
     assert '@router.post("/{script_id}/artwork-candidates/uploads")' in routes
     assert "save_candidate_artwork" in routes
+    assert "apply_candidate_artwork" in routes
+    assert "artwork_selection:{...state.artworkSelection}" in javascript
 
 if __name__ == "__main__":
     test_script_admin_has_third_mode_and_editor_mount()

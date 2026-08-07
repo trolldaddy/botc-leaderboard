@@ -212,6 +212,12 @@ def update_script(
             setattr(script, field, data[field])
     if "tags" in data:
         script.tags = json.dumps(data.get("tags") or [], ensure_ascii=False)
+    if "artwork_selection" in data or "artwork_candidates" in data:
+        apply_candidate_artwork(
+            script,
+            data.get("artwork_selection") or {},
+            data.get("artwork_candidates") or [],
+        )
     if "custom_roles" in data:
         by_id = {item.id: item for item in script.supplements}
         retained_ids = set()
@@ -237,6 +243,21 @@ def update_script(
     db.commit()
     script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
     return {"status": "success", "script": serialize_script(script, detail=True)}
+
+
+def apply_candidate_artwork(script, selection, candidates):
+    saved = save_candidate_artwork(script, selection, candidates)
+    by_slot = {item.sort_order: item for item in script.images if item.sort_order in (0, 1, 100)}
+    for slot, url, kind in saved:
+        item = by_slot.get(slot)
+        suffix = {"front": "正面", "back": "背面", "logo": " Logo"}[kind]
+        if item:
+            item.image_url, item.alt_text = url, f"{script.name_zh_tw}{suffix}"
+        else:
+            item = ScriptImage(image_url=url, alt_text=f"{script.name_zh_tw}{suffix}", sort_order=slot)
+            script.images.append(item)
+            by_slot[slot] = item
+    return saved
 
 
 @router.delete("/{script_id}")
@@ -339,17 +360,9 @@ def apply_artwork_selection(
     script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
     if not script:
         raise HTTPException(status_code=404, detail="找不到劇本")
-    saved = save_candidate_artwork(
+    apply_candidate_artwork(
         script, data.get("artwork_selection") or {}, data.get("artwork_candidates") or []
     )
-    by_slot = {item.sort_order: item for item in script.images if item.sort_order in (0, 1, 100)}
-    for slot, url, kind in saved:
-        item = by_slot.get(slot)
-        suffix = {"front": "正面", "back": "背面", "logo": " Logo"}[kind]
-        if item:
-            item.image_url, item.alt_text = url, f"{script.name_zh_tw}{suffix}"
-        else:
-            script.images.append(ScriptImage(image_url=url, alt_text=f"{script.name_zh_tw}{suffix}", sort_order=slot))
     db.commit()
     db.expire_all()
     refreshed = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()

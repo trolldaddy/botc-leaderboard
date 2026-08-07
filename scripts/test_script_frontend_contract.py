@@ -53,9 +53,21 @@ def test_public_script_catalog_filters_and_role_search_are_available():
     assert "entry.name_zh_tw" in javascript
     assert "categoryMatches" in javascript
 
+
+def test_room_script_summary_uses_logo_link_and_same_page_room_state():
+    rooms = (ROOT / "static/js/rooms.js").read_text(encoding="utf-8")
+    summary = (ROOT / "static/js/rooms-script-summary-patch.js").read_text(encoding="utf-8")
+    assert "botc:town-room-changed" in rooms
+    assert "getCurrentRoom" in rooms
+    assert "script.logo_image_url" in summary
+    assert "window.TownCheckin?.getCurrentRoom?.()" in summary
+    assert "botc:town-room-changed" in summary
+    assert "/#scripts/${encodeURIComponent(script.slug)}" in summary
+
 if __name__ == "__main__":
     test_public_script_page_renders_sanitized_rich_text()
     test_custom_script_entries_are_cards_not_links_and_show_ability()
     test_special_entry_categories_and_admin_controls_are_explicit()
     test_public_script_catalog_filters_and_role_search_are_available()
-    print({"status": "ok", "tests": 4})
+    test_room_script_summary_uses_logo_link_and_same_page_room_state()
+    print({"status": "ok", "tests": 5})

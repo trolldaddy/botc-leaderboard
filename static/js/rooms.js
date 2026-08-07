@@ -27,6 +27,7 @@ window.TownCheckin = (() => {
 
   const saveLocalRoom = () => {
     if (currentRoom) localStorage.setItem(STORAGE_KEY, JSON.stringify(currentRoom));
+    window.dispatchEvent(new CustomEvent('botc:town-room-changed', { detail: { room: currentRoom } }));
   };
 
   const loadLocalRoom = () => {
@@ -363,6 +364,7 @@ window.TownCheckin = (() => {
   const clearLocalRoom = () => {
     localStorage.removeItem(STORAGE_KEY);
     currentRoom = null;
+    window.dispatchEvent(new CustomEvent('botc:town-room-changed', { detail: { room: null } }));
     render();
     setStatus('已清空本機暫存。');
   };
@@ -396,6 +398,7 @@ window.TownCheckin = (() => {
     copyJoinUrl,
     goLineLogin,
     transferToRecorder,
-    clearLocalRoom
+    clearLocalRoom,
+    getCurrentRoom: () => currentRoom
   };
 })();

@@ -11,6 +11,8 @@
     .replace(/[\s\-—–·・:：,，.。()（）《》〈〉【】\[\]]+/g, '');
 
   const roomScriptName = () => {
+    const activeRoom = window.TownCheckin?.getCurrentRoom?.();
+    if (activeRoom) return activeRoom.script || '';
     try {
       return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}').script || '';
     } catch (_) {
@@ -99,6 +101,7 @@
     if (event.key === STORAGE_KEY) queueRender();
   };
   window.addEventListener('storage', onStorage);
+  window.addEventListener('botc:town-room-changed', queueRender);
 
   fetch(`${window.API_BASE || ''}/api/scripts`, {
     credentials: 'same-origin',
@@ -116,6 +119,7 @@
     stopped = true;
     observer.disconnect();
     window.removeEventListener('storage', onStorage);
+    window.removeEventListener('botc:town-room-changed', queueRender);
     document.querySelector('#active-room-summary .room-script-library-link')?.remove();
   };
 })();
