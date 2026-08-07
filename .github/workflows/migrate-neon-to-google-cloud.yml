@@ -1,6 +1,9 @@
 name: Migrate Neon to Google Cloud
 
 on:
+  push:
+    branches: [feature/town-checkin]
+    paths: [.github/migration-trigger]
   workflow_dispatch:
     inputs:
       confirmation:
@@ -14,7 +17,7 @@ permissions:
 
 jobs:
   migrate:
-    if: inputs.confirmation == 'MIGRATE'
+    if: github.event_name == 'push' || inputs.confirmation == 'MIGRATE'
     runs-on: ubuntu-latest
     environment: production
     timeout-minutes: 45
