@@ -55,10 +55,13 @@
 
     const logo = document.createElement('span');
     logo.className = 'room-script-library-logo';
-    if (script.logo_image_url) {
+    const frontImageUrl = script.images?.[0]?.url || '';
+    const artworkUrl = script.logo_image_url || frontImageUrl;
+    if (artworkUrl) {
       const image = document.createElement('img');
-      image.src = script.logo_image_url;
+      image.src = artworkUrl;
       image.alt = '';
+      if (!script.logo_image_url) logo.classList.add('is-front-fallback');
       image.addEventListener('error', () => { logo.textContent = '📜'; }, { once: true });
       logo.appendChild(image);
     } else {

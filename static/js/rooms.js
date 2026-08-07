@@ -126,16 +126,20 @@ window.TownCheckin = (() => {
       return (a.id || 0) - (b.id || 0);
     });
     if (players.length === 0) {
-      body.innerHTML = '<tr><td colspan="5" class="empty-row">尚未有玩家加入。</td></tr>';
+      body.innerHTML = '<tr><td colspan="6" class="empty-row">尚未有玩家加入。</td></tr>';
       return;
     }
     body.innerHTML = players.map((p, index) => {
       const fallbackId = p.id || `local-${index}`;
-      const avatar = p.picture_url ? `<img class="player-avatar" src="${p.picture_url}" alt="">` : '';
+      const avatar = p.picture_url
+        ? `<img class="player-avatar" src="${escapeHtml(p.picture_url)}" alt="">`
+        : '<span class="player-avatar player-avatar-placeholder"><i class="fa-solid fa-user"></i></span>';
+      const playerName = p.player_name || p.display_name || p.name || '未命名玩家';
       return `
         <tr>
           <td><input class="form-control dark-input" type="number" min="1" max="20" value="${p.seat_number || ''}" onchange="TownCheckin.updateSeat('${fallbackId}', this.value)"></td>
-          <td>${avatar}<input class="form-control dark-input" style="display:inline-block;width:220px;max-width:80%;" value="${escapeHtml(p.display_name || p.name || '')}" onchange="TownCheckin.updateName('${fallbackId}', this.value)"></td>
+          <td><div class="room-player-identity">${avatar}<span>${escapeHtml(playerName)}</span></div></td>
+          <td><input class="form-control dark-input room-player-nickname" value="${escapeHtml(p.display_name || p.name || '')}" aria-label="${escapeHtml(playerName)}的暱稱" onchange="TownCheckin.updateName('${fallbackId}', this.value)"></td>
           <td>${p.is_temporary ? '臨時玩家' : 'LINE'}</td>
           <td>${p.line_user_id ? '已綁定' : '未綁定'}</td>
           <td><button class="btn btn-outline" onclick="TownCheckin.removePlayer('${fallbackId}')"><i class="fa-solid fa-trash"></i></button></td>

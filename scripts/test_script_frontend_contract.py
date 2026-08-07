@@ -72,17 +72,23 @@ def test_public_script_catalog_filters_and_role_search_are_available():
 
 
 def test_room_script_summary_uses_logo_link_and_same_page_room_state():
+    page = (ROOT / "static/pages/rooms.html").read_text(encoding="utf-8")
     rooms = (ROOT / "static/js/rooms.js").read_text(encoding="utf-8")
     summary = (ROOT / "static/js/rooms-script-summary-patch.js").read_text(encoding="utf-8")
     assert "botc:town-room-changed" in rooms
     assert "getCurrentRoom" in rooms
     assert "script.logo_image_url" in summary
+    assert "script.images?.[0]?.url" in summary
+    assert "is-front-fallback" in summary
     assert "window.TownCheckin?.getCurrentRoom?.()" in summary
     assert "botc:town-room-changed" in summary
     assert "/#scripts/${encodeURIComponent(script.slug)}" in summary
     assert "[...summary.children].find" in summary
     assert "child.contains(summaryTitle)" in summary
     assert "summaryTitle?.nextSibling" not in summary
+    assert '<th>暱稱</th>' in page
+    assert 'room-player-nickname' in rooms
+    assert 'p.player_name || p.display_name' in rooms
 
 if __name__ == "__main__":
     test_public_script_page_renders_sanitized_rich_text()
