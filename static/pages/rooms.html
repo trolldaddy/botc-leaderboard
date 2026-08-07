@@ -173,8 +173,8 @@
   .profile-avatar img { width:100%; height:100%; object-fit:cover; }
   .profile-name { color:#fff; font-size:1.05rem; font-weight:800; }
   .profile-state { color:var(--text-muted); font-size:.85rem; margin-top:.2rem; }
-  .active-room-summary { position:relative; min-height:150px; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.22); border-radius:16px; padding:1rem 16rem 1rem 1rem; margin-top:1rem; }
-  .room-script-library-link { position:absolute; top:1rem; right:1rem; width:13.5rem; height:7.5rem; display:block; overflow:hidden; color:inherit; text-decoration:none; border:1px solid rgba(246,190,45,.28); border-radius:12px; background:rgba(246,190,45,.07); transition:border-color .18s ease, transform .18s ease; }
+  .active-room-summary { position:relative; min-height:180px; border:1px solid rgba(255,255,255,.08); background:rgba(0,0,0,.22); border-radius:16px; padding:1rem calc(50% + .75rem) 1rem 1rem; margin-top:1rem; }
+  .room-script-library-link { position:absolute; inset:1rem 1rem 1rem 50%; display:block; overflow:hidden; color:inherit; text-decoration:none; border:1px solid rgba(246,190,45,.28); border-radius:12px; background:rgba(246,190,45,.07); transition:border-color .18s ease, transform .18s ease; }
   .room-script-library-link:hover { border-color:rgba(246,190,45,.7); transform:translateY(-1px); }
   .room-script-library-logo { width:100%; height:100%; display:grid; place-items:center; overflow:hidden; background:rgba(255,255,255,.04); font-size:2rem; }
   .room-script-library-logo img { width:100%; height:100%; object-fit:contain; }
@@ -222,7 +222,7 @@
     .qr-box { width:160px; height:160px; }
     .room-key-input { max-width:100%; }
     .active-room-summary { padding-right:1rem; }
-    .room-script-library-link { position:relative; top:auto; right:auto; width:100%; height:7rem; margin:.75rem 0; }
+    .room-script-library-link { position:relative; inset:auto; width:100%; height:8.5rem; margin:.75rem 0; }
   }
   @media (max-width:640px) {
     .town-mode-tabs { width:100%; margin-bottom:1rem; border-radius:18px; }
