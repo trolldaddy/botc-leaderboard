@@ -48,7 +48,9 @@
   function roleCard(role) {
     const href = `#knowledge/${encodeURIComponent(role.knowledge_slug || role.canonical_key)}`;
     const icon = role.image_url ? `<img src="${escapeHtml(role.image_url)}" alt="" loading="lazy">` : '<span class="script-role-fallback"><i class="fa-solid fa-masks-theater"></i></span>';
-    return `<a class="script-role-card" href="${href}">${icon}<span><strong>${escapeHtml(role.name_zh_tw)}</strong><small>${escapeHtml(role.team)}</small></span></a>`;
+    const ability = role.ability_zh_tw ? `<span class="script-role-ability">${richText(role.ability_zh_tw)}</span>` : '<span class="script-role-ability is-missing">能力資料待補</span>';
+    const linkedIcon = `<a class="script-role-icon-link" href="${href}" aria-label="查看${escapeHtml(role.name_zh_tw)}角色資料">${icon}</a>`;
+    return `<div class="script-role-card"><span class="script-role-identity">${linkedIcon}<span><strong>${escapeHtml(role.name_zh_tw)}</strong><small>${escapeHtml(groupLabels[normalizeGroup(role.team)] || role.team)}</small></span></span>${ability}</div>`;
   }
 
   const groupOrder = ['townsfolk', 'outsider', 'minion', 'demon', 'traveller', 'loric', 'fabled', 'jinx', 'special'];
@@ -61,7 +63,9 @@
 
   function specialCard(item) {
     const icon = item.image_url ? `<img src="${escapeHtml(item.image_url)}" alt="" loading="lazy">` : '<span class="script-role-fallback"><i class="fa-solid fa-scroll"></i></span>';
-    return `<div class="script-role-card script-special-card">${icon}<span><strong>${escapeHtml(item.name_zh_tw)}</strong><small>${escapeHtml(groupLabels[item.team] || item.team || '特殊條目')}</small></span>${item.ability ? `<span class="script-special-ability">${richText(item.ability)}</span>` : ''}</div>`;
+    const linkedIcon = item.knowledge_slug ? `<a class="script-role-icon-link" href="#knowledge/${encodeURIComponent(item.knowledge_slug)}" aria-label="查看${escapeHtml(item.name_zh_tw)}角色資料">${icon}</a>` : icon;
+    const ability = item.ability ? richText(item.ability) : '<span class="is-missing">能力資料待補</span>';
+    return `<div class="script-role-card script-special-card"><span class="script-role-identity">${linkedIcon}<span><strong>${escapeHtml(item.name_zh_tw)}</strong><small>${escapeHtml(groupLabels[normalizeGroup(item.team)] || item.team || '特殊條目')}</small></span></span><span class="script-role-ability">${ability}</span></div>`;
   }
 
   function groupedRosterMarkup(roles, specialEntries) {

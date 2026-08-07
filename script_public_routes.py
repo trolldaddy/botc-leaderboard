@@ -7,7 +7,8 @@ from sqlalchemy.orm import Session, joinedload
 from account_binding_routes import get_optional_account
 import models
 from database import get_db
-from knowledge_models import KnowledgeNode
+from knowledge_models import KnowledgeAlias, KnowledgeNode
+from knowledge_visibility import PUBLIC_VISIBILITIES
 from role_public_routes import role_card
 from role_models import Role, RoleKnowledgeLink
 from script_models import ScriptEntry, ScriptRole, ScriptSupplement
@@ -31,7 +32,7 @@ def can_read_storyteller_guide(account):
     return bool(account) and not bool(getattr(account, "is_banned", False))
 
 
-def serialize_script(script, include_roles=False, knowledge_slugs=None, account=None):
+def serialize_script(script, include_roles=False, knowledge_slugs=None, supplement_knowledge_slugs=None, account=None):
     payload = {
         "slug": script.slug, "name_zh_tw": script.name_zh_tw, "version": script.version,
         "category": script.category, "introduction": script.introduction,
@@ -65,11 +66,13 @@ def serialize_script(script, include_roles=False, knowledge_slugs=None, account=
                             for item in sorted(script.roles, key=lambda value: (value.sort_order, value.id))
                             if item.role and item.role.is_active]
         payload["special_entries"] = [{
+            "id": item.id,
             "external_id": item.external_id,
             "name_zh_tw": item.name_zh_tw,
             "team": item.entry_type,
             "image_url": item.image_url,
             "ability": item.ability,
+            "knowledge_slug": (supplement_knowledge_slugs or {}).get(item.id),
         } for item in sorted(script.supplements, key=lambda value: (value.sort_order, value.id))]
     return payload
 
@@ -140,8 +143,39 @@ def get_script(
             KnowledgeNode, KnowledgeNode.id == RoleKnowledgeLink.knowledge_node_id
         ).filter(RoleKnowledgeLink.role_id.in_(role_ids)).order_by(RoleKnowledgeLink.id).all():
             knowledge_slugs.setdefault(role_id, slug)
+    supplement_knowledge_slugs = {}
+    supplement_names = {item.name_zh_tw for item in script.supplements if item.name_zh_tw}
+    if supplement_names:
+        public_nodes = db.query(KnowledgeNode).filter(
+            KnowledgeNode.visibility.in_(PUBLIC_VISIBILITIES),
+            KnowledgeNode.node_type == "role",
+            ~KnowledgeNode.status.in_(("deleted", "archived", "disabled")),
+        )
+        nodes_by_name = {
+            name: node for node in public_nodes.filter(or_(
+                KnowledgeNode.canonical_name_zh_tw.in_(supplement_names),
+                KnowledgeNode.canonical_name_zh_cn.in_(supplement_names),
+                KnowledgeNode.canonical_name_en.in_(supplement_names),
+            )).all()
+            for name in (node.canonical_name_zh_tw, node.canonical_name_zh_cn, node.canonical_name_en)
+            if name
+        }
+        for alias, node in db.query(KnowledgeAlias.alias, KnowledgeNode).join(
+            KnowledgeNode, KnowledgeNode.id == KnowledgeAlias.node_id
+        ).filter(
+            KnowledgeAlias.alias.in_(supplement_names),
+            KnowledgeNode.visibility.in_(PUBLIC_VISIBILITIES),
+            KnowledgeNode.node_type == "role",
+            ~KnowledgeNode.status.in_(("deleted", "archived", "disabled")),
+        ).all():
+            nodes_by_name.setdefault(alias, node)
+        for item in script.supplements:
+            node = nodes_by_name.get(item.name_zh_tw)
+            if node:
+                supplement_knowledge_slugs[item.id] = node.slug
     return serialize_script(
-        script, include_roles=True, knowledge_slugs=knowledge_slugs, account=account
+        script, include_roles=True, knowledge_slugs=knowledge_slugs,
+        supplement_knowledge_slugs=supplement_knowledge_slugs, account=account
     )
 
 

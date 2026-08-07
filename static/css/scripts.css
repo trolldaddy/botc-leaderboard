@@ -67,3 +67,15 @@ body.script-viewer-open{overflow:hidden}
 .script-carousel-arrow{display:none}
 .script-carousel-controls button{touch-action:manipulation}
 @media(pointer:coarse){.script-carousel{-webkit-overflow-scrolling:touch;touch-action:pan-y!important}.script-carousel-slide,.script-carousel-card,.script-carousel-image{touch-action:pan-y!important}.script-image-viewer-actions{right:max(.75rem,env(safe-area-inset-right));top:max(.75rem,env(safe-area-inset-top))}}
+
+/* Ability-first roster cards: readable in-place while preserving role links. */
+.script-role-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+.script-role-card{display:grid;grid-template-columns:1fr;grid-template-rows:auto 1fr;align-content:start;gap:.75rem;min-height:154px;padding:.85rem}
+.script-role-identity{display:grid;grid-template-columns:58px minmax(0,1fr);gap:.75rem;align-items:center}
+.script-role-ability{display:block;grid-column:1/-1;padding-top:.7rem;border-top:1px solid rgba(255,255,255,.09);color:var(--text-main);font-size:.9rem;line-height:1.65}
+.script-role-ability p:first-child{margin-top:0}.script-role-ability p:last-child{margin-bottom:0}
+.script-role-ability.is-missing,.script-role-ability .is-missing{color:var(--text-muted);font-style:italic}
+.script-special-card{grid-column:auto}
+.script-role-icon-link{display:block;width:58px;height:58px;border-radius:50%}
+.script-role-icon-link:hover,.script-role-icon-link:focus-visible{outline:2px solid var(--accent-gold);outline-offset:3px}
+@media(max-width:680px){.script-role-grid{grid-template-columns:1fr}}

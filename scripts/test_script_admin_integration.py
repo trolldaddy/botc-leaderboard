@@ -12,6 +12,7 @@ from sqlalchemy.pool import StaticPool
 import models  # noqa: F401 - register account tables on shared metadata
 import role_models  # noqa: F401 - register role tables on shared metadata
 from database import Base
+from knowledge_models import KnowledgeNode
 from role_models import Role
 from script_admin_routes import apply_role_json
 from script_admin_routes import delete_script
@@ -21,6 +22,7 @@ from script_admin_routes import update_script_images
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 import script_import_service
 import scripts.import_bilibili_script as import_bilibili_script
+from script_public_routes import get_script as get_public_script
 from script_public_routes import get_storyteller_guide, list_scripts, serialize_script as serialize_public_script
 
 
@@ -40,6 +42,7 @@ def seed_script(db):
         name_zh_tw="洗衣婦",
         name_en="Washerwoman",
         team="townsfolk",
+        ability_zh_tw="在你的首個夜晚，你會得知兩名玩家，其中一人是特定鎮民角色。",
         is_official=True,
         is_active=True,
         image_url="https://example.test/washerwoman.png",
@@ -234,6 +237,7 @@ def test_public_payload_and_storyteller_login_gate():
     }
     assert "content" not in anonymous["guides"]["storyteller"]
     assert anonymous["special_entries"][0]["ability"] == "舊能力"
+    assert anonymous["roles"][0]["ability_zh_tw"].startswith("在你的首個夜晚")
 
     logged_in = serialize_public_script(
         script,
@@ -242,7 +246,6 @@ def test_public_payload_and_storyteller_login_gate():
     )
     assert logged_in["guides"]["storyteller"]["locked"] is False
     assert logged_in["guides"]["storyteller"]["login_required"] is False
-
     try:
         get_storyteller_guide(script.slug, db=db, account=None)
         raise AssertionError("anonymous access should be rejected")
@@ -261,6 +264,23 @@ def test_public_payload_and_storyteller_login_gate():
         account=SimpleNamespace(is_banned=False),
     )
     assert allowed["content"] == "<p>登入後可看的說書人攻略</p>"
+
+
+def test_public_script_links_custom_role_to_matching_public_knowledge_page():
+    db = make_session()
+    seed_script(db)
+    db.add(KnowledgeNode(
+        node_type="role",
+        slug="custom-seer",
+        canonical_name_zh_tw="自創先知",
+        visibility="public",
+        status="published",
+    ))
+    db.commit()
+
+    payload = get_public_script("integration-script", db=db, account=None)
+
+    assert payload["special_entries"][0]["knowledge_slug"] == "custom-seer"
 
 
 
@@ -448,10 +468,11 @@ if __name__ == "__main__":
     test_admin_can_create_classify_and_delete_special_entries()
     test_public_script_list_searches_roles_and_combines_catalog_filters()
     test_public_payload_and_storyteller_login_gate()
+    test_public_script_links_custom_role_to_matching_public_knowledge_page()
     test_admin_can_delete_script_and_cascade_children()
     test_admin_can_replace_or_add_script_faces()
     test_general_script_save_persists_selected_front_back_and_logo()
     test_new_manual_import_creates_internal_draft_and_local_artwork()
     test_remote_artwork_prefers_two_portrait_faces_over_logo()
     test_reviewed_artwork_uses_pixels_not_metadata_order()
-    print({"status": "ok", "tests": 12})
+    print({"status": "ok", "tests": 13})

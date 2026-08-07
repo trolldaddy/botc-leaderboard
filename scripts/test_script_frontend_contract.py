@@ -15,14 +15,27 @@ def test_public_script_page_renders_sanitized_rich_text():
     assert "target.innerHTML = richText(payload.content" in javascript
 
 
-def test_custom_script_entries_are_cards_not_links_and_show_ability():
+def test_all_script_role_cards_show_ability_and_keep_available_links():
     javascript = (ROOT / "static/js/scripts.js").read_text(encoding="utf-8")
+    stylesheet = (ROOT / "static/css/scripts.css").read_text(encoding="utf-8")
+    role_start = javascript.index("function roleCard(role)")
+    role_end = javascript.index("const groupOrder", role_start)
+    role_card = javascript[role_start:role_end]
     start = javascript.index("function specialCard(item)")
     end = javascript.index("function groupedRosterMarkup", start)
     special_card = javascript[start:end]
+    assert "role.ability_zh_tw" in role_card
+    assert '<div class="script-role-card">' in role_card
+    assert '<a class="script-role-card"' not in role_card
+    assert 'class="script-role-icon-link"' in role_card
     assert '<div class="script-role-card script-special-card">' in special_card
     assert '<a class="script-role-card' not in special_card
     assert "richText(item.ability)" in special_card
+    assert "item.knowledge_slug" in special_card
+    assert 'class="script-role-icon-link"' in special_card
+    assert ".script-role-ability" in stylesheet
+    assert "grid-template-columns:repeat(2,minmax(0,1fr))" in stylesheet
+    assert "@media(max-width:680px){.script-role-grid{grid-template-columns:1fr}}" in stylesheet
 
 
 def test_special_entry_categories_and_admin_controls_are_explicit():
@@ -66,7 +79,7 @@ def test_room_script_summary_uses_logo_link_and_same_page_room_state():
 
 if __name__ == "__main__":
     test_public_script_page_renders_sanitized_rich_text()
-    test_custom_script_entries_are_cards_not_links_and_show_ability()
+    test_all_script_role_cards_show_ability_and_keep_available_links()
     test_special_entry_categories_and_admin_controls_are_explicit()
     test_public_script_catalog_filters_and_role_search_are_available()
     test_room_script_summary_uses_logo_link_and_same_page_room_state()
