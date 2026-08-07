@@ -49,8 +49,6 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$SOURCE_DATABASE_URL" || { echo "Missing Neon DATABASE_URL secret"; exit 1; }
-          sudo apt-get update -qq
-          sudo apt-get install -y postgresql-client
           pip install -r requirements.txt
 
       - name: Enable Google APIs
@@ -103,8 +101,8 @@ jobs:
           TARGET_DATABASE_URL: ${{ steps.database.outputs.target_url }}
         run: |
           set -euo pipefail
-          pg_dump "$SOURCE_DATABASE_URL" --format=custom --no-owner --no-acl -f neon.dump
-          pg_restore --dbname="$TARGET_DATABASE_URL" --clean --if-exists --no-owner --no-acl neon.dump
+          docker run --rm --network host -v "$PWD:/work" postgres:17 pg_dump "$SOURCE_DATABASE_URL" --format=custom --no-owner --no-acl -f /work/neon.dump
+          docker run --rm --network host -v "$PWD:/work" postgres:17 pg_restore --dbname="$TARGET_DATABASE_URL" --clean --if-exists --no-owner --no-acl /work/neon.dump
           python scripts/compare_databases.py
 
       - name: Move database-backed artwork to Cloud Storage
