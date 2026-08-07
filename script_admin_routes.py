@@ -10,7 +10,8 @@ from account_binding_routes import require_admin_account
 from database import get_db
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 from script_import_service import (
-    create_script, museum_metadata, remote_artwork_candidates, save_artwork_slot, save_selected_artwork
+    create_script, existing_artwork_candidates, museum_metadata, remote_artwork_candidates,
+    save_artwork_slot, save_candidate_artwork, uploaded_artwork_candidates
 )
 from scripts.import_bilibili_script import (
     TO_TRADITIONAL,
@@ -221,7 +222,7 @@ def update_script(
                 incoming_id = None
             item = by_id.get(incoming_id)
             if not item:
-                item = ScriptSupplement(script_id=script.id, external_id=f"manual-{uuid.uuid4().hex}", name_zh_tw="???", entry_type="special", sort_order=index)
+                item = ScriptSupplement(script_id=script.id, external_id=f"manual-{uuid.uuid4().hex}", name_zh_tw="\u65b0\u689d\u76ee", entry_type="special", sort_order=index)
                 db.add(item)
                 db.flush()
             retained_ids.add(item.id)
@@ -308,7 +309,24 @@ def list_artwork_candidates(
     if not script:
         raise HTTPException(status_code=404, detail="找不到劇本")
     metadata = museum_metadata(script.source_url) if script.source_url else {}
-    return {"items": remote_artwork_candidates(metadata.get("remote_images") or [])}
+    existing = existing_artwork_candidates(script.images)
+    imported = remote_artwork_candidates(metadata.get("remote_images") or [])
+    return {"items": existing + imported}
+
+
+@router.post("/{script_id}/artwork-candidates/uploads")
+def upload_artwork_candidates(
+    script_id: int,
+    data: dict,
+    db: Session = Depends(get_db),
+    admin: models.StorytellerAccount = Depends(require_admin_account),
+):
+    if not db.query(ScriptEntry.id).filter(ScriptEntry.id == script_id).first():
+        raise HTTPException(status_code=404, detail="\u627e\u4e0d\u5230\u5287\u672c")
+    images = data.get("images") or []
+    if not isinstance(images, list) or not images or len(images) > 24:
+        raise HTTPException(status_code=400, detail="\u8acb\u4e0a\u50b3 1 \u81f3 24 \u5f35\u5716\u7247")
+    return {"items": uploaded_artwork_candidates(images)}
 
 
 @router.post("/{script_id}/artwork-selection")
@@ -321,8 +339,9 @@ def apply_artwork_selection(
     script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
     if not script:
         raise HTTPException(status_code=404, detail="找不到劇本")
-    metadata = museum_metadata(script.source_url) if script.source_url else {}
-    saved = save_selected_artwork(script, data.get("artwork_selection") or {}, metadata.get("remote_images") or [])
+    saved = save_candidate_artwork(
+        script, data.get("artwork_selection") or {}, data.get("artwork_candidates") or []
+    )
     by_slot = {item.sort_order: item for item in script.images if item.sort_order in (0, 1, 100)}
     for slot, url, kind in saved:
         item = by_slot.get(slot)

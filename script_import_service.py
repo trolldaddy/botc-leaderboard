@@ -3,6 +3,7 @@ import hashlib
 import io
 import json
 import re
+import shutil
 import uuid
 from pathlib import Path
 from urllib.parse import urlparse
@@ -119,6 +120,60 @@ def remote_artwork_candidates(remote_urls):
     return candidates
 
 
+
+def uploaded_artwork_candidates(uploads):
+    """Store manual uploads in the same review library as article images."""
+    CANDIDATE_ROOT.mkdir(parents=True, exist_ok=True)
+    candidates = []
+    for index, item in enumerate((uploads or [])[:24]):
+        content = uploaded_bytes(item)
+        try:
+            with Image.open(io.BytesIO(content)) as image:
+                width, height = image.size
+        except OSError as exc:
+            raise HTTPException(400, "\u4e0a\u50b3\u7684\u6a94\u6848\u4e0d\u662f\u6709\u6548\u5716\u7247") from exc
+        candidate_id = uuid.uuid4().hex[:16]
+        target = CANDIDATE_ROOT / f"{candidate_id}{extension(item.get('filename'), item.get('content_type'))}"
+        target.write_bytes(content)
+        candidates.append({
+            "id": candidate_id, "index": index,
+            "url": f"/static/script-images/candidates/{target.name}",
+            "source_url": f"/static/script-images/candidates/{target.name}",
+            "width": width, "height": height,
+            "content_type": item.get("content_type") or "",
+        })
+    return candidates
+
+
+def existing_artwork_candidates(images):
+    """Expose already assigned artwork in the review library without duplicating it."""
+    items = []
+    for index, image in enumerate(images or []):
+        if image.sort_order not in (0, 1, 100):
+            continue
+        items.append({
+            "id": f"existing-{image.id}", "index": index, "url": image.image_url,
+            "source_url": image.image_url, "width": None, "height": None,
+            "assigned_kind": {0: "front", 1: "back", 100: "logo"}[image.sort_order],
+        })
+    return items
+
+
+def _safe_local_artwork_path(url):
+    path = urlparse(str(url or "")).path
+    prefixes = {
+        "/static/script-images/candidates/": CANDIDATE_ROOT,
+        "/static/script-images/uploads/": IMAGE_ROOT,
+    }
+    for prefix, root in prefixes.items():
+        if path.startswith(prefix):
+            relative = path[len(prefix):]
+            candidate = (root / relative).resolve()
+            if root.resolve() in candidate.parents and candidate.is_file():
+                return candidate
+    raise HTTPException(400, "\u5019\u9078\u5716\u7247\u8def\u5f91\u7121\u6548")
+
+
 def _download_selected_artwork(script, selected, candidates):
     by_id = {item["id"]: item for item in candidates}
     chosen = {}
@@ -206,6 +261,33 @@ def save_artwork_slot(script, item, slot):
 
 def save_selected_artwork(script, selection, remote_urls):
     return _download_selected_artwork(script, selection, remote_artwork_candidates(remote_urls))
+
+
+
+def save_candidate_artwork(script, selection, candidates):
+    """Apply explicitly reviewed local candidates, including manual uploads."""
+    by_id = {str(item.get("id")): item for item in (candidates or []) if item.get("id")}
+    chosen = {}
+    for kind, candidate_id in (selection or {}).items():
+        if kind not in ARTWORK_SLOTS or not candidate_id:
+            continue
+        if candidate_id not in by_id:
+            raise HTTPException(400, f"{kind} \u5716\u7247\u4e0d\u5728\u5099\u9078\u5eab\u4e2d")
+        if candidate_id in chosen.values():
+            raise HTTPException(400, "\u540c\u4e00\u5f35\u5716\u7247\u4e0d\u80fd\u540c\u6642\u6307\u5b9a\u6210\u591a\u500b\u7528\u9014")
+        chosen[kind] = candidate_id
+    folder = IMAGE_ROOT / script.slug
+    folder.mkdir(parents=True, exist_ok=True)
+    saved = []
+    for kind, candidate_id in chosen.items():
+        source = _safe_local_artwork_path(by_id[candidate_id].get("url"))
+        target = folder / f"{kind}{source.suffix.lower()}"
+        if source.resolve() != target.resolve():
+            for existing in folder.glob(f"{kind}.*"):
+                existing.unlink(missing_ok=True)
+            shutil.copyfile(source, target)
+        saved.append((ARTWORK_SLOTS[kind], f"/static/script-images/uploads/{script.slug}/{target.name}", kind))
+    return saved
 
 
 def local_icon(script, item):
