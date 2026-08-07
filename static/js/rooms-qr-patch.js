@@ -1,5 +1,33 @@
 (() => {
   const BRANCH_ALIAS_HOST = 'botc-leaderboard-git-feature-town-checkin-trolldaddys-projects.vercel.app';
+  const QR_CODE_CDN = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  let qrLibraryPromise = null;
+
+  const loadQrLibrary = () => {
+    if (typeof window.QRCode === 'function') return Promise.resolve(true);
+    if (qrLibraryPromise) return qrLibraryPromise;
+
+    qrLibraryPromise = new Promise((resolve) => {
+      const script = document.createElement('script');
+      let timer = null;
+      let settled = false;
+      const finish = (loaded) => {
+        if (settled) return;
+        settled = true;
+        if (timer) clearTimeout(timer);
+        resolve(loaded && typeof window.QRCode === 'function');
+      };
+
+      script.src = QR_CODE_CDN;
+      script.async = true;
+      script.onload = () => finish(true);
+      script.onerror = () => finish(false);
+      timer = setTimeout(() => finish(false), 4000);
+      document.head.appendChild(script);
+    });
+
+    return qrLibraryPromise;
+  };
 
   const getCanonicalOrigin = () => {
     const { protocol, hostname, origin } = window.location;
@@ -54,6 +82,11 @@
     if (!codeEl || !qrBox) return false;
 
     redrawQr();
+    loadQrLibrary().then((loaded) => {
+      if (!loaded) return;
+      delete qrBox.dataset.cleanQrUrl;
+      redrawQr();
+    });
 
     const observer = new MutationObserver(() => setTimeout(redrawQr, 0));
     observer.observe(codeEl, { childList: true, characterData: true, subtree: true });

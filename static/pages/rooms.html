@@ -112,7 +112,9 @@
           </div>
           <div class="form-group">
             <label>劇本名稱</label>
-            <input id="room-script" class="form-control dark-input" placeholder="例如：意氣用事">
+            <input id="room-script" class="form-control dark-input" list="room-script-options" autocomplete="off" placeholder="選擇或輸入劇本名稱">
+            <datalist id="room-script-options"></datalist>
+            <div id="room-script-picker-status" class="script-picker-status">正在載入可用劇本...</div>
           </div>
           <div class="form-group">
             <label>日期</label>
@@ -214,10 +216,17 @@
     .town-table td:first-child, .town-table th:first-child { position:sticky; left:0; z-index:2; background:rgba(20,16,32,.98); }
     .room-members-card .table-scroll { margin-left:-.25rem; margin-right:-.25rem; padding-bottom:.35rem; }
   }
+  .script-picker-status {
+    margin-top: .35rem;
+    color: var(--text-muted);
+    font-size: .72rem;
+    line-height: 1.4;
+  }
+  .script-picker-status.is-error { color: var(--accent-red); }
 </style>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="/js/rooms.js"></script>
+<script src="/js/rooms-script-picker.js"></script>
 <script src="/js/rooms-tabs-patch.js"></script>
 <script src="/js/rooms-ui-patch.js"></script>
 <script src="/js/rooms-qr-patch.js"></script>
