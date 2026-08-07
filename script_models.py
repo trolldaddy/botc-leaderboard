@@ -43,6 +43,8 @@ class ScriptImage(Base):
     id = Column(Integer, primary_key=True)
     script_id = Column(Integer, ForeignKey("script_entries.id"), nullable=False, index=True)
     image_url = Column(Text, nullable=False)
+    image_data = Column(Text, nullable=True)
+    content_type = Column(String(100), nullable=True)
     alt_text = Column(String(220), nullable=True)
     sort_order = Column(Integer, nullable=False, default=0)
     script = relationship("ScriptEntry", back_populates="images")

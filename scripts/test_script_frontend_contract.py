@@ -34,6 +34,9 @@ def test_all_script_role_cards_show_ability_and_keep_available_links():
     assert "item.knowledge_slug" in special_card
     assert 'class="script-role-icon-link"' in special_card
     assert ".script-role-ability" in stylesheet
+    assert ".script-role-content" in stylesheet
+    assert "grid-template-columns:58px minmax(0,1fr)" in stylesheet
+    assert "overflow-wrap:anywhere" in stylesheet
     assert "grid-template-columns:repeat(2,minmax(0,1fr))" in stylesheet
     assert "@media(max-width:680px){.script-role-grid{grid-template-columns:1fr}}" in stylesheet
 

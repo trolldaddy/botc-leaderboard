@@ -23,6 +23,7 @@ from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 import script_import_service
 import scripts.import_bilibili_script as import_bilibili_script
 from script_public_routes import get_script as get_public_script
+from script_public_routes import get_script_artwork
 from script_public_routes import get_storyteller_guide, list_scripts, serialize_script as serialize_public_script
 
 
@@ -376,8 +377,14 @@ def test_admin_can_replace_or_add_script_faces():
         finally:
             script_import_service.IMAGE_ROOT = previous
     assert [image["sort_order"] for image in result["script"]["images"]] == [0, 1]
-    assert result["script"]["images"][0]["url"].endswith("/front.png")
-    assert result["script"]["images"][1]["url"].endswith("/back.jpg")
+    assert result["script"]["images"][0]["url"] == "/api/scripts/artwork/integration-script/0"
+    assert result["script"]["images"][1]["url"] == "/api/scripts/artwork/integration-script/1"
+    front = get_script_artwork("integration-script", 0, db=db)
+    back = get_script_artwork("integration-script", 1, db=db)
+    assert front.body == b"new-front"
+    assert front.media_type == "image/png"
+    assert back.body == b"new-back"
+    assert back.media_type == "image/jpeg"
 
 
 def test_general_script_save_persists_selected_front_back_and_logo():
@@ -414,9 +421,31 @@ def test_general_script_save_persists_selected_front_back_and_logo():
             script_import_service.CANDIDATE_ROOT = previous_candidate_root
 
     assert [image["sort_order"] for image in result["script"]["images"]] == [0, 1, 100]
-    assert [Path(image["url"]).stem for image in result["script"]["images"]] == ["front", "back", "logo"]
+    assert [image["url"].rsplit("/", 1)[-1] for image in result["script"]["images"]] == ["0", "1", "100"]
+    assert [
+        base64.b64decode(image.image_data)
+        for image in db.query(ScriptImage).filter_by(script_id=script_id).order_by(ScriptImage.sort_order)
+    ] == [b"front-image", b"back-image", b"logo-image"]
     public = serialize_public_script(db.query(ScriptEntry).filter_by(id=script_id).one())
-    assert public["logo_image_url"].endswith("/logo.png")
+    assert public["logo_image_url"] == "/api/scripts/artwork/integration-script/100"
+    script = db.query(ScriptEntry).filter_by(id=script_id).one()
+    existing = script_import_service.existing_artwork_candidates(script.images)
+    second_save = update_script(
+        script_id,
+        {
+            "tagline": "部署後只更新文字",
+            "artwork_selection": {
+                item["assigned_kind"]: item["id"] for item in existing
+            },
+            "artwork_candidates": existing,
+        },
+        db=db,
+        admin=SimpleNamespace(),
+    )
+    assert second_save["script"]["tagline"] == "部署後只更新文字"
+    assert base64.b64decode(
+        db.query(ScriptImage).filter_by(script_id=script_id, sort_order=100).one().image_data
+    ) == b"logo-image"
 
 
 def test_new_manual_import_creates_internal_draft_and_local_artwork():
@@ -458,7 +487,8 @@ def test_new_manual_import_creates_internal_draft_and_local_artwork():
     assert script.is_public is False
     assert script.needs_review is True
     assert len(script.roles) == 5
-    assert script.images[0].image_url.startswith("/static/script-images/uploads/")
+    assert script.images[0].image_url == "/api/scripts/artwork/手動匯入測試/0"
+    assert base64.b64decode(script.images[0].image_data) == image_bytes
     assert script.source_platform == "manual"
 
 if __name__ == "__main__":

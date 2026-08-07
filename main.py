@@ -111,6 +111,13 @@ def ensure_runtime_schema():
                 }.items():
                     if column not in columns:
                         conn.execute(text(add_column_sql("script_entries", column, definition)))
+        if "script_images" in table_names:
+            columns = {col["name"] for col in inspector.get_columns("script_images")}
+            with engine.begin() as conn:
+                if "image_data" not in columns:
+                    conn.execute(text(add_column_sql("script_images", "image_data", "TEXT")))
+                if "content_type" not in columns:
+                    conn.execute(text(add_column_sql("script_images", "content_type", "VARCHAR(100)")))
         if "knowledge_nodes" in table_names:
             columns = {col["name"] for col in inspector.get_columns("knowledge_nodes")}
             with engine.begin() as conn:

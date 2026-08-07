@@ -11,7 +11,8 @@ from database import get_db
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 from script_import_service import (
     create_script, existing_artwork_candidates, museum_metadata, remote_artwork_candidates,
-    save_artwork_slot, save_candidate_artwork, uploaded_artwork_candidates
+    local_artwork_payload, persisted_artwork_url, save_artwork_slot, save_candidate_artwork,
+    uploaded_artwork_candidates
 )
 from scripts.import_bilibili_script import (
     TO_TRADITIONAL,
@@ -246,15 +247,56 @@ def update_script(
 
 
 def apply_candidate_artwork(script, selection, candidates):
-    saved = save_candidate_artwork(script, selection, candidates)
     by_slot = {item.sort_order: item for item in script.images if item.sort_order in (0, 1, 100)}
+    by_id = {item.id: item for item in script.images}
+    candidate_ids = [str(value) for value in (selection or {}).values() if value]
+    if len(candidate_ids) != len(set(candidate_ids)):
+        raise HTTPException(status_code=400, detail="同一張圖片不能同時指定成多個用途")
+    fresh_selection = {}
+    for kind, candidate_id in (selection or {}).items():
+        if kind not in {"front", "back", "logo"} or not candidate_id:
+            continue
+        candidate_id = str(candidate_id)
+        if not candidate_id.startswith("existing-"):
+            fresh_selection[kind] = candidate_id
+            continue
+        try:
+            source = by_id[int(candidate_id.removeprefix("existing-"))]
+        except (KeyError, ValueError):
+            raise HTTPException(status_code=400, detail=f"{kind} 圖片不在備選庫中")
+        slot = {"front": 0, "back": 1, "logo": 100}[kind]
+        image_data, content_type = source.image_data, source.content_type
+        if not image_data:
+            image_data, content_type = local_artwork_payload(source.image_url)
+        target = by_slot.get(slot)
+        suffix = {"front": "正面", "back": "背面", "logo": " Logo"}[kind]
+        if target:
+            target.image_url = persisted_artwork_url(script, slot)
+            target.image_data = image_data
+            target.content_type = content_type
+            target.alt_text = f"{script.name_zh_tw}{suffix}"
+        else:
+            target = ScriptImage(
+                image_url=persisted_artwork_url(script, slot), image_data=image_data,
+                content_type=content_type, alt_text=f"{script.name_zh_tw}{suffix}", sort_order=slot,
+            )
+            script.images.append(target)
+            by_slot[slot] = target
+    saved = save_candidate_artwork(script, fresh_selection, candidates) if fresh_selection else []
     for slot, url, kind in saved:
+        image_data, content_type = local_artwork_payload(url)
         item = by_slot.get(slot)
         suffix = {"front": "正面", "back": "背面", "logo": " Logo"}[kind]
         if item:
-            item.image_url, item.alt_text = url, f"{script.name_zh_tw}{suffix}"
+            item.image_url = persisted_artwork_url(script, slot)
+            item.image_data = image_data
+            item.content_type = content_type
+            item.alt_text = f"{script.name_zh_tw}{suffix}"
         else:
-            item = ScriptImage(image_url=url, alt_text=f"{script.name_zh_tw}{suffix}", sort_order=slot)
+            item = ScriptImage(
+                image_url=persisted_artwork_url(script, slot), image_data=image_data,
+                content_type=content_type, alt_text=f"{script.name_zh_tw}{suffix}", sort_order=slot,
+            )
             script.images.append(item)
             by_slot[slot] = item
     return saved
@@ -304,13 +346,18 @@ def update_script_images(
             raise HTTPException(status_code=400, detail="劇本圖片位置不正確或重複")
         seen.add(slot)
         url = save_artwork_slot(script, incoming, slot)
+        image_data, content_type = local_artwork_payload(url)
         image = by_slot.get(slot)
         if image:
-            image.image_url = url
+            image.image_url = persisted_artwork_url(script, slot)
+            image.image_data = image_data
+            image.content_type = content_type
             image.alt_text = f"{script.name_zh_tw}{ {0: '正面', 1: '背面', 100: ' Logo'}[slot] }"
         else:
             script.images.append(ScriptImage(
-                image_url=url,
+                image_url=persisted_artwork_url(script, slot),
+                image_data=image_data,
+                content_type=content_type,
                 alt_text=f"{script.name_zh_tw}{ {0: '正面', 1: '背面', 100: ' Logo'}[slot] }",
                 sort_order=slot,
             ))

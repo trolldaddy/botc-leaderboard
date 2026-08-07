@@ -1,6 +1,7 @@
+import base64
 import json
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import or_
 from sqlalchemy.orm import Session, joinedload
 
@@ -11,9 +12,30 @@ from knowledge_models import KnowledgeAlias, KnowledgeNode
 from knowledge_visibility import PUBLIC_VISIBILITIES
 from role_public_routes import role_card
 from role_models import Role, RoleKnowledgeLink
-from script_models import ScriptEntry, ScriptRole, ScriptSupplement
+from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 
 router = APIRouter(prefix="/api/scripts", tags=["scripts-public"])
+
+
+@router.get("/artwork/{script_slug}/{slot}")
+def get_script_artwork(script_slug: str, slot: int, db: Session = Depends(get_db)):
+    if slot not in (0, 1, 100):
+        raise HTTPException(status_code=404, detail="找不到劇本圖片")
+    image = db.query(ScriptImage).join(ScriptEntry).filter(
+        ScriptEntry.slug == script_slug,
+        ScriptImage.sort_order == slot,
+    ).first()
+    if not image or not image.image_data:
+        raise HTTPException(status_code=404, detail="找不到劇本圖片")
+    try:
+        content = base64.b64decode(image.image_data, validate=True)
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=404, detail="劇本圖片資料已損壞")
+    return Response(
+        content=content,
+        media_type=image.content_type or "application/octet-stream",
+        headers={"Cache-Control": "public, max-age=300"},
+    )
 
 
 def parse_tags(value):

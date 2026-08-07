@@ -2,6 +2,7 @@ import base64
 import hashlib
 import io
 import json
+import mimetypes
 import re
 import shutil
 import uuid
@@ -24,6 +25,16 @@ CANDIDATE_ROOT = ROOT / "static" / "script-images" / "candidates"
 ALLOWED_HOSTS = {"www.bilibili.com", "bilibili.com"}
 EXTENSIONS = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif"}
 ARTWORK_SLOTS = {"front": 0, "back": 1, "logo": 100}
+
+
+def persisted_artwork_url(script, slot):
+    return f"/api/scripts/artwork/{script.slug}/{slot}"
+
+
+def local_artwork_payload(url):
+    source = _safe_local_artwork_path(url)
+    content_type = mimetypes.guess_type(source.name)[0] or "application/octet-stream"
+    return base64.b64encode(source.read_bytes()).decode("ascii"), content_type
 
 
 def museum_metadata(source_url):
@@ -338,7 +349,11 @@ def create_script(db, data, official, supplements, metadata):
         script, data.get("images") or [], metadata.get("remote_images") or [], data.get("artwork_selection") or {}
     ):
         suffix = {"front": "正面", "back": "背面", "logo": " Logo"}[kind]
-        script.images.append(ScriptImage(image_url=url, alt_text=f"{name}{suffix}", sort_order=slot))
+        image_data, content_type = local_artwork_payload(url)
+        script.images.append(ScriptImage(
+            image_url=persisted_artwork_url(script, slot), image_data=image_data,
+            content_type=content_type, alt_text=f"{name}{suffix}", sort_order=slot,
+        ))
     for index, role in enumerate(official):
         script.roles.append(ScriptRole(role_id=role.id, sort_order=index))
     for index, item in enumerate(supplements):
