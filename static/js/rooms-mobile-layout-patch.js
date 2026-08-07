@@ -70,7 +70,12 @@
       members.classList.remove('town-tab-player');
       members.classList.add('town-tab-storyteller');
     }
-    if (storyteller && members && storyteller.parentElement === members.parentElement) {
+    if (
+      storyteller &&
+      members &&
+      storyteller.parentElement === members.parentElement &&
+      storyteller.nextElementSibling !== members
+    ) {
       storyteller.insertAdjacentElement('afterend', members);
     }
   };

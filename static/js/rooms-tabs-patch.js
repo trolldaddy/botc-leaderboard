@@ -156,7 +156,12 @@
     $$('.storyteller-room-card, .room-members-card').forEach((el) => el.classList.add('town-tab-storyteller'));
     const storytellerCard = $('.storyteller-room-card');
     const membersCard = $('.room-members-card');
-    if (storytellerCard && membersCard && storytellerCard.parentElement === membersCard.parentElement) {
+    if (
+      storytellerCard &&
+      membersCard &&
+      storytellerCard.parentElement === membersCard.parentElement &&
+      storytellerCard.nextElementSibling !== membersCard
+    ) {
       storytellerCard.insertAdjacentElement('afterend', membersCard);
     }
     $$('.town-mode-tab').forEach((button) => button.addEventListener('click', () => setActiveTab(button.dataset.townTabTarget)));
