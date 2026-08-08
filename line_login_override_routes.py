@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 import models
 from database import get_db
+from line_account_service import reconcile_line_account
 
 router = APIRouter(tags=["line-login-override"])
 
@@ -188,26 +189,13 @@ async def line_callback_mobile_safe(
     if not line_user_id:
         raise HTTPException(status_code=400, detail="LINE 未回傳 userId")
 
-    account = (
-        db.query(models.StorytellerAccount)
-        .filter(models.StorytellerAccount.line_user_id == line_user_id)
-        .first()
+    account = reconcile_line_account(
+        db,
+        line_user_id=line_user_id,
+        display_name=display_name,
+        picture_url=picture_url,
+        is_allowed_default=(not ALLOWED_LINE_USER_IDS) or (line_user_id in ALLOWED_LINE_USER_IDS),
     )
-    now = datetime.now()
-    if account:
-        account.display_name = display_name
-        account.picture_url = picture_url
-        account.last_login_at = now
-    else:
-        account = models.StorytellerAccount(
-            line_user_id=line_user_id,
-            display_name=display_name,
-            picture_url=picture_url,
-            is_allowed=(not ALLOWED_LINE_USER_IDS)
-            or (line_user_id in ALLOWED_LINE_USER_IDS),
-            last_login_at=now,
-        )
-        db.add(account)
 
     db.commit()
     db.refresh(account)

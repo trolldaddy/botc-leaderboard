@@ -62,3 +62,18 @@ def test_room_join_keeps_line_identity_canonical():
     assert 'if not (existing.display_name or "").strip()' in backend
     assert '"duplicates_removed"' in backend
     assert "account_id=account.id if account else None" in backend
+
+
+def test_line_callback_selects_established_account_without_deleting_history():
+    service = (ROOT / "line_account_service.py").read_text(encoding="utf-8")
+    override = (ROOT / "line_login_override_routes.py").read_text(encoding="utf-8")
+    main_source = (ROOT / "main.py").read_text(encoding="utf-8")
+
+    assert "def reconcile_line_account(" in service
+    assert "models.StorytellerAccount.line_user_id == line_user_id" in service
+    assert "account.id in owner_ids" in service
+    assert "db.delete(" not in service
+    assert ".delete(" not in service
+    assert ".update(" not in service
+    assert "reconcile_line_account(" in override
+    assert "reconcile_line_account(" in main_source

@@ -19,6 +19,7 @@ from sqlalchemy.orm import Session, joinedload
 
 import models
 from database import RUN_SCHEMA_MIGRATIONS, engine, get_db
+from line_account_service import reconcile_line_account
 
 app = FastAPI(title="BOTC Stats Leaderboard API")
 
@@ -340,15 +341,13 @@ async def line_callback(request: Request, code: str = "", state: str = "", db: S
     picture_url = profile.get("pictureUrl")
     if not line_user_id:
         raise HTTPException(status_code=400, detail="LINE 未回傳 userId")
-    account = db.query(models.StorytellerAccount).filter(models.StorytellerAccount.line_user_id == line_user_id).first()
-    now = datetime.now()
-    if account:
-        account.display_name = display_name
-        account.picture_url = picture_url
-        account.last_login_at = now
-    else:
-        account = models.StorytellerAccount(line_user_id=line_user_id, display_name=display_name, picture_url=picture_url, is_allowed=(not ALLOWED_LINE_USER_IDS) or (line_user_id in ALLOWED_LINE_USER_IDS), last_login_at=now)
-        db.add(account)
+    account = reconcile_line_account(
+        db,
+        line_user_id=line_user_id,
+        display_name=display_name,
+        picture_url=picture_url,
+        is_allowed_default=(not ALLOWED_LINE_USER_IDS) or (line_user_id in ALLOWED_LINE_USER_IDS),
+    )
     db.commit()
     db.refresh(account)
     next_url = request.cookies.get(LINE_NEXT_COOKIE) or "/#record"
