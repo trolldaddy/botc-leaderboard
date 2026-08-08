@@ -23,6 +23,7 @@ def build_room_permissions(
 ) -> dict:
     is_owner = bool(account and room.created_by_id == account.id)
     return {
+        "authenticated": bool(account),
         "is_owner": is_owner,
         "can_manage_players": is_owner,
         "can_manage_room": is_owner,

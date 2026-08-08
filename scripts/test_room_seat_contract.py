@@ -25,3 +25,14 @@ def test_room_seat_identity_uses_the_logged_in_account_id():
     assert '"user": {"id": account.id' in main_source
     assert "Number(player.account_id) === accountId" in mobile_source
     assert "Number(player.account_id) === Number(ctx.account.id)" in self_seat_source
+
+
+def test_room_permissions_distinguish_expired_login_from_non_owner():
+    backend = (ROOT / "player_seat_routes.py").read_text(encoding="utf-8")
+    frontend = (ROOT / "static/js/rooms-permission-patch.js").read_text(
+        encoding="utf-8"
+    )
+
+    assert '"authenticated": bool(account)' in backend
+    assert "else if (!permissions.authenticated)" in frontend
+    assert "重新 LINE 登入" in frontend

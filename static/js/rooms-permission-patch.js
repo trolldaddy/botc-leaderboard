@@ -18,16 +18,16 @@
 
   const fetchPermissions = async () => {
     const code = getRoomCode();
-    if (!code) return { is_owner: false, can_manage_players: false, can_manage_room: false };
+    if (!code) return { authenticated: false, is_owner: false, can_manage_players: false, can_manage_room: false };
     try {
       const resp = await fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}/permissions`, {
         credentials: 'same-origin',
         cache: 'no-store'
       });
-      if (!resp.ok) return { is_owner: false, can_manage_players: false, can_manage_room: false };
+      if (!resp.ok) return { authenticated: false, is_owner: false, can_manage_players: false, can_manage_room: false };
       return await resp.json();
     } catch (err) {
-      return { is_owner: false, can_manage_players: false, can_manage_room: false };
+      return { authenticated: false, is_owner: false, can_manage_players: false, can_manage_room: false };
     }
   };
 
@@ -81,6 +81,18 @@
     if (permissions.is_owner) {
       hostBox.textContent = `你是此房間建立者，可以管理房間、玩家座號與移除玩家。`;
       hostBox.style.color = 'var(--text-muted)';
+    } else if (!permissions.authenticated) {
+      hostBox.replaceChildren();
+      const message = document.createElement('span');
+      message.textContent = 'LINE 登入狀態已失效，請重新登入以恢復房主管理權限。';
+      const login = document.createElement('button');
+      login.type = 'button';
+      login.className = 'btn btn-outline btn-sm';
+      login.style.marginLeft = '.75rem';
+      login.innerHTML = '<i class="fa-brands fa-line"></i> 重新 LINE 登入';
+      login.addEventListener('click', () => window.TownCheckinUI?.lineLoginWithCode?.());
+      hostBox.append(message, login);
+      hostBox.style.color = 'var(--accent-red)';
     } else {
       hostBox.textContent = room.created_by_display_name
         ? `此房間由 ${room.created_by_display_name} 建立。你可以查看與加入，但不能管理房間。`
