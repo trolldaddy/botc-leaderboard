@@ -77,3 +77,23 @@ def test_line_callback_selects_established_account_without_deleting_history():
     assert ".update(" not in service
     assert "reconcile_line_account(" in override
     assert "reconcile_line_account(" in main_source
+
+
+def test_admin_can_explicitly_reclaim_only_the_current_room():
+    backend = (ROOT / "player_seat_routes.py").read_text(encoding="utf-8")
+    frontend = (ROOT / "static/js/rooms-permission-patch.js").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'os.getenv("ADMIN_LINE_USER_IDS"' in backend
+    assert '"can_reclaim_owner"' in backend
+    assert '@router.post("/{room_code}/reclaim-owner")' in backend
+    assert 'data.get("confirm_room_code"' in backend
+    assert "creator_name != account_name" in backend
+    assert "models.RoomPlayer.account_id == account.id" in backend
+    assert "models.RoomPlayer.is_temporary.is_(False)" in backend
+    assert "room.created_by_id = account.id" in backend
+    assert "恢復房主權限" in frontend
+    assert "window.confirm" in frontend
+    assert "/reclaim-owner" in frontend
+    assert "confirm_room_code: code" in frontend

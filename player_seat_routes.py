@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -12,9 +13,19 @@ from room_routes import (
     reload_room,
     serialize_room,
     serialize_room_player,
+    require_account,
 )
 
 router = APIRouter(prefix="/api/rooms", tags=["town-checkin-player-seat"])
+
+
+def can_reclaim_room_owner(account: Optional[models.StorytellerAccount]) -> bool:
+    admin_ids = {
+        item.strip()
+        for item in os.getenv("ADMIN_LINE_USER_IDS", "").split(",")
+        if item.strip()
+    }
+    return bool(account and account.line_user_id in admin_ids)
 
 
 def build_room_permissions(
@@ -28,6 +39,7 @@ def build_room_permissions(
         "is_owner": is_owner,
         "can_manage_players": is_owner,
         "can_manage_room": is_owner,
+        "can_reclaim_owner": bool(not is_owner and can_reclaim_room_owner(account)),
     }
 
 
@@ -59,6 +71,54 @@ async def get_room_permissions(
         raise HTTPException(status_code=404, detail="找不到房間")
 
     return build_room_permissions(room, account)
+
+
+@router.post("/{room_code}/reclaim-owner")
+async def reclaim_room_owner(
+    room_code: str,
+    data: dict,
+    db: Session = Depends(get_db),
+    account: models.StorytellerAccount = Depends(require_account),
+):
+    if not can_reclaim_room_owner(account):
+        raise HTTPException(status_code=403, detail="只有管理員可以恢復房主權限")
+
+    room = db.query(models.GameRoom).filter(
+        models.GameRoom.room_code == room_code.upper()
+    ).first()
+    if not room:
+        raise HTTPException(status_code=404, detail="找不到房間")
+
+    if str(data.get("confirm_room_code", "")).strip().upper() != room.room_code:
+        raise HTTPException(status_code=400, detail="房號確認不符")
+
+    creator = db.query(models.StorytellerAccount).filter(
+        models.StorytellerAccount.id == room.created_by_id
+    ).first()
+    creator_name = (creator.display_name if creator else "").strip()
+    account_name = (account.display_name or "").strip()
+    if not creator_name or creator_name != account_name:
+        raise HTTPException(status_code=403, detail="目前帳號與原房主資料不符")
+
+    account_player = db.query(models.RoomPlayer).filter(
+        models.RoomPlayer.room_id == room.id,
+        models.RoomPlayer.account_id == account.id,
+        models.RoomPlayer.is_temporary.is_(False),
+    ).first()
+    if not account_player:
+        raise HTTPException(status_code=403, detail="目前帳號尚未以 LINE 加入此房間")
+
+    previous_owner_id = room.created_by_id
+    room.created_by_id = account.id
+    db.commit()
+    room = reload_room(db, room.id)
+
+    return {
+        "status": "success",
+        "previous_owner_id": previous_owner_id,
+        "room": serialize_room(room),
+        "permissions": build_room_permissions(room, account),
+    }
 
 
 @router.patch("/{room_code}/players/{room_player_id}/seat")

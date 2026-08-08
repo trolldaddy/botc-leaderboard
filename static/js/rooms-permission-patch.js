@@ -107,6 +107,35 @@
       switchAccount.innerHTML = '<i class="fa-brands fa-line"></i> 切換 LINE 帳號';
       switchAccount.addEventListener('click', () => window.TownCheckinUI?.switchLineAccount?.());
       hostBox.append(message, switchAccount);
+      if (permissions.can_reclaim_owner) {
+        const reclaim = document.createElement('button');
+        reclaim.type = 'button';
+        reclaim.className = 'btn btn-primary btn-sm';
+        reclaim.style.marginLeft = '.5rem';
+        reclaim.innerHTML = '<i class="fa-solid fa-key"></i> 恢復房主權限';
+        reclaim.addEventListener('click', async () => {
+          const code = getRoomCode();
+          if (!code || !window.confirm(`確定要將房間 ${code} 的房主轉移給目前登入的 ${currentName}？`)) return;
+          reclaim.disabled = true;
+          try {
+            const resp = await fetch(`${apiBase()}/api/rooms/${encodeURIComponent(code)}/reclaim-owner`, {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ confirm_room_code: code })
+            });
+            const data = await resp.json().catch(() => ({}));
+            if (!resp.ok) throw new Error(data.detail || '恢復房主權限失敗');
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data.room));
+            window.dispatchEvent(new CustomEvent('botc:town-room-changed', { detail: data.room }));
+            await applyPermissions();
+          } catch (err) {
+            window.alert(err.message || '恢復房主權限失敗');
+            reclaim.disabled = false;
+          }
+        });
+        hostBox.append(reclaim);
+      }
       hostBox.style.color = 'var(--accent-red)';
     }
   };
