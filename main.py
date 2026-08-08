@@ -373,7 +373,7 @@ async def logout_redirect():
 async def get_me(account: Optional[models.StorytellerAccount] = Depends(get_optional_storyteller)):
     if not account:
         return {"logged_in": False, "can_upload": False, "is_admin": False, "user": None}
-    return {"logged_in": True, "can_upload": storyteller_can_upload(account), "is_admin": storyteller_is_admin(account), "user": {"display_name": account.display_name, "line_user_id": account.line_user_id, "picture_url": account.picture_url, "is_allowed": account.is_allowed, "is_banned": bool(account.is_banned)}}
+    return {"logged_in": True, "can_upload": storyteller_can_upload(account), "is_admin": storyteller_is_admin(account), "user": {"id": account.id, "display_name": account.display_name, "line_user_id": account.line_user_id, "picture_url": account.picture_url, "is_allowed": account.is_allowed, "is_banned": bool(account.is_banned)}}
 
 
 @app.get("/api/locations")

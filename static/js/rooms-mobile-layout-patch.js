@@ -126,10 +126,12 @@
       if (response.ok) me = await response.json();
     } catch (err) {}
 
+    const accountId = Number(me?.user?.id || 0);
     const lineUserId = me?.user?.line_user_id || '';
     return room.players.find((player) =>
-      (token && player.device_token && player.device_token === token) ||
-      (lineUserId && player.line_user_id === lineUserId)
+      (accountId && Number(player.account_id) === accountId) ||
+      (lineUserId && player.line_user_id === lineUserId) ||
+      (token && player.device_token && player.device_token === token)
     ) || null;
   };
 

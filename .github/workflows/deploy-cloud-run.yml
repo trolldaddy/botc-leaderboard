@@ -102,8 +102,8 @@ jobs:
             --platform managed \
             --allow-unauthenticated \
             --add-cloudsql-instances "${{ steps.runtime.outputs.connection }}" \
-            --set-secrets "DATABASE_URL=botc-database-url:latest" \
-            --set-env-vars "GCS_BUCKET=${{ steps.runtime.outputs.bucket }},RUN_SCHEMA_MIGRATIONS=0,DB_CONNECT_TIMEOUT=10" \
+            --update-secrets "DATABASE_URL=botc-database-url:latest" \
+            --update-env-vars "GCS_BUCKET=${{ steps.runtime.outputs.bucket }},RUN_SCHEMA_MIGRATIONS=0,DB_CONNECT_TIMEOUT=10" \
             --quiet
 
       - name: Set up Python for approved script seed
