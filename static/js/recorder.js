@@ -427,7 +427,7 @@ const saveState = (key, value) => {
 // ==========================================
 // 子組件：行動卡片
 // ==========================================
-const RoleActionCard = ({ player, reminder, onRecord, players, script }) => {
+const RoleActionCard = ({ player, reminder, onRecord, players, script, roleCatalog }) => {
   const [isRecorded, setIsRecorded] = useState(false);
   const [formData, setFormData] = useState({});
   const [detailNote, setDetailNote] = useState(""); 
@@ -497,7 +497,7 @@ const configs = getRoleInputConfig(player.role);
               ) : c.type === 'role' ? (
                 <select onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none">
                   <option value="">{c.label}...</option>
-                  {(script && script.length > 0 ? script : MASTER_ROLE_DB).map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
+                  {(script && script.length > 0 ? script : roleCatalog).map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
                 </select>
               ) : (
                 <input type="text" placeholder={c.label} onChange={e=>setFormData({...formData, [c.key]: e.target.value})} className="w-full bg-slate-800 border border-slate-700 rounded-lg text-xs p-1 text-slate-200 outline-none" />
@@ -520,6 +520,7 @@ const configs = getRoleInputConfig(player.role);
 // 主應用程式
 // ==========================================
 const App = () => {
+  const [roleCatalog, setRoleCatalog] = useState(() => window.MASTER_ROLE_DB || MASTER_ROLE_DB);
   const [script, setScript] = useState(() => loadState('botc_script', [])); 
   const [players, setPlayers] = useState(() => loadState('botc_players', [])); 
   const [gamePhase, setGamePhase] = useState(() => loadState('botc_gamePhase', { type: 'Setup', number: 0 })); 
@@ -535,13 +536,39 @@ const App = () => {
   const [selectingRoleFor, setSelectingRoleFor] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  useEffect(() => {
+    let active = true;
+    const applyCatalog = (catalog) => {
+      if (!active || !Array.isArray(catalog) || catalog.length === 0) return;
+      setRoleCatalog(catalog);
+      const findRole = (role) => catalog.find(item =>
+        item.id === role?.id ||
+        item.databaseId === role?.databaseId ||
+        item.name === role?.name ||
+        (item.aliases || []).includes(role?.name)
+      );
+      setScript(current => current.map(role => ({ ...role, ...(findRole(role) || {}) })));
+      setPlayers(current => current.map(player => player.role
+        ? { ...player, role: { ...player.role, ...(findRole(player.role) || {}) } }
+        : player
+      ));
+    };
+    window.RoleCatalog?.ready?.then(applyCatalog).catch(() => {});
+    const onReady = event => applyCatalog(event.detail);
+    window.addEventListener('botc:role-catalog-ready', onReady);
+    return () => {
+      active = false;
+      window.removeEventListener('botc:role-catalog-ready', onReady);
+    };
+  }, []);
+
   const loadBuiltInScript = (scriptKey) => {
     const roleIds = DEFAULT_SCRIPTS_DATA[scriptKey];
     if (!roleIds) return;
     
     // 從 window 全域的角色庫比對 ID 並產生新的 script 狀態
     const parsed = roleIds.map(id => {
-      let dbRole = window.MASTER_ROLE_DB.find(r => r.id === id);
+      let dbRole = roleCatalog.find(r => r.id === id);
       return dbRole ? { ...dbRole } : null;
     }).filter(Boolean);
 
@@ -566,13 +593,13 @@ const App = () => {
 
   // 強制合併旅行者到選角池
   const allAvailableRoles = useMemo(() => {
-    const travellers = MASTER_ROLE_DB.filter(r => r.team === 'traveller');
+    const travellers = roleCatalog.filter(r => r.team === 'traveller');
     const combined = [...script];
     travellers.forEach(tr => {
       if (!combined.some(r => r.id === tr.id)) combined.push(tr);
     });
     return combined;
-  }, [script]);
+  }, [script, roleCatalog]);
 
   const showAlert = (message) => {
     setModalConfig({ isOpen: true, type: 'alert', message, onConfirm: null });
@@ -865,16 +892,16 @@ const App = () => {
             const tName = toTraditional(item.name || "");
             const tAbility = toTraditional(item.ability || "");
 
-            let dbRole = MASTER_ROLE_DB.find(r => r.id === roleId);
+            let dbRole = roleCatalog.find(r => r.id === roleId);
             
             if (!dbRole && tName) {
-              dbRole = MASTER_ROLE_DB.find(r => r.name === tName || tName.includes(r.name));
+              dbRole = roleCatalog.find(r => r.name === tName || tName.includes(r.name));
             }
 
             if (!dbRole && tAbility) {
               const normalize = (str) => (str || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
               const normItem = normalize(tAbility);
-              dbRole = MASTER_ROLE_DB.find(r => {
+              dbRole = roleCatalog.find(r => {
                 const dbNorm = normalize(r.ability);
                 return dbNorm === normItem && dbNorm.length > 0;
               });
@@ -1268,7 +1295,7 @@ const App = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {['townsfolk', 'outsider', 'minion', 'demon', 'traveller'].map(team => {
-                    const source = (script && script.length > 0) ? allAvailableRoles : MASTER_ROLE_DB;
+                    const source = (script && script.length > 0) ? allAvailableRoles : roleCatalog;
                     const teamRoles = source.filter(r => r.team === team && (r.name.includes(searchTerm) || r.id.toLowerCase().includes(searchTerm.toLowerCase())));
                     if (teamRoles.length === 0) return null;
                     return (
@@ -1378,7 +1405,7 @@ const App = () => {
                         className="w-full bg-slate-900/80 border border-red-900/50 rounded-xl px-3 py-2 text-xs outline-none focus:border-red-500 mt-1 text-slate-200"
                       >
                         <option value="">選擇角色...</option>
-                        {(script && script.length > 0 ? script : MASTER_ROLE_DB).map(r => (
+                        {(script && script.length > 0 ? script : roleCatalog).map(r => (
                           <option key={r.id} value={r.name}>{r.name}</option>
                         ))}
                       </select>
@@ -1464,6 +1491,7 @@ const App = () => {
                         onRecord={(action, target, detail) => recordEvent(player.role.name, action, target, detail)}
                         players={players}
                         script={script}
+                        roleCatalog={roleCatalog}
                       />
                     );
                   })}
@@ -1550,6 +1578,7 @@ const App = () => {
                       onRecord={(action, target, detail) => recordEvent(player.role.name, action, target, detail)}
                       players={players}
                       script={script}
+                      roleCatalog={roleCatalog}
                     />
                   ))}
                 </div>

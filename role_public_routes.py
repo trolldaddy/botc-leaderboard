@@ -66,6 +66,10 @@ def role_card(role: Role, mention_aliases=None, knowledge_slug=None):
         "team": role.team,
         "ability_zh_tw": role.ability_zh_tw,
         "image_url": role.image_url,
+        "first_night_order": role.first_night_order or 0,
+        "other_night_order": role.other_night_order or 0,
+        "first_night_reminder": role.first_night_reminder,
+        "other_night_reminder": role.other_night_reminder,
         "script_names": string_list(role.script_names_json),
         "ability_tags": string_list(role.ability_tags_json),
         "mention_aliases": sorted(({str(value).strip() for value in (mention_aliases or []) if value and str(value).strip()} | known_aliases) - {canonical_name}),
@@ -154,7 +158,7 @@ def find_role(db: Session, key: str):
 
 
 @router.get("")
-def search_roles(q: str = Query(default="", max_length=120), team: str = "", limit: int = Query(default=60, ge=1, le=500), db: Session = Depends(get_db)):
+def search_roles(q: str = Query(default="", max_length=120), team: str = "", limit: int = Query(default=60, ge=1, le=1000), db: Session = Depends(get_db)):
     query = db.query(Role).filter(Role.is_active == True)  # noqa: E712
     keyword = q.strip()
     if keyword:

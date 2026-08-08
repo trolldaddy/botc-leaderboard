@@ -23,7 +23,12 @@ function setupRoleDatalist() {
     }
 }
 
-window.addEventListener('DOMContentLoaded', setupRoleDatalist);
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', setupRoleDatalist);
+} else {
+    setupRoleDatalist();
+}
+window.addEventListener('botc:role-catalog-ready', setupRoleDatalist);
 
 {
     let currentAuth = {
