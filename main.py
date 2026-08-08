@@ -12,7 +12,7 @@ from urllib.parse import urlencode
 import requests
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session, joinedload
@@ -360,7 +360,9 @@ async def line_callback(request: Request, code: str = "", state: str = "", db: S
 
 @app.post("/api/auth/logout")
 async def logout():
-    return {"status": "success"}
+    response = JSONResponse({"status": "success"})
+    clear_auth_cookie(response)
+    return response
 
 
 @app.get("/auth/logout")

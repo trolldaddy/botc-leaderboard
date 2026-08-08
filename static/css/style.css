@@ -146,6 +146,66 @@ h1, h2, h3, h4 {
     color: var(--text-main);
 }
 
+.nav-account-item {
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+    margin-left: .45rem;
+    padding-left: .65rem;
+    border-left: 1px solid var(--border-color);
+    flex: 0 0 auto;
+}
+
+.nav-account-loading,
+.nav-account-identity,
+.nav-account-login,
+.nav-account-logout,
+.nav-account-retry {
+    display: inline-flex;
+    align-items: center;
+    gap: .42rem;
+    height: 36px;
+    padding: 0 .68rem;
+    border-radius: 8px;
+    white-space: nowrap;
+    font: inherit;
+    font-size: .78rem;
+}
+
+.nav-account-loading { color: var(--text-muted); }
+.nav-account-identity { color: var(--text-main); min-width: 0; }
+.nav-account-identity > i,
+.nav-account-login > i { color: #32c45e; font-size: 1rem; }
+.nav-account-name { max-width: 9rem; overflow: hidden; text-overflow: ellipsis; }
+
+.nav-account-login,
+.nav-account-logout,
+.nav-account-retry {
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, .035);
+    color: var(--text-muted);
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.nav-account-login:hover,
+.nav-account-login:focus-visible,
+.nav-account-logout:hover,
+.nav-account-logout:focus-visible,
+.nav-account-retry:hover,
+.nav-account-retry:focus-visible {
+    border-color: rgba(255, 183, 3, .45);
+    background: rgba(255, 183, 3, .09);
+    color: var(--text-main);
+    outline: none;
+}
+
+.nav-account-login:active,
+.nav-account-logout:active,
+.nav-account-retry:active { transform: translateY(1px); }
+.nav-account-logout:disabled { cursor: wait; opacity: .65; }
+
 /* --- 主內容區 --- */
 .main-content {
     flex: 1;
@@ -436,7 +496,11 @@ html, body {
         margin: 0 !important;
     }
 
-    .nav-links li a {
+    .nav-account-item {
+        height: 100%;
+    }
+
+  .nav-links li a {
         padding: 0 1rem !important;
         height: 100%;
         display: flex;
@@ -451,6 +515,7 @@ html, body {
     .hamburger-btn {
         display: none !important;
     }
+
 }
 
 /* 🟢 2. 確保原本的手機版 (@media (max-width: 767px)) 邏輯不受影響 */
@@ -549,6 +614,16 @@ html, body {
         padding: 12px 15px !important;
         font-size: 0.75rem !important;
     }
+    .nav-account-item {
+        width: 100%;
+        margin: .4rem 0 0 !important;
+        padding: .75rem .5rem 0 !important;
+        border-left: 0;
+        border-top: 1px solid var(--border-color);
+        flex-wrap: wrap;
+    }
+    .nav-account-identity { flex: 1 1 auto; }
+    .nav-account-name { max-width: 8.5rem; }
 }
 /* 查閱覆盤按鈕 - 精緻金色風格 */
 .view-log-btn {

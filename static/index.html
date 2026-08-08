@@ -70,6 +70,9 @@
         <li id="admin-role-nav-item" style="display:none;"><a href="#" data-page="role_admin"><i class="fa-solid fa-address-book"></i> <span>角色資料庫</span></a></li>
         <li id="admin-bindings-nav-item" style="display:none;"><a href="#" data-page="account_bindings"><i class="fa-solid fa-link"></i> <span>帳號綁定</span></a></li>
         <li id="admin-nav-item" style="display:none;"><a href="#" data-page="admin"><i class="fa-solid fa-shield-halved"></i> <span>管理後台</span></a></li>
+        <li id="site-account-nav-item" class="nav-account-item" aria-live="polite">
+            <span class="nav-account-loading"><i class="fa-solid fa-user-clock"></i> 帳號載入中</span>
+        </li>
     </ul>
 
     <main class="main-content" id="content-area">
@@ -172,6 +175,73 @@
             } catch (err) {}
         }
 
+        function authNextUrl() {
+            return `${window.location.pathname}${window.location.search}${window.location.hash}`;
+        }
+
+        function renderSiteAccount(me) {
+            const item = document.getElementById('site-account-nav-item');
+            if (!item) return;
+            item.replaceChildren();
+
+            if (!me?.logged_in || !me.user) {
+                const login = document.createElement('a');
+                login.className = 'nav-account-login';
+                login.href = `/api/auth/line/login?next=${encodeURIComponent(authNextUrl())}`;
+                login.innerHTML = '<i class="fa-brands fa-line"></i><span>LINE 登入</span>';
+                item.appendChild(login);
+                return;
+            }
+
+            const identity = document.createElement('span');
+            identity.className = 'nav-account-identity';
+            identity.title = me.user.display_name || 'LINE 使用者';
+            identity.innerHTML = '<i class="fa-brands fa-line"></i>';
+            const name = document.createElement('span');
+            name.className = 'nav-account-name';
+            name.textContent = me.user.display_name || 'LINE 使用者';
+            identity.appendChild(name);
+
+            const logout = document.createElement('button');
+            logout.type = 'button';
+            logout.className = 'nav-account-logout';
+            logout.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i><span>登出</span>';
+            logout.addEventListener('click', async () => {
+                logout.disabled = true;
+                logout.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>登出中</span>';
+                try {
+                    const response = await fetch('/api/auth/logout', {
+                        method: 'POST',
+                        credentials: 'same-origin'
+                    });
+                    if (!response.ok) throw new Error('登出失敗');
+                    window.location.reload();
+                } catch (err) {
+                    logout.disabled = false;
+                    logout.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i><span>重試登出</span>';
+                    logout.title = err.message || '登出失敗';
+                }
+            });
+            item.append(identity, logout);
+        }
+
+        async function refreshSiteAccount() {
+            try {
+                const response = await fetch(`${window.API_BASE || ''}/api/me`, {
+                    credentials: 'same-origin',
+                    cache: 'no-store'
+                });
+                if (!response.ok) throw new Error('無法取得登入狀態');
+                renderSiteAccount(await response.json());
+            } catch (err) {
+                const item = document.getElementById('site-account-nav-item');
+                if (item) {
+                    item.innerHTML = '<button type="button" class="nav-account-retry"><i class="fa-solid fa-rotate-right"></i><span>重試帳號狀態</span></button>';
+                    item.querySelector('button')?.addEventListener('click', refreshSiteAccount);
+                }
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             let loadedPage = '';
             const pageFromHash = () => {
@@ -214,6 +284,7 @@
             });
             window.addEventListener('hashchange', loadPageFromHash);
             revealAdminNav();
+            refreshSiteAccount();
             loadPageFromHash();
         });
     </script>
