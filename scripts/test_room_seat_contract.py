@@ -55,6 +55,10 @@ def test_room_join_keeps_line_identity_canonical():
 
     assert "is_temporary = account is None" in backend
     assert "models.RoomPlayer.account_id == account.id" in backend
-    assert "temporary_duplicate" in backend
+    assert "account_entries[0]" in backend
+    assert "for duplicate in account_entries[1:]" in backend
+    assert "temporary_duplicates" in backend
     assert "models.RoomPlayer.account_id.is_(None)" in backend
+    assert 'if not (existing.display_name or "").strip()' in backend
+    assert '"duplicates_removed"' in backend
     assert "account_id=account.id if account else None" in backend

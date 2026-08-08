@@ -253,32 +253,57 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
         raise HTTPException(status_code=400, detail="請輸入玩家名稱")
 
     if account:
-        existing = db.query(models.RoomPlayer).filter(models.RoomPlayer.room_id == room.id, models.RoomPlayer.account_id == account.id).first()
-        if existing:
+        account_entries = db.query(models.RoomPlayer).filter(
+            models.RoomPlayer.room_id == room.id,
+            models.RoomPlayer.account_id == account.id,
+        ).order_by(models.RoomPlayer.joined_at.asc(), models.RoomPlayer.id.asc()).all()
+        if account_entries:
+            # Older databases may not have enforced uq_room_player_account yet.
+            # Keep the earliest room identity and remove later LINE duplicates.
+            existing = account_entries[0]
+            for duplicate in account_entries[1:]:
+                db.delete(duplicate)
+            if len(account_entries) > 1:
+                db.flush()
+
             # A player may have checked in temporarily on this browser before
             # logging in. Merge that unbound row into the canonical LINE row.
-            temporary_duplicate = None
+            temporary_duplicates = []
             if device_token:
-                temporary_duplicate = db.query(models.RoomPlayer).filter(
+                temporary_duplicates = db.query(models.RoomPlayer).filter(
                     models.RoomPlayer.room_id == room.id,
                     models.RoomPlayer.device_token == device_token,
                     models.RoomPlayer.account_id.is_(None),
                     models.RoomPlayer.id != existing.id,
-                ).first()
-            duplicate_seat = temporary_duplicate.seat_number if temporary_duplicate else None
-            if temporary_duplicate:
+                ).order_by(models.RoomPlayer.joined_at.asc(), models.RoomPlayer.id.asc()).all()
+            duplicate_seat = next(
+                (entry.seat_number for entry in temporary_duplicates if entry.seat_number is not None),
+                None,
+            )
+            for temporary_duplicate in temporary_duplicates:
                 db.delete(temporary_duplicate)
+            if temporary_duplicates:
                 db.flush()
             if existing.seat_number is None and duplicate_seat is not None:
                 existing.seat_number = duplicate_seat
-            existing.display_name = display_name
+            # A repeated LINE login must return to the existing in-room identity,
+            # not rename it from a stale nickname field on another device.
+            if not (existing.display_name or "").strip():
+                existing.display_name = display_name
             existing.is_temporary = False
             if device_token:
                 existing.device_token = device_token
             db.commit()
             db.refresh(existing)
             room = reload_room(db, room.id)
-            return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room), "deduped": True, "updated_existing": True}
+            return {
+                "status": "success",
+                "player": serialize_room_player(existing),
+                "room": serialize_room(room),
+                "deduped": True,
+                "duplicates_removed": max(0, len(account_entries) - 1) + len(temporary_duplicates),
+                "updated_existing": True,
+            }
 
     if device_token:
         # Device tokens may survive logout/account switching. Only an unbound
