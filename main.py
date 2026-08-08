@@ -304,11 +304,13 @@ def serialize_match(m: models.Match, include_players: bool = True):
 
 @app.get("/auth/line/login")
 @app.get("/api/auth/line/login")
-async def line_login(request: Request, next: str = "/#record"):
+async def line_login(request: Request, next: str = "/#record", switch_account: bool = False):
     if not LINE_CHANNEL_ID or not LINE_CHANNEL_SECRET:
         raise HTTPException(status_code=500, detail="尚未設定 LINE_CHANNEL_ID 或 LINE_CHANNEL_SECRET")
     state = secrets.token_urlsafe(24)
     params = {"response_type": "code", "client_id": LINE_CHANNEL_ID, "redirect_uri": line_callback_url(request), "state": state, "scope": "profile openid"}
+    if switch_account:
+        params["disable_auto_login"] = "true"
     response = RedirectResponse(f"https://access.line.me/oauth2/v2.1/authorize?{urlencode(params)}")
     secure = is_secure_request(request)
     response.set_cookie(LINE_STATE_COOKIE, state, max_age=600, httponly=True, secure=secure, samesite="lax")

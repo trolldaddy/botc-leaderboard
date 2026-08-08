@@ -197,6 +197,15 @@
     window.location.href = `/api/auth/line/login?next=${encodeURIComponent(next)}`;
   };
 
+  const switchLineAccount = () => {
+    const code = getJoinCode();
+    const url = new URL(window.location.href);
+    if (code) url.searchParams.set('join', code);
+    url.hash = 'rooms';
+    const next = `${url.pathname}${url.search}${url.hash}`;
+    window.location.href = `/api/auth/line/login?switch_account=1&next=${encodeURIComponent(next)}`;
+  };
+
   const storytellerLogin = () => {
     const url = new URL(window.location.href);
     url.hash = 'rooms';
@@ -331,6 +340,7 @@
     saveDisplayName,
     joinByCode,
     lineLoginWithCode,
+    switchLineAccount,
     storytellerLogin,
     updateRoomDetails,
     startQrScanner,

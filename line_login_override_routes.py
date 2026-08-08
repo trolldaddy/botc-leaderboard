@@ -98,7 +98,11 @@ def line_callback_url(request: Request) -> str:
 
 @router.get("/auth/line/login")
 @router.get("/api/auth/line/login")
-async def line_login_with_bot_prompt(request: Request, next: str = "/#record"):
+async def line_login_with_bot_prompt(
+    request: Request,
+    next: str = "/#record",
+    switch_account: bool = False,
+):
     if not LINE_CHANNEL_ID or not LINE_CHANNEL_SECRET:
         raise HTTPException(
             status_code=500,
@@ -120,6 +124,8 @@ async def line_login_with_bot_prompt(request: Request, next: str = "/#record"):
         "scope": "profile openid",
         "bot_prompt": "normal",
     }
+    if switch_account:
+        params["disable_auto_login"] = "true"
     return RedirectResponse(
         f"https://access.line.me/oauth2/v2.1/authorize?{urlencode(params)}"
     )

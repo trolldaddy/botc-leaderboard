@@ -90,13 +90,23 @@
       login.className = 'btn btn-outline btn-sm';
       login.style.marginLeft = '.75rem';
       login.innerHTML = '<i class="fa-brands fa-line"></i> 重新 LINE 登入';
-      login.addEventListener('click', () => window.TownCheckinUI?.lineLoginWithCode?.());
+      login.addEventListener('click', () => window.TownCheckinUI?.switchLineAccount?.());
       hostBox.append(message, login);
       hostBox.style.color = 'var(--accent-red)';
     } else {
-      hostBox.textContent = room.created_by_display_name
-        ? `此房間由 ${room.created_by_display_name} 建立。你可以查看與加入，但不能管理房間。`
+      const currentName = permissions.current_account_display_name || '目前的 LINE 玩家';
+      hostBox.replaceChildren();
+      const message = document.createElement('span');
+      message.textContent = room.created_by_display_name
+        ? `目前登入：${currentName}。此房間由 ${room.created_by_display_name} 建立。`
         : '你不是此房間建立者，無法管理房間。';
+      const switchAccount = document.createElement('button');
+      switchAccount.type = 'button';
+      switchAccount.className = 'btn btn-outline btn-sm';
+      switchAccount.style.marginLeft = '.75rem';
+      switchAccount.innerHTML = '<i class="fa-brands fa-line"></i> 切換 LINE 帳號';
+      switchAccount.addEventListener('click', () => window.TownCheckinUI?.switchLineAccount?.());
+      hostBox.append(message, switchAccount);
       hostBox.style.color = 'var(--accent-red)';
     }
   };

@@ -24,6 +24,7 @@ def build_room_permissions(
     is_owner = bool(account and room.created_by_id == account.id)
     return {
         "authenticated": bool(account),
+        "current_account_display_name": account.display_name if account else None,
         "is_owner": is_owner,
         "can_manage_players": is_owner,
         "can_manage_room": is_owner,
