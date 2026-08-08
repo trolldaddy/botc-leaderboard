@@ -244,15 +244,33 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
         raise HTTPException(status_code=404, detail="找不到房間")
     ensure_room_open(room)
 
-    is_temporary = bool(data.get("is_temporary")) or account is None
+    # Authentication is authoritative. A stale frontend `is_temporary` flag must
+    # never create a second temporary row for an already authenticated LINE user.
+    is_temporary = account is None
     display_name = (data.get("display_name") or data.get("name") or (account.display_name if account else "")).strip()
     device_token = normalize_device_token(data.get("device_token") or data.get("deviceToken"))
     if not display_name:
         raise HTTPException(status_code=400, detail="請輸入玩家名稱")
 
-    if account and not is_temporary:
+    if account:
         existing = db.query(models.RoomPlayer).filter(models.RoomPlayer.room_id == room.id, models.RoomPlayer.account_id == account.id).first()
         if existing:
+            # A player may have checked in temporarily on this browser before
+            # logging in. Merge that unbound row into the canonical LINE row.
+            temporary_duplicate = None
+            if device_token:
+                temporary_duplicate = db.query(models.RoomPlayer).filter(
+                    models.RoomPlayer.room_id == room.id,
+                    models.RoomPlayer.device_token == device_token,
+                    models.RoomPlayer.account_id.is_(None),
+                    models.RoomPlayer.id != existing.id,
+                ).first()
+            duplicate_seat = temporary_duplicate.seat_number if temporary_duplicate else None
+            if temporary_duplicate:
+                db.delete(temporary_duplicate)
+                db.flush()
+            if existing.seat_number is None and duplicate_seat is not None:
+                existing.seat_number = duplicate_seat
             existing.display_name = display_name
             existing.is_temporary = False
             if device_token:
@@ -263,13 +281,17 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
             return {"status": "success", "player": serialize_room_player(existing), "room": serialize_room(room), "deduped": True, "updated_existing": True}
 
     if device_token:
+        # Device tokens may survive logout/account switching. Only an unbound
+        # temporary row may be promoted to a LINE account; never hijack or
+        # downgrade a row already bound to another LINE account.
         existing = db.query(models.RoomPlayer).filter(
             models.RoomPlayer.room_id == room.id,
             models.RoomPlayer.device_token == device_token,
+            models.RoomPlayer.account_id.is_(None),
         ).first()
         if existing:
             existing.display_name = display_name
-            if account and not is_temporary:
+            if account:
                 existing.account_id = account.id
                 existing.is_temporary = False
             else:
@@ -296,7 +318,7 @@ async def join_room(room_code: str, data: dict, db: Session = Depends(get_db), a
 
     entry = models.RoomPlayer(
         room_id=room.id,
-        account_id=account.id if account and not is_temporary else None,
+        account_id=account.id if account else None,
         device_token=device_token,
         display_name=display_name,
         is_temporary=is_temporary,

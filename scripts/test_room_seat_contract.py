@@ -48,3 +48,13 @@ def test_line_login_can_disable_auto_login_for_account_switching():
     assert 'params["disable_auto_login"] = "true"' in override
     assert 'params["disable_auto_login"] = "true"' in main_source
     assert "switch_account=1" in room_ui
+
+
+def test_room_join_keeps_line_identity_canonical():
+    backend = (ROOT / "room_routes.py").read_text(encoding="utf-8")
+
+    assert "is_temporary = account is None" in backend
+    assert "models.RoomPlayer.account_id == account.id" in backend
+    assert "temporary_duplicate" in backend
+    assert "models.RoomPlayer.account_id.is_(None)" in backend
+    assert "account_id=account.id if account else None" in backend
