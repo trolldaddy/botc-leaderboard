@@ -151,8 +151,8 @@
                 area.style.opacity = '1';
                 document.querySelectorAll('#main-nav li').forEach(li => {
                     const link = li.querySelector('a');
-                    if (link.getAttribute('data-page') === pageName) li.classList.add('active');
-                    else li.classList.remove('active');
+                    const linkedPage = link?.getAttribute('data-page');
+                    li.classList.toggle('active', linkedPage === pageName);
                 });
             } catch (err) {
                 area.innerHTML = `<div class="card"><h3>無法載入頁面</h3><p>${err.message}</p></div>`;
