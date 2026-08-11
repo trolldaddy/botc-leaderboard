@@ -120,10 +120,18 @@ def localize(script, candidate, by_id, by_name):
         raw_team = str(item.get("team") or "").strip().casefold()
         special = raw_team in {"fabled", "jinx", "jinxed", "a jinxed", "loric", "special", "other"}
         role = by_id.get(normalized(item.get("id"))) or by_name.get(normalized(item.get("name")))
+        supplement = None
         if not special:
             positional_role = official[official_index] if official_index < len(official) else None
-            official_index += 1
+            if positional_role:
+                official_index += 1
+            elif supplement_index < len(supplements):
+                supplement = supplements[supplement_index]
+                supplement_index += 1
             role = role or positional_role
+        elif supplement_index < len(supplements):
+            supplement = supplements[supplement_index]
+            supplement_index += 1
         if role:
             matched_roles += 1
             item.update({
@@ -137,9 +145,7 @@ def localize(script, candidate, by_id, by_name):
                 "firstNightReminder": role.first_night_reminder or "",
                 "otherNightReminder": role.other_night_reminder or "",
             })
-        elif special and supplement_index < len(supplements):
-            supplement = supplements[supplement_index]
-            supplement_index += 1
+        elif supplement:
             item.update({
                 "id": supplement.external_id,
                 "name": supplement.name_zh_tw,
