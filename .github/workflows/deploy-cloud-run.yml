@@ -104,6 +104,28 @@ jobs:
           python3 -m pip install --disable-pip-version-check SQLAlchemy psycopg2-binary
           python3 scripts/migrate_runtime_schema.py
 
+      - name: Install script JSON pairing dependencies
+        if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[pair-script-json-preview]') || contains(github.event.head_commit.message, '[pair-script-json-write]'))
+        run: python3 -m pip install --disable-pip-version-check -r requirements.txt
+
+      - name: Pair archived script JSON with Cloud SQL
+        if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[pair-script-json-preview]') || contains(github.event.head_commit.message, '[pair-script-json-write]'))
+        shell: bash
+        run: |
+          set -euo pipefail
+          args=(--report reports/script-json-pairing.json)
+          if [[ "${{ github.event.head_commit.message }}" == *"[pair-script-json-write]"* ]]; then args+=(--write); fi
+          python3 scripts/pair_script_json_archive.py "${args[@]}"
+
+      - name: Upload script JSON pairing report
+        if: always() && github.event_name == 'push' && (contains(github.event.head_commit.message, '[pair-script-json-preview]') || contains(github.event.head_commit.message, '[pair-script-json-write]'))
+        uses: actions/upload-artifact@v4
+        with:
+          name: script-json-pairing-report
+          path: reports/script-json-pairing.json
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Deploy source to Cloud Run
         shell: bash
         run: |

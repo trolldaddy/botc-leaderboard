@@ -1,0 +1,249 @@
+[{
+	"id": "_meta",
+	"name": "未來之主",
+	"author": "Tiger小王",
+	"almanac": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/almanac.html"
+}, {
+	"id": "_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/_futureking.png",
+	"firstNightReminder": "6",
+	"reminders": ["鎮民", "錯誤"],
+	"name": "洗衣婦",
+	"team": "townsfolk",
+	"ability": "在你的首個夜晚，你會得知兩名玩家和一個鎮民角色：這兩名玩家之一是該角色。",
+	"firstNight": 16
+}, {
+	"id": "1_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/1_futureking.png",
+	"firstNightReminder": "7",
+	"reminders": ["爪牙", "錯誤"],
+	"name": "調查員",
+	"team": "townsfolk",
+	"ability": "在你的首個夜晚，你會得知兩名玩家和一個爪牙角色：這兩名玩家之一是該角色（或者你會得知沒有爪牙在場）。",
+	"firstNight": 17
+}, {
+	"id": "2_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/2_futureking.png",
+	"firstNightReminder": "12",
+	"name": "修行者",
+	"team": "townsfolk",
+	"ability": "在你的首個夜晚，你會得知距離最近的邪惡玩家位於你的順時針還是逆時針方向。如果兩側的邪惡玩家與你距離相等，你得知的信息由說書人決定。",
+	"firstNight": 22
+}, {
+	"id": "3_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/3_futureking.png",
+	"firstNightReminder": "9",
+	"otherNightReminder": "13",
+	"reminders": ["幹擾項"],
+	"name": "占卜師",
+	"team": "townsfolk",
+	"ability": "每個夜晚，你要選擇兩名玩家：你會得知他們之中是否有惡魔。  會有一名善良玩家始終被你的能力當作惡魔。",
+	"firstNight": 19,
+	"otherNight": 14
+}, {
+	"id": "4_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/4_futureking.png",
+	"firstNightReminder": "8",
+	"otherNightReminder": "12",
+	"name": "共情著",
+	"team": "townsfolk",
+	"ability": "每個夜晚，你會得知與你鄰近的兩名存活的玩家中邪惡玩家的數量。",
+	"firstNight": 18,
+	"otherNight": 13
+}, {
+	"id": "5_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/5_futureking.png",
+	"otherNightReminder": "14",
+	"reminders": ["惡魔未投票", "惡魔已投票"],
+	"name": "賣花女孩",
+	"team": "townsfolk",
+	"ability": "每個夜晚*，你會得知在今天白天時是否有惡魔投過票。",
+	"otherNight": 15
+}, {
+	"id": "6_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/6_futureking.png",
+	"reminders": ["飽餐", "中毒"],
+	"name": "食人族",
+	"team": "townsfolk",
+	"ability": "你擁有上個死於處決的玩家的能力。如果該玩家屬於邪惡陣營，你中毒直到下個善良玩家死於處決。"
+}, {
+	"id": "7_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/7_futureking.png",
+	"firstNightReminder": "5",
+	"otherNightReminder": "10",
+	"reminders": ["失去能力", "已轉化"],
+	"name": "穿越者",
+	"team": "townsfolk",
+	"ability": "每局遊戲限一次，在夜晚時，你可以選擇一個除你以外的善良角色：如果有多個相同的該角色在場，其中之一的醉酒玩家會轉變為一個不在場的同類型角色。",
+	"firstNight": 15,
+	"otherNight": 11
+}, {
+	"id": "8_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/8_futureking.png",
+	"firstNightReminder": "10",
+	"otherNightReminder": "15",
+	"reminders": ["失去能力"],
+	"name": "女裁縫",
+	"team": "townsfolk",
+	"ability": "每局遊戲限一次，在夜晚時，你可以選擇除你以外的兩名玩家：你會得知他們是否為同一陣營。",
+	"firstNight": 20,
+	"otherNight": 16
+}, {
+	"id": "9_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/9_futureking.png",
+	"firstNightReminder": "2",
+	"otherNightReminder": "1",
+	"reminders": ["醉酒"],
+	"name": "水手",
+	"team": "townsfolk",
+	"ability": "每個夜晚，你要選擇一名存活的玩家：你或他之一會醉酒直到下個黃昏。  你不會死亡。",
+	"firstNight": 12,
+	"otherNight": 2
+}, {
+	"id": "10_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/10_futureking.png",
+	"firstNightReminder": "11",
+	"otherNightReminder": "16",
+	"reminders": ["得知"],
+	"name": "氣球駕駛員",
+	"team": "townsfolk",
+	"ability": "每個夜晚，你會得知一名與上個夜晚得知的玩家角色類型不同的玩家。[+0~1外來者]",
+	"firstNight": 21,
+	"otherNight": 17
+}, {
+	"id": "11_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/11_futureking.png",
+	"otherNightReminder": "2",
+	"reminders": ["太子"],
+	"name": "貍貓",
+	"team": "townsfolk",
+	"ability": "每個夜晚*，你要選擇一名玩家：如果他是善良角色且當晚被邪惡角色殺死，你和他交換角色。",
+	"otherNight": 3
+}, {
+	"id": "12_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/12_futureking.png",
+	"firstNightReminder": "13",
+	"otherNightReminder": "17",
+	"name": "侍女",
+	"team": "townsfolk",
+	"ability": "每個夜晚，你要選擇除你以外的兩名存活的玩家：你會得知他們中有幾人在當晚因其自身能力而被喚醒。",
+	"firstNight": 23,
+	"otherNight": 18
+}, {
+	"id": "13_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/13_futureking.png",
+	"name": "畸形秀演員",
+	"team": "outsider",
+	"ability": "如果你“瘋狂”地證明自己是外來者，你可能被處決。"
+}, {
+	"id": "14_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/14_futureking.png",
+	"reminders": ["無法提名"],
+	"name": "魔像",
+	"team": "outsider",
+	"ability": "每局遊戲你只能發起提名一次。當你發起提名時，如果被你提名的玩家不是惡魔，他死亡。"
+}, {
+	"id": "15_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/15_futureking.png",
+	"otherNightReminder": "11",
+	"reminders": ["死亡"],
+	"name": "月之子",
+	"team": "outsider",
+	"ability": "當你得知你死亡時，你要公開選擇一名存活的玩家。如果他是善良的，在當晚他會死亡。",
+	"otherNight": 12
+}, {
+	"id": "16_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/16_futureking.png",
+	"reminders": ["醉酒"],
+	"name": "莽夫",
+	"team": "outsider",
+	"ability": "每個夜晚，首個使用其自身能力選擇了你的玩家會醉酒直到下個黃昏。你會轉變為他的陣營。"
+}, {
+	"id": "17_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/17_futureking.png",
+	"firstNightReminder": "3",
+	"otherNightReminder": "4",
+	"reminders": ["第一晚", "第二晚", "第三晚", "大限將至"],
+	"name": "限",
+	"team": "minion",
+	"ability": "在等同於初始外來者數量的夜晚，所有鎮民玩家中毒直到下個黃昏。[外來者數量任意]",
+	"firstNight": 13,
+	"otherNight": 5
+}, {
+	"id": "18_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/18_futureking.png",
+	"firstNightReminder": "14",
+	"otherNightReminder": "18",
+	"name": "間諜",
+	"team": "minion",
+	"ability": "每個夜晚，你能查看魔典。  你可能會被當作善良陣營、鎮民角色或外來者角色，即使你已死亡。",
+	"firstNight": 24,
+	"otherNight": 19
+}, {
+	"id": "19_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/19_futureking.png",
+	"otherNightReminder": "9",
+	"reminders": ["失去能力", "死亡"],
+	"name": "修正者",
+	"team": "minion",
+	"ability": "每局遊戲限一次，在夜晚時*，你可以選擇1~3名名玩家：如果他們角色相同，他們死亡。",
+	"otherNight": 10
+}, {
+	"id": "20_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/20_futureking.png",
+	"otherNightReminder": "3",
+	"name": "麻臉巫婆",
+	"team": "minion",
+	"ability": "每個夜晚*，你要選擇一名玩家和一個角色，如果該角色不在場，他變成該角色。如果因此創造了一個惡魔，當晚的死亡由說書人決定。",
+	"otherNight": 4
+}, {
+	"id": "21_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/21_futureking.png",
+	"otherNightReminder": "5",
+	"reminders": ["死亡"],
+	"name": "小惡魔",
+	"team": "demon",
+	"ability": "每個夜晚*，你要選擇一名玩家：他死亡。如果你以這種方式自殺，一名爪牙會變成小惡魔。",
+	"otherNight": 6
+}, {
+	"id": "22_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/22_futureking.png",
+	"otherNightReminder": "8",
+	"reminders": ["死亡", "保留能力", "中毒"],
+	"name": "亡骨魔",
+	"team": "demon",
+	"ability": "每個夜晚*，你要選擇一名玩家：他死亡。  被你殺死的爪牙保留他的能力，且與他鄰近的兩名鎮民之一中毒。[-1外來者]",
+	"otherNight": 9
+}, {
+	"id": "23_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/23_futureking.png",
+	"firstNightReminder": "1",
+	"otherNightReminder": "7",
+	"reminders": ["第一死", "第二死", "第三死", "第四死", "第五死", "第六死", "第七死"],
+	"name": "拉普拉斯",
+	"team": "demon",
+	"ability": "在你的首個夜晚，你要選擇存活玩家中一半（向下取整）的玩家。 每個夜晚*，被你選擇的玩家依次死亡。如果他們都死亡，你的陣營獲勝。",
+	"firstNight": 11,
+	"otherNight": 8
+}, {
+	"id": "24_futureking",
+	"image": "https:\/\/www.bloodstar.xyz\/p\/Tiger\/Future-King\/24_futureking.png",
+	"firstNightReminder": "4",
+	"otherNightReminder": "6",
+	"reminders": ["中毒", "死亡"],
+	"name": "普卡",
+	"team": "demon",
+	"ability": "每個夜晚，你要選擇一名玩家：他中毒。  上個因你的能力中毒的玩家會死亡並恢復健康。",
+	"firstNight": 14,
+	"otherNight": 7
+}, {
+	"id": "ef42503a-d4aa-46cd-9c61-6ce8e42450g",
+	"image": "https://clocktower-wiki.gstonegames.com/images/thumb/9/97/Bootlegger.png/300px-Bootlegger.png",
+	"edition": "custom",
+	"name": "時空悖論",
+	"ability": "超過一個相同角色在場時，他們中一半（向下取整）的玩家醉酒。",
+	"reminders": ["醉酒"],
+	"team": "fabled",
+	"firstNight": 0,
+	"otherNight": 0
+}]

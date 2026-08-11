@@ -1,0 +1,295 @@
+[
+  {
+    "id": "_meta",
+    "name": "只若初見",
+    "author": "海霧和他最棒的玩家們",
+    "logo": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/9/93/ntit068wyrpfdoc2up812h83fw4w0ff.png",
+    "almanac": "有問題聯系SE謝謝喵~"
+  },
+  {
+    "id": "_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/05/a5613uupc0bffr0sg9egfotdaofup1e.png",
+    "firstNightReminder": "喚醒調查員，對他指向兩名玩家，並展示一個爪牙角色標記。這兩名玩家其中之一是這個爪牙。",
+    "reminders": [
+      "爪牙",
+      "錯誤"
+    ],
+    "name": "調查員",
+    "team": "townsfolk",
+    "ability": "在你的首個夜晚，你會得知兩名玩家和一個爪牙角色：這兩名玩家之一是該角色（或者你會得知沒有爪牙在場）。",
+    "firstNight": 16000
+  },
+  {
+    "id": "1_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/9/91/04je4dg5ituw4nymx4f0x0b80p6gntg.png",
+    "firstNightReminder": "喚醒占卜師，讓他選擇兩名玩家。以點頭或搖頭告知他是否選中了惡魔。",
+    "otherNightReminder": "喚醒占卜師，讓他選擇兩名玩家。以點頭或搖頭告知他是否選中了惡魔。",
+    "reminders": [
+      "幹擾項"
+    ],
+    "name": "占卜師",
+    "team": "townsfolk",
+    "ability": "每個夜晚，你要選擇兩名玩家：你會得知他們之中是否有惡魔。會有一名善良玩家始終被你的能力當作惡魔。",
+    "firstNight": 17000,
+    "otherNight": 13
+  },
+  {
+    "id": "2_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/a3/nxckynoy8mshn7pwnsnnraceso4zx2p.png",
+    "otherNightReminder": "喚醒僧侶，讓他選擇除自己以外的一名玩家，那名玩家今晚免受惡魔負面效果影響。",
+    "reminders": [
+      "保護"
+    ],
+    "name": "僧侶",
+    "team": "townsfolk",
+    "ability": "每個夜晚*，你要選擇除你以外的一名玩家：當晚惡魔的負面能力對他無效。",
+    "otherNight": 5
+  },
+  {
+    "id": "3_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/df/cud437aq02j4lnizdmdyxp1dcc5lojm.png",
+    "firstNightReminder": "喚醒祖母，對她指向一名善良玩家，並展示該玩家的角色標記。",
+    "otherNightReminder": "如果惡魔殺死了孫子，祖母死亡。",
+    "reminders": [
+      "孫子",
+      "死亡"
+    ],
+    "name": "祖母",
+    "team": "townsfolk",
+    "ability": "在你的首個夜晚，你會得知一名善良玩家和他的角色。如果惡魔殺死了他，你也會死亡。",
+    "firstNight": 18000,
+    "otherNight": 11
+  },
+  {
+    "id": "4_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/9/90/bt7yvbzi61ftut2iqheqrgznkdohslh.png",
+    "firstNightReminder": "喚醒水手，讓他選擇一名玩家。決定他倆其中誰因為水手能力醉酒。",
+    "otherNightReminder": "喚醒水手，讓他選擇一名玩家。決定他倆其中誰因為水手能力醉酒。",
+    "reminders": [
+      "醉酒"
+    ],
+    "name": "水手",
+    "team": "townsfolk",
+    "ability": "每個夜晚，你要選擇一名存活的玩家：你或他之一會醉酒直到下個黃昏。你不會死亡。",
+    "firstNight": 12000,
+    "otherNight": 2
+  },
+  {
+    "id": "5_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/4/48/0d9uthaidhlal5rz0zjx2tvzzrviqdo.png",
+    "firstNightReminder": "喚醒侍女，讓她選擇兩名除自己以外的存活玩家。用手勢比劃數字來告知她這些玩家中因自己能力而喚醒的玩家數量。",
+    "otherNightReminder": "喚醒侍女，讓她選擇兩名除自己以外的存活玩家。用手勢比劃數字來告知她這些玩家中因自己能力而喚醒的玩家數量。",
+    "name": "侍女",
+    "team": "townsfolk",
+    "ability": "每個夜晚，你要選擇除你以外的兩名存活的玩家：你會得知他們中有幾人在當晚因其自身能力而被喚醒。",
+    "firstNight": 21000,
+    "otherNight": 15
+  },
+  {
+    "id": "6_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/0a/55q4nfyb9gftn9jiujtt49ti2qa33h6.png",
+    "otherNightReminder": "喚醒賭徒，讓他進行猜測。如果猜測錯誤，他死亡。",
+    "reminders": [
+      "死亡"
+    ],
+    "name": "賭徒",
+    "team": "townsfolk",
+    "ability": "每個夜晚*，你要選擇一名玩家並猜測該玩家的角色：如果你猜錯了，你會死亡。",
+    "otherNight": 4
+  },
+  {
+    "id": "7_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/a4/t8h7diw8bpav612k1e3t62b10hlbizz.png",
+    "reminders": [
+      "不會死亡"
+    ],
+    "name": "茶藝師",
+    "team": "townsfolk",
+    "ability": "如果與你鄰近的兩名存活的玩家是善良的，他們不會死亡。"
+  },
+  {
+    "id": "8_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/a/aa/0khyidxxipwitzqjs9iryheur62zkrj.png",
+    "firstNightReminder": "喚醒女裁縫，她可以搖頭不使用能力，或選擇除自己以外的兩名玩家。以點頭或搖頭告知她選擇的玩家是否為同一陣營。",
+    "otherNightReminder": "如果女裁縫未曾使用能力，喚醒女裁縫，她可以搖頭不使用能力，或選擇除自己以外的兩名玩家。以點頭或搖頭告知她選擇的玩家是否為同一陣營。",
+    "reminders": [
+      "失去能力"
+    ],
+    "name": "女裁縫",
+    "team": "townsfolk",
+    "ability": "每局遊戲限一次，在夜晚時，你可以選擇除你以外的兩名玩家：你會得知他們是否為同一陣營。",
+    "firstNight": 19000,
+    "otherNight": 14
+  },
+  {
+    "id": "9_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/4/44/bio3bf3g3vunctpnldg6lsct4u4jt81.png",
+    "reminders": [
+      "失去能力"
+    ],
+    "name": "漁夫",
+    "team": "townsfolk",
+    "ability": "每局遊戲限一次，在白天時，你可以讓說書人給你一些能幫助你的陣營獲勝的建議。"
+  },
+  {
+    "id": "10_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/4/41/a5jfldz9g39nkh59frnwinbwrzevfi4.png",
+    "otherNightReminder": "如果農夫死於夜晚，喚醒一名存活的善良玩家告知他角色變化。",
+    "name": "農夫",
+    "team": "townsfolk",
+    "ability": "當你在夜晚死亡時，一名存活的善良玩家會變成農夫。",
+    "otherNight": 12
+  },
+  {
+    "id": "11_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/b/bf/0wf6zizpzk61n1txjo233fembq7utl3.png",
+    "name": "戲法師",
+    "team": "townsfolk",
+    "ability": "'每個白天，你可以公開進行一次誰是爪牙，誰是惡魔的猜測。如果你猜對，善良陣營獲勝。"
+  },
+  {
+    "id": "12_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/b/b5/rdpsq1wjpsq66ah5y3f4p2wyuzl8wuk.png",
+    "reminders": [
+      "不會死亡"
+    ],
+    "name": "公主",
+    "team": "townsfolk",
+    "ability": "在你的首個白天，如果你提名並處決了一名玩家，當晚惡魔不會造成死亡。"
+  },
+  {
+    "id": "13_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/5/5e/dw5z7fnz58ia54bw160d1numjsjay8f.png",
+    "name": "陌客",
+    "team": "outsider",
+    "ability": "你可能會被當作邪惡陣營、爪牙角色或惡魔角色，即使你已死亡。"
+  },
+  {
+    "id": "14_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/3/3c/hulwpl4c71z09ixgyg3dlkeega2a3an.png",
+    "otherNightReminder": "如果月之子在今天白天的時候使用自己的能力選擇了一名善良玩家，那名玩家死亡。",
+    "reminders": [
+      "死亡"
+    ],
+    "name": "月之子",
+    "team": "outsider",
+    "ability": "當你得知你死亡時，你要公開選擇一名存活的玩家。如果他是善良的，在當晚他會死亡。",
+    "otherNight": 10
+  },
+  {
+    "id": "15_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/5/59/ns2ifb3z40ukn4xa61a460473sm6lhq.png",
+    "reminders": [
+      "醉酒",
+      "已猜測"
+    ],
+    "name": "解謎大師",
+    "team": "outsider",
+    "ability": "一名玩家醉酒，即使你已死亡。每局遊戲限一次，你可以猜測誰是那個醉酒的玩家，如果猜對了，你會得知誰是惡魔，但如果猜錯了，你會得知錯誤的“誰是惡魔”信息。"
+  },
+  {
+    "id": "16_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/7/73/pgakqxxr1gostnluw2xkp4cnudn3z7a.png",
+    "firstNightReminder": "喚醒食人魔，讓他選擇一名玩家。如果他選擇了邪惡玩家，將他的角色標記在魔典中倒置以表示他轉變為邪惡陣營。",
+    "reminders": [
+      "摯友"
+    ],
+    "name": "食人魔",
+    "team": "outsider",
+    "ability": "在你的首個夜晚，你要選擇除你以外的一名玩家：你轉變為他的陣營，即使你已醉酒或中毒，但你不知道你轉變後的陣營。",
+    "firstNight": 20000
+  },
+  {
+    "id": "17_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/2/2f/fbxp1pzgxjfs4vsrb0l30otb078m84e.png",
+    "firstNightReminder": "喚醒魔鬼代言人，讓他選擇一名玩家，那名玩家處決不死。",
+    "otherNightReminder": "喚醒魔鬼代言人，讓他選擇一名與上一晚不同的玩家，那名玩家處決不死。",
+    "reminders": [
+      "處決不死"
+    ],
+    "name": "魔鬼代言人",
+    "team": "minion",
+    "ability": "每個夜晚，你要選擇一名存活的玩家（與上個夜晚不同）：如果明天白天他被處決，他不會死亡。",
+    "firstNight": 15000,
+    "otherNight": 6
+  },
+  {
+    "id": "18_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/d0/ftyh3tzzolrzec1njghipdcbmk7opuf.png",
+    "otherNightReminder": "如果刺客未曾使用能力，喚醒刺客，他可以搖頭不使用能力，或選擇攻擊一名玩家。",
+    "reminders": [
+      "死亡",
+      "失去能力"
+    ],
+    "name": "刺客",
+    "team": "minion",
+    "ability": "每局遊戲限一次，在夜晚時*，你可以選擇一名玩家：他死亡，即使因為任何原因讓他不會死亡。",
+    "otherNight": 9
+  },
+  {
+    "id": "19_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/d/d7/msb759ew0f2hudkvxhsz15jnxsqqpy9.png",
+    "name": "精神病患者",
+    "team": "minion",
+    "ability": "每個白天，在提名開始前，你可以公開選擇一名玩家：他死亡。如果你被處決，提名你的玩家需要和你猜拳，只有你輸了你才會死亡。"
+  },
+  {
+    "id": "20_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e5/el29kr1dznrpaa089tayj3chd444s6k.png",
+    "firstNightReminder": "如果提線木偶在場，對惡魔展示提線木偶角色標記並指向提線木偶玩家。",
+    "remindersGlobal": [
+      "是提線木偶"
+    ],
+    "setup": true,
+    "name": "提線木偶",
+    "team": "minion",
+    "ability": "你以為你是一個善良角色，但其實你不是。惡魔會知道你是提線木偶。[提線木偶會與惡魔鄰座]",
+    "firstNight": 11000
+  },
+  {
+    "id": "21_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/0d/f64m0fvt72762oey33lurp4wez01hcp.png",
+    "firstNightReminder": "如果夜晚天數等於初始外來者數量，所有鎮民玩家中毒到下個黃昏。",
+    "otherNightReminder": "如果夜晚天數等於初始外來者數量，所有鎮民玩家中毒到下個黃昏。",
+    "reminders": [
+      "第一晚",
+      "第二晚",
+      "第三晚",
+      "第四晚",
+      "大限將至"
+    ],
+    "setup": true,
+    "name": "限",
+    "team": "minion",
+    "ability": "在等同於初始外來者數量的夜晚，所有鎮民玩家中毒直到下個黃昏。[外來者數量任意]",
+    "firstNight": 14000,
+    "otherNight": 3
+  },
+  {
+    "id": "22_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/0/03/1trck24gi8o05kklsg93al4co09nakb.png",
+    "otherNightReminder": "喚醒小惡魔，讓他攻擊一名玩家。如果他成功自殺，則在他入睡後通知一名爪牙角色變化。",
+    "reminders": [
+      "死亡"
+    ],
+    "name": "小惡魔",
+    "team": "demon",
+    "ability": "每個夜晚*，你要選擇一名玩家：他死亡。如果你以這種方式自殺，一名爪牙會變成小惡魔。",
+    "otherNight": 7
+  },
+  {
+    "id": "23_zhiruochujian",
+    "image": "https://patchwiki.biligame.com/images/jbzlbwgwjcygf/e/e7/i3bse7nern4raiqwjpmzrpzjfa0vrq4.png",
+    "firstNightReminder": "喚醒痢蛭，讓他選擇一名玩家以寄生。",
+    "otherNightReminder": "喚醒痢蛭，讓他攻擊一名玩家。",
+    "reminders": [
+      "中毒",
+      "死亡"
+    ],
+    "name": "痢蛭",
+    "team": "demon",
+    "ability": "每個夜晚*，你要選擇一名玩家：他死亡。在你的首個夜晚，你要選擇一名存活的玩家：他中毒，只有當他處於死亡狀態時你才會立即死亡。",
+    "firstNight": 13000,
+    "otherNight": 8
+  }
+]
