@@ -3,31 +3,60 @@ import hashlib
 import hmac
 import json
 import os
-import secrets
 import time
 from datetime import datetime, timedelta
 from typing import Optional
-from urllib.parse import urlencode
 
-import requests
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
-from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session, joinedload
 
 import models
+import account_binding_routes
+import knowledge_admin_routes
+import knowledge_public_routes
+import line_login_override_routes
+import match_override_routes
+import player_seat_routes
+import role_admin_routes
+import role_content_admin_routes
+import role_public_routes
+import role_reminder_routes
+import role_sync_routes
+import room_routes
+import script_admin_routes
+import script_public_routes
 from database import RUN_SCHEMA_MIGRATIONS, engine, get_db
-from line_account_service import reconcile_line_account
+from runtime_schema import ensure_runtime_schema
 
 app = FastAPI(title="BOTC Stats Leaderboard API")
 
+for feature_router in (
+    line_login_override_routes.router,
+    match_override_routes.router,
+    room_routes.router,
+    player_seat_routes.router,
+    account_binding_routes.router,
+    knowledge_public_routes.router,
+    role_public_routes.router,
+    script_public_routes.router,
+):
+    app.include_router(feature_router)
+
+for admin_router in (
+    script_admin_routes.router,
+    role_admin_routes.router,
+    role_content_admin_routes.router,
+    role_sync_routes.router,
+    role_reminder_routes.router,
+    knowledge_admin_routes.router,
+):
+    app.include_router(admin_router, prefix="/api/admin")
+
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "mmmm")
 SESSION_SECRET = os.getenv("SESSION_SECRET") or ADMIN_PASSWORD
-LINE_CHANNEL_ID = os.getenv("LINE_CHANNEL_ID", "")
-LINE_CHANNEL_SECRET = os.getenv("LINE_CHANNEL_SECRET", "")
-LINE_CALLBACK_URL = os.getenv("LINE_CALLBACK_URL", "")
 ALLOWED_LINE_USER_IDS = {item.strip() for item in os.getenv("ALLOWED_LINE_USER_IDS", "").split(",") if item.strip()}
 ADMIN_LINE_USER_IDS = {item.strip() for item in os.getenv("ADMIN_LINE_USER_IDS", "").split(",") if item.strip()}
 UPLOAD_LIMIT_PER_24H = int(os.getenv("UPLOAD_LIMIT_PER_24H", "10"))
@@ -44,102 +73,11 @@ if RUN_SCHEMA_MIGRATIONS:
         print(f"資料庫初始化失敗: {e}")
 
 
-def ensure_runtime_schema():
+if RUN_SCHEMA_MIGRATIONS:
     try:
-        inspector = inspect(engine)
-        dialect = engine.dialect.name
-        timestamp_type = "TIMESTAMP" if dialect == "postgresql" else "DATETIME"
-        boolean_default = "FALSE" if dialect == "postgresql" else "0"
-
-        def add_column_sql(table, column, definition):
-            if dialect == "postgresql":
-                return f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {column} {definition}"
-            return f"ALTER TABLE {table} ADD COLUMN {column} {definition}"
-
-        table_names = inspector.get_table_names()
-        if "matches" in table_names:
-            columns = {col["name"] for col in inspector.get_columns("matches")}
-            with engine.begin() as conn:
-                if "uploaded_by_id" not in columns:
-                    conn.execute(text(add_column_sql("matches", "uploaded_by_id", "INTEGER")))
-                if "created_at" not in columns:
-                    conn.execute(text(add_column_sql("matches", "created_at", timestamp_type)))
-                    conn.execute(text("UPDATE matches SET created_at = date WHERE created_at IS NULL"))
-        if "storyteller_accounts" in table_names:
-            columns = {col["name"] for col in inspector.get_columns("storyteller_accounts")}
-            with engine.begin() as conn:
-                if "created_at" not in columns:
-                    conn.execute(text(add_column_sql("storyteller_accounts", "created_at", timestamp_type)))
-                    if "last_login_at" in columns:
-                        conn.execute(text("UPDATE storyteller_accounts SET created_at = last_login_at WHERE created_at IS NULL"))
-                if "last_login_at" not in columns:
-                    conn.execute(text(add_column_sql("storyteller_accounts", "last_login_at", timestamp_type)))
-                if "is_banned" not in columns:
-                    conn.execute(text(add_column_sql("storyteller_accounts", "is_banned", f"BOOLEAN DEFAULT {boolean_default}")))
-                if "banned_at" not in columns:
-                    conn.execute(text(add_column_sql("storyteller_accounts", "banned_at", timestamp_type)))
-        if "locations" in table_names:
-            columns = {col["name"] for col in inspector.get_columns("locations")}
-            with engine.begin() as conn:
-                for column, definition in {
-                    "type": "VARCHAR DEFAULT 'store'",
-                    "address": "TEXT",
-                    "link_url": "TEXT",
-                    "image_url": "TEXT",
-                    "description": "TEXT",
-                    "schedule_note": "TEXT",
-                    "contact_note": "TEXT",
-                    "is_public": f"BOOLEAN DEFAULT {boolean_default}",
-                    "sort_order": "INTEGER DEFAULT 0",
-                    "created_at": timestamp_type,
-                    "updated_at": timestamp_type,
-                }.items():
-                    if column not in columns:
-                        conn.execute(text(add_column_sql("locations", column, definition)))
-        if "script_entries" in table_names:
-            columns = {col["name"] for col in inspector.get_columns("script_entries")}
-            with engine.begin() as conn:
-                for column, definition in {
-                    "author_name": "VARCHAR(220)",
-                    "tagline": "TEXT",
-                    "tags": "TEXT",
-                    "background_introduction": "TEXT",
-                    "gameplay_overview": "TEXT",
-                    "author_note": "TEXT",
-                    "production_updates": "TEXT",
-                    "player_guide": "TEXT",
-                    "storyteller_guide": "TEXT",
-                    "script_json": "TEXT",
-                    "script_json_filename": "VARCHAR(255)",
-                    "script_json_updated_at": timestamp_type,
-                    "is_laplace_owned": f"BOOLEAN DEFAULT {boolean_default}",
-                }.items():
-                    if column not in columns:
-                        conn.execute(text(add_column_sql("script_entries", column, definition)))
-        if "script_images" in table_names:
-            columns = {col["name"] for col in inspector.get_columns("script_images")}
-            with engine.begin() as conn:
-                if "image_data" not in columns:
-                    conn.execute(text(add_column_sql("script_images", "image_data", "TEXT")))
-                if "content_type" not in columns:
-                    conn.execute(text(add_column_sql("script_images", "content_type", "VARCHAR(100)")))
-        if "knowledge_nodes" in table_names:
-            columns = {col["name"] for col in inspector.get_columns("knowledge_nodes")}
-            with engine.begin() as conn:
-                for column, definition in {
-                    "presentation_type": "VARCHAR(50)",
-                    "classification_method": "VARCHAR(80)",
-                    "classification_confidence": "FLOAT",
-                    "classification_status": "VARCHAR(40) DEFAULT 'unclassified'",
-                }.items():
-                    if column not in columns:
-                        conn.execute(text(add_column_sql("knowledge_nodes", column, definition)))
+        ensure_runtime_schema(engine)
     except Exception as e:
         print(f"資料庫結構補齊失敗: {e}")
-
-
-if RUN_SCHEMA_MIGRATIONS:
-    ensure_runtime_schema()
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
@@ -191,10 +129,6 @@ def clear_auth_cookie(response):
     response.delete_cookie(SESSION_COOKIE)
     response.delete_cookie(LINE_STATE_COOKIE)
     response.delete_cookie(LINE_NEXT_COOKIE)
-
-
-def line_callback_url(request: Request) -> str:
-    return LINE_CALLBACK_URL or str(request.url_for("line_callback"))
 
 
 def storyteller_can_upload(account: models.StorytellerAccount) -> bool:
@@ -306,61 +240,6 @@ def serialize_match(m: models.Match, include_players: bool = True):
     return payload
 
 
-@app.get("/auth/line/login")
-@app.get("/api/auth/line/login")
-async def line_login(request: Request, next: str = "/#record", switch_account: bool = False):
-    if not LINE_CHANNEL_ID or not LINE_CHANNEL_SECRET:
-        raise HTTPException(status_code=500, detail="尚未設定 LINE_CHANNEL_ID 或 LINE_CHANNEL_SECRET")
-    state = secrets.token_urlsafe(24)
-    params = {"response_type": "code", "client_id": LINE_CHANNEL_ID, "redirect_uri": line_callback_url(request), "state": state, "scope": "profile openid"}
-    if switch_account:
-        params["disable_auto_login"] = "true"
-    response = RedirectResponse(f"https://access.line.me/oauth2/v2.1/authorize?{urlencode(params)}")
-    secure = is_secure_request(request)
-    response.set_cookie(LINE_STATE_COOKIE, state, max_age=600, httponly=True, secure=secure, samesite="lax")
-    response.set_cookie(LINE_NEXT_COOKIE, next or "/#record", max_age=600, httponly=True, secure=secure, samesite="lax")
-    return response
-
-
-@app.get("/auth/line/callback")
-async def line_callback(request: Request, code: str = "", state: str = "", db: Session = Depends(get_db)):
-    expected_state = request.cookies.get(LINE_STATE_COOKIE)
-    if not expected_state or not state or not hmac.compare_digest(expected_state, state):
-        raise HTTPException(status_code=400, detail="LINE 登入狀態驗證失敗，請重新登入")
-    if not code:
-        raise HTTPException(status_code=400, detail="LINE 未回傳授權碼")
-    token_resp = requests.post("https://api.line.me/oauth2/v2.1/token", data={"grant_type": "authorization_code", "code": code, "redirect_uri": line_callback_url(request), "client_id": LINE_CHANNEL_ID, "client_secret": LINE_CHANNEL_SECRET}, timeout=10)
-    if not token_resp.ok:
-        raise HTTPException(status_code=400, detail="LINE token 換取失敗")
-    access_token = token_resp.json().get("access_token")
-    if not access_token:
-        raise HTTPException(status_code=400, detail="LINE 未回傳 access token")
-    profile_resp = requests.get("https://api.line.me/v2/profile", headers={"Authorization": f"Bearer {access_token}"}, timeout=10)
-    if not profile_resp.ok:
-        raise HTTPException(status_code=400, detail="LINE 個人資料讀取失敗")
-    profile = profile_resp.json()
-    line_user_id = profile.get("userId")
-    display_name = profile.get("displayName") or "LINE 使用者"
-    picture_url = profile.get("pictureUrl")
-    if not line_user_id:
-        raise HTTPException(status_code=400, detail="LINE 未回傳 userId")
-    account = reconcile_line_account(
-        db,
-        line_user_id=line_user_id,
-        display_name=display_name,
-        picture_url=picture_url,
-        is_allowed_default=(not ALLOWED_LINE_USER_IDS) or (line_user_id in ALLOWED_LINE_USER_IDS),
-    )
-    db.commit()
-    db.refresh(account)
-    next_url = request.cookies.get(LINE_NEXT_COOKIE) or "/#record"
-    response = RedirectResponse(next_url)
-    set_auth_cookie(response, request, account.id)
-    response.delete_cookie(LINE_STATE_COOKIE)
-    response.delete_cookie(LINE_NEXT_COOKIE)
-    return response
-
-
 @app.post("/api/auth/logout")
 async def logout():
     response = JSONResponse({"status": "success"})
@@ -391,36 +270,6 @@ async def get_locations(db: Session = Depends(get_db)):
         if name not in by_name:
             results.append({"id": None, "name": name, "type": "discord" if name == "線上" else "store", "address": None, "link_url": None, "image_url": None, "description": None, "schedule_note": None, "contact_note": None, "is_public": True, "sort_order": 1000 + index})
     return results
-
-
-@app.post("/api/matches")
-async def create_match(data: dict, db: Session = Depends(get_db), uploader: models.StorytellerAccount = Depends(require_upload_storyteller)):
-    try:
-        enforce_upload_rate_limit(db, uploader)
-        match = models.Match(script=data.get("script"), date=datetime.strptime(data.get("date"), "%Y-%m-%d") if data.get("date") else datetime.now(), location=data.get("location"), storyteller=data.get("storyteller"), winning_team=data.get("winning_team"), replay_log=data.get("replay_log"), uploaded_by_id=uploader.id, created_at=datetime.now())
-        db.add(match)
-        db.flush()
-        for p in data.get("players", []):
-            name = (p.get("name") or "").strip()
-            if not name:
-                continue
-            player = db.query(models.Player).filter(models.Player.name == name).first()
-            if not player:
-                player = models.Player(name=name)
-                db.add(player)
-                db.flush()
-            survived = p.get("survived")
-            if survived is None:
-                survived = p.get("status") != "dead"
-            db.add(models.MatchPlayer(match_id=match.id, player_id=player.id, seat_number=p.get("seat_number") or p.get("seat"), initial_character=p.get("initial_character") or p.get("initial_role"), final_character=p.get("final_character") or p.get("final_role"), alignment=p.get("alignment"), survived=bool(survived)))
-        db.commit()
-        return {"status": "success", "match_id": match.id}
-    except HTTPException:
-        raise
-    except Exception as e:
-        db.rollback()
-        print(f"上傳失敗: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/admin/users")

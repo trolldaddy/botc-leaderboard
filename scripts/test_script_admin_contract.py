@@ -60,7 +60,9 @@ def test_script_admin_new_import_is_preview_first_and_local_only():
     routes = (ROOT / "script_admin_routes.py").read_text(encoding="utf-8")
     service = (ROOT / "script_import_service.py").read_text(encoding="utf-8")
     assert 'id="script-admin-create"' in html
-    assert 'id="si-images"' in javascript
+    assert 'id="si-front"' in javascript
+    assert 'id="si-back"' in javascript
+    assert 'id="si-logo"' in javascript
     assert 'id="si-json"' in javascript
     assert "/api/admin/scripts/imports/preview" in javascript
     assert "/api/admin/scripts/imports/apply" in javascript
@@ -70,7 +72,9 @@ def test_script_admin_new_import_is_preview_first_and_local_only():
     assert "/static/script-role-icons/uploads/" in service
     assert "is_public=False" in service
     assert "needs_review=True" in service
-    assert "沒有成功保存任何劇本圖片" in service
+    assert "for slot, url, kind in save_artwork(" in service
+    assert "persist_artwork(script, slot, url)" in service
+    assert "sort_order=slot" in service
     assert "image_data" in service
 
 def test_script_admin_compacts_flags_and_supports_confirmed_delete():
@@ -92,7 +96,8 @@ def test_script_admin_compacts_flags_and_supports_confirmed_delete():
     assert "apply_candidate_artwork" in routes
     assert "artwork_selection:{...state.artworkSelection}" in javascript
     assert "local_artwork_payload" in routes
-    assert "persisted_artwork_url" in routes
+    assert "persist_artwork" in routes
+    assert "persisted_artwork_url" in (ROOT / "script_import_service.py").read_text(encoding="utf-8")
 
 
 def test_script_artwork_candidate_list_scrolls_inside_workbench():

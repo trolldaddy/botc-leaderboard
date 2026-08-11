@@ -30,10 +30,9 @@ def test_babel_source_and_transform_are_cached():
 
 
 def test_room_transfer_does_not_load_recorder_twice():
-    for name in ("rooms.js", "rooms-transfer-patch.js"):
-        source = (ROOT / "static" / "js" / name).read_text(encoding="utf-8")
-        assert "window.location.hash = 'recorder'" in source
-        assert "window.loadPage('recorder')" not in source
+    source = (ROOT / "static" / "js" / "rooms-script.js").read_text(encoding="utf-8")
+    assert "window.location.hash = 'recorder'" in source
+    assert "window.loadPage('recorder')" not in source
 
 
 if __name__ == "__main__":

@@ -1,3 +1,56 @@
+/* Town Check-in: script selection, artwork summary, and recorder transfer. */
+
+/* Consolidated from static/js/rooms-script-picker.js. */
+(() => {
+  const input = document.getElementById('room-script');
+  const datalist = document.getElementById('room-script-options');
+  const status = document.getElementById('room-script-picker-status');
+  if (!input || !datalist) return;
+
+  const setStatus = (message, isError = false) => {
+    if (!status) return;
+    status.textContent = message;
+    status.classList.toggle('is-error', isError);
+  };
+
+  const loadScripts = async () => {
+    try {
+      const response = await fetch(`${window.API_BASE || ''}/api/scripts`, {
+        credentials: 'same-origin',
+        cache: 'no-store'
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const data = await response.json();
+      const items = Array.isArray(data.items) ? data.items : [];
+      const seen = new Set();
+      datalist.innerHTML = '';
+
+      items.forEach((script) => {
+        const name = String(script.name_zh_tw || '').trim();
+        if (!name || seen.has(name)) return;
+        seen.add(name);
+
+        const option = document.createElement('option');
+        option.value = name;
+        const meta = [script.category, script.author_name].filter(Boolean).join('｜');
+        if (meta) option.label = meta;
+        datalist.appendChild(option);
+      });
+
+      setStatus(seen.size
+        ? `可從 ${seen.size} 套公開劇本中選擇，也可手動輸入。`
+        : '目前沒有公開劇本，可手動輸入名稱。');
+    } catch (error) {
+      console.warn('房間劇本清單載入失敗', error);
+      setStatus('劇本清單暫時無法載入，仍可手動輸入名稱。', true);
+    }
+  };
+
+  loadScripts();
+})();
+
+/* Consolidated from static/js/rooms-script-summary-patch.js. */
 (() => {
   window.__roomsScriptSummaryPatchDestroy?.();
 
@@ -146,3 +199,96 @@
     document.querySelector('#active-room-summary .room-script-library-link')?.remove();
   };
 })();
+
+
+/* Consolidated from static/js/rooms-transfer-patch.js. */
+(() => {
+  const STORAGE_KEY = 'botc_town_checkin_room';
+  const RECORDER_STORAGE_KEY = 'botc_recorder_state_v2';
+
+  const today = () => new Date().toISOString().split('T')[0];
+
+  const readRoom = () => {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+    } catch (err) {
+      return null;
+    }
+  };
+
+  const buildRecorderPlayers = (room) => {
+    return [...(room?.players || [])]
+      .filter((p) => p.display_name || p.name)
+      .sort((a, b) => {
+        const as = Number(a.seat_number || 999);
+        const bs = Number(b.seat_number || 999);
+        if (as !== bs) return as - bs;
+        return String(a.display_name || a.name || '').localeCompare(String(b.display_name || b.name || ''), 'zh-Hant');
+      })
+      .map((p, index) => ({
+        id: Number(p.seat_number) || index + 1,
+        name: p.display_name || p.name,
+        role: null,
+        hiddenRole: '',
+        isDead: false,
+        roomPlayerId: p.id || null,
+        accountId: p.account_id || null,
+        lineUserId: p.line_user_id || null,
+        playerId: p.player_id || null,
+        playerName: p.player_name || null,
+        isTemporary: !!p.is_temporary
+      }));
+  };
+
+  const patchedTransferToRecorder = () => {
+    const room = readRoom();
+    if (!room) {
+      alert('尚未建立或載入房間。');
+      return;
+    }
+
+    const players = buildRecorderPlayers(room);
+    if (players.length === 0) {
+      alert('沒有玩家可帶入。');
+      return;
+    }
+
+    const recorderState = {
+      botc_script: [],
+      botc_players: players,
+      botc_playerCount: players.length,
+      botc_scriptName: room.script || room.title || '未命名劇本',
+      botc_gameDate: String(room.date || today()).slice(0, 10),
+      botc_gameLocation: room.location || '拉普拉斯',
+      botc_customLocation: '',
+      botc_storyteller: room.storyteller || '',
+      botc_gamePhase: { type: 'Setup', number: 0 },
+      botc_logs: [],
+      botc_demonBluffs: { r1: '', r2: '', r3: '', recorded: false }
+    };
+
+    // recorder.js 使用 window.name，而不是 localStorage。
+    localStorage.setItem(RECORDER_STORAGE_KEY, JSON.stringify(recorderState));
+
+    // 同步保留一份給未來 record/rooms 橋接用。
+    localStorage.setItem('botc_room_to_recorder', JSON.stringify({ room, players }));
+
+    window.location.hash = 'recorder';
+  };
+
+  const install = () => {
+    if (!window.TownCheckin) return false;
+    window.TownCheckin.transferToRecorder = patchedTransferToRecorder;
+    return true;
+  };
+
+  if (!install()) {
+    let tries = 0;
+    const timer = setInterval(() => {
+      tries += 1;
+      if (install() || tries > 20) clearInterval(timer);
+    }, 100);
+  }
+})();
+
+

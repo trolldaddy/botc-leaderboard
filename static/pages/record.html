@@ -45,6 +45,14 @@
             </div>
             <div style="margin-top: 1rem;">
                 <textarea id="log-input" class="form-control dark-input" style="min-height: 100px;" placeholder="貼上覆盤文字紀錄..."></textarea>
+                <div class="record-parser-row">
+                    <label for="log-parser-mode">戰報格式</label>
+                    <select id="log-parser-mode" class="form-control dark-input" onchange="saveDraft()">
+                        <option value="auto">自動辨識</option>
+                        <option value="clocktower_recorder">血染覆盤紀錄格式</option>
+                        <option value="simple_role_list">玩家角色列表格式</option>
+                    </select>
+                </div>
                 <div style="display: flex; gap: 0.8rem; margin-top: 1rem;">
                     <button class="btn btn-purple" onclick="autoFillFromLog()">
                         <i class="fa-solid fa-bolt"></i> 立即解析並填充
@@ -286,6 +294,9 @@
 .status-box.box-evil { background: rgba(230, 57, 70, 0.22); border-color: rgba(230, 57, 70, 0.35); }
 .status-box.box-good .box-value, .status-box.box-good .box-label { color: #cfe9ff; }
 .status-box.box-evil .box-value, .status-box.box-evil .box-label { color: #ffd0d4; }
+.record-parser-row { margin: .75rem 0; display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.record-parser-row label { font-size: .85rem; color: var(--text-muted, #94a3b8); }
+#log-parser-mode { width: auto; min-width: 220px; color-scheme: dark; }
 </style>
 
-<script src="/js/recordtwo.js"></script>
+<script src="/js/record.js"></script>

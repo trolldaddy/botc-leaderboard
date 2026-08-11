@@ -26,6 +26,10 @@ def test_global_role_catalog_uses_database_with_static_fallback():
     assert "window.MASTER_ROLE_DB = catalog" in catalog
     assert "return fallback" in catalog
     assert "botc:role-catalog-ready" in record
+    assert "resolve," in catalog
+    assert "alignmentFor," in catalog
+    assert "nameMatches.length === 1" in catalog
+    assert "window.RoleCatalog?.alignmentFor" in record
 
 
 def test_recorder_rehydrates_roles_and_night_actions_from_catalog():
@@ -47,3 +51,18 @@ def test_recorder_rehydrates_roles_and_night_actions_from_catalog():
     assert "p.role.otherNight > 0" in recorder
     assert "player.role.firstNightReminder" in recorder
     assert "player.role.otherNightReminder" in recorder
+    assert "window.RoleCatalog?.resolve" in recorder
+    assert "window.MASTER_ROLE_DB || []" in recorder
+    assert "window.MASTER_ROLE_DB || MASTER_ROLE_DB" not in recorder
+
+
+def test_record_page_uses_one_formal_module_and_shared_role_catalog():
+    page = (ROOT / "static/pages/record.html").read_text(encoding="utf-8")
+    record = (ROOT / "static/js/record.js").read_text(encoding="utf-8")
+
+    assert '/js/record.js' in page
+    assert '/js/recordtwo.js' not in page
+    assert 'id="log-parser-mode"' in page
+    assert "window.RoleCatalog?.alignmentFor" in record
+    assert "parseSimpleRoleListReplay" in record
+    assert "parser_format:" in record

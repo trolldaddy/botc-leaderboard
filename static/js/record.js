@@ -384,6 +384,9 @@ window.addEventListener('botc:role-catalog-ready', setupRoleDatalist);
 
         targetRole = normalizeRoleName(targetRole);
 
+        const catalogAlignment = window.RoleCatalog?.alignmentFor?.({ name: targetRole });
+        if (catalogAlignment) return catalogAlignment;
+
         const db = window.MASTER_ROLE_DB || [];
 
         const roleData = db.find(r => {
@@ -577,6 +580,7 @@ window.addEventListener('botc:role-catalog-ready', setupRoleDatalist);
             winner: document.getElementById('match-winner')?.value || 'good',
             log: document.getElementById('log-input')?.value || '',
             replay_log: document.getElementById('log-input')?.value || '',
+            parser_format: document.getElementById('log-parser-mode')?.value || 'auto',
             players: Array.from(document.querySelectorAll('.player-row')).map((row, index) => ({
                 seat_number: index + 1,
                 seat: index + 1,
@@ -624,6 +628,9 @@ window.addEventListener('botc:role-catalog-ready', setupRoleDatalist);
         if (logInput) {
             logInput.value = data.replay_log || data.log || '';
         }
+
+        const parserMode = document.getElementById('log-parser-mode');
+        if (parserMode) parserMode.value = data.parser_format || 'auto';
 
         renderPlayersFromData(data.players || []);
     };
@@ -733,11 +740,91 @@ window.addEventListener('botc:role-catalog-ready', setupRoleDatalist);
         return blocks;
     };
 
+    const parseSimpleRoleListReplay = (text) => {
+        const result = { meta: {}, players: [] };
+        const title = text.split(/\r?\n/).map(line => line.trim()).find(line => line && !line.includes('玩家角色列表'));
+        const winner = text.match(/(善良陣營|邪惡陣營)獲勝/);
+        if (title) result.meta.script = title;
+        if (winner) result.meta.winner = parseWinnerText(winner[1]);
+
+        const list = text.match(/玩家角色列表:\s*([\s\S]*?)(?:\n\s*設置|\n\s*首夜|\n\s*第一個白天|\n\s*第一個夜晚|$)/);
+        if (!list) return result;
+
+        const playerMap = {};
+        list[1].split(/\r?\n/).map(line => line.trim()).filter(Boolean).forEach(line => {
+            const match = line.match(/^(.+?)【\s*(\d+)\.([^】]+)\s*】$/);
+            if (!match) return;
+            const seat = Number(match[2]);
+            const role = String(match[3] || '').replace(/^(.+?)[（(](.+?)[）)]$/, '$1').trim();
+            if (!seat || seat >= 20 || !match[1].trim()) return;
+            playerMap[seat] = {
+                seat_number: seat,
+                seat,
+                name: match[1].trim(),
+                initial_character: role,
+                initial_role: role,
+                final_character: role,
+                final_role: role,
+                alignment: getAlignmentByRole(role),
+                status: 'alive',
+                survived: true
+            };
+        });
+
+        const transformRegex = /【\s*\d+\.[^】]+】.*?【\s*(\d+)\.[^】]+】\s*為\s*【\s*(\d+)\.([^】]+)\s*】/g;
+        let transform;
+        while ((transform = transformRegex.exec(text)) !== null) {
+            const beforeSeat = Number(transform[1]);
+            const afterSeat = Number(transform[2]);
+            const newRole = String(transform[3] || '').replace(/^(.+?)[（(](.+?)[）)]$/, '$1').trim();
+            if (beforeSeat === afterSeat && playerMap[afterSeat]) {
+                playerMap[afterSeat].final_character = newRole;
+                playerMap[afterSeat].final_role = newRole;
+                playerMap[afterSeat].alignment = getAlignmentByRole(newRole);
+            }
+        }
+
+        let lastAlive = null;
+        const aliveRegex = /存活玩家\s*:\s*([0-9\s]+)/g;
+        let aliveMatch;
+        while ((aliveMatch = aliveRegex.exec(text)) !== null) {
+            lastAlive = new Set(aliveMatch[1].trim().split(/\s+/).map(Number).filter(Boolean));
+        }
+        if (lastAlive) {
+            Object.values(playerMap).forEach(player => {
+                player.survived = lastAlive.has(player.seat_number);
+                player.status = player.survived ? 'alive' : 'dead';
+            });
+        }
+
+        result.players = Object.values(playerMap).sort((a, b) => a.seat_number - b.seat_number);
+        return result;
+    };
+
     window.autoFillFromLog = () => {
         const text = document.getElementById('log-input')?.value || '';
 
         if (!text.trim()) {
             alert('請先貼上文字紀錄');
+            return;
+        }
+
+        const selectedFormat = document.getElementById('log-parser-mode')?.value || 'auto';
+        const parserFormat = selectedFormat === 'auto'
+            ? (text.includes('玩家角色列表:') ? 'simple_role_list' : 'clocktower_recorder')
+            : selectedFormat;
+        if (parserFormat === 'simple_role_list') {
+            const parsed = parseSimpleRoleListReplay(text);
+            if (!parsed.players.length) {
+                alert('無法解析玩家角色列表，請確認格式。');
+                return;
+            }
+            if (parsed.meta.script) safeSet('match-script', parsed.meta.script);
+            if (parsed.meta.winner) safeSet('match-winner', parsed.meta.winner);
+            renderPlayersFromData(parsed.players);
+            updateRowNumbers();
+            saveDraft();
+            alert(`已自動解析 ${parsed.players.length} 位玩家。`);
             return;
         }
 
@@ -884,6 +971,7 @@ window.addEventListener('botc:role-catalog-ready', setupRoleDatalist);
             storyteller: document.getElementById('match-storyteller').value,
             winning_team: document.getElementById('match-winner').value,
             replay_log: document.getElementById('log-input').value,
+            parser_format: document.getElementById('log-parser-mode')?.value || 'auto',
             players: Array.from(document.querySelectorAll('.player-row'))
                 .map((row, index) => ({
                     seat_number: index + 1,

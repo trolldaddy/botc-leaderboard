@@ -75,11 +75,11 @@ def test_public_script_catalog_filters_and_role_search_are_available():
 
 def test_room_script_summary_uses_logo_link_and_same_page_room_state():
     page = (ROOT / "static/pages/rooms.html").read_text(encoding="utf-8")
-    rooms = (ROOT / "static/js/rooms.js").read_text(encoding="utf-8")
-    summary = (ROOT / "static/js/rooms-script-summary-patch.js").read_text(encoding="utf-8")
-    self_seat = (ROOT / "static/js/rooms-self-seat-patch.js").read_text(encoding="utf-8")
-    seat_select = (ROOT / "static/js/rooms-seat-select-patch.js").read_text(encoding="utf-8")
-    room_sync = (ROOT / "static/js/rooms-sync-patch.js").read_text(encoding="utf-8")
+    rooms = (ROOT / "static/js/rooms-sync.js").read_text(encoding="utf-8")
+    summary = (ROOT / "static/js/rooms-script.js").read_text(encoding="utf-8")
+    self_seat = (ROOT / "static/js/rooms-seat.js").read_text(encoding="utf-8")
+    seat_select = self_seat
+    room_sync = rooms
     assert "botc:town-room-changed" in rooms
     assert "getCurrentRoom" in rooms
     assert "script.logo_image_url" in summary

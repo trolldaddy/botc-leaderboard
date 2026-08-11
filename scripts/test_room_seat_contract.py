@@ -15,12 +15,8 @@ def test_deploy_preserves_existing_cloud_run_configuration():
 
 def test_room_seat_identity_uses_the_logged_in_account_id():
     main_source = (ROOT / "main.py").read_text(encoding="utf-8")
-    mobile_source = (ROOT / "static/js/rooms-mobile-layout-patch.js").read_text(
-        encoding="utf-8"
-    )
-    self_seat_source = (ROOT / "static/js/rooms-self-seat-patch.js").read_text(
-        encoding="utf-8"
-    )
+    mobile_source = (ROOT / "static/js/rooms-ui.js").read_text(encoding="utf-8")
+    self_seat_source = (ROOT / "static/js/rooms-seat.js").read_text(encoding="utf-8")
 
     assert '"user": {"id": account.id' in main_source
     assert "Number(player.account_id) === accountId" in mobile_source
@@ -29,9 +25,7 @@ def test_room_seat_identity_uses_the_logged_in_account_id():
 
 def test_room_permissions_distinguish_expired_login_from_non_owner():
     backend = (ROOT / "player_seat_routes.py").read_text(encoding="utf-8")
-    frontend = (ROOT / "static/js/rooms-permission-patch.js").read_text(
-        encoding="utf-8"
-    )
+    frontend = (ROOT / "static/js/rooms-identity.js").read_text(encoding="utf-8")
 
     assert '"authenticated": bool(account)' in backend
     assert '"current_account_display_name": account.display_name' in backend
@@ -43,10 +37,10 @@ def test_room_permissions_distinguish_expired_login_from_non_owner():
 def test_line_login_can_disable_auto_login_for_account_switching():
     override = (ROOT / "line_login_override_routes.py").read_text(encoding="utf-8")
     main_source = (ROOT / "main.py").read_text(encoding="utf-8")
-    room_ui = (ROOT / "static/js/rooms-ui-patch.js").read_text(encoding="utf-8")
+    room_ui = (ROOT / "static/js/rooms-identity.js").read_text(encoding="utf-8")
 
     assert 'params["disable_auto_login"] = "true"' in override
-    assert 'params["disable_auto_login"] = "true"' in main_source
+    assert "line_login_override_routes.router" in main_source
     assert "switch_account=1" in room_ui
 
 
@@ -76,14 +70,12 @@ def test_line_callback_selects_established_account_without_deleting_history():
     assert ".delete(" not in service
     assert ".update(" not in service
     assert "reconcile_line_account(" in override
-    assert "reconcile_line_account(" in main_source
+    assert "line_login_override_routes.router" in main_source
 
 
 def test_admin_can_explicitly_reclaim_only_the_current_room():
     backend = (ROOT / "player_seat_routes.py").read_text(encoding="utf-8")
-    frontend = (ROOT / "static/js/rooms-permission-patch.js").read_text(
-        encoding="utf-8"
-    )
+    frontend = (ROOT / "static/js/rooms-identity.js").read_text(encoding="utf-8")
 
     assert 'os.getenv("ADMIN_LINE_USER_IDS"' in backend
     assert '"can_reclaim_owner"' in backend
