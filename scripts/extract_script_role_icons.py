@@ -1,14 +1,16 @@
 """Extract role icons from script artwork and optionally persist them to GCS/Cloud SQL."""
 
 import argparse
+import colorsys
 import io
 import json
+import math
 import sys
 from datetime import datetime
 from pathlib import Path
 
 import requests
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageFilter, ImageStat
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -28,18 +30,98 @@ def load_source(value):
     return Image.open(value).convert("RGBA")
 
 
-def extract_icon(source, x, y, crop_size, output_size):
+def foreground_mask(crop):
+    width, height = crop.size
+    border = Image.new("RGB", (40, 1))
+    samples = []
+    for px in range(10):
+        for py in range(10):
+            samples.extend((crop.getpixel((px, py))[:3], crop.getpixel((width - 1 - px, py))[:3],
+                            crop.getpixel((px, height - 1 - py))[:3], crop.getpixel((width - 1 - px, height - 1 - py))[:3]))
+    for index, color in enumerate(samples[:40]):
+        border.putpixel((index, 0), color)
+    background = ImageStat.Stat(border).median
+
+    active = set()
+    for y in range(height):
+        for x in range(width):
+            red, green, blue, _ = crop.getpixel((x, y))
+            _, saturation, value = colorsys.rgb_to_hsv(red / 255, green / 255, blue / 255)
+            distance = math.sqrt(sum((channel - base) ** 2 for channel, base in zip((red, green, blue), background)))
+            if distance > 48 or saturation > 0.30 or value < 0.56:
+                active.add((x, y))
+
+    components = []
+    while active:
+        seed = active.pop()
+        stack, component = [seed], {seed}
+        while stack:
+            cx, cy = stack.pop()
+            for nx in range(max(0, cx - 1), min(width, cx + 2)):
+                for ny in range(max(0, cy - 1), min(height, cy + 2)):
+                    point = (nx, ny)
+                    if point in active:
+                        active.remove(point)
+                        component.add(point)
+                        stack.append(point)
+        if len(component) >= 4:
+            components.append(component)
+    if not components:
+        raise ValueError("No foreground component detected")
+    components.sort(key=len, reverse=True)
+    largest = components[0]
+    kept = set(largest)
+    largest_left = min(x for x, _ in largest)
+    largest_top = min(y for _, y in largest)
+    largest_right = max(x for x, _ in largest)
+    largest_bottom = max(y for _, y in largest)
+    margin_x = max(5, round((largest_right - largest_left + 1) * 0.18))
+    margin_y = max(5, round((largest_bottom - largest_top + 1) * 0.18))
+    neighborhood = (
+        max(0, largest_left - margin_x),
+        max(0, largest_top - margin_y),
+        min(width - 1, largest_right + margin_x),
+        min(height - 1, largest_bottom + margin_y),
+    )
+    for component in components[1:]:
+        centroid = (sum(x for x, _ in component) / len(component), sum(y for _, y in component) / len(component))
+        near_main_shape = (
+            neighborhood[0] <= centroid[0] <= neighborhood[2]
+            and neighborhood[1] <= centroid[1] <= neighborhood[3]
+        )
+        if len(component) >= max(5, len(largest) * 0.012) and near_main_shape:
+            kept.update(component)
+
+    mask = Image.new("L", crop.size, 0)
+    mask_pixels = mask.load()
+    for x, y in kept:
+        mask_pixels[x, y] = 255
+    mask = mask.filter(ImageFilter.MaxFilter(3)).filter(ImageFilter.MinFilter(3))
+    return mask.filter(ImageFilter.GaussianBlur(0.65))
+
+
+def extract_icon(source, x, y, crop_size, output_size, output_padding=24):
     half = crop_size // 2
     box = (x - half, y - half, x + half, y + half)
     if box[0] < 0 or box[1] < 0 or box[2] > source.width or box[3] > source.height:
         raise ValueError(f"Crop {box} exceeds source size {source.size}")
-    icon = source.crop(box).resize((output_size, output_size), Image.Resampling.LANCZOS)
-    mask = Image.new("L", icon.size, 0)
-    ImageDraw.Draw(mask).ellipse((3, 3, output_size - 4, output_size - 4), fill=255)
-    mask = mask.filter(ImageFilter.GaussianBlur(max(1, output_size // 128)))
+    crop = source.crop(box)
+    mask = foreground_mask(crop)
+    bounds = mask.getbbox()
+    if not bounds:
+        raise ValueError(f"No foreground bounds detected at {(x, y)}")
+    icon = crop.crop(bounds)
+    mask = mask.crop(bounds)
+    available = output_size - output_padding * 2
+    scale = min(available / icon.width, available / icon.height)
+    size = (max(1, round(icon.width * scale)), max(1, round(icon.height * scale)))
+    icon = icon.resize(size, Image.Resampling.LANCZOS)
+    mask = mask.resize(size, Image.Resampling.LANCZOS)
     icon.putalpha(mask)
+    canvas = Image.new("RGBA", (output_size, output_size), (0, 0, 0, 0))
+    canvas.alpha_composite(icon, ((output_size - size[0]) // 2, (output_size - size[1]) // 2))
     output = io.BytesIO()
-    icon.save(output, "WEBP", quality=95, method=6)
+    canvas.save(output, "WEBP", quality=95, method=6)
     return output.getvalue()
 
 
@@ -66,13 +148,15 @@ def run(manifest_path, preview_dir=None, write=False, report_path=None):
     source = load_source(manifest["source_image_url"])
     crop_size = int(manifest.get("crop_size", 64))
     output_size = int(manifest.get("output_size", 256))
+    output_padding = int(manifest.get("output_padding", 24))
     roles = manifest.get("roles") or []
     if len({item["id"] for item in roles}) != len(roles):
         raise ValueError("Role IDs in extraction manifest must be unique")
 
     extracted = []
     for item in roles:
-        data = extract_icon(source, int(item["x"]), int(item["y"]), crop_size, output_size)
+        role_crop_size = int(item.get("crop_size", crop_size))
+        data = extract_icon(source, int(item["x"]), int(item["y"]), role_crop_size, output_size, output_padding)
         filename = f"{item['id']}.webp"
         if preview_dir:
             preview_dir.mkdir(parents=True, exist_ok=True)

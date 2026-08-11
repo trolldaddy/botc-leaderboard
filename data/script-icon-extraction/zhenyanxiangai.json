@@ -1,10 +1,11 @@
 {
   "script_slug": "真贗相愛",
   "source_image_url": "https://storage.googleapis.com/skillful-cider-460210-r7-botc-assets/script-artwork/%E7%9C%9F%E8%B4%97%E7%9B%B8%E6%84%9B/1-dadb3543e3084732.webp",
-  "crop_size": 64,
+  "crop_size": 90,
   "output_size": 256,
+  "output_padding": 24,
   "roles": [
-    {"id": "zhenyan_scout", "name": "偵察兵", "x": 138, "y": 355},
+    {"id": "zhenyan_scout", "name": "偵察兵", "x": 138, "y": 355, "crop_size": 76},
     {"id": "zhenyan_huashan", "name": "華山", "x": 642, "y": 215},
     {"id": "zhenyan_cat_legion", "name": "貓貓軍團", "x": 642, "y": 300},
     {"id": "zhenyan_zero", "name": "零", "x": 642, "y": 406},
@@ -16,10 +17,10 @@
     {"id": "zhenyan_serpent_emissary", "name": "蛇神使", "x": 642, "y": 1005},
     {"id": "zhenyan_counterfeit", "name": "贗品", "x": 642, "y": 1072},
     {"id": "zhenyan_paper_lady", "name": "紙夫人", "x": 138, "y": 1206},
-    {"id": "zhenyan_yuan", "name": "鴛", "x": 138, "y": 1275},
+    {"id": "zhenyan_yuan", "name": "鴛", "x": 138, "y": 1275, "crop_size": 76},
     {"id": "zhenyan_e_duo", "name": "惡墮", "x": 138, "y": 1345},
-    {"id": "zhenyan_kukapa", "name": "骷咔啪", "x": 642, "y": 1191},
-    {"id": "zhenyan_yang", "name": "鴦", "x": 642, "y": 1300},
+    {"id": "zhenyan_kukapa", "name": "骷咔啪", "x": 622, "y": 1191, "crop_size": 80},
+    {"id": "zhenyan_yang", "name": "鴦", "x": 620, "y": 1300, "crop_size": 80},
     {"id": "zhenyan_lightbulb", "name": "電燈泡", "x": 138, "y": 1454},
     {"id": "zhenyan_godel", "name": "哥德爾", "x": 642, "y": 1454}
   ]
