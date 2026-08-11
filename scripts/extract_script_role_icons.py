@@ -100,12 +100,43 @@ def foreground_mask(crop):
     return mask.filter(ImageFilter.GaussianBlur(0.65))
 
 
-def extract_icon(source, x, y, crop_size, output_size, output_padding=24):
+def background_color(crop):
+    width, height = crop.size
+    samples = []
+    for offset in range(min(10, width // 3, height // 3)):
+        samples.extend(
+            (
+                crop.getpixel((offset, offset))[:3],
+                crop.getpixel((width - 1 - offset, offset))[:3],
+                crop.getpixel((offset, height - 1 - offset))[:3],
+                crop.getpixel((width - 1 - offset, height - 1 - offset))[:3],
+            )
+        )
+    channels = zip(*samples)
+    return tuple(sorted(channel)[len(samples) // 2] for channel in channels)
+
+
+def extract_icon(source, x, y, crop_size, output_size, output_padding=24, remove_background=True):
     half = crop_size // 2
     box = (x - half, y - half, x + half, y + half)
     if box[0] < 0 or box[1] < 0 or box[2] > source.width or box[3] > source.height:
         raise ValueError(f"Crop {box} exceeds source size {source.size}")
     crop = source.crop(box)
+    if not remove_background:
+        mask = foreground_mask(crop)
+        bounds = mask.getbbox()
+        if not bounds:
+            raise ValueError(f"No foreground bounds detected at {(x, y)}")
+        icon = crop.crop(bounds).convert("RGB")
+        available = output_size - output_padding * 2
+        scale = min(available / icon.width, available / icon.height)
+        size = (max(1, round(icon.width * scale)), max(1, round(icon.height * scale)))
+        icon = icon.resize(size, Image.Resampling.LANCZOS)
+        canvas = Image.new("RGB", (output_size, output_size), background_color(crop))
+        canvas.paste(icon, ((output_size - size[0]) // 2, (output_size - size[1]) // 2))
+        output = io.BytesIO()
+        canvas.save(output, "WEBP", quality=95, method=6)
+        return output.getvalue()
     mask = foreground_mask(crop)
     bounds = mask.getbbox()
     if not bounds:
@@ -149,6 +180,7 @@ def run(manifest_path, preview_dir=None, write=False, report_path=None):
     crop_size = int(manifest.get("crop_size", 64))
     output_size = int(manifest.get("output_size", 256))
     output_padding = int(manifest.get("output_padding", 24))
+    remove_background = bool(manifest.get("remove_background", True))
     roles = manifest.get("roles") or []
     if len({item["id"] for item in roles}) != len(roles):
         raise ValueError("Role IDs in extraction manifest must be unique")
@@ -156,7 +188,15 @@ def run(manifest_path, preview_dir=None, write=False, report_path=None):
     extracted = []
     for item in roles:
         role_crop_size = int(item.get("crop_size", crop_size))
-        data = extract_icon(source, int(item["x"]), int(item["y"]), role_crop_size, output_size, output_padding)
+        data = extract_icon(
+            source,
+            int(item["x"]),
+            int(item["y"]),
+            role_crop_size,
+            output_size,
+            output_padding,
+            remove_background,
+        )
         filename = f"{item['id']}.webp"
         if preview_dir:
             preview_dir.mkdir(parents=True, exist_ok=True)

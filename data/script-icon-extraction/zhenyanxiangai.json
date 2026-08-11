@@ -4,6 +4,7 @@
   "crop_size": 90,
   "output_size": 256,
   "output_padding": 24,
+  "remove_background": false,
   "roles": [
     {"id": "zhenyan_scout", "name": "偵察兵", "x": 138, "y": 355, "crop_size": 76},
     {"id": "zhenyan_huashan", "name": "華山", "x": 642, "y": 215},
