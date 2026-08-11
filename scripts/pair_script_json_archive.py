@@ -17,6 +17,7 @@ from database import SessionLocal  # noqa: E402
 from role_models import Role, RoleAlias  # noqa: E402
 from script_models import ScriptEntry, ScriptRole  # noqa: E402
 from scripts.import_bilibili_script import TO_TRADITIONAL, normalized_entry_type  # noqa: E402
+from script_import_service import normalized_script_payload  # noqa: E402
 
 DEFAULT_ARCHIVE = ROOT / "data" / "script-json-archive"
 DEFAULT_REPORT = ROOT / "reports" / "script-json-pairing.json"
@@ -26,7 +27,15 @@ def normalized(value):
     value = TO_TRADITIONAL.convert(str(value or "")).casefold()
     value = re.sub(r"^(?:new|nojinx|jinx改travel|原版|新夜序|\d+)#?", "", value)
     value = re.sub(r"v?\d+(?:\.\d+)*|公測版|測試版|原版", "", value)
-    return re.sub(r"[^0-9a-z\u4e00-\u9fff]+", "", value)
+    value = re.sub(r"[^0-9a-z\u4e00-\u9fff]+", "", value)
+    return value.replace("希望與絕望間", "希望與絕望之間").replace("斗轉", "鬥轉")
+
+
+PREFERRED_FILES = {
+    normalized("共生體"): "原版共生体-蓝铃兰-20260801.json",
+    normalized("魚躍龍門"): "鱼跃龙门-北风-20251122.json",
+    normalized("夜半狂歡"): "新夜序#夜半狂欢-Zets.json",
+}
 
 
 def read_candidate(path):
@@ -95,6 +104,10 @@ def localize(script, candidate, by_id, by_name):
     output = []
     matched_roles = 0
     unresolved = []
+    official = [item.role for item in sorted(script.roles, key=lambda row: (row.sort_order, row.id)) if item.role]
+    supplements = sorted(script.supplements, key=lambda row: (row.sort_order, row.id))
+    official_index = 0
+    supplement_index = 0
     for index, raw in enumerate(source):
         if isinstance(raw, str):
             raw = {"id": raw}
@@ -104,7 +117,12 @@ def localize(script, candidate, by_id, by_name):
             output.append({**raw, "name": script.name_zh_tw, "author": script.author_name or raw.get("author") or ""})
             continue
         item = dict(raw)
+        special = normalized_entry_type(item.get("team")) in {"fabled", "jinx", "loric", "special"}
         role = by_id.get(normalized(item.get("id"))) or by_name.get(normalized(item.get("name")))
+        if not special:
+            positional_role = official[official_index] if official_index < len(official) else None
+            official_index += 1
+            role = role or positional_role
         if role:
             matched_roles += 1
             item.update({
@@ -117,6 +135,16 @@ def localize(script, candidate, by_id, by_name):
                 "otherNight": role.other_night_order or 0,
                 "firstNightReminder": role.first_night_reminder or "",
                 "otherNightReminder": role.other_night_reminder or "",
+            })
+        elif special and supplement_index < len(supplements):
+            supplement = supplements[supplement_index]
+            supplement_index += 1
+            item.update({
+                "id": supplement.external_id,
+                "name": supplement.name_zh_tw,
+                "team": supplement.entry_type,
+                "ability": supplement.ability or TO_TRADITIONAL.convert(str(item.get("ability") or "")),
+                "image": supplement.image_url or item.get("image") or "",
             })
         else:
             item["name"] = TO_TRADITIONAL.convert(str(item.get("name") or item.get("id") or "自創角色"))
@@ -155,29 +183,48 @@ def run(archive, report_path, write=False):
             ranked.sort(key=lambda row: (-row[0], row[1]["path"].name))
             score, selected, reasons = ranked[0]
             runner_up = ranked[1][0] if len(ranked) > 1 else 0
-            ambiguous = score < 90 or (runner_up >= score - 5)
+            preferred_name = PREFERRED_FILES.get(normalized(script.name_zh_tw))
+            if preferred_name:
+                preferred = next((row for row in ranked if row[1]["path"].name == preferred_name), None)
+                if preferred:
+                    score, selected, reasons = preferred
+                    reasons = [*reasons, "preferred-reviewed-version"]
+            generated = score < 90
+            ambiguous = not generated and runner_up >= score - 5 and not preferred_name
             row = {
                 "script_id": script.id,
                 "slug": script.slug,
                 "script_name": script.name_zh_tw,
-                "selected_file": selected["path"].name if not ambiguous else None,
+                "selected_file": selected["path"].name if not (ambiguous or generated) else None,
                 "score": score,
                 "runner_up_score": runner_up,
                 "reasons": reasons,
-                "status": "ambiguous" if ambiguous else "matched",
+                "status": "ambiguous" if ambiguous else ("database-generated" if generated else "matched"),
                 "alternatives": [{"file": item[1]["path"].name, "score": item[0]} for item in ranked[:3]],
             }
-            if not ambiguous:
+            if generated:
+                supplement_payload = [{
+                    "id": item.external_id, "name": item.name_zh_tw, "team": item.entry_type,
+                    "ability": item.ability or "", "image": item.image_url or "",
+                } for item in sorted(script.supplements, key=lambda value: (value.sort_order, value.id))]
+                localized = normalized_script_payload(
+                    script.name_zh_tw,
+                    script.author_name,
+                    [item.role for item in sorted(script.roles, key=lambda value: (value.sort_order, value.id)) if item.role],
+                    supplement_payload,
+                )
+                row.update({"matched_roles": len(script.roles), "unresolved_roles": [], "reason": "no-archive-title-match"})
+            elif not ambiguous:
                 localized, matched_roles, unresolved = localize(script, selected, by_id, by_name)
                 row.update({"matched_roles": matched_roles, "unresolved_roles": unresolved})
                 used.add(selected["path"].name)
-                if write:
-                    script.script_json = json.dumps(localized, ensure_ascii=False, indent=2)
-                    script.script_json_filename = f"{script.slug}.json"
-                    script.script_json_updated_at = datetime.now()
+            if not ambiguous and write:
+                script.script_json = json.dumps(localized, ensure_ascii=False, indent=2)
+                script.script_json_filename = f"{script.slug}.json"
+                script.script_json_updated_at = datetime.now()
             rows.append(row)
         if write:
-            if any(row["status"] != "matched" for row in rows):
+            if any(row["status"] == "ambiguous" for row in rows):
                 raise RuntimeError("Refusing partial write because one or more scripts are ambiguous")
             db.commit()
         report = {
@@ -185,14 +232,15 @@ def run(archive, report_path, write=False):
             "script_count": len(scripts),
             "candidate_count": len(candidates),
             "matched_count": sum(row["status"] == "matched" for row in rows),
-            "ambiguous_count": sum(row["status"] != "matched" for row in rows),
+            "generated_count": sum(row["status"] == "database-generated" for row in rows),
+            "ambiguous_count": sum(row["status"] == "ambiguous" for row in rows),
             "scripts": rows,
             "unused_files": sorted(candidate["path"].name for candidate in candidates if candidate["path"].name not in used),
             "invalid_files": invalid,
         }
         report_path.parent.mkdir(parents=True, exist_ok=True)
         report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(json.dumps({key: report[key] for key in ("mode", "script_count", "candidate_count", "matched_count", "ambiguous_count")}, ensure_ascii=False))
+        print(json.dumps({key: report[key] for key in ("mode", "script_count", "candidate_count", "matched_count", "generated_count", "ambiguous_count")}, ensure_ascii=False))
         return 0 if (not write or not report["ambiguous_count"]) else 2
     finally:
         db.close()
