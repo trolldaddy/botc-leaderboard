@@ -535,6 +535,7 @@ const App = () => {
 
   const [selectingRoleFor, setSelectingRoleFor] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [publicScripts, setPublicScripts] = useState([]);
 
   useEffect(() => {
     let active = true;
@@ -560,6 +561,15 @@ const App = () => {
       active = false;
       window.removeEventListener('botc:role-catalog-ready', onReady);
     };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`${window.API_BASE || ''}/api/scripts`, { credentials: 'same-origin' })
+      .then(response => response.ok ? response.json() : Promise.reject(new Error(`HTTP ${response.status}`)))
+      .then(data => { if (active) setPublicScripts(data.items || []); })
+      .catch(() => {});
+    return () => { active = false; };
   }, []);
 
   const loadBuiltInScript = (scriptKey) => {
@@ -865,6 +875,50 @@ const App = () => {
       setDayAction({ actor: "", action: "白天行動", target: "", detail: "" });
       setNominationRecord({ nominator: "", target: "", votes: "", result: "未達門檻" });
     });
+  };
+
+  const applyScriptJson = (json, fallbackName = '') => {
+    const rawRoles = Array.isArray(json) ? json : (json.roles || []);
+    const metaInfo = rawRoles.find(item => item.id === '_meta');
+    setScriptName(metaInfo?.name || fallbackName || '未命名劇本');
+    const parsedRoles = rawRoles.map(item => {
+      const roleId = typeof item === 'string' ? item : item.id;
+      if (roleId === '_meta') return null;
+      const tName = toTraditional(item.name || "");
+      const tAbility = toTraditional(item.ability || "");
+      let dbRole = roleCatalog.find(r => r.id === roleId);
+      if (!dbRole && tName) dbRole = roleCatalog.find(r => r.name === tName || tName.includes(r.name));
+      if (!dbRole && tAbility) {
+        const normalize = (str) => (str || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
+        const normItem = normalize(tAbility);
+        dbRole = roleCatalog.find(r => normalize(r.ability) === normItem && normItem.length > 0);
+      }
+      return {
+        id: roleId,
+        baseRoleId: dbRole ? dbRole.id : roleId,
+        name: dbRole?.name || tName || roleId,
+        team: dbRole?.team || item.team || "townsfolk",
+        firstNight: Number(dbRole?.firstNight) || Number(item.firstNight) || 0,
+        otherNight: Number(dbRole?.otherNight) || Number(item.otherNight) || 0,
+        firstNightReminder: dbRole?.firstNightReminder || item.firstNightReminder || "",
+        otherNightReminder: dbRole?.otherNightReminder || item.otherNightReminder || "",
+        image: dbRole?.image || item.image || "",
+        ability: dbRole?.ability || tAbility || ""
+      };
+    }).filter(Boolean);
+    setScript(parsedRoles);
+    return parsedRoles.length;
+  };
+
+  const loadPublicScript = async (item) => {
+    try {
+      const response = await fetch(item.json_download_url || `/api/scripts/${encodeURIComponent(item.slug)}/download.json`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const count = applyScriptJson(await response.json(), item.name_zh_tw);
+      showAlert(`已載入「${item.name_zh_tw}」共 ${count} 個角色。`);
+    } catch (err) {
+      showAlert(`劇本載入失敗：${err.message}`);
+    }
   };
 
   const handleScriptUpload = (event) => {
@@ -1361,9 +1415,19 @@ const App = () => {
     </button>
         
      <div className="flex flex-col gap-4 w-full max-w-sm">
-        <label className="text-base font-black text-indigo-500 uppercase tracking-widest text-center">快速載入官方劇本</label>
-        <div className="grid grid-cols-3 gap-3">
-          {Object.keys(DEFAULT_SCRIPTS_DATA).map(name => (
+        <label className="text-base font-black text-indigo-500 uppercase tracking-widest text-center">快速載入劇本庫</label>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-64 overflow-y-auto pr-1">
+          {publicScripts.length > 0 ? publicScripts.map(item => (
+            <button
+              key={item.slug}
+              type="button"
+              onClick={() => loadPublicScript(item)}
+              className={`relative min-h-24 overflow-hidden rounded-2xl border-2 bg-slate-900 transition-all ${scriptName === item.name_zh_tw ? 'border-indigo-400' : 'border-slate-800 hover:border-indigo-500'}`}
+            >
+              {item.logo_image_url && <img src={item.logo_image_url} alt="" className="absolute inset-0 w-full h-full object-contain p-2" />}
+              <span className="absolute inset-x-0 bottom-0 bg-black/75 px-2 py-1.5 text-sm font-black text-white">{item.name_zh_tw}</span>
+            </button>
+          )) : Object.keys(DEFAULT_SCRIPTS_DATA).map(name => (
             <button 
               key={name} 
               type="button"

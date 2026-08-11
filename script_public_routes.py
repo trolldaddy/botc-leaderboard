@@ -1,5 +1,6 @@
 import base64
 import json
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from sqlalchemy import or_
@@ -13,6 +14,7 @@ from knowledge_visibility import PUBLIC_VISIBILITIES
 from role_public_routes import role_card
 from role_models import Role, RoleKnowledgeLink
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
+from script_import_service import normalized_script_payload
 
 router = APIRouter(prefix="/api/scripts", tags=["scripts-public"])
 
@@ -72,6 +74,7 @@ def serialize_script(script, include_roles=False, knowledge_slugs=None, suppleme
                    for image in sorted(script.images, key=lambda item: (item.sort_order, item.id))
                    if image.sort_order in (0, 1)],
         "logo_image_url": next((image.image_url for image in script.images if image.sort_order == 100), None),
+        "json_download_url": f"/api/scripts/{script.slug}/download.json",
         "role_count": len(script.roles),
         "special_entry_count": len(script.supplements),
     }
@@ -97,6 +100,25 @@ def serialize_script(script, include_roles=False, knowledge_slugs=None, suppleme
             "knowledge_slug": (supplement_knowledge_slugs or {}).get(item.id),
         } for item in sorted(script.supplements, key=lambda value: (value.sort_order, value.id))]
     return payload
+
+
+def downloadable_script_json(script):
+    if script.script_json:
+        return script.script_json
+    official = [item.role for item in sorted(script.roles, key=lambda value: (value.sort_order, value.id))
+                if item.role and item.role.is_active]
+    supplements = [{
+        "id": item.external_id,
+        "name": item.name_zh_tw,
+        "team": item.entry_type,
+        "ability": item.ability or "",
+        "image": item.image_url or "",
+    } for item in sorted(script.supplements, key=lambda value: (value.sort_order, value.id))]
+    return json.dumps(
+        normalized_script_payload(script.name_zh_tw, script.author_name, official, supplements),
+        ensure_ascii=False,
+        indent=2,
+    )
 
 
 def script_load_options(include_role_records=False):
@@ -198,6 +220,24 @@ def get_script(
     return serialize_script(
         script, include_roles=True, knowledge_slugs=knowledge_slugs,
         supplement_knowledge_slugs=supplement_knowledge_slugs, account=account
+    )
+
+
+@router.get("/{slug}/download.json")
+def download_script_json(slug: str, db: Session = Depends(get_db)):
+    script = db.query(ScriptEntry).options(*script_load_options(include_role_records=True)).filter(
+        ScriptEntry.slug == slug, ScriptEntry.is_public == True  # noqa: E712
+    ).first()
+    if not script:
+        raise HTTPException(status_code=404, detail="找不到劇本")
+    filename = script.script_json_filename or f"{script.slug}.json"
+    return Response(
+        content=downloadable_script_json(script).encode("utf-8"),
+        media_type="application/json; charset=utf-8",
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{quote(filename, safe='')}",
+            "Cache-Control": "public, max-age=300",
+        },
     )
 
 

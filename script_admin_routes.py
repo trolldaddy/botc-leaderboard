@@ -12,6 +12,7 @@ from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
 from script_import_service import (
     create_script, existing_artwork_candidates, museum_metadata, remote_artwork_candidates,
     local_artwork_payload, persist_artwork, persist_artwork_bytes,
+    save_normalized_script_json,
     save_artwork_slot, save_candidate_artwork,
     uploaded_artwork_candidates
 )
@@ -242,6 +243,18 @@ def update_script(
         for existing_id, item in by_id.items():
             if existing_id not in retained_ids:
                 db.delete(item)
+    db.flush()
+    current_supplements = db.query(ScriptSupplement).filter(
+        ScriptSupplement.script_id == script.id
+    ).order_by(ScriptSupplement.sort_order, ScriptSupplement.id).all()
+    save_normalized_script_json(
+        script,
+        [item.role for item in sorted(script.roles, key=lambda value: (value.sort_order, value.id)) if item.role],
+        [{
+            "id": item.external_id, "name": item.name_zh_tw, "team": item.entry_type,
+            "ability": item.ability or "", "image": item.image_url or "",
+        } for item in current_supplements],
+    )
     db.commit()
     script = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()
     return {"status": "success", "script": serialize_script(script, detail=True)}
@@ -480,6 +493,7 @@ def apply_role_json(
             sort_order=index,
         ))
     script.needs_review = True
+    save_normalized_script_json(script, official, supplements)
     db.commit()
     db.expire_all()
     refreshed = db.query(ScriptEntry).options(*load_options()).filter(ScriptEntry.id == script_id).first()

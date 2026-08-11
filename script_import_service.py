@@ -6,6 +6,7 @@ import mimetypes
 import re
 import shutil
 import uuid
+from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -26,6 +27,49 @@ CANDIDATE_ROOT = ROOT / "static" / "script-images" / "candidates"
 ALLOWED_HOSTS = {"www.bilibili.com", "bilibili.com"}
 EXTENSIONS = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif"}
 ARTWORK_SLOTS = {"front": 0, "back": 1, "logo": 100}
+
+
+def _integer(value):
+    try:
+        return int(value or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def normalized_script_payload(name, author, official, supplements):
+    payload = [{"id": "_meta", "name": name, "author": author or ""}]
+    for role in official:
+        payload.append({
+            "id": role.canonical_key,
+            "name": role.name_zh_tw,
+            "team": role.team,
+            "ability": role.ability_zh_tw or "",
+            "image": role.image_url or "",
+            "firstNight": role.first_night_order or 0,
+            "otherNight": role.other_night_order or 0,
+            "firstNightReminder": role.first_night_reminder or "",
+            "otherNightReminder": role.other_night_reminder or "",
+        })
+    for item in supplements:
+        payload.append({
+            "id": item.get("id") or f"custom-{uuid.uuid4().hex[:8]}",
+            "name": TO_TRADITIONAL.convert(item.get("name") or item.get("id") or "自創角色"),
+            "team": normalized_entry_type(item.get("team")),
+            "ability": TO_TRADITIONAL.convert(item.get("ability") or ""),
+            "image": item.get("image") or "",
+            "firstNight": _integer(item.get("firstNight")),
+            "otherNight": _integer(item.get("otherNight")),
+            "firstNightReminder": TO_TRADITIONAL.convert(item.get("firstNightReminder") or ""),
+            "otherNightReminder": TO_TRADITIONAL.convert(item.get("otherNightReminder") or ""),
+        })
+    return payload
+
+
+def save_normalized_script_json(script, official, supplements):
+    payload = normalized_script_payload(script.name_zh_tw, script.author_name, official, supplements)
+    script.script_json = json.dumps(payload, ensure_ascii=False, indent=2)
+    script.script_json_filename = f"{script.slug}.json"
+    script.script_json_updated_at = datetime.now()
 
 
 def persisted_artwork_url(script, slot):
@@ -380,5 +424,6 @@ def create_script(db, data, official, supplements, metadata):
             name_zh_tw=TO_TRADITIONAL.convert(item.get("name") or item.get("id") or "未命名"),
             entry_type=normalized_entry_type(item.get("team")), image_url=local_icon(script, item),
             ability=TO_TRADITIONAL.convert(item.get("ability") or "") or None, sort_order=index))
+    save_normalized_script_json(script, official, supplements)
     db.commit()
     return script

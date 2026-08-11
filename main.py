@@ -109,6 +109,9 @@ def ensure_runtime_schema():
                     "production_updates": "TEXT",
                     "player_guide": "TEXT",
                     "storyteller_guide": "TEXT",
+                    "script_json": "TEXT",
+                    "script_json_filename": "VARCHAR(255)",
+                    "script_json_updated_at": timestamp_type,
                     "is_laplace_owned": f"BOOLEAN DEFAULT {boolean_default}",
                 }.items():
                     if column not in columns:
