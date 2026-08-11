@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 import requests
-from PIL import Image, ImageFilter, ImageStat
+from PIL import Image, ImageDraw, ImageFilter, ImageStat
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
@@ -134,6 +134,15 @@ def extract_icon(source, x, y, crop_size, output_size, output_padding=24, remove
         icon = icon.resize(size, Image.Resampling.LANCZOS)
         canvas = Image.new("RGB", (output_size, output_size), background_color(crop))
         canvas.paste(icon, ((output_size - size[0]) // 2, (output_size - size[1]) // 2))
+        antialias = 4
+        circle = Image.new("L", (output_size * antialias, output_size * antialias), 0)
+        ImageDraw.Draw(circle).ellipse(
+            (antialias, antialias, output_size * antialias - antialias - 1, output_size * antialias - antialias - 1),
+            fill=255,
+        )
+        circle = circle.resize((output_size, output_size), Image.Resampling.LANCZOS)
+        canvas = canvas.convert("RGBA")
+        canvas.putalpha(circle)
         output = io.BytesIO()
         canvas.save(output, "WEBP", quality=95, method=6)
         return output.getvalue()

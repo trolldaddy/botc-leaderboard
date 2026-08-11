@@ -223,7 +223,18 @@
 .script-artwork-remove:hover{background:#4a2028;color:#fff}
 .script-manual-actions{display:flex;justify-content:flex-end;margin-top:.75rem}
 @media(max-width:900px){.script-artwork-workbench{grid-template-columns:1fr;height:auto;overflow:visible}.script-artwork-stage{min-height:420px}.script-artwork-list{height:auto;max-height:300px}.script-image-head-actions{justify-content:flex-start}}
-@media(max-width:720px){.script-image-slots{grid-template-columns:1fr}.script-artwork-stage{min-height:360px}.script-artwork-assign button{min-height:46px}.script-artwork-list-item{grid-template-columns:56px minmax(0,1fr) 30px 30px}.script-artwork-list-item img{width:56px;height:56px}}</style>
+@media(max-width:720px){.script-image-slots{grid-template-columns:1fr}.script-artwork-stage{min-height:360px}.script-artwork-assign button{min-height:46px}.script-artwork-list-item{grid-template-columns:56px minmax(0,1fr) 30px 30px}.script-artwork-list-item img{width:56px;height:56px}}
+.script-admin-head-actions{display:flex;align-items:center;justify-content:flex-end;gap:.5rem;flex-wrap:wrap}
+.script-admin-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin:.25rem 0 1rem;padding:.35rem;border:1px solid #39415a;border-radius:12px;background:#151924}
+.script-admin-tabs button{min-height:42px;border:1px solid transparent;border-radius:9px;background:transparent;color:#aeb6c9;font-weight:900;cursor:pointer}
+.script-admin-tabs button:hover{color:#fff;background:rgba(139,124,246,.1)}
+.script-admin-tabs button.active{color:#fff;border-color:#8b7cf6;background:linear-gradient(135deg,#33235b,#4a2878)}
+.script-admin-pane[hidden]{display:none!important}.script-admin-pane{min-width:0}
+.script-admin-pane[data-script-admin-pane="guide"]{display:grid;grid-template-columns:1fr;gap:.75rem}
+.script-admin-pane[data-script-admin-pane="guide"] .script-admin-field{grid-column:1/-1}
+.script-admin-pane[data-script-admin-pane="roster"]>h4{margin:1rem 0 .65rem}
+@media(max-width:760px){.article-admin-head{align-items:stretch;flex-direction:column}.script-admin-head-actions{justify-content:flex-start}.script-admin-tabs{grid-template-columns:1fr}.script-admin-tabs button{min-height:46px}}
+</style>
 
 <script src="/js/knowledge_article_admin.js?v=20260803b"></script>
 <script src="/js/role_admin.js?v=20260731a"></script>
@@ -233,4 +244,5 @@
 <script src="/js/role_admin_reminder_merge.js"></script>
 <script src="/js/role_display_settings.js"></script>
 <script src="/js/script_admin.js?v=20260807e"></script>
+<script src="/js/script_admin_tabs_patch.js?v=20260811a"></script>
 <script src="/js/role_admin_rich_text.js?v=20260806a"></script>

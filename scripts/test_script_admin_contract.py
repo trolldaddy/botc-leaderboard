@@ -101,10 +101,29 @@ def test_script_artwork_candidate_list_scrolls_inside_workbench():
     assert "overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain" in html
     assert "scrollbar-gutter:stable" in html
 
+
+def test_script_editor_uses_three_lower_panes_and_header_actions():
+    html = (ROOT / "static/pages/role_admin.html").read_text(encoding="utf-8")
+    javascript = (ROOT / "static/js/script_admin_tabs_patch.js").read_text(encoding="utf-8")
+    assert "script_admin_tabs_patch.js" in html
+    assert "script-admin-head-actions" in html
+    assert "script-admin-tabs" in html
+    assert 'data-script-admin-tab="intro"' in javascript
+    assert 'data-script-admin-tab="roster"' in javascript
+    assert 'data-script-admin-tab="guide"' in javascript
+    assert "劇本介紹" in javascript
+    assert "角色構成" in javascript
+    assert "拉普拉斯攻略" in javascript
+    assert "headerActions.appendChild(button)" in javascript
+    assert "intro.append(imageEditor, copy)" in javascript
+    assert "roster.appendChild(roleSummary)" in javascript
+    assert "guide.appendChild(label)" in javascript
+
 if __name__ == "__main__":
     test_script_admin_has_third_mode_and_editor_mount()
     test_script_admin_exposes_all_required_rich_text_fields()
     test_script_admin_api_persists_required_fields_and_custom_abilities()
     test_script_admin_compacts_flags_and_supports_confirmed_delete()
     test_script_artwork_candidate_list_scrolls_inside_workbench()
+    test_script_editor_uses_three_lower_panes_and_header_actions()
     print({"status": "ok"})
