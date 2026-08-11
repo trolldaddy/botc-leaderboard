@@ -35,7 +35,10 @@ def test_recorder_rehydrates_roles_and_night_actions_from_catalog():
     assert "window.RoleCatalog?.ready?.then(applyCatalog)" in recorder
     assert "setScript(current => current.map" in recorder
     assert "setPlayers(current => current.map" in recorder
-    assert "roleCatalog.find(r => r.id === roleId)" in recorder
+    assert "normalizedRoleId(r.id) === normalizedRoleId(roleId)" in recorder
+    assert "normalizedRoleId(item.id) === normalizedRoleId(role?.baseRoleId)" in recorder
+    assert '<div className="space-y-6">' in recorder
+    assert "sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7" in recorder
     assert "p.role.firstNight > 0" in recorder
     assert "p.role.otherNight > 0" in recorder
     assert "player.role.firstNightReminder" in recorder

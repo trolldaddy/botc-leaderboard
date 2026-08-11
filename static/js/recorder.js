@@ -520,6 +520,7 @@ const configs = getRoleInputConfig(player.role);
 // 主應用程式
 // ==========================================
 const App = () => {
+  const normalizedRoleId = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const [roleCatalog, setRoleCatalog] = useState(() => window.MASTER_ROLE_DB || MASTER_ROLE_DB);
   const [script, setScript] = useState(() => loadState('botc_script', [])); 
   const [players, setPlayers] = useState(() => loadState('botc_players', [])); 
@@ -543,8 +544,9 @@ const App = () => {
       if (!active || !Array.isArray(catalog) || catalog.length === 0) return;
       setRoleCatalog(catalog);
       const findRole = (role) => catalog.find(item =>
-        item.id === role?.id ||
-        item.databaseId === role?.databaseId ||
+        normalizedRoleId(item.id) === normalizedRoleId(role?.id) ||
+        normalizedRoleId(item.id) === normalizedRoleId(role?.baseRoleId) ||
+        (item.databaseId && role?.databaseId && item.databaseId === role.databaseId) ||
         item.name === role?.name ||
         (item.aliases || []).includes(role?.name)
       );
@@ -578,7 +580,7 @@ const App = () => {
     
     // 從 window 全域的角色庫比對 ID 並產生新的 script 狀態
     const parsed = roleIds.map(id => {
-      let dbRole = roleCatalog.find(r => r.id === id);
+      let dbRole = roleCatalog.find(r => normalizedRoleId(r.id) === normalizedRoleId(id));
       return dbRole ? { ...dbRole } : null;
     }).filter(Boolean);
 
@@ -606,7 +608,7 @@ const App = () => {
     const travellers = roleCatalog.filter(r => r.team === 'traveller');
     const combined = [...script];
     travellers.forEach(tr => {
-      if (!combined.some(r => r.id === tr.id)) combined.push(tr);
+      if (!combined.some(r => normalizedRoleId(r.id) === normalizedRoleId(tr.id))) combined.push(tr);
     });
     return combined;
   }, [script, roleCatalog]);
@@ -886,7 +888,7 @@ const App = () => {
       if (roleId === '_meta') return null;
       const tName = toTraditional(item.name || "");
       const tAbility = toTraditional(item.ability || "");
-      let dbRole = roleCatalog.find(r => r.id === roleId);
+      let dbRole = roleCatalog.find(r => normalizedRoleId(r.id) === normalizedRoleId(roleId));
       if (!dbRole && tName) dbRole = roleCatalog.find(r => r.name === tName || tName.includes(r.name));
       if (!dbRole && tAbility) {
         const normalize = (str) => (str || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
@@ -946,7 +948,7 @@ const App = () => {
             const tName = toTraditional(item.name || "");
             const tAbility = toTraditional(item.ability || "");
 
-            let dbRole = roleCatalog.find(r => r.id === roleId);
+            let dbRole = roleCatalog.find(r => normalizedRoleId(r.id) === normalizedRoleId(roleId));
             
             if (!dbRole && tName) {
               dbRole = roleCatalog.find(r => r.name === tName || tName.includes(r.name));
@@ -1347,17 +1349,17 @@ const App = () => {
                   <p>請先由右上角讀入劇本 JSON 檔案</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="space-y-6">
                   {['townsfolk', 'outsider', 'minion', 'demon', 'traveller'].map(team => {
                     const source = (script && script.length > 0) ? allAvailableRoles : roleCatalog;
                     const teamRoles = source.filter(r => r.team === team && (r.name.includes(searchTerm) || r.id.toLowerCase().includes(searchTerm.toLowerCase())));
                     if (teamRoles.length === 0) return null;
                     return (
-                      <div key={team} id={`role-section-${team}`} className="space-y-3 pt-4">
+                      <section key={team} id={`role-section-${team}`} className="space-y-3 scroll-mt-4">
                         <h3 className="text-xs font-black uppercase tracking-widest border-l-4 pl-2 border-indigo-500 text-slate-400">
                           {team === 'townsfolk' ? '鎮民' : team === 'outsider' ? '外來者' : team === 'minion' ? '爪牙' : team === 'demon' ? '惡魔' : '旅行者'}
                         </h3>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-2">
                           {teamRoles.map(role => (
                             <button 
                               key={role.id}
@@ -1373,7 +1375,7 @@ const App = () => {
                             </button>
                           ))}
                         </div>
-                      </div>
+                      </section>
                     );
                   })}
                 </div>
