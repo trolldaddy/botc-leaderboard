@@ -117,7 +117,8 @@ def localize(script, candidate, by_id, by_name):
             output.append({**raw, "name": script.name_zh_tw, "author": script.author_name or raw.get("author") or ""})
             continue
         item = dict(raw)
-        special = normalized_entry_type(item.get("team")) in {"fabled", "jinx", "loric", "special"}
+        raw_team = str(item.get("team") or "").strip().casefold()
+        special = raw_team in {"fabled", "jinx", "jinxed", "a jinxed", "loric", "special", "other"}
         role = by_id.get(normalized(item.get("id"))) or by_name.get(normalized(item.get("name")))
         if not special:
             positional_role = official[official_index] if official_index < len(official) else None
