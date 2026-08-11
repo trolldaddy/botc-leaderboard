@@ -357,12 +357,7 @@ window.TownCheckin = (() => {
     localStorage.setItem('botc_storyteller', JSON.stringify(currentRoom.storyteller || ''));
     localStorage.setItem('botc_gamePhase', JSON.stringify({ type: 'Setup', number: 0 }));
     localStorage.setItem('botc_logs', JSON.stringify([]));
-    if (window.loadPage) {
-      window.location.hash = 'recorder';
-      window.loadPage('recorder');
-    } else {
-      window.location.href = '/#recorder';
-    }
+    window.location.hash = 'recorder';
   };
 
   const clearLocalRoom = () => {

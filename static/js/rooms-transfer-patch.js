@@ -82,12 +82,7 @@
     // 同步保留一份給未來 record/rooms 橋接用。
     localStorage.setItem('botc_room_to_recorder', JSON.stringify({ room, players }));
 
-    if (window.loadPage) {
-      window.location.hash = 'recorder';
-      window.loadPage('recorder');
-    } else {
-      window.location.href = '/#recorder';
-    }
+    window.location.hash = 'recorder';
   };
 
   const install = () => {

@@ -81,9 +81,95 @@
     </main>
 
     <script>
+        function createPageScope() {
+            const intervals = new Set();
+            const timeouts = new Set();
+            const observers = new Set();
+            const listeners = [];
+            let active = true;
+            const scopedSetInterval = (callback, delay, ...args) => {
+                const id = globalThis.setInterval(callback, delay, ...args);
+                intervals.add(id);
+                return id;
+            };
+            const scopedSetTimeout = (callback, delay, ...args) => {
+                const id = globalThis.setTimeout(() => {
+                    timeouts.delete(id);
+                    if (active) callback(...args);
+                }, delay);
+                timeouts.add(id);
+                return id;
+            };
+            class ScopedMutationObserver extends globalThis.MutationObserver {
+                constructor(callback) {
+                    super(callback);
+                    observers.add(this);
+                }
+            }
+            const trackListener = (target, type, listener, options) => {
+                listeners.push({ target, type, listener, options });
+                target.addEventListener(type, listener, options);
+            };
+            const scopedDocument = new Proxy(globalThis.document, {
+                get(target, property) {
+                    if (property === 'addEventListener') {
+                        return (type, listener, options) => trackListener(target, type, listener, options);
+                    }
+                    const value = Reflect.get(target, property, target);
+                    return typeof value === 'function' ? value.bind(target) : value;
+                }
+            });
+            const scopedWindow = new Proxy(globalThis, {
+                get(target, property) {
+                    if (property === 'setInterval') return scopedSetInterval;
+                    if (property === 'setTimeout') return scopedSetTimeout;
+                    if (property === 'addEventListener') {
+                        return (type, listener, options) => {
+                            trackListener(target, type, listener, options);
+                        };
+                    }
+                    const value = Reflect.get(target, property, target);
+                    return typeof value === 'function' ? value.bind(target) : value;
+                },
+                set(target, property, value) {
+                    return Reflect.set(target, property, value, target);
+                }
+            });
+            return {
+                window: scopedWindow,
+                document: scopedDocument,
+                setInterval: scopedSetInterval,
+                setTimeout: scopedSetTimeout,
+                MutationObserver: ScopedMutationObserver,
+                cleanup() {
+                    active = false;
+                    intervals.forEach(id => globalThis.clearInterval(id));
+                    timeouts.forEach(id => globalThis.clearTimeout(id));
+                    observers.forEach(observer => observer.disconnect());
+                    listeners.forEach(({ target, type, listener, options }) => target.removeEventListener(type, listener, options));
+                }
+            };
+        }
+
+        function leaveCurrentPage(nextPage) {
+            window.__activePageScope?.cleanup?.();
+            window.__activePageScope = null;
+            window.dispatchEvent(new CustomEvent('botc:page-leave', { detail: { nextPage } }));
+            if (nextPage !== 'rooms') {
+                const url = new URL(window.location.href);
+                if (url.searchParams.has('join')) {
+                    url.searchParams.delete('join');
+                    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`);
+                }
+            }
+        }
+
         async function loadPage(pageName) {
             const area = document.getElementById('content-area');
             if (!area) return;
+            leaveCurrentPage(pageName);
+            const pageScope = createPageScope();
+            window.__activePageScope = pageScope;
             area.style.opacity = '0.5';
             try {
                 const response = await fetch(`/pages/${pageName}.html?t=${new Date().getTime()}`);
@@ -100,19 +186,29 @@
                     if (type === 'text/babel') {
                         let sourceCode = '';
                         if (src) {
-                            const scriptUrl = `${src}?v=${new Date().getTime()}`;
-                            const scriptResp = await fetch(scriptUrl);
-                            if (!scriptResp.ok) throw new Error(`腳本載入失敗：${src}`);
-                            sourceCode = await scriptResp.text();
+                            const sourceCache = window.__babelPageSourceCache || (window.__babelPageSourceCache = new Map());
+                            sourceCode = sourceCache.get(src) || '';
+                            const scriptResp = sourceCode ? null : await fetch(src);
+                            if (scriptResp && !scriptResp.ok) throw new Error(`腳本載入失敗：${src}`);
+                            if (!sourceCode) {
+                                sourceCode = await scriptResp.text();
+                                sourceCache.set(src, sourceCode);
+                            }
                         } else {
                             sourceCode = oldScript.textContent || '';
                         }
-                        const transformed = Babel.transform(sourceCode, {
-                            presets: [['react', { runtime: 'classic' }]],
-                            sourceType: 'script'
-                        }).code;
+                        const transformCache = window.__babelPageTransformCache || (window.__babelPageTransformCache = new Map());
+                        const cacheKey = src || sourceCode;
+                        let transformed = transformCache.get(cacheKey);
+                        if (!transformed) {
+                            transformed = Babel.transform(sourceCode, {
+                                presets: [['react', { runtime: 'classic' }]],
+                                sourceType: 'script'
+                            }).code;
+                            transformCache.set(cacheKey, transformed);
+                        }
                         const newScript = document.createElement('script');
-                        newScript.textContent = transformed;
+                        newScript.textContent = `(() => {\n${transformed}\n})();\n//# sourceURL=${src || `inline-${pageName}.jsx`}`;
                         document.body.appendChild(newScript);
                         continue;
                     }
@@ -132,7 +228,7 @@
                                 sourceCode = await scriptResp.text();
                                 sourceCache.set(src, sourceCode);
                             }
-                            newScript.textContent = `(() => {\n${sourceCode}\n})();\n//# sourceURL=${src}`;
+                            newScript.textContent = `(() => {\nconst __scope = globalThis.__activePageScope;\nconst window = __scope.window;\nconst document = __scope.document;\nconst setInterval = __scope.setInterval;\nconst setTimeout = __scope.setTimeout;\nconst MutationObserver = __scope.MutationObserver;\n${sourceCode}\n})();\n//# sourceURL=${src}`;
                             document.body.appendChild(newScript);
                             continue;
                         }
