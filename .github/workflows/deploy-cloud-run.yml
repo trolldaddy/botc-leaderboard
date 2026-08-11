@@ -105,7 +105,7 @@ jobs:
           python3 scripts/migrate_runtime_schema.py
 
       - name: Install script JSON pairing dependencies
-        if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[pair-script-json-preview]') || contains(github.event.head_commit.message, '[pair-script-json-write]'))
+        if: github.event_name == 'push' && (contains(github.event.head_commit.message, '[pair-script-json-preview]') || contains(github.event.head_commit.message, '[pair-script-json-write]') || contains(github.event.head_commit.message, '[extract-zhenyan-icons]'))
         run: python3 -m pip install --disable-pip-version-check -r requirements.txt
 
       - name: Pair archived script JSON with Cloud SQL
@@ -123,6 +123,23 @@ jobs:
         with:
           name: script-json-pairing-report
           path: reports/script-json-pairing.json
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Extract and persist reviewed script role icons
+        if: github.event_name == 'push' && contains(github.event.head_commit.message, '[extract-zhenyan-icons]')
+        run: |
+          python3 scripts/extract_script_role_icons.py \
+            data/script-icon-extraction/zhenyanxiangai.json \
+            --write \
+            --report reports/zhenyanxiangai-icon-extraction.json
+
+      - name: Upload script role icon extraction report
+        if: always() && github.event_name == 'push' && contains(github.event.head_commit.message, '[extract-zhenyan-icons]')
+        uses: actions/upload-artifact@v4
+        with:
+          name: zhenyanxiangai-icon-extraction-report
+          path: reports/zhenyanxiangai-icon-extraction.json
           if-no-files-found: warn
           retention-days: 14
 

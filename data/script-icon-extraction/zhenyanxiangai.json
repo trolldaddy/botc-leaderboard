@@ -1,0 +1,26 @@
+{
+  "script_slug": "真贗相愛",
+  "source_image_url": "https://storage.googleapis.com/skillful-cider-460210-r7-botc-assets/script-artwork/%E7%9C%9F%E8%B4%97%E7%9B%B8%E6%84%9B/1-dadb3543e3084732.webp",
+  "crop_size": 64,
+  "output_size": 256,
+  "roles": [
+    {"id": "zhenyan_scout", "name": "偵察兵", "x": 138, "y": 355},
+    {"id": "zhenyan_huashan", "name": "華山", "x": 642, "y": 215},
+    {"id": "zhenyan_cat_legion", "name": "貓貓軍團", "x": 642, "y": 300},
+    {"id": "zhenyan_zero", "name": "零", "x": 642, "y": 406},
+    {"id": "zhenyan_covenant_wing", "name": "聖約之翼", "x": 642, "y": 548},
+    {"id": "zhenyan_paper_bride", "name": "紙嫁衣", "x": 138, "y": 826},
+    {"id": "zhenyan_snowman", "name": "雪人", "x": 642, "y": 826},
+    {"id": "zhenyan_mechanical_master", "name": "機械大師", "x": 138, "y": 1004},
+    {"id": "zhenyan_gugugu", "name": "蠱孤菇", "x": 138, "y": 1072},
+    {"id": "zhenyan_serpent_emissary", "name": "蛇神使", "x": 642, "y": 1005},
+    {"id": "zhenyan_counterfeit", "name": "贗品", "x": 642, "y": 1072},
+    {"id": "zhenyan_paper_lady", "name": "紙夫人", "x": 138, "y": 1206},
+    {"id": "zhenyan_yuan", "name": "鴛", "x": 138, "y": 1275},
+    {"id": "zhenyan_e_duo", "name": "惡墮", "x": 138, "y": 1345},
+    {"id": "zhenyan_kukapa", "name": "骷咔啪", "x": 642, "y": 1191},
+    {"id": "zhenyan_yang", "name": "鴦", "x": 642, "y": 1300},
+    {"id": "zhenyan_lightbulb", "name": "電燈泡", "x": 138, "y": 1454},
+    {"id": "zhenyan_godel", "name": "哥德爾", "x": 642, "y": 1454}
+  ]
+}
