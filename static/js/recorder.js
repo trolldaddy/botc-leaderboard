@@ -519,8 +519,35 @@ const configs = getRoleInputConfig(player.role);
 // ==========================================
 // 主應用程式
 // ==========================================
+const normalizedRoleId = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+const normalizedRoleText = value => String(value || '').toLowerCase().replace(/[^\u4e00-\u9fa5a-z0-9]/g, '');
+
+const findCatalogRole = (catalog, role) => {
+  if (!role) return null;
+
+  const roleId = normalizedRoleId(role.id || role.baseRoleId);
+  const idMatch = roleId && catalog.find(item => normalizedRoleId(item.id) === roleId);
+  if (idMatch) return idMatch;
+
+  if (role.databaseId) {
+    const databaseMatch = catalog.find(item => item.databaseId && item.databaseId === role.databaseId);
+    if (databaseMatch) return databaseMatch;
+  }
+
+  // 完整自創角色的能力是其身分的一部分。同名但能力不同時，不可套用官方角色。
+  const ability = normalizedRoleText(role.ability);
+  if (ability) {
+    return catalog.find(item => normalizedRoleText(item.ability) === ability) || null;
+  }
+
+  // 只有缺少穩定 ID 與能力的舊資料，才允許用名稱補救；有 ID 的同名角色不可互相合併。
+  if (roleId || !role.name) return null;
+  return catalog.find(item =>
+    item.name === role.name || (item.aliases || []).includes(role.name)
+  ) || null;
+};
+
 const App = () => {
-  const normalizedRoleId = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const [roleCatalog, setRoleCatalog] = useState(() => window.MASTER_ROLE_DB || MASTER_ROLE_DB);
   const [script, setScript] = useState(() => loadState('botc_script', [])); 
   const [players, setPlayers] = useState(() => loadState('botc_players', [])); 
@@ -543,13 +570,7 @@ const App = () => {
     const applyCatalog = (catalog) => {
       if (!active || !Array.isArray(catalog) || catalog.length === 0) return;
       setRoleCatalog(catalog);
-      const findRole = (role) => catalog.find(item =>
-        normalizedRoleId(item.id) === normalizedRoleId(role?.id) ||
-        normalizedRoleId(item.id) === normalizedRoleId(role?.baseRoleId) ||
-        (item.databaseId && role?.databaseId && item.databaseId === role.databaseId) ||
-        item.name === role?.name ||
-        (item.aliases || []).includes(role?.name)
-      );
+      const findRole = role => findCatalogRole(catalog, role);
       setScript(current => current.map(role => ({ ...role, ...(findRole(role) || {}) })));
       setPlayers(current => current.map(player => player.role
         ? { ...player, role: { ...player.role, ...(findRole(player.role) || {}) } }
@@ -888,13 +909,7 @@ const App = () => {
       if (roleId === '_meta') return null;
       const tName = toTraditional(item.name || "");
       const tAbility = toTraditional(item.ability || "");
-      let dbRole = roleCatalog.find(r => normalizedRoleId(r.id) === normalizedRoleId(roleId));
-      if (!dbRole && tName) dbRole = roleCatalog.find(r => r.name === tName || tName.includes(r.name));
-      if (!dbRole && tAbility) {
-        const normalize = (str) => (str || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
-        const normItem = normalize(tAbility);
-        dbRole = roleCatalog.find(r => normalize(r.ability) === normItem && normItem.length > 0);
-      }
+      const dbRole = findCatalogRole(roleCatalog, { id: roleId, name: tName, ability: tAbility });
       return {
         id: roleId,
         baseRoleId: dbRole ? dbRole.id : roleId,
@@ -948,20 +963,7 @@ const App = () => {
             const tName = toTraditional(item.name || "");
             const tAbility = toTraditional(item.ability || "");
 
-            let dbRole = roleCatalog.find(r => normalizedRoleId(r.id) === normalizedRoleId(roleId));
-            
-            if (!dbRole && tName) {
-              dbRole = roleCatalog.find(r => r.name === tName || tName.includes(r.name));
-            }
-
-            if (!dbRole && tAbility) {
-              const normalize = (str) => (str || "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9]/g, '');
-              const normItem = normalize(tAbility);
-              dbRole = roleCatalog.find(r => {
-                const dbNorm = normalize(r.ability);
-                return dbNorm === normItem && dbNorm.length > 0;
-              });
-            }
+            const dbRole = findCatalogRole(roleCatalog, { id: roleId, name: tName, ability: tAbility });
             
             return {
               id: roleId,
