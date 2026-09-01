@@ -79,12 +79,6 @@ class RoomPlayer(Base):
     room = relationship("GameRoom", back_populates="players")
     account = relationship("StorytellerAccount", back_populates="checkin_entries")
 
-class CubeEscapePlayer(Base):
-    __tablename__ = "cube_escape_players"
-    uid = Column(String(64), primary_key=True)
-    payload = Column(Text, nullable=False)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=False)
-
 class Match(Base):
     __tablename__ = "matches"
     id = Column(Integer, primary_key=True, index=True)
