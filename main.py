@@ -448,6 +448,84 @@ async def get_history(db: Session = Depends(get_db)):
     return [serialize_match(m) for m in matches]
 
 
+def _normalize_cube_player(uid: str, data: dict) -> dict:
+    uid = str(uid).strip()[:64]
+    if not uid:
+        raise HTTPException(status_code=400, detail="玩家識別碼不可為空")
+    defaults = {
+        "uid": uid, "name": "未命名玩家", "hp": 10, "currentRoomId": "",
+        "gasStatus": False, "isShadow": False, "str": 4, "spd": 3, "lod": 3,
+        "rocketTarget": "", "recyclerUsed": False,
+        "weapons": {"shotgun": 0, "pistol": 0, "knife": 0},
+        "items": {"mask": False, "rope": False, "adrenaline": False,
+                  "recycler": False, "rocketLauncher": False, "dimensionPocket": False},
+    }
+    source = data or {}
+    result = {key: source.get(key, value) for key, value in defaults.items()}
+    result["uid"] = uid
+    result["name"] = str(result.get("name") or "未命名玩家").strip()[:80]
+    for key in ("hp", "str", "spd", "lod"):
+        try:
+            result[key] = max(0, min(999, int(result.get(key, defaults[key]))))
+        except (TypeError, ValueError):
+            result[key] = defaults[key]
+    result["currentRoomId"] = str(result.get("currentRoomId") or "")[:16]
+    result["rocketTarget"] = str(result.get("rocketTarget") or "")[:16]
+    for key in ("gasStatus", "isShadow", "recyclerUsed"):
+        result[key] = bool(result.get(key))
+    result["weapons"] = {
+        key: max(0, min(99, int((result.get("weapons") or {}).get(key, 0) or 0)))
+        for key in defaults["weapons"]
+    }
+    result["items"] = {
+        key: bool((result.get("items") or {}).get(key, False))
+        for key in defaults["items"]
+    }
+    return result
+
+
+@app.get("/api/cube-escape/players")
+async def get_cube_escape_players(db: Session = Depends(get_db)):
+    rows = db.query(models.CubeEscapePlayer).order_by(models.CubeEscapePlayer.updated_at.desc()).all()
+    players = []
+    for row in rows:
+        try:
+            players.append(json.loads(row.payload))
+        except (TypeError, json.JSONDecodeError):
+            continue
+    revision = max((row.updated_at.timestamp() for row in rows if row.updated_at), default=0)
+    return {"players": players, "revision": revision}
+
+
+@app.put("/api/cube-escape/players/{uid}")
+async def put_cube_escape_player(uid: str, data: dict, db: Session = Depends(get_db)):
+    player = _normalize_cube_player(uid, data)
+    row = db.query(models.CubeEscapePlayer).filter(models.CubeEscapePlayer.uid == player["uid"]).first()
+    if row is None:
+        row = models.CubeEscapePlayer(uid=player["uid"], payload="{}")
+        db.add(row)
+    row.payload = json.dumps(player, ensure_ascii=False, separators=(",", ":"))
+    row.updated_at = datetime.now()
+    db.commit()
+    return {"status": "success", "player": player}
+
+
+@app.delete("/api/cube-escape/players/{uid}")
+async def delete_cube_escape_player(uid: str, db: Session = Depends(get_db)):
+    row = db.query(models.CubeEscapePlayer).filter(models.CubeEscapePlayer.uid == uid).first()
+    if row:
+        db.delete(row)
+        db.commit()
+    return {"status": "success"}
+
+
+@app.delete("/api/cube-escape/players")
+async def clear_cube_escape_players(db: Session = Depends(get_db)):
+    db.query(models.CubeEscapePlayer).delete(synchronize_session=False)
+    db.commit()
+    return {"status": "success"}
+
+
 @app.get("/")
 @app.get("/index.html")
 async def serve_home():
