@@ -2,6 +2,8 @@
 
 from sqlalchemy import inspect, text
 
+from script_content import merge_script_introductions
+
 
 def ensure_runtime_schema(engine):
     inspector = inspect(engine)
@@ -81,4 +83,14 @@ def ensure_runtime_schema(engine):
                 connection.execute(text("UPDATE matches SET created_at = date WHERE created_at IS NULL"))
             if table == "storyteller_accounts" and "created_at" not in columns and "last_login_at" in columns:
                 connection.execute(text("UPDATE storyteller_accounts SET created_at = last_login_at WHERE created_at IS NULL"))
+            if table == "script_entries" and {"introduction", "background_introduction"}.issubset(columns):
+                rows = connection.execute(text(
+                    "SELECT id, introduction, background_introduction FROM script_entries "
+                    "WHERE background_introduction IS NOT NULL AND TRIM(background_introduction) <> ''"
+                )).mappings()
+                for row in rows:
+                    connection.execute(
+                        text("UPDATE script_entries SET introduction = :introduction, background_introduction = NULL WHERE id = :id"),
+                        {"id": row["id"], "introduction": merge_script_introductions(row["introduction"], row["background_introduction"])},
+                    )
     return applied

@@ -17,6 +17,7 @@ from script_artwork_classifier import inspect_artwork, select_script_faces
 from object_storage import store_public_bytes, store_public_file
 
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement
+from script_content import merge_script_introductions
 from scripts.crawl_bilibili_scripts import IMAGE_RE, TITLE_RE, author_from_markdown, extracted_fields, slugify
 from scripts.import_bilibili_script import TO_TRADITIONAL, normalized_entry_type
 
@@ -396,9 +397,12 @@ def create_script(db, data, official, supplements, metadata):
         version=str(data.get("version") or "").strip() or None,
         category=str(data.get("category") or "社群縫合劇本").strip(),
         author_name=str(data.get("author_name") or metadata.get("author_name") or "").strip() or None,
-        introduction=str(data.get("introduction") or metadata.get("introduction") or "").strip() or None,
+        introduction=merge_script_introductions(
+            data.get("introduction") or metadata.get("introduction"),
+            data.get("background_introduction") or metadata.get("background_introduction"),
+        ),
         tagline=str(data.get("tagline") or metadata.get("tagline") or "").strip() or None,
-        background_introduction=metadata.get("background_introduction") or None,
+        background_introduction=None,
         gameplay_overview=metadata.get("gameplay_overview") or None,
         author_note=metadata.get("author_note") or None, production_updates=metadata.get("production_updates") or None,
         player_guide=metadata.get("player_guide") or None, storyteller_guide=metadata.get("storyteller_guide") or None,

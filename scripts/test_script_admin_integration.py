@@ -74,7 +74,7 @@ def test_admin_update_round_trips_rich_text_and_custom_role():
     script_id = seed_script(db)
     custom_id = db.query(ScriptSupplement.id).scalar()
     rich_fields = {
-        "background_introduction": '<p><strong>背景</strong>與<a href="https://example.test">連結</a></p>',
+        "introduction": '<p><strong>背景</strong>與<a href="https://example.test">連結</a></p>',
         "gameplay_overview": '<p><span style="font-size:1.25em">核心體驗</span></p>',
         "author_note": "<blockquote>作者的話</blockquote>",
         "production_updates": "<ul><li>v2 更新</li></ul>",

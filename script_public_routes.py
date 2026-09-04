@@ -62,7 +62,6 @@ def serialize_script(script, include_roles=False, knowledge_slugs=None, suppleme
         "category": script.category, "introduction": script.introduction,
         "author_name": script.author_name, "tagline": script.tagline,
         "tags": parse_tags(script.tags),
-        "background_introduction": script.background_introduction,
         "gameplay_overview": script.gameplay_overview,
         "author_note": script.author_note,
         "production_updates": script.production_updates,

@@ -9,7 +9,8 @@ def test_public_script_page_renders_sanitized_rich_text():
     assert "function richText(" in javascript
     assert "const allowedTags = new Set(" in javascript
     assert "allowedFontSizes" in javascript
-    assert "richText(item.background_introduction || item.introduction" in javascript
+    assert "richText(item.introduction" in javascript
+    assert "item.background_introduction" not in javascript
     assert "richText(item.gameplay_overview" in javascript
     assert "richText(guides.player?.content" in javascript
     assert "target.innerHTML = richText(payload.content" in javascript

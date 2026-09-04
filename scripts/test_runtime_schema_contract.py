@@ -43,6 +43,29 @@ def test_runtime_schema_is_idempotent_and_backfills_match_created_at():
     assert str(account_created_at).startswith("2026-08-12 09:00:00")
 
 
+def test_runtime_schema_merges_legacy_script_introductions_once():
+    from runtime_schema import ensure_runtime_schema
+
+    engine = create_engine("sqlite:///:memory:")
+    with engine.begin() as connection:
+        connection.execute(text(
+            "CREATE TABLE script_entries (id INTEGER PRIMARY KEY, introduction TEXT, background_introduction TEXT)"
+        ))
+        connection.execute(text(
+            "INSERT INTO script_entries VALUES "
+            "(1, '短介紹', '短介紹以及完整背景'), "
+            "(2, '不同的前言', '完整背景')"
+        ))
+
+    ensure_runtime_schema(engine)
+    ensure_runtime_schema(engine)
+    with engine.connect() as connection:
+        rows = connection.execute(text(
+            "SELECT introduction, background_introduction FROM script_entries ORDER BY id"
+        )).all()
+    assert rows == [("短介紹以及完整背景", None), ("不同的前言\n\n完整背景", None)]
+
+
 if __name__ == "__main__":
     test_deploy_and_local_schema_steps_share_one_migration_function()
     test_runtime_schema_is_idempotent_and_backfills_match_created_at()

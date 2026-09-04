@@ -14,6 +14,7 @@ from database import Base, SessionLocal, engine  # noqa: E402
 from role_models import Role, RoleAlias  # noqa: E402
 from script_models import ScriptEntry, ScriptImage, ScriptRole, ScriptSupplement  # noqa: E402
 from script_artwork_classifier import inspect_artwork_path, select_script_faces  # noqa: E402
+from script_content import merge_script_introductions  # noqa: E402
 
 TO_TRADITIONAL = OpenCC("s2twp")
 SPECIAL_ENTRY_TYPES = {"fabled", "jinx", "loric", "special"}
@@ -263,8 +264,8 @@ def main():
             script = ScriptEntry(slug=metadata["slug"], name_zh_tw=metadata["name_zh_tw"])
             db.add(script)
             db.flush()
-        for field in ("name_zh_tw", "version", "category", "introduction", "author_name",
-                      "tagline", "tags", "background_introduction", "gameplay_overview",
+        for field in ("name_zh_tw", "version", "category", "author_name",
+                      "tagline", "tags", "gameplay_overview",
                       "author_note", "production_updates", "player_guide", "storyteller_guide",
                       "source_url", "source_platform", "source_external_id"):
             if field in metadata:
@@ -272,6 +273,10 @@ def main():
                 if field == "tags" and isinstance(value, list):
                     value = json.dumps(value, ensure_ascii=False)
                 setattr(script, field, value)
+        script.introduction = merge_script_introductions(
+            metadata.get("introduction"), metadata.get("background_introduction")
+        )
+        script.background_introduction = None
         script.published_at = datetime.fromisoformat(metadata["published_at"]) if metadata.get("published_at") else None
         script.is_public = bool(metadata.get("is_public")) and not missing and (len(matched) + len(supplements)) >= 5
         script.needs_review = bool(missing) or (len(matched) + len(supplements)) < 5

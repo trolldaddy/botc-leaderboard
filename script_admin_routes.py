@@ -60,7 +60,7 @@ def serialize_script(script, detail=False):
     }
     if detail:
         for field in (
-            "introduction", "background_introduction", "gameplay_overview", "author_note",
+            "introduction", "gameplay_overview", "author_note",
             "production_updates", "player_guide", "storyteller_guide",
         ):
             data[field] = getattr(script, field) or ""
@@ -207,7 +207,7 @@ def update_script(
         raise HTTPException(status_code=400, detail="\u8acb\u9078\u64c7\u6709\u6548\u7684\u5287\u672c\u5206\u985e")
     editable = (
         "name_zh_tw", "version", "category", "introduction", "author_name", "tagline",
-        "background_introduction", "gameplay_overview", "author_note", "production_updates",
+        "gameplay_overview", "author_note", "production_updates",
         "player_guide", "storyteller_guide", "source_url", "is_public", "needs_review", "is_laplace_owned",
     )
     for field in editable:

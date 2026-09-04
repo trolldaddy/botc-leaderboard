@@ -29,7 +29,7 @@ def test_script_admin_exposes_all_required_rich_text_fields():
 def test_script_admin_api_persists_required_fields_and_custom_abilities():
     routes = (ROOT / "script_admin_routes.py").read_text(encoding="utf-8")
     for field in (
-        "background_introduction",
+        "introduction",
         "gameplay_overview",
         "author_note",
         "production_updates",
