@@ -23,11 +23,12 @@ jobs:
           set -eu
           test "$PROJECT" = skillful-cider-460210-r7
           gcloud run deploy botc-twitch --project "$PROJECT" --region asia-east1 \
-            --source move-notice --port 8080 --clear-cloudsql-instances \
+            --source move-notice --clear-base-image --port 8080 --clear-cloudsql-instances \
             --clear-secrets --clear-env-vars --scaling auto --min 0 --quiet
           revision="$(gcloud run services describe botc-twitch --project "$PROJECT" --region asia-east1 --format='value(status.latestReadyRevisionName)')"
           test -n "$revision"
           gcloud run services update-traffic botc-twitch --project "$PROJECT" --region asia-east1 --to-revisions "$revision=100" --quiet
           curl --fail --silent --show-error --retry 4 https://botc-twitch-873087277461.asia-east1.run.app/ -o /tmp/notice.html
-          grep -F 'https://botc.larplus.com/' /tmp/notice.html
+          grep -qF 'https://botc.larplus.com/' /tmp/notice.html
+
 
